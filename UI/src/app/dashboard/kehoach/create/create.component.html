@@ -1,0 +1,55 @@
+<mat-dialog-content class="back-ground">
+    <h4 class="dispaly-4">Thêm mới kế hoạch</h4>
+    <hr>
+    <form [formGroup]="formKeHoach" autocapitalize="off" (submit)="submitKeHoach()">
+        <input type="hidden" name="Id">
+        <div class="form-group">
+            <label>Mã kế hoạch
+                <span class="field-required-asterisk ng-star-inserted">(*)</span>
+            </label>
+            <input class="form-control" formControlName="code">
+            <label class="text-danger"
+                *ngIf="formKeHoach.get('code').touched && formKeHoach.get('code').hasError('minlength')">
+                Mã kế hoạch phải có ít nhất 3 ký tự
+            </label>
+            <label class="text-danger"
+                *ngIf="formKeHoach.get('code').touched && formKeHoach.get('code').hasError('required')">
+                Tham số bắt buộc
+            </label>
+            <label class="text-danger"
+                *ngIf="formKeHoach.get('code').touched && formKeHoach.get('code').hasError('pattern') 
+                && !formKeHoach.get('code').hasError('minlength')">
+                Có ký tự không phù hợp (có chứa các ký tự đặc biệt).
+                Mã kế hoạch chỉ bao gồm các ký tự số, chữ không dấu, dấu gạch dưới(_) hoặc gạch ngang(-)
+            </label>
+        </div>
+        <div class="form-group">
+            <label>Tên kế hoạch
+                <span class="field-required-asterisk ng-star-inserted">(*)</span>
+            </label>
+            <input class="form-control" formControlName="name">
+            <label class="text-danger"
+                *ngIf="formKeHoach.get('name').touched && formKeHoach.get('name').hasError('required')">
+                Tham số bắt buộc
+            </label>
+            <label class="text-danger"
+                *ngIf="formKeHoach.get('name').touched && formKeHoach.get('name').hasError('maxlength')">
+                Tên kế hoạch nhiều nhất 50 ký tự
+            </label>
+        </div>
+        <div class="form-group">
+            <label>Trạng thái
+                <span class="field-required-asterisk ng-star-inserted">(*)</span>
+            </label>
+            <select name="Status" class="form-control" formControlName="status">
+                <option value="Hoạt động" [selected]>Hoạt động</option>
+                <option value="Không hoạt động">Không hoạt động</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-dark" [disabled]="!formKeHoach.valid"><i class="fa fa-database"></i> Lưu</button>
+            <button type="button" class="btn btn-outline-dark ml-1" [mat-dialog-close]><i
+                    class="fa fa-close"></i>Đóng</button>
+        </div>
+    </form>
+</mat-dialog-content>

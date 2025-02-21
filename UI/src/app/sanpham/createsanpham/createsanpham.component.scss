@@ -1,0 +1,41 @@
+@import "../../../../node_modules/quill/dist/quill.snow.css";
+@import "../../../../node_modules/quill/dist/quill.bubble.css";
+
+.dialog-height {
+  max-height: 100vh;
+}
+.custom-editor {
+  height: 210px; /* Đặt chiều cao tổng thể của trình soạn thảo */
+  line-height: 1.5; /* Đặt độ cao dòng */
+  overflow-y: auto; /* Hiển thị thanh cuộn dọc nếu nội dung vượt quá chiều cao */
+}
+
+.hr-border {
+  border: none;
+  height: 4px;
+  background-color: red;
+}
+
+.thead-color {
+  background-color: #f3d0cc;
+}
+
+.icon-distance-right {
+  padding-right: 10px;
+}
+
+.flipped-icon {
+  display: inline-block;
+  transform: rotate(180deg);
+  color: blue;
+}
+.icon-trash{
+  color:red;
+}
+.centered-cell {
+  text-align: center;
+  vertical-align: middle;
+}
+ td{
+  vertical-align: middle ;
+}

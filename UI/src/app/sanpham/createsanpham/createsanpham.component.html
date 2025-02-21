@@ -1,0 +1,165 @@
+<meta charset="UTF-8">
+<div class="model-header row">
+    <div class="col-md-6">
+        <h4 class="dispaly-4">Thêm mới sản phẩm</h4>
+    </div>
+    <div class="col-md-6"><button type="button" aria-label="Close" class="close" (click)="close()">
+            <span aria-hidden="true">X</span>
+        </button></div>
+</div>
+<br>
+<form #form="ngForm" autocapitalize="off" [formGroup]="formChuongTrinh">
+    <input type="hidden" name="orderItemId">
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <label><strong>Mã sản phẩm</strong>
+                <span class="field-required-asterisk ng-star-inserted">(*)</span>
+            </label>
+            <input name="price" class="form-control" placeholder="Nhập mã sản phẩm">
+        </div>
+        <div class="form-group col-md-8">
+            <label><strong>Tên sản phẩm</strong>
+                <span class="field-required-asterisk ng-star-inserted">(*)</span>
+            </label>
+            <input name="quantity" class="form-control" placeholder="Nhập tên sản phẩm">
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label><strong>Thời gian bắt đầu</strong>
+                <span class="field-required-asterisk ng-star-inserted">(*)</span>
+            </label>
+            <input type="date" class="form-control" placeholder="Nhập thời gian bắt đầu">
+        </div>
+        <div class="form-group col-md-6">
+            <label><strong>Thời gian kết thúc</strong>
+                <span class="field-required-asterisk ng-star-inserted">(*)</span>
+            </label>
+            <input type="date" class="form-control" placeholder="Nhập thời gian kết thúc">
+        </div>
+    </div>
+    <div class="form-group">
+        <label><strong>Mô tả chung tính năng sản phẩm</strong>
+            <span class="field-required-asterisk ng-star-inserted">(*)</span>
+        </label>
+        <textarea name="" id="" rows="3" class="form-control" placeholder="Nhập mô tả chung về sản phẩm"></textarea>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label><strong>Phân loại công việc</strong>
+                <span class="field-required-asterisk ng-star-inserted">(*)</span>
+            </label>
+            <select name="itemId" class="form-control">
+                <option value="" disabled selected>Chọn phân loại công việc</option>
+                <option *ngFor="let item of phanLoaiCongViec;let i=index" value="{{item.id}}">{{item.congViec}}</option>
+            </select>
+        </div>
+        <div class="form-group col-md-6">
+            <label><strong>Giai đoạn thực hiện</strong>
+                <span class="field-required-asterisk ng-star-inserted">(*)</span>
+            </label>
+            <select name="itemId" class="form-control">
+                <option value="" disabled selected>Chọn giai đoạn thực hiện</option>
+                <option *ngFor="let item of giaiDoanThucHien;let i=index" value="{{item.id}}">{{item.giaiDoan}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label><strong>Trạng thái thực hiện</strong>
+                <span class="field-required-asterisk ng-star-inserted">(*)</span>
+            </label>
+            <select name="itemId" class="form-control">
+                <option value="" disabled selected>Chọn trạng thái thực hiện</option>
+                <option *ngFor="let item of trangThaiThucHien;let i=index" value="{{item.id}}">{{item.trangThai}}</option>
+            </select>
+        </div>
+        <div class="form-group col-md-6">
+            <label><strong>Mức độ rủi ro</strong>
+                <span class="field-required-asterisk ng-star-inserted">(*)</span>
+            </label>
+            <select name="itemId" class="form-control">
+                <option value="" disabled selected>Chọn mức độ rủi ro</option>
+                <option *ngFor="let item of mucDoRuiRo;let i=index" value="{{item.id}}">{{item.mucDo}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label><strong>Ghi chú</strong></label>
+        <input name="total" class="form-control" placeholder="Nhập ghi chú(nếu có)">
+    </div>
+    <hr class="hr-border">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header row">
+                    <div class="col-md-6">
+                        <h4 class="card-title">Tài liệu đính kèm</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="float-right">
+                            <button type="button" class="btn btn-sm btn-success mr-1 mb-1" (click)="selectFile()"><i
+                                    class="fa ft-plus-circle mr-1"></i>Thêm mới</button>
+                            <input type="file" #fileInput (change)="handleFileUpload($event)" hidden>
+                        </label>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table m-0 straight-row table-striped">
+                                <thead class="thead thead-color">
+                                    <tr>
+                                        <th [width]="50">#</th>
+                                        <th class="centered-cell" [width]="550">Tài liệu</th>
+                                        <th class="centered-cell" [width]="550">Tên file</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let file of uploadedFiles;let i=index">
+                                        <td scope="row"><strong>{{i+1}}</strong></td>
+                                        <td>
+                                            <input type="text" class="form-control"
+                                                placeholder="Nhập tên tài liệu đính kèm">
+                                        </td>
+                                        <td><a href="">{{file.name}}</a></td>
+                                        <td>
+                                            <div class="row">
+                                                <div class="col-md-1">
+                                                    <i class="ft-eye cursor-pointer "
+                                                        (click)="view(file)"></i>
+                                                </div>
+                                                <div class="col-md-1">
+                                                    <i class="ft-download cursor-pointer flipped-icon"></i>
+                                                </div>
+                                                <div class="col-md-1">
+                                                    <i class="ft-trash cursor-pointer icon-trash"
+                                                        (click)="delete(i)"></i>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr class="hr-border">
+    <div class="form-group">
+        <label><strong>Nội dung</strong>
+            <span class="field-required-asterisk ng-star-inserted">(*)</span>
+        </label>
+        <div class="custom-editor">
+            <quill-editor formControlName="content" placeholder="Nhập nội dung"></quill-editor>
+        </div>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-dark"><i class="fa fa-database"></i> Submit</button>
+        <button type="button" class="btn btn-outline-dark ml-1" (click)="close()"><i class="fa fa-close"></i>
+            Close</button>
+    </div>
+</form>
