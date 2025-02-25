@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudyFlow.Infrastructure.Data;
 
 #nullable disable
 
-namespace CleanArchitecture.Infrastructure.Data.Migrations
+namespace StudyFlow.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250225081154_Lan1Migration")]
+    partial class Lan1Migration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -196,6 +199,9 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int?>("ChinhSachId")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("LichHocId")
                         .HasColumnType("uniqueidentifier");
 
@@ -223,6 +229,8 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ChinhSachId");
 
                     b.HasIndex("LichHocId");
 
@@ -428,7 +436,7 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<int?>("ChinhSachId")
+                    b.Property<int>("ChinhSachId")
                         .HasColumnType("int");
 
                     b.Property<Guid>("CoSoId")
@@ -988,6 +996,11 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("StudyFlow.Domain.Entities.BaiTap", b =>
                 {
+                    b.HasOne("StudyFlow.Domain.Entities.ChinhSach", null)
+                        .WithMany("HocSinhs")
+                        .HasForeignKey("ChinhSachId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("StudyFlow.Domain.Entities.LichHoc", "LichHoc")
                         .WithMany("BaiTaps")
                         .HasForeignKey("LichHocId")
@@ -1027,9 +1040,10 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
             modelBuilder.Entity("StudyFlow.Domain.Entities.HocSinh", b =>
                 {
                     b.HasOne("StudyFlow.Domain.Entities.ChinhSach", "ChinhSach")
-                        .WithMany("HocSinhs")
+                        .WithMany()
                         .HasForeignKey("ChinhSachId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("StudyFlow.Domain.Entities.CoSo", "Coso")
                         .WithMany("HocSinhs")

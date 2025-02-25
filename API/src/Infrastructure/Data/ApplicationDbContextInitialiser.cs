@@ -67,20 +67,37 @@ public class ApplicationDbContextInitialiser
 
     public async Task TrySeedAsync()
     {
-        // Default roles
+        // Create all roles
         var administratorRole = new IdentityRole(Roles.Administrator);
-
-        if (_roleManager.Roles.All(r => r.Name != administratorRole.Name))
+        //if (_roleManager.Roles.All(r => r.Name != administratorRole.Name))
+        //{
+        //    await _roleManager.CreateAsync(administratorRole);
+        //}
+        var roles = new[]
         {
-            await _roleManager.CreateAsync(administratorRole);
+            Roles.Administrator,
+            Roles.CampusManager,
+            Roles.LearningManager,
+            Roles.Student,
+            Roles.Teacher
+        };
+
+        // Tạo từng role nếu chưa tồn tại
+        foreach (var roleName in roles)
+        {
+            var role = new IdentityRole(roleName);
+            if (_roleManager.Roles.All(r => r.Name != role.Name))
+            {
+                await _roleManager.CreateAsync(role);
+            }
         }
 
         // Default users
-        var administrator = new ApplicationUser { UserName = "administrator@localhost", Email = "administrator@localhost" };
+        var administrator = new ApplicationUser { UserName = "studyFlowAdmin", Email = "hoctthe170098@gmail.com" };
 
         if (_userManager.Users.All(u => u.UserName != administrator.UserName))
         {
-            await _userManager.CreateAsync(administrator, "Administrator1!");
+            await _userManager.CreateAsync(administrator, "AdminWeb1!");
             if (!string.IsNullOrWhiteSpace(administratorRole.Name))
             {
                 await _userManager.AddToRolesAsync(administrator, new [] { administratorRole.Name });
