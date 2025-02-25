@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { CustomizerService } from 'app/shared/services/customizer.service';
 import { TranslateService } from '@ngx-translate/core';
 
+
 @Component({
   selector: 'app-content-layout',
   templateUrl: './content-layout.component.html',

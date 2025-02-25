@@ -9,15 +9,27 @@ import { Router, ActivatedRoute } from "@angular/router";
 })
 
 export class ForgotPasswordPageComponent {
-    @ViewChild('f') forogtPasswordForm: NgForm;
+    @ViewChild('f') forgotPasswordForm!: NgForm;
+    emailInvalid: boolean = false;
 
     constructor(private router: Router,
         private route: ActivatedRoute) { }
+        validateEmail(email: string): boolean {
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            return emailPattern.test(email);
+        }
 
-    // On submit click, reset form fields
-    onSubmit() {
-        this.forogtPasswordForm.reset();
-    }
+        onSubmit() {
+            const emailValue = this.forgotPasswordForm.value.email;
+    
+            if (!emailValue || !this.validateEmail(emailValue)) {
+                this.emailInvalid = true;
+                return;
+            }
+    
+            this.emailInvalid = false;
+            this.forgotPasswordForm.reset();
+        }
 
     // On login link click
     onLogin() {
