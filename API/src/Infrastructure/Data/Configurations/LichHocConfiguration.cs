@@ -10,10 +10,11 @@ using StudyFlow.Domain.Entities;
 namespace StudyFlow.Infrastructure.Data.Configurations;
 public class LichHocConfiguration : IEntityTypeConfiguration<LichHoc>
 {
-    public void Configure(EntityTypeBuilder<LichHoc> builder)
+    public void Configure(EntityTypeBuilder<LichHoc> builder)   
     {
         builder.ToTable(nameof(LichHoc));
         builder.HasKey(x => x.Id);
+        builder.HasIndex(x => new {x.Thu,x.Phong,x.SlotId,x.TrangThai}).IsUnique();
         builder.HasAnnotation($"CheckConstraint:CK_LichHoc_Thu", "[Thu] >= 2 AND [Thu] <= 8");
         builder.Property(x => x.Phong)
            .HasMaxLength(20);
