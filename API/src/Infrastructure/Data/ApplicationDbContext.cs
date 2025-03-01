@@ -13,6 +13,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
     public DbSet<CoSo> CoSos => Set<CoSo>();
     public DbSet<ChinhSach> ChinhSaches => Set<ChinhSach>();
+    public DbSet<ApplicationUser> ApplicationUsers => Set<ApplicationUser>();
     public DbSet<BaiTap> HocSinhs => Set<BaiTap>();
     public DbSet<GiaoVien> GiaoViens => Set<GiaoVien>();
     public DbSet<NhanVien> NhanViens => Set<NhanVien>();
@@ -28,6 +29,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<NoiDungBaiHoc> NoiDungBaiHocs => Set<NoiDungBaiHoc>();
     public DbSet<TaiLieuHocTap> TaiLieuHocTaps => Set<TaiLieuHocTap>();
 
+    
     public DbSet<TodoList> TodoLists => Set<TodoList>();
 
     public DbSet<TodoItem> TodoItems => Set<TodoItem>();
@@ -52,7 +54,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         base.OnModelCreating(builder);
         foreach (var relationship in builder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
         {
-            relationship.DeleteBehavior = DeleteBehavior.Restrict; // Hoặc DeleteBehavior.NoAction
+            relationship.DeleteBehavior = DeleteBehavior.Restrict; 
         }
     }
 }

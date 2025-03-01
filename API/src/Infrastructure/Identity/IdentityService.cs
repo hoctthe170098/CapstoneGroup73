@@ -3,6 +3,19 @@ using StudyFlow.Application.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.Extensions.Logging.Abstractions;
+using StudyFlow.Domain.Constants;
+using System.Net.Mail;
+using System.Net;
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
+using Twilio.Types;
+using Twilio.Exceptions;
 
 namespace StudyFlow.Infrastructure.Identity;
 
@@ -11,15 +24,17 @@ public class IdentityService : IIdentityService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IUserClaimsPrincipalFactory<ApplicationUser> _userClaimsPrincipalFactory;
     private readonly IAuthorizationService _authorizationService;
-
+    private readonly IConfiguration _configuration;
     public IdentityService(
         UserManager<ApplicationUser> userManager,
         IUserClaimsPrincipalFactory<ApplicationUser> userClaimsPrincipalFactory,
-        IAuthorizationService authorizationService)
+        IAuthorizationService authorizationService,
+        IConfiguration configuration)
     {
         _userManager = userManager;
         _userClaimsPrincipalFactory = userClaimsPrincipalFactory;
         _authorizationService = authorizationService;
+        _configuration = configuration;
     }
 
     public async Task<string?> GetUserNameAsync(string userId)
@@ -77,5 +92,253 @@ public class IdentityService : IIdentityService
         var result = await _userManager.DeleteAsync(user);
 
         return result.ToApplicationResult();
+    }
+
+    public async Task<string?> GenerateJwtToken(string username,string password)
+    {
+        var user = await  _userManager.FindByNameAsync(username);
+        if (user != null && await _userManager.CheckPasswordAsync(user, password))
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+            IdentityOptions _options = new IdentityOptions();
+            var secretKey = _configuration["Jwt:SecretKey"] ?? throw new ArgumentNullException(nameof(_configuration), "Jwt:SecretKey is missing in configuration.");
+            var issuer = _configuration["Jwt:Issuer"] ?? throw new ArgumentNullException(nameof(_configuration), "Jwt:Issuer is missing in configuration.");
+            var audience = _configuration["Jwt:Audience"] ?? throw new ArgumentNullException(nameof(_configuration), "Jwt:Audience is missing in configuration.");
+
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.Name, username)
+    };
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+            var token = new JwtSecurityToken(
+                issuer,
+                audience,
+                claims,
+                expires: DateTime.Now.AddMinutes(120), // Token hết hạn sau 2 giờ
+                signingCredentials: credentials);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+        else return null;
+
+    }
+    public async Task<Output> ForgotPasswordByEmail(string email, string title)
+    {
+        Output output = new Output();
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+        {
+            output.isError = false;
+            output.message = "Đã gửi mật khẩu mới vào email";
+            return output;
+        };
+        var newPassword = GenerateRandomPassword();
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var result = await _userManager.ResetPasswordAsync(user,token, newPassword);
+        if (result.Succeeded)
+        {
+            try
+            {
+                await SendEmail(email, title, $"Mật khẩu mới của bạn là: {newPassword}");
+                output.isError = false;
+                output.message = "Đã gửi mật khẩu mới vào email";
+                return output;
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi gửi email. Có thể log lỗi.
+                output.isError = true;
+                output.message = "Lỗi gửi email"+ ex.Message;
+                return output;
+            }
+        }
+        else
+        {
+            output.isError = true;
+            output.message = "Lỗi đặt lại mật khẩu:" +  string.Join(", ", result.Errors.Select(e => e.Description));
+            return output;
+        }
+    }
+    private string GenerateRandomPassword(int length = 8)
+    {
+        const string uppercaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const string lowercaseChars = "abcdefghijklmnopqrstuvwxyz";
+        const string digitChars = "0123456789";
+        const string specialChars = "!@#$%^&*()_+";
+
+        var random = new Random();
+        var password = new StringBuilder();
+
+        // Đảm bảo có ít nhất 1 ký tự từ mỗi loại
+        password.Append(uppercaseChars[random.Next(uppercaseChars.Length)]);
+        password.Append(lowercaseChars[random.Next(lowercaseChars.Length)]);
+        password.Append(digitChars[random.Next(digitChars.Length)]);
+        password.Append(specialChars[random.Next(specialChars.Length)]);
+
+        // Thêm các ký tự ngẫu nhiên còn lại
+        string allChars = uppercaseChars + lowercaseChars + digitChars + specialChars;
+        for (int i = password.Length; i < length; i++)
+        {
+            password.Append(allChars[random.Next(allChars.Length)]);
+        }
+
+        // Trộn chuỗi để tăng tính ngẫu nhiên
+        return new string(password.ToString().OrderBy(s => random.Next()).ToArray());
+    }
+    private async Task SendEmail(string toEmail, string subject, string body)
+    {
+        var smtpServer = _configuration["Email:SmtpServer"];
+        var smtpPort = int.Parse(_configuration["Email:SmtpPort"] ?? "587");
+        var smtpUsername = _configuration["Email:SmtpUsername"];
+        var smtpPassword = _configuration["Email:SmtpPassword"];
+        if (string.IsNullOrEmpty(smtpUsername))
+        {
+            smtpUsername = "trantrunghoc46@gmail.com";
+        }
+        using (var client = new SmtpClient(smtpServer, smtpPort))
+        {
+            client.EnableSsl = true;
+            client.Credentials = new NetworkCredential(smtpUsername, smtpPassword);
+
+            var mailMessage = new MailMessage(smtpUsername, toEmail, subject, body);
+
+            await client.SendMailAsync(mailMessage);
+        }
+    }
+
+    public async Task<Output> ForgotPasswordByPhone(string phone)
+    {
+        Output output = new Output();
+        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.PhoneNumber == phone);
+        if (user == null)
+        {
+            output.isError = true;
+            output.message = "Không tìm thấy người dùng với số điện thoại này.";
+            return output;
+        }
+        string formattedPhoneNumber = FormatPhoneNumber(phone);
+        try
+        {
+            // Tạo mã đặt lại mật khẩu ngẫu nhiên
+            var resetCode = GenerateRandomPassword();
+
+            // Gửi mã đặt lại mật khẩu qua SMS
+            await SendSms(formattedPhoneNumber, $"Mật khẩu mới của bạn là: {resetCode}");
+
+            // Lưu mã đặt lại mật khẩu vào cơ sở dữ liệu hoặc bộ nhớ cache cùng với số điện thoại của người dùng
+            // ... (Triển khai logic lưu trữ mã đặt lại mật khẩu)
+
+            output.isError = false;
+            output.message = "Mã đặt lại mật khẩu đã được gửi qua SMS.";
+            return output;
+        }
+        catch (TwilioException ex)
+        {
+            // Xử lý lỗi Twilio
+            output.isError = true;
+            output.message = $"Lỗi Twilio: {ex.Message}";
+            return output;
+        }
+        catch (Exception ex)
+        {
+            // Xử lý các lỗi khác
+            output.isError = true;
+            output.message = $"Lỗi: {ex.Message}";
+            return output;
+        }
+    }
+    private string FormatPhoneNumber(string phoneNumber)
+    {
+        // Thêm mã quốc gia (+84) nếu cần thiết
+        if (!phoneNumber.StartsWith("+84"))
+        {
+            if (phoneNumber.StartsWith("0"))
+            {
+                phoneNumber = "+84" + phoneNumber.Substring(1);
+            }
+            else
+            {
+                phoneNumber = "+84" + phoneNumber;
+            }
+        }
+
+        return phoneNumber;
+    }
+    private async Task SendSms(string toPhoneNumber, string message)
+    {
+        var accountSid = _configuration["Twilio:AccountSid"];
+        var authToken = _configuration["Twilio:AuthToken"];
+        var from = _configuration["Twilio:FromPhoneNumber"];
+
+        TwilioClient.Init(accountSid, authToken);
+
+        // Tạo CreateMessageOptions
+        var messageOptions = new CreateMessageOptions(new PhoneNumber(toPhoneNumber))
+        {
+            From = new PhoneNumber(from),
+            Body = message
+        };
+
+        await MessageResource.CreateAsync(messageOptions);
+    }
+
+    public async Task<Output> ChangePassword(string token, string oldPassword, string newPassword)
+    {
+        Output output = new Output();
+        try
+        {
+            // 1. Xác thực mã thông báo JWT
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var secretKey = _configuration["Jwt:SecretKey"] ?? throw 
+                new ArgumentNullException(nameof(_configuration)
+                , "Jwt:SecretKey is missing in configuration.");
+            var key = Encoding.ASCII.GetBytes(secretKey);
+            tokenHandler.ValidateToken(token, new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
+                ClockSkew = TimeSpan.Zero
+            }, out SecurityToken validatedToken);
+
+            var jwtToken = (JwtSecurityToken)validatedToken;
+            var username = jwtToken.Claims.First(x => x.Type == ClaimTypes.Name).Value;
+            var user = await _userManager.FindByNameAsync(username);
+            // 2. Tìm người dùng
+            if (user == null)
+            {
+                output.isError = true;
+                output.message = "Không tìm thấy người dùng.";
+                return output;
+            }
+            // 3. Thay đổi mật khẩu
+            var result = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+            if (result.Succeeded)
+            {
+                output.isError = false;
+                output.message = "Đổi mật khẩu thành công.";
+                return output;
+            }
+            else
+            {
+                output.isError = true;
+                output.message = "Đổi mật khẩu thất bại:" + string.Join(", ", result.Errors.Select(e => e.Description));
+                return output;
+            }
+        }
+        catch (Exception ex)
+        {
+            output.isError = true;
+            output.message = "Lỗi: " + ex.Message;
+            return output;
+        }
     }
 }

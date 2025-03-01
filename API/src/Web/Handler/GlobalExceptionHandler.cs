@@ -50,7 +50,7 @@ internal sealed class GlobalExceptionHandler : IExceptionHandler
                 break;
             default:
                 output.code = 500;
-                output.message = "Có lỗi xảy ra!";
+                output.message = exception.Message;
                 break;
         }
         httpContext.Response.StatusCode = StatusCodes.Status200OK;
