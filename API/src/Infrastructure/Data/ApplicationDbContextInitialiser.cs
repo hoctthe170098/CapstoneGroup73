@@ -93,7 +93,7 @@ public class ApplicationDbContextInitialiser
         }
 
         // Default users
-        var administrator = new ApplicationUser { UserName = "studyFlowAdmin", Email = "hoctthe170098@gmail.com" };
+        var administrator = new ApplicationUser { UserName = "studyFlowAdmin", Email = "hoctthe170098@fpt.edu.vn", PhoneNumber = "0948102469" };
 
         if (_userManager.Users.All(u => u.UserName != administrator.UserName))
         {

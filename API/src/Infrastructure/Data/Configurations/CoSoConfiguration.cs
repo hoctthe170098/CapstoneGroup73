@@ -17,7 +17,7 @@ public class CoSoConfiguration : IEntityTypeConfiguration<CoSo>
         builder.Property(x => x.Ten)
             .HasMaxLength(30);
         builder.Property(x => x.DiaChi)
-            .HasMaxLength(30);
+            .HasMaxLength(50);
         builder.Property(x => x.SoDienThoai)
             .HasMaxLength(11);
         builder.HasAnnotation($"CheckConstraint:CK_CoSo_SoDienThoai", "[SoDienThoai] LIKE '0%' AND [SoDienThoai] NOT LIKE '%[^0-9]%'");

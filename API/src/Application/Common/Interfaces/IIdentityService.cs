@@ -13,4 +13,8 @@ public interface IIdentityService
     Task<(Result Result, string UserId)> CreateUserAsync(string userName, string password);
 
     Task<Result> DeleteUserAsync(string userId);
+    Task<string?> GenerateJwtToken(string username,string password);
+    Task<Output> ForgotPasswordByEmail(string email, string title);
+    Task<Output> ForgotPasswordByPhone(string phone);
+    Task<Output> ChangePassword(string token, string oldPassword, string newPassword);
 }
