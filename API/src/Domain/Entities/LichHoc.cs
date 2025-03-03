@@ -22,6 +22,7 @@ public class LichHoc
     public required string GiaoVienCode { get; set; }
     [JsonIgnore]
     public GiaoVien GiaoVien { get; set; } = null!;
+    public required int ChuongTrinhId { get; set; }
     [JsonIgnore]
     public ChuongTrinh ChuongTrinh { get; set; } = null!;
     [JsonIgnore]

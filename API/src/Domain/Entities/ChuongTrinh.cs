@@ -11,6 +11,7 @@ public class ChuongTrinh
     public int Id { get; set; }
     public required string TieuDe { get; set; }
     public required string MoTa { get; set; }
+    public required string TrangThai { get; set; }
     [JsonIgnore]
     public IList<LichHoc> LichHocs { get; private set; } = new List<LichHoc>();
     [JsonIgnore]

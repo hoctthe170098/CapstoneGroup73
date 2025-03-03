@@ -26,8 +26,8 @@ namespace StudyFlow.Application.ApplicationUsers.Commands.ChangePassword;
 
     public async Task<Output> Handle(ChangePasswordComand request, CancellationToken cancellationToken)
     {
-        if(string.IsNullOrEmpty(request.token)||string.IsNullOrEmpty(request.oldPassword)
-            ||string.IsNullOrEmpty(request.newPassword)) throw new NotFoundDataException();
+        if(string.IsNullOrWhiteSpace(request.token)||string.IsNullOrWhiteSpace(request.oldPassword)
+            ||string.IsNullOrWhiteSpace(request.newPassword)) throw new NotFoundDataException();
         else
         {
             if (!IsValidPassword(request.newPassword)) throw new FormatException();

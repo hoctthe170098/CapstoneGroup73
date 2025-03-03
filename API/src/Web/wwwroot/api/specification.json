@@ -6,7 +6,7 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/ApplicationUsers/Login": {
+    "/api/ApplicationUsers/login": {
       "post": {
         "tags": [
           "ApplicationUsers"
@@ -38,7 +38,7 @@
         }
       }
     },
-    "/api/ApplicationUsers/ForgotPassword": {
+    "/api/ApplicationUsers/forgotpassword": {
       "post": {
         "tags": [
           "ApplicationUsers"
@@ -70,7 +70,7 @@
         }
       }
     },
-    "/api/ApplicationUsers/ChangePassword": {
+    "/api/ApplicationUsers/changepassword": {
       "post": {
         "tags": [
           "ApplicationUsers"
@@ -102,7 +102,7 @@
         }
       }
     },
-    "/api/CoSos/CreateCoSo": {
+    "/api/CoSos/createcoso": {
       "post": {
         "tags": [
           "CoSos"
@@ -134,7 +134,7 @@
         }
       }
     },
-    "/api/CoSos/GetCoSosWithPagination": {
+    "/api/CoSos/getcososwithpagination": {
       "post": {
         "tags": [
           "CoSos"
@@ -146,6 +146,38 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/GetCososWithPaginationQuery"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/CoSos/editcoso": {
+      "put": {
+        "tags": [
+          "CoSos"
+        ],
+        "operationId": "EditCoSo",
+        "requestBody": {
+          "x-name": "comand",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditCoSoComand"
               }
             }
           },
@@ -584,6 +616,32 @@
           "pageSize": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "EditCoSoComand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "ten": {
+            "type": "string",
+            "nullable": true
+          },
+          "diaChi": {
+            "type": "string",
+            "nullable": true
+          },
+          "soDienThoai": {
+            "type": "string",
+            "nullable": true
+          },
+          "trangThai": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
