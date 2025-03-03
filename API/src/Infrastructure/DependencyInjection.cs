@@ -52,6 +52,7 @@ public static class DependencyInjection
 
         services.AddAuthorization(options =>
         {
+            options.AddPolicy(Policies.CanCreateCoso, policy => policy.RequireRole(Roles.Administrator));
             options.AddPolicy(Policies.CanPurge, policy => policy.RequireRole(Roles.Administrator));
             // Policy cho quyền của tất cả người dùng đã đăng nhập
             options.AddPolicy(Policies.AuthenticatedUser, policy => policy.RequireAuthenticatedUser());
@@ -73,7 +74,11 @@ public static class DependencyInjection
         services.AddTransient<IIdentityService, IdentityService>();
 
         services.AddAuthorization(options =>
-            options.AddPolicy(Policies.CanPurge, policy => policy.RequireRole(Roles.Administrator)));
+        {
+            options.AddPolicy(Policies.CanPurge, policy 
+                => policy.RequireRole(Roles.Administrator));
+        }
+          );
        
         return services;
     }

@@ -97,7 +97,7 @@ public class IdentityService : IIdentityService
     public async Task<string?> GenerateJwtToken(string username,string password)
     {
         var user = await  _userManager.FindByNameAsync(username);
-        if (user != null && await _userManager.CheckPasswordAsync(user, password))
+        if (user != null &&user.IsActive==true && await _userManager.CheckPasswordAsync(user, password))
         {
             var roles = await _userManager.GetRolesAsync(user);
             IdentityOptions _options = new IdentityOptions();

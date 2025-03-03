@@ -17,17 +17,15 @@ public class ApplicationUsers : EndpointGroupBase
             .MapPost(ForgotPassword,"ForgotPassword")
             .MapPost(ChangePassword,"ChangePassword");
     }
-    //[Authorize(Policy = Policies.CanPurge)]
     public async Task<Output> Login(ISender sender, LoginComand comand)
     {
         return await sender.Send(comand);
     }
-    
     public async Task<Output> ForgotPassword(ISender sender, ForgotPasswordComand comand)
     {
         return await sender.Send(comand);
     }
-    [Authorize(Policy = Policies.AuthenticatedUser)]
+    [Authorize]
     public async Task<Output> ChangePassword(ISender sender, ChangePasswordComand comand)
     {
         return await sender.Send(comand);

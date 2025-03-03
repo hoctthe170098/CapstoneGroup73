@@ -10,6 +10,7 @@ public class NoiDungBaiHoc
 {
     public Guid Id { get; set; }//k
     public required string TieuDe { get; set; }
+    public required int SoThuTu { get; set; }
     public required string Mota { get; set; }
     public required int ChuongTrinhId { get; set; }
     [JsonIgnore]

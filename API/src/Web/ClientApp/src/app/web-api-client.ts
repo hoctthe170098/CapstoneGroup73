@@ -193,6 +193,7 @@ export class ApplicationUsersClient implements IApplicationUsersClient {
 
 export interface ICoSosClient {
     createCoSo(comand: CreateCoSoComand): Observable<Output>;
+    getCoSosWithPagination(query: GetCososWithPaginationQuery): Observable<Output>;
 }
 
 @Injectable({
@@ -239,6 +240,58 @@ export class CoSosClient implements ICoSosClient {
     }
 
     protected processCreateCoSo(response: HttpResponseBase): Observable<Output> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Output.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getCoSosWithPagination(query: GetCososWithPaginationQuery): Observable<Output> {
+        let url_ = this.baseUrl + "/api/CoSos/GetCoSosWithPagination";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(query);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetCoSosWithPagination(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetCoSosWithPagination(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Output>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Output>;
+        }));
+    }
+
+    protected processGetCoSosWithPagination(response: HttpResponseBase): Observable<Output> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1064,6 +1117,46 @@ export interface ICreateCoSoComand {
     ten?: string | undefined;
     diaChi?: string | undefined;
     soDienThoai?: string | undefined;
+}
+
+export class GetCososWithPaginationQuery implements IGetCososWithPaginationQuery {
+    pageNumber?: number;
+    pageSize?: number;
+
+    constructor(data?: IGetCososWithPaginationQuery) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+        }
+    }
+
+    static fromJS(data: any): GetCososWithPaginationQuery {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetCososWithPaginationQuery();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        return data;
+    }
+}
+
+export interface IGetCososWithPaginationQuery {
+    pageNumber?: number;
+    pageSize?: number;
 }
 
 export class PaginatedListOfTodoItemBriefDto implements IPaginatedListOfTodoItemBriefDto {
