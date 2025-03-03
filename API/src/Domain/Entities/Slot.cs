@@ -13,5 +13,5 @@ public class Slot
     public required TimeOnly BatDau { get; set; }
     public required TimeOnly KetThuc { get; set; }
     [JsonIgnore]
-    public IList<LichHoc> LicHocs { get; private set; } = new List<LichHoc>();
+    public IList<LichHoc> LichHocs { get; private set; } = new List<LichHoc>();
 }
