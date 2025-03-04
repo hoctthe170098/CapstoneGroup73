@@ -11,9 +11,9 @@ using StudyFlow.Domain.Entities;
 namespace StudyFlow.Application.Cosos.Commands.CreateCoSo;
 public record CreateCoSoComand : IRequest<Output>
 {
-    public  string? Ten { get; set; }
-    public  string? DiaChi { get; set; }
-    public  string? SoDienThoai { get; set; }
+    public  string? Ten { get; init; }
+    public  string? DiaChi { get; init; }
+    public  string? SoDienThoai { get; init; }
 }
 public class CreateCoSoComandHandler : IRequestHandler<CreateCoSoComand, Output>
 {
@@ -24,7 +24,9 @@ public class CreateCoSoComandHandler : IRequestHandler<CreateCoSoComand, Output>
     }
     public async Task<Output> Handle(CreateCoSoComand request, CancellationToken cancellationToken)
     {
-        if (request.Ten == null || request.DiaChi == null || request.SoDienThoai == null)
+        if (string.IsNullOrWhiteSpace(request.Ten) 
+            ||string.IsNullOrWhiteSpace(request.DiaChi) 
+            ||string.IsNullOrWhiteSpace(request.SoDienThoai))
             throw new NotFoundDataException("Dữ liệu không được để trống");
         if (request.Ten.Length > 30 || request.DiaChi.Length > 50
             || request.SoDienThoai.Length > 11) throw new WrongInputException("Độ dài dữ liệu không hợp lệ!");

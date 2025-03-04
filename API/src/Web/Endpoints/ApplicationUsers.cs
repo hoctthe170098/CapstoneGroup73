@@ -13,9 +13,9 @@ public class ApplicationUsers : EndpointGroupBase
     public override void Map(WebApplication app)
     {
         app.MapGroup(this)
-            .MapPost(Login,"Login")
-            .MapPost(ForgotPassword,"ForgotPassword")
-            .MapPost(ChangePassword,"ChangePassword");
+            .MapPost(Login,"login")
+            .MapPost(ForgotPassword,"forgotpassword")
+            .MapPost(ChangePassword,"changepassword");
     }
     public async Task<Output> Login(ISender sender, LoginComand comand)
     {

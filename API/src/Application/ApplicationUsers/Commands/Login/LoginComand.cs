@@ -25,7 +25,7 @@ public class LoginComandHandler : IRequestHandler<LoginComand, Output>
 
     public async Task<Output> Handle(LoginComand request, CancellationToken cancellationToken)
     {
-        if (request.UserName == null|| request.Password==null)
+        if (string.IsNullOrWhiteSpace(request.UserName) || string.IsNullOrWhiteSpace(request.Password))
         {
             throw new NotFoundDataException();
         }

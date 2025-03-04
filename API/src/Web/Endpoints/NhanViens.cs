@@ -1,21 +1,20 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using StudyFlow.Application.ApplicationUsers.Commands.Login;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Application.Cosos.Commands.CreateCoSo;
 using StudyFlow.Application.Cosos.Commands.EditCoSo;
-using StudyFlow.Application.Cosos.Queries.GetCososWithPagination;
+using StudyFlow.Application.NhanViens.Queries.GetNhanViensWithPagination;
 using StudyFlow.Domain.Constants;
 
 namespace StudyFlow.Web.Endpoints;
 
-public class CoSos : EndpointGroupBase
+public class NhanViens : EndpointGroupBase
 {
     public override void Map(WebApplication app)
     {
         app.MapGroup(this)
-            .MapPost(CreateCoSo,"createcoso")
-            .MapPost(GetCoSosWithPagination, "getcososwithpagination")
-            .MapPut(EditCoSo,"editcoso");
+            .MapPost(CreateCoSo, "createcoso")
+            .MapPost(GetNhanViensWithPagination, "getnhanvienswithpagination")
+            .MapPut(EditCoSo, "editcoso");
     }
     [Authorize(Roles = Roles.Administrator)]
     public async Task<Output> CreateCoSo(ISender sender, CreateCoSoComand comand)
@@ -23,7 +22,7 @@ public class CoSos : EndpointGroupBase
         return await sender.Send(comand);
     }
     [Authorize(Roles = Roles.Administrator)]
-    public async Task<Output> GetCoSosWithPagination(ISender sender, GetCososWithPaginationQuery query)
+    public async Task<Output> GetNhanViensWithPagination(ISender sender, GetNhanViensWithPaginationQuery query)
     {
         return await sender.Send(query);
     }
