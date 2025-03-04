@@ -22,7 +22,7 @@ public class CoSos : EndpointGroupBase
     {
         return await sender.Send(comand);
     }
-    [Authorize(Roles = Roles.Administrator)]
+    //[Authorize(Roles = Roles.Administrator)]
     public async Task<Output> GetCoSosWithPagination(ISender sender, GetCososWithPaginationQuery query)
     {
         return await sender.Send(query);
