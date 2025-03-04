@@ -238,6 +238,38 @@
         }
       }
     },
+    "/api/CoSos/editcoso": {
+      "put": {
+        "tags": [
+          "CoSos"
+        ],
+        "operationId": "EditCoSo",
+        "requestBody": {
+          "x-name": "comand",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditCoSoComand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/LichHocs/lichhoc/create": {
       "post": {
         "tags": [
@@ -337,19 +369,6 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateSlotCommand"
-
-    "/api/CoSos/editcoso": {
-      "put": {
-        "tags": [
-          "CoSos"
-        ],
-        "operationId": "EditCoSo",
-        "requestBody": {
-          "x-name": "comand",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EditCoSoComand"
               }
             }
           },
@@ -849,6 +868,32 @@
           }
         }
       },
+      "EditCoSoComand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "ten": {
+            "type": "string",
+            "nullable": true
+          },
+          "diaChi": {
+            "type": "string",
+            "nullable": true
+          },
+          "soDienThoai": {
+            "type": "string",
+            "nullable": true
+          },
+          "trangThai": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
       "CreateLichHocCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -891,14 +936,11 @@
         }
       },
       "EditLichHocCommand": {
-
-      "EditCoSoComand": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "id": {
             "type": "string",
-
             "format": "guid"
           },
           "thu": {
@@ -984,22 +1026,6 @@
           "ketThuc": {
             "type": "string",
             "format": "time",
-            "nullable": true
-          },
-          "ten": {
-            "type": "string",
-            "nullable": true
-          },
-          "diaChi": {
-            "type": "string",
-            "nullable": true
-          },
-          "soDienThoai": {
-            "type": "string",
-            "nullable": true
-          },
-          "trangThai": {
-            "type": "string",
             "nullable": true
           }
         }

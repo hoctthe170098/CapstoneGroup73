@@ -16,6 +16,7 @@ public class Slots : EndpointGroupBase
             .MapPost(CreateSlot, "slots/create"); 
     }
     [Authorize(Roles = Roles.CampusManager)]
+    [Authorize(Roles = Roles.Administrator)]
     public async Task<List<SlotDto>> GetSlots(ISender sender)
     {
         return await sender.Send(new GetSlotsQuery());
