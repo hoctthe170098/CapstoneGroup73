@@ -23,7 +23,9 @@ public class NhanVienDto
     {
         public Mapping()
         {
-            CreateMap<NhanVien, NhanVienDto>();
+            CreateMap<NhanVien, NhanVienDto>()
+                .ForMember(dest => dest.TenCoSo, opt => opt.MapFrom(src => src.Coso.Ten))
+                .ForMember(dest => dest.TenVaiTro, opt => opt.Ignore());
         }
     }
 }

@@ -16,9 +16,4 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="NhanViens\Command\CreateNhanVien\" />
-    <Folder Include="NhanViens\Command\EditNhanVien\" />
-  </ItemGroup>
-
 </Project>
