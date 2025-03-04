@@ -9,7 +9,7 @@ using StudyFlow.Application.Common.Interfaces;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Domain.Entities;
 
-namespace StudyFlow.Application.NhanViens.Command.CreateNhanViens;
+namespace StudyFlow.Application.NhanViens.Command.CreateNhanVien;
 public record CreateNhanVienCommand : IRequest<Output>
 {
     public required string Code { get; init; }
