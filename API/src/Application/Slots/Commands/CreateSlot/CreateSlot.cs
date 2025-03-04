@@ -35,6 +35,15 @@ public class CreateSlotCommandHandler : IRequestHandler<CreateSlotCommand, Outpu
         {
             throw new WrongInputException("Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc.");
         }
+
+        bool isOverlapping = await _context.Slots.AnyAsync(s =>
+            (request.BatDau < s.KetThuc && request.KetThuc > s.BatDau), cancellationToken);
+
+        if (isOverlapping)
+        {
+            throw new WrongInputException("Thời gian của slot bị trùng với một slot khác.");
+        }
+
         var slot = new Slot
         {
             Ten = request.Ten,

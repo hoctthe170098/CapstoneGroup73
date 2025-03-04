@@ -31,7 +31,8 @@ public class CreateChuongTrinhCommandHandler : IRequestHandler<CreateChuongTrinh
         var chuongTrinh = new ChuongTrinh
         {
             TieuDe = request.TieuDe,
-            MoTa = request.MoTa
+            MoTa = request.MoTa,
+            TrangThai = "use" 
         };
 
         _context.ChuongTrinhs.Add(chuongTrinh);
