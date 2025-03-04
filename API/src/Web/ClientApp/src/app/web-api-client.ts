@@ -617,6 +617,76 @@ export class LichHocsClient implements ILichHocsClient {
     }
 }
 
+export interface INhanViensClient {
+    getNhanViensWithPagination(query: GetNhanViensWithPaginationQuery): Observable<Output>;
+}
+
+@Injectable({
+    providedIn: 'root'
+})
+export class NhanViensClient implements INhanViensClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    getNhanViensWithPagination(query: GetNhanViensWithPaginationQuery): Observable<Output> {
+        let url_ = this.baseUrl + "/api/NhanViens/getnhanvienswithpagination";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(query);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetNhanViensWithPagination(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetNhanViensWithPagination(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Output>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Output>;
+        }));
+    }
+
+    protected processGetNhanViensWithPagination(response: HttpResponseBase): Observable<Output> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Output.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
 export interface ISlotsClient {
     getSlots(): Observable<SlotDto[]>;
     createSlot(command: CreateSlotCommand): Observable<Output>;
@@ -691,7 +761,7 @@ export class SlotsClient implements ISlotsClient {
     }
 
     createSlot(command: CreateSlotCommand): Observable<Output> {
-        let url_ = this.baseUrl + "/api/Slots/slots/create";
+        let url_ = this.baseUrl + "/api/Slots/createslot";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(command);
@@ -1934,6 +2004,62 @@ export interface IEditLichHocCommand {
     trangThai?: string | undefined;
     giaoVienCode?: string | undefined;
     chuongTrinhId?: number | undefined;
+}
+
+export class GetNhanViensWithPaginationQuery implements IGetNhanViensWithPaginationQuery {
+    pageNumber?: number;
+    pageSize?: number;
+    searchTen?: string | undefined;
+    filterTenCoSo?: string | undefined;
+    filterTenVaiTro?: string | undefined;
+    sortBy?: string | undefined;
+
+    constructor(data?: IGetNhanViensWithPaginationQuery) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.searchTen = _data["searchTen"];
+            this.filterTenCoSo = _data["filterTenCoSo"];
+            this.filterTenVaiTro = _data["filterTenVaiTro"];
+            this.sortBy = _data["sortBy"];
+        }
+    }
+
+    static fromJS(data: any): GetNhanViensWithPaginationQuery {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetNhanViensWithPaginationQuery();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["searchTen"] = this.searchTen;
+        data["filterTenCoSo"] = this.filterTenCoSo;
+        data["filterTenVaiTro"] = this.filterTenVaiTro;
+        data["sortBy"] = this.sortBy;
+        return data;
+    }
+}
+
+export interface IGetNhanViensWithPaginationQuery {
+    pageNumber?: number;
+    pageSize?: number;
+    searchTen?: string | undefined;
+    filterTenCoSo?: string | undefined;
+    filterTenVaiTro?: string | undefined;
+    sortBy?: string | undefined;
 }
 
 export class SlotDto implements ISlotDto {

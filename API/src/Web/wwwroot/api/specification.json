@@ -334,6 +334,38 @@
         }
       }
     },
+    "/api/NhanViens/getnhanvienswithpagination": {
+      "post": {
+        "tags": [
+          "NhanViens"
+        ],
+        "operationId": "GetNhanViensWithPagination",
+        "requestBody": {
+          "x-name": "query",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetNhanViensWithPaginationQuery"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Slots/slots": {
       "get": {
         "tags": [
@@ -357,7 +389,7 @@
         }
       }
     },
-    "/api/Slots/slots/create": {
+    "/api/Slots/createslot": {
       "post": {
         "tags": [
           "Slots"
@@ -985,6 +1017,36 @@
           "chuongTrinhId": {
             "type": "integer",
             "format": "int32",
+            "nullable": true
+          }
+        }
+      },
+      "GetNhanViensWithPaginationQuery": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "searchTen": {
+            "type": "string",
+            "nullable": true
+          },
+          "filterTenCoSo": {
+            "type": "string",
+            "nullable": true
+          },
+          "filterTenVaiTro": {
+            "type": "string",
+            "nullable": true
+          },
+          "sortBy": {
+            "type": "string",
             "nullable": true
           }
         }
