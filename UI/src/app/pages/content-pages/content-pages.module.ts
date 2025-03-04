@@ -15,6 +15,7 @@ import { MaintenancePageComponent } from "./maintenance/maintenance-page.compone
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { ChangePasswordComponent } from './change-password/change-password.component';
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, "./assets/i18n/", ".json");
@@ -43,6 +44,7 @@ export function createTranslateLoader(http: HttpClient) {
     LockScreenPageComponent,
     LoginPageComponent,
     MaintenancePageComponent,
+    ChangePasswordComponent
     
   ]
 })
