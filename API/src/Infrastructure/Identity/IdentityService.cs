@@ -349,4 +349,13 @@ public class IdentityService : IIdentityService
         var roles = await _userManager.GetRolesAsync(user);
         return roles.ToList();
     }
+
+    public async Task<bool> AssignRoleAsync(string userId, string roleId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null) return false;
+
+        var result = await _userManager.AddToRoleAsync(user, roleId);
+        return result.Succeeded;
+    }
 }

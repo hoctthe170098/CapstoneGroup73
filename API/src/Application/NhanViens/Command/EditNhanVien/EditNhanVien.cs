@@ -1,10 +1,102 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using StudyFlow.Application.Common.Exceptions;
+using StudyFlow.Application.Common.Interfaces;
+using StudyFlow.Application.Common.Models;
+using StudyFlow.Domain.Entities;
 
 namespace StudyFlow.Application.NhanViens.Command.EditNhanVien;
-public class EditNhanVien
+public class EditNhanVienCommand : IRequest<Output>
 {
+    public required string Code { get; init; }
+    public required string Ten { get; init; }
+    public required string GioiTinh { get; init; }
+    public required string DiaChi { get; init; }
+    public required DateOnly NgaySinh { get; init; }
+    public string? Email { get; init; }
+    public string? SoDienThoai { get; init; }
+    public required string CoSoId { get; init; }
+    public string? UserId { get; init; }
+    public required string Role { get; init; }
+}
+
+public class EditNhanVienCommandHandler : IRequestHandler<EditNhanVienCommand, Output>
+{
+    private readonly IApplicationDbContext _context;
+    private readonly IIdentityService _identityService; 
+
+    public EditNhanVienCommandHandler(IApplicationDbContext context, IIdentityService identityService)
+    {
+        _context = context;
+        _identityService = identityService;
+    }
+    public async Task<Output> Handle(EditNhanVienCommand request, CancellationToken cancellationToken)
+    {
+        // Validate required fields
+        if (string.IsNullOrWhiteSpace(request.Code) ||
+            string.IsNullOrWhiteSpace(request.Ten) ||
+            string.IsNullOrWhiteSpace(request.GioiTinh) ||
+            string.IsNullOrWhiteSpace(request.DiaChi))
+        {
+            throw new NotFoundDataException("Dữ liệu không được để trống");
+        }
+
+        // Validate length constraints
+        if (request.Code.Length > 20 || request.Ten.Length > 50 || request.DiaChi.Length > 100)
+        {
+            throw new WrongInputException("Độ dài dữ liệu không hợp lệ!");
+        }
+
+        // Validate phone number 
+        if (!string.IsNullOrEmpty(request.SoDienThoai))
+        {
+            if (request.SoDienThoai.Length > 11 || !request.SoDienThoai.StartsWith("0") || !request.SoDienThoai.All(char.IsDigit))
+            {
+                throw new FormatException("Số điện thoại không hợp lệ");
+            }
+        }
+
+        // Validate email 
+        if (!string.IsNullOrEmpty(request.Email) && !new EmailAddressAttribute().IsValid(request.Email))
+        {
+            throw new FormatException("Email không hợp lệ");
+        }
+
+        // Check if CoSo exists
+        var coSoExists = await _context.CoSos.AnyAsync(c => c.Id == Guid.Parse(request.CoSoId), cancellationToken);
+        if (!coSoExists)
+        {
+            throw new NotFoundDataException("Cơ sở không tồn tại");
+        }
+
+        Guid g_id = Guid.Parse(request.Code);
+        var nhanVien = await _context.NhanViens.FindAsync(new object[] { g_id }, cancellationToken);
+
+        if (nhanVien == null) throw new NotFoundIDException();
+        else
+        {
+            nhanVien.Code = request.Code;
+            nhanVien.Ten = request.Ten;
+            nhanVien.GioiTinh = request.GioiTinh;
+            nhanVien.DiaChi = request.DiaChi;
+            nhanVien.NgaySinh = request.NgaySinh;
+            nhanVien.Email = request.Email;
+            nhanVien.SoDienThoai = request.SoDienThoai;
+            nhanVien.CoSoId = Guid.Parse(request.CoSoId);
+        }
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return new Output
+        {
+            isError = false,
+            data = nhanVien,
+            code = 200,
+            message = "Cập nhật nhân viên thành công"
+        };
+    }
 }
