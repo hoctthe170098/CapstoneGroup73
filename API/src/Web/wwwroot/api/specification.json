@@ -1,12 +1,12 @@
 {
-  "x-generator": "NSwag v14.0.0.0 (NJsonSchema v11.0.0.0 (Newtonsoft.Json v13.0.0.0))",
+  "x-generator": "NSwag v14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))",
   "openapi": "3.0.0",
   "info": {
     "title": "StudyFlow API",
     "version": "1.0.0"
   },
   "paths": {
-    "/api/ApplicationUsers/Login": {
+    "/api/ApplicationUsers/login": {
       "post": {
         "tags": [
           "ApplicationUsers"
@@ -38,7 +38,7 @@
         }
       }
     },
-    "/api/ApplicationUsers/ForgotPassword": {
+    "/api/ApplicationUsers/forgotpassword": {
       "post": {
         "tags": [
           "ApplicationUsers"
@@ -70,7 +70,7 @@
         }
       }
     },
-    "/api/ApplicationUsers/ChangePassword": {
+    "/api/ApplicationUsers/changepassword": {
       "post": {
         "tags": [
           "ApplicationUsers"
@@ -174,7 +174,7 @@
         }
       }
     },
-    "/api/CoSos/CreateCoSo": {
+    "/api/CoSos/createcoso": {
       "post": {
         "tags": [
           "CoSos"
@@ -206,7 +206,7 @@
         }
       }
     },
-    "/api/CoSos/GetCoSosWithPagination": {
+    "/api/CoSos/getcososwithpagination": {
       "post": {
         "tags": [
           "CoSos"
@@ -337,6 +337,19 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateSlotCommand"
+
+    "/api/CoSos/editcoso": {
+      "put": {
+        "tags": [
+          "CoSos"
+        ],
+        "operationId": "EditCoSo",
+        "requestBody": {
+          "x-name": "comand",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditCoSoComand"
               }
             }
           },
@@ -878,11 +891,14 @@
         }
       },
       "EditLichHocCommand": {
+
+      "EditCoSoComand": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "id": {
             "type": "string",
+
             "format": "guid"
           },
           "thu": {
@@ -968,6 +984,22 @@
           "ketThuc": {
             "type": "string",
             "format": "time",
+            "nullable": true
+          },
+          "ten": {
+            "type": "string",
+            "nullable": true
+          },
+          "diaChi": {
+            "type": "string",
+            "nullable": true
+          },
+          "soDienThoai": {
+            "type": "string",
+            "nullable": true
+          },
+          "trangThai": {
+            "type": "string",
             "nullable": true
           }
         }

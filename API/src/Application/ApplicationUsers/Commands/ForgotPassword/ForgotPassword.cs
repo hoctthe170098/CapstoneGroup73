@@ -26,7 +26,7 @@ public class ForgotPasswordComandHandler : IRequestHandler<ForgotPasswordComand,
     public async Task<Output> Handle(ForgotPasswordComand request, CancellationToken cancellationToken)
     {
         Output output = new Output();
-        if((string.IsNullOrEmpty(request.Email)&&string.IsNullOrEmpty(request.SoDienThoai))||
+        if((string.IsNullOrWhiteSpace(request.Email)&&string.IsNullOrWhiteSpace(request.SoDienThoai))||
             (request.Email!=null && request.SoDienThoai!=null))
         {
             throw new WrongInputException();
