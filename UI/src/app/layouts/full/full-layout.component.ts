@@ -54,7 +54,6 @@ export class FullLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private deviceService: DeviceDetectorService
   ) {
-
     this.config = this.configService.templateConf;
     this.innerWidth = window.innerWidth;
 
@@ -98,7 +97,6 @@ export class FullLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    //Unsubcribe subscriptions
     if (this.configSub) {
       this.configSub.unsubscribe();
     }
@@ -134,7 +132,6 @@ export class FullLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
         this.renderer.removeClass(this.document.body, "fixed-navbar");
         this.renderer.removeClass(this.document.body, "menu-hide");
         this.renderer.removeClass(this.document.body, "vertical-menu");
-        // this.renderer.removeClass(this.document.body, "blank-page");
         this.renderer.addClass(this.document.body, "horizontal-menu");
         this.renderer.addClass(this.document.body, "horizontal-layout");
         this.renderer.addClass(this.document.body, "horizontal-menu-padding");
@@ -153,7 +150,6 @@ export class FullLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.renderer.addClass(this.document.body, "vertical-layout");
         this.renderer.addClass(this.document.body, "menu-hide");
-
       }
       else { // If Screen size > 1200
         this.displayOverlayMenu = false;
@@ -161,7 +157,6 @@ export class FullLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
         this.renderer.removeClass(this.document.body, "horizontal-layout");
         this.renderer.removeClass(this.document.body, "horizontal-menu");
         this.renderer.removeClass(this.document.body, "horizontal-menu-padding");
-        // this.renderer.removeClass(this.document.body, "blank-page");
 
         this.renderer.setAttribute(this.document.body, "data-menu", "vertical-menu");
         this.renderer.addClass(this.document.body, "vertical-layout");
@@ -176,9 +171,7 @@ export class FullLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-
   loadLayout() {
-
     //menu position "SIDE" or "TOP"
     if (this.config.layout.menuPosition && this.config.layout.menuPosition.toString().trim() != "") {
       this.menuPosition = this.config.layout.menuPosition;
@@ -202,9 +195,8 @@ export class FullLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.config.layout.menuPosition === "Side") {
       if (this.config.layout.sidebar.collapsed) {
         this.isMenuCollapsedOnHover = true;
-      }
-      else {
-        this.isMenuCollapsedOnHover = true;
+      } else {
+        this.isMenuCollapsedOnHover = false;
       }
       this.toggleSidebar();
     }
@@ -215,12 +207,10 @@ export class FullLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.config.layout.variant === "Light") {
       this.renderer.removeClass(this.document.body, "layout-dark");
       this.renderer.removeClass(this.document.body, "layout-transparent");
-    }
-    else if (this.config.layout.variant === "Dark") {
+    } else if (this.config.layout.variant === "Dark") {
       this.renderer.removeClass(this.document.body, "layout-transparent");
       this.renderer.addClass(this.document.body, "layout-dark");
-    }
-    else if (this.config.layout.variant === "Transparent") {
+    } else if (this.config.layout.variant === "Transparent") {
       this.renderer.addClass(this.document.body, "layout-dark");
       this.renderer.addClass(this.document.body, "layout-transparent");
       this.renderer.addClass(this.document.body, this.bgColor);
@@ -264,7 +254,6 @@ export class FullLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
       this.renderer.removeClass(this.document.body, "navbar-static");
       this.renderer.addClass(this.document.body, "navbar-sticky");
     }
-
   }
 
   toggleSidebar() {
@@ -296,7 +285,6 @@ export class FullLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   isTouchDevice() {
-
     const isMobile = this.deviceService.isMobile();
     const isTablet = this.deviceService.isTablet();
 
@@ -307,7 +295,6 @@ export class FullLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
         this.renderer.removeClass(this.document.body, "overflow-hidden");
       }
     }
-
   }
 
   hideCompactMenuOnSmallScreen() {
@@ -366,10 +353,10 @@ export class FullLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isNavbarSeachTextEmpty = true;
   }
 
-  checkNavbarSeachTextEmpty($event) {
+  checkNavbarSeachTextEmpty($event: boolean) {
     this.isNavbarSeachTextEmpty = $event;
+    console.log('Search text empty:', $event);
   }
-
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
@@ -382,7 +369,6 @@ export class FullLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
       this.hideCompactMenuOnSmallScreen();
     }).bind(this), 500);
   }
-
 
   //Add/remove classes on page scroll
   @HostListener("window:scroll", [])
@@ -406,5 +392,4 @@ export class FullLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
       this.renderer.removeClass(this.document.body, "page-scrolled");
     }
   }
-
 }

@@ -1,0 +1,26 @@
+<div class="top-bar" (click)="handleClickOutside($event)">
+  <input type="text" class="search-input" placeholder="Search..." [(ngModel)]="searchText" (ngModelChange)="onSearchChange()">
+  <div class="dropdown-container" placement="bottom-left" display="static" ngbDropdown> <!-- Thay <li> bằng <div> -->
+    <a class="nav-link dropdown-toggle user-dropdown d-flex align-items-end" id="dropdownBasic2"
+      href="javascript:;" data-toggle="dropdown" ngbDropdownToggle>
+      <div class="user d-md-flex d-none mr-2">
+        <span class="text-right">Admin</span>
+      </div>
+      <i class="fas fa-user-circle"></i>
+    </a>
+    <div class="dropdown-menu text-left dropdown-menu-right m-0 pb-0" aria-labelledby="dropdownBasic2"
+      ngbDropdownMenu>
+      <a class="dropdown-item" routerLink="/pages/change-password">
+        <div class="d-flex align-items-center">
+          <i class="ft-edit mr-2"></i><span>Change password</span>
+        </div>
+      </a>
+      <div class="dropdown-divider"></div>
+      <a class="dropdown-item" routerLink="/pages/login">
+        <div class="d-flex align-items-center">
+          <i class="ft-power mr-2"></i><span>Signout</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>

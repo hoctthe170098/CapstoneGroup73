@@ -1,0 +1,93 @@
+
+<div class="dashboard-content">
+    <h2>DANH SÁCH CÁC CƠ SỞ</h2>
+    <div class="campus-header">
+      <button class="add-campus-button" (click)="openAddCampusModal()">Thêm cơ sở</button>
+    </div>
+  
+    <div class="campus-list">
+      <div class="campus-card" *ngFor="let campus of paginatedCampuses">
+        <i class="fas fa-home"></i>
+        <h3>{{ campus.name }}</h3>
+        <p><i class="fas fa-map-marker-alt"></i> <b>Địa chỉ:</b> {{ campus.address }}</p>
+        <p><i class="fas fa-phone"></i> <b>Tel:</b> {{ campus.phone }}</p>
+        <p><i class="fas fa-calendar-alt"></i> <b>Ngày tạo:</b> {{ campus.createdAt }}</p>
+        <p>
+          <input type="checkbox" [(ngModel)]="campus.isDefault" name="isDefault" (change)="updateDefaultCampus(campus)">
+          <b>Đặt làm cơ sở mặc định</b>
+        </p>
+        <p *ngIf="campus.isActive" class="status active">Trạng thái: Đang kích hoạt</p>
+        <p *ngIf="!campus.isActive" class="status inactive">Trạng thái: Chưa kích hoạt</p>
+        <button class="btn-edit" (click)="openEditCampusModal(campus)">Chỉnh Sửa</button>
+      </div>
+    </div>
+  
+  
+    <!-- Add Campus Modal -->
+    <div class="modal-overlay" (click)="closeModal()" *ngIf="isModalOpen"></div>
+    <div class="modal-content" *ngIf="isModalOpen">
+      <div class="modal-header">
+        <h2>THÊM CƠ SỞ MỚI</h2>
+        <button class="close-btn" (click)="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="addCampusForm" (ngSubmit)="saveCampus()">
+          <div class="form-group">
+            <label for="campusName">Tên Cơ Sở</label>
+            <input id="campusName" formControlName="name" type="text" placeholder="Nhập tên" required>
+          </div>
+          <div class="form-group">
+            <label for="campusAddress">Địa chỉ</label>
+            <input id="campusAddress" formControlName="address" type="text" placeholder="Nhập địa chỉ" required>
+          </div>
+          <div class="form-group">
+            <label for="campusPhone">Số điện thoại</label>
+            <input id="campusPhone" formControlName="phone" type="tel" placeholder="Nhập số điện thoại" required>
+          </div>
+          <div class="form-group">
+            <label>Đặt làm cơ sở mặc định</label>
+            <input type="checkbox" formControlName="isActive" name="isActive">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="cancel-btn" (click)="closeModal()">Hủy</button>
+            <button type="submit" class="save-btn" [disabled]="addCampusForm.invalid">Thêm</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  
+    <!-- Edit Campus Modal -->
+    <div class="modal-overlay" (click)="closeEditModal()" *ngIf="isEditModalOpen"></div>
+    <div class="modal-content" *ngIf="isEditModalOpen">
+      <div class="modal-header">
+        <h2>CHỈNH SỬA CƠ SỞ</h2>
+        <button class="close-btn" (click)="closeEditModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="editCampusForm" (ngSubmit)="updateCampus({ name: editCampusForm.value.name, address: editCampusForm.value.address, phone: editCampusForm.value.phone, isActive: editCampusForm.value.isActive })">
+          <div class="form-group">
+            <label for="editCampusName">Tên Cơ Sở</label>
+            <input id="editCampusName" formControlName="name" type="text" placeholder="Nhập tên" required>
+          </div>
+          <div class="form-group">
+            <label for="editCampusAddress">Địa chỉ</label>
+            <input id="editCampusAddress" formControlName="address" type="text" placeholder="Nhập địa chỉ" required>
+          </div>
+          <div class="form-group">
+            <label for="editCampusPhone">Số điện thoại</label>
+            <input id="editCampusPhone" formControlName="phone" type="tel" placeholder="Nhập số điện thoại" required>
+          </div>
+          <div class="modal-footer">
+            <div class="toggle-container">
+              <label class="toggle-switch">
+                <input type="checkbox" formControlName="isActive" id="toggleActive" (change)="editCampusForm.patchValue({ isActive: !editCampusForm.value.isActive })">
+                <span class="slider"></span>
+              </label>
+              <span class="toggle-label">Kích Hoạt</span>
+            </div>
+            <button type="submit" class="apply-btn" [disabled]="editCampusForm.invalid">Áp Dụng</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>

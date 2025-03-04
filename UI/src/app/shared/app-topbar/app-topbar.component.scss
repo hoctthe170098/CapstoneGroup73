@@ -1,0 +1,130 @@
+.top-bar {
+  display: flex;
+  position: fixed;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  left: 240px; /* Bắt đầu từ sau sidebar (giả định sidebar rộng 220px + 20px margin) */
+  top: 0;
+  right: 0;
+  z-index: 50;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+  background-color: #ffffff;
+  height: 60px; /* Đặt chiều cao cố định để topbar sát với cạnh trên */
+}
+
+.search-input {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 12px;
+  width: 200px;
+  background-color: #fff;
+}
+
+.admin-profile {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+  cursor: pointer;
+  position: relative; /* Để định vị dropdown */
+
+  .dropdown-toggle {
+    text-decoration: none;
+    color: inherit;
+
+    .user {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      margin-right: 10px;
+
+      &.d-md-flex.d-none {
+        display: none;
+
+        @media (min-width: 768px) {
+          display: flex;
+        }
+      }
+
+      .user-name {
+        color: #7e57c2; /* Màu tím cho "John Doe" */
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      .user-status {
+        color: #757575; /* Màu xám cho "Available" */
+        font-size: 12px;
+        font-style: italic;
+      }
+    }
+
+    .avatar {
+      height: 35px;
+      width: 35px;
+      border-radius: 50%; /* Avatar tròn */
+      margin-left: 10px;
+      object-fit: cover;
+    }
+
+    i.fas.fa-caret-down {
+      margin-left: 5px;
+      font-size: 16px;
+      color: #7e57c2; /* Màu tím giống "John Doe" */
+    }
+  }
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%; /* Đặt dropdown ngay dưới nút Admin */
+  right: 0; /* Đặt dropdown bên phải nút Admin */
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 150px;
+  z-index: 1000; /* Đảm bảo hiển thị trên các phần tử khác */
+  list-style: none; /* Xóa dấu bullet nếu có */
+  padding: 0; /* Xóa padding mặc định */
+}
+
+.dropdown-item {
+  padding: 8px 16px;
+  color: #333;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-item:hover {
+  background-color: #f0f0f0;
+  color: #000;
+}
+
+@media (max-width: 768px) {
+  .top-bar {
+    position: static;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    height: auto; /* Loại bỏ chiều cao cố định trên mobile */
+  }
+
+  .search-input {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .admin-profile {
+    margin-left: 0;
+
+    .user {
+      display: none; /* Ẩn tên và trạng thái trên mobile */
+    }
+
+    .dropdown-toggle .avatar {
+      margin-left: 0;
+    }
+  }
+}

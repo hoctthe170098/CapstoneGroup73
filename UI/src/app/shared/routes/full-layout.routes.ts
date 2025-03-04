@@ -12,6 +12,10 @@ export const Full_ROUTES: Routes = [
     loadChildren: () => import('../../sanpham/sanpham.module').then(m => m.SanphamModule)
   },
   {
+    path: 'coso',
+    loadChildren: () => import('../../coso/coso.module').then(m => m.CosoModule)
+  },
+  {
     path: 'calendar',
     loadChildren: () => import('../../calendar/calendar.module').then(m => m.CalendarsModule)
   },
