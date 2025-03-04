@@ -80,7 +80,7 @@ import { SidebarComponent } from './sidebar/sidebar.component';
     TopMenuAnchorToggleDirective,
     TopMenuDirective,
     AppTopbarComponent,
-    SidebarComponent, 
+    
   ]
 })
 export class SharedModule { }
