@@ -3,7 +3,8 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../shared/user.service';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { LoginRequest, LoginResponse } from '../shared/user.model';
+import { ToastrService } from 'ngx-toastr';
+import { LoginRequest} from '../shared/user.model';
 
 @Component({
   selector: 'app-login-page',
@@ -21,7 +22,7 @@ export class LoginPageComponent {
     rememberMe: new FormControl(true)
   });
 
-  constructor(private router: Router, private authService: UserService, private spinner: NgxSpinnerService) {}
+  constructor(private router: Router, private authService: UserService, private spinner: NgxSpinnerService,private toastr: ToastrService) {}
 
   get lf() {
     return this.loginForm.controls;
@@ -29,7 +30,10 @@ export class LoginPageComponent {
 
   onSubmit() {
     this.loginFormSubmitted = true;
+    this.isLoginFailed = false; // Reset lỗi trước khi gửi yêu cầu
+
     if (this.loginForm.invalid) {
+      this.toastr.error('Vui lòng nhập đầy đủ thông tin', 'Lỗi');
       return;
     }
 
@@ -46,16 +50,19 @@ export class LoginPageComponent {
 
         if (res.code === 200) {
           localStorage.setItem('token', res.data);
+          this.toastr.success('Đăng nhập thành công!', 'Thành công');
           this.router.navigate(['/dashboard/dashboard1']);
         } else {
-          this.isLoginFailed = true;
-          this.errorMessage = res.message;
+          this.isLoginFailed = true; 
+          
+          this.toastr.error(res.message, 'Lỗi');
         }
         this.spinner.hide();
       },
       (error) => {
-        this.isLoginFailed = true;
-        this.errorMessage = 'Đăng nhập thất bại. Vui lòng thử lại!';
+        this.isLoginFailed = true; 
+        
+        this.toastr.error('Đăng nhập thất bại. Vui lòng thử lại!', 'Lỗi');
         this.spinner.hide();
         console.error('Login failed:', error);
       }
