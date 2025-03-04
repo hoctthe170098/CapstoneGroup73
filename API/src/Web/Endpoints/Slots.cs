@@ -12,8 +12,8 @@ public class Slots : EndpointGroupBase
     public override void Map(WebApplication app)
     {
         app.MapGroup(this)
-            .MapGet(GetSlots, "slots") 
-            .MapPost(CreateSlot, "slots/create"); 
+            .MapGet(GetSlots, "getslots") 
+            .MapPost(CreateSlot, "createslot"); 
     }
     [Authorize(Roles = Roles.CampusManager)]
     [Authorize(Roles = Roles.Administrator)]

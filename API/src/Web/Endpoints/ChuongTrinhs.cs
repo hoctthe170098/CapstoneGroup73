@@ -12,8 +12,8 @@ public class ChuongTrinhs : EndpointGroupBase
     public override void Map(WebApplication app)
     {
         app.MapGroup(this)
-            .MapPost(CreateChuongTrinh, "chuongtrinh/create")
-            .MapGet(GetChuongTrinhsWithPagination, "chuongtrinh/list");
+            .MapPost(CreateChuongTrinh, "createchuongtrinh")
+            .MapGet(GetChuongTrinhsWithPagination, "getchuongtrinhs");
     }
     [Authorize(Roles = Roles.LearningManager)]
     public async Task<Output> CreateChuongTrinh(ISender sender, [FromBody] CreateChuongTrinhCommand command)

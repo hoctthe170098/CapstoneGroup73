@@ -10,8 +10,8 @@ public class LichHocs : EndpointGroupBase
     public override void Map(WebApplication app)
     {
         app.MapGroup(this)
-            .MapPost(CreateLichHoc, "lichhoc/create")
-            .MapPut(EditLichHoc, "lichhoc/edit");
+            .MapPost(CreateLichHoc, "createlichhoc")
+            .MapPut(EditLichHoc, "editlichhoc");
     }
 
     public async Task<Output> CreateLichHoc(ISender sender, [FromBody] CreateLichHocCommand command)
