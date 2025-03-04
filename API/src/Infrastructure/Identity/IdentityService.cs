@@ -135,7 +135,7 @@ public class IdentityService : IIdentityService
         if (user == null)
         {
             output.isError = false;
-            output.message = "Đã gửi mật khẩu mới vào email";
+            output.message = "Email không khớp, vui lòng thử lại!";
             return output;
         };
         var newPassword = GenerateRandomPassword();
