@@ -12,10 +12,10 @@ import { ForgotPasswordPageComponent } from "./forgot-password/forgot-password-p
 import { LockScreenPageComponent } from "./lock-screen/lock-screen-page.component";
 import { LoginPageComponent } from "./login/login-page.component";
 import { MaintenancePageComponent } from "./maintenance/maintenance-page.component";
-import { RegisterPageComponent } from "./register/register-page.component";
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { ChangePasswordComponent } from './change-password/change-password.component';
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, "./assets/i18n/", ".json");
@@ -44,7 +44,8 @@ export function createTranslateLoader(http: HttpClient) {
     LockScreenPageComponent,
     LoginPageComponent,
     MaintenancePageComponent,
-    RegisterPageComponent
+    ChangePasswordComponent
+    
   ]
 })
 export class ContentPagesModule { }

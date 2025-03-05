@@ -349,4 +349,20 @@ public class IdentityService : IIdentityService
         var roles = await _userManager.GetRolesAsync(user);
         return roles.ToList();
     }
+
+    public async Task<bool> AssignRoleAsync(string userId, string roleName)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null) return false;
+
+        var validRoles = new List<string> { "Administrator", "Student", "LearningManager", "Teacher", "CampusManager" }; 
+        if (!validRoles.Contains(roleName))
+        {
+            throw new Exception($"Vai trò '{roleName}' không hợp lệ.");
+        }
+
+        var result = await _userManager.AddToRoleAsync(user, roleName);
+        return result.Succeeded;
+    }
+
 }

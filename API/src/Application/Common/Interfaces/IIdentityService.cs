@@ -14,4 +14,5 @@ public interface IIdentityService
     Task<Output> ForgotPasswordByPhone(string phone);
     Task<Output> ChangePassword(string token, string oldPassword, string newPassword);
     Task<List<string>> GetRolesByUserId(string userId);
+    Task<bool> AssignRoleAsync(string userId, string role);
 }

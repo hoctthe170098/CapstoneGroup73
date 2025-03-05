@@ -6,6 +6,9 @@ import { Observable } from 'rxjs';
 
 @Injectable()
 export class AuthService {
+  login(username: any, password: any) {
+    throw new Error('Method not implemented.');
+  }
   private user: Observable<firebase.User>;
   private userDetails: firebase.User = null;
 

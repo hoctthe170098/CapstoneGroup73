@@ -102,6 +102,78 @@
         }
       }
     },
+    "/api/ChuongTrinhs/chuongtrinh/create": {
+      "post": {
+        "tags": [
+          "ChuongTrinhs"
+        ],
+        "operationId": "CreateChuongTrinh",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateChuongTrinhCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ChuongTrinhs/chuongtrinh/list": {
+      "get": {
+        "tags": [
+          "ChuongTrinhs"
+        ],
+        "operationId": "GetChuongTrinhsWithPagination",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedListOfChuongTrinhDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/CoSos/createcoso": {
       "post": {
         "tags": [
@@ -198,6 +270,70 @@
         }
       }
     },
+    "/api/LichHocs/lichhoc/create": {
+      "post": {
+        "tags": [
+          "LichHocs"
+        ],
+        "operationId": "CreateLichHoc",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLichHocCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/LichHocs/lichhoc/edit": {
+      "put": {
+        "tags": [
+          "LichHocs"
+        ],
+        "operationId": "EditLichHoc",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditLichHocCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/NhanViens/getnhanvienswithpagination": {
       "post": {
         "tags": [
@@ -210,6 +346,61 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/GetNhanViensWithPaginationQuery"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Slots/slots": {
+      "get": {
+        "tags": [
+          "Slots"
+        ],
+        "operationId": "GetSlots",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SlotDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Slots/createslot": {
+      "post": {
+        "tags": [
+          "Slots"
+        ],
+        "operationId": "CreateSlot",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSlotCommand"
               }
             }
           },
@@ -619,6 +810,64 @@
           }
         }
       },
+      "CreateChuongTrinhCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tieuDe": {
+            "type": "string"
+          },
+          "moTa": {
+            "type": "string"
+          }
+        }
+      },
+      "PaginatedListOfChuongTrinhDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChuongTrinhDto"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hasPreviousPage": {
+            "type": "boolean"
+          },
+          "hasNextPage": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ChuongTrinhDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tieuDe": {
+            "type": "string"
+          },
+          "moTa": {
+            "type": "string"
+          }
+        }
+      },
       "CreateCoSoComand": {
         "type": "object",
         "additionalProperties": false,
@@ -677,6 +926,101 @@
           }
         }
       },
+      "CreateLichHocCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "thu": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "slotId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "phong": {
+            "type": "string"
+          },
+          "tenLop": {
+            "type": "string"
+          },
+          "ngayBatDau": {
+            "type": "string"
+          },
+          "ngayKetThuc": {
+            "type": "string",
+            "nullable": true
+          },
+          "hocPhi": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "trangThai": {
+            "type": "string"
+          },
+          "giaoVienCode": {
+            "type": "string"
+          },
+          "chuongTrinhId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "EditLichHocCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "thu": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "slotId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "phong": {
+            "type": "string",
+            "nullable": true
+          },
+          "tenLop": {
+            "type": "string",
+            "nullable": true
+          },
+          "ngayBatDau": {
+            "type": "string",
+            "nullable": true
+          },
+          "ngayKetThuc": {
+            "type": "string",
+            "nullable": true
+          },
+          "hocPhi": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "trangThai": {
+            "type": "string",
+            "nullable": true
+          },
+          "giaoVienCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "chuongTrinhId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        }
+      },
       "GetNhanViensWithPaginationQuery": {
         "type": "object",
         "additionalProperties": false,
@@ -703,6 +1047,47 @@
           },
           "sortBy": {
             "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "SlotDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ten": {
+            "type": "string"
+          },
+          "batDau": {
+            "type": "string",
+            "format": "time"
+          },
+          "ketThuc": {
+            "type": "string",
+            "format": "time"
+          }
+        }
+      },
+      "CreateSlotCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "ten": {
+            "type": "string",
+            "nullable": true
+          },
+          "batDau": {
+            "type": "string",
+            "format": "time",
+            "nullable": true
+          },
+          "ketThuc": {
+            "type": "string",
+            "format": "time",
             "nullable": true
           }
         }

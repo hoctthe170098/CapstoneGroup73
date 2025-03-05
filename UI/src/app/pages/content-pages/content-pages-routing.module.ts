@@ -7,11 +7,13 @@ import { ForgotPasswordPageComponent } from "./forgot-password/forgot-password-p
 import { LockScreenPageComponent } from "./lock-screen/lock-screen-page.component";
 import { LoginPageComponent } from "./login/login-page.component";
 import { MaintenancePageComponent } from "./maintenance/maintenance-page.component";
-import { RegisterPageComponent } from "./register/register-page.component";
+import { ChangePasswordComponent } from './change-password/change-password.component';
+
 
 
 const routes: Routes = [
   {
+    
     path: '',
     children: [
       {
@@ -43,6 +45,10 @@ const routes: Routes = [
           title: 'Lock Screen page'
         }
       },   
+      { 
+        path: 'change-password', 
+        component: ChangePasswordComponent 
+      },
       {
         path: 'login',
         component: LoginPageComponent,
@@ -57,13 +63,7 @@ const routes: Routes = [
           title: 'Maintenance Page'
         }
       },
-      {
-        path: 'register',
-        component: RegisterPageComponent,
-        data: {
-          title: 'Register Page'
-        }
-      }   
+       
       
     ]
   }
