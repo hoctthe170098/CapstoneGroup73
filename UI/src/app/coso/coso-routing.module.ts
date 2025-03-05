@@ -8,11 +8,11 @@ const routes: Routes = [
     path: '',
      component: CosoComponent,
     data: {
-      title: 'Sản phẩm'
+      title: 'Cơ sở'
     }
   },
   {
-    path: 'danh-sach-sanpham',
+    path: 'danh-sach-coso',
     component: CosoComponent
   }
 ];

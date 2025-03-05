@@ -1,5 +1,5 @@
 import { Component, Output, EventEmitter, HostListener } from '@angular/core';
-
+import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-topbar',
   templateUrl: './app-topbar.component.html',

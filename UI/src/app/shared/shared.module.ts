@@ -32,7 +32,6 @@ import { TopMenuDirective } from './directives/topmenu.directive';
 import { TopMenuLinkDirective } from './directives/topmenu-link.directive';
 import { TopMenuDropdownDirective } from './directives/topmenu-dropdown.directive';
 import { TopMenuAnchorToggleDirective } from './directives/topmenu-anchor-toggle.directive';
-import { SidebarComponent } from './sidebar/sidebar.component';
 
 @NgModule({
   exports: [

@@ -1,105 +1,162 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CoSo } from './shared/coso.model';
+import { CoSoService } from './shared/coso.service';
+import { ChangeDetectorRef } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 @Component({
-  selector: 'app-coso',
-  templateUrl: './coso.component.html',
-  styleUrls: ['./coso.component.scss']
+    selector: 'app-coso',
+    templateUrl: './coso.component.html',
+    styleUrls: ['./coso.component.scss']
 })
-export class CosoComponent {
-  campuses = [
-    { id: 1, name: 'Hoàng Văn Thái', address: '24 Hoàng Văn Thái, phường Thanh Xuân, TP Hà Nội', phone: '0123-456-789', createdAt: '23-11-2012', isActive: false, isDefault: false },
-    { id: 2, name: 'A', address: '24 Hoàng Văn Thái, phường Thanh Xuân, TP Hà Nội', phone: '0123-456-789', createdAt: '23-11-2012', isActive: false, isDefault: false },
-    { id: 3, name: 'B', address: '24 Hoàng Văn Thái, phường Thanh Xuân, TP Hà Nội', phone: '0123-456-789', createdAt: '23-11-2012', isActive: false, isDefault: false },
-    { id: 4, name: 'C', address: '24 Hoàng Văn Thái, phường Thanh Xuân, TP Hà Nội', phone: '0123-456-789', createdAt: '23-11-2012', isActive: false, isDefault: false },
-    { id: 5, name: 'D', address: '24 Hoàng Văn Thái, phường Thanh Xuân, TP Hà Nội', phone: '0123-456-789', createdAt: '23-11-2012', isActive: false, isDefault: false },
-    { id: 6, name: 'Nguyễn Trãi', address: '55 Nguyễn Trãi, TP Hà Nội', phone: '0987-654-321', createdAt: '10-05-2015', isActive: false, isDefault: false }
-  ];
-  isModalOpen = false;
-  isEditModalOpen = false;
-  selectedCampus: any = null;
-  itemsPerPage = 6;
-  currentPage = 1;
+export class CosoComponent implements OnInit {
+    campuses: CoSo[] = [];
+    isModalOpen = false;
+    isEditModalOpen = false;
+    selectedCampus: CoSo | null = null;
 
-  addCampusForm: FormGroup;
-  editCampusForm: FormGroup;
+    itemsPerPage = 6;
+    currentPage = 1;
+    totalItems = 0;
+    searchText = '';
 
-  constructor(private fb: FormBuilder) {
-    this.addCampusForm = this.fb.group({
-      name: ['', Validators.required],
-      address: ['', Validators.required],
-      phone: ['', [Validators.required, Validators.pattern(/^\d{10,11}$/)]],
-      isActive: [false]
-    });
+    addCampusForm: FormGroup;
+    editCampusForm: FormGroup;
 
-    this.editCampusForm = this.fb.group({
-      name: ['', Validators.required],
-      address: ['', Validators.required],
-      phone: ['', [Validators.required, Validators.pattern(/^\d{10,11}$/)]],
-      isActive: [false]
-    });
-  }
+    constructor(
+        private fb: FormBuilder,
+        private coSoService: CoSoService,
+        private cdr: ChangeDetectorRef,
+        private toastr: ToastrService
+    ) {
+        this.addCampusForm = this.fb.group({
+            ten: ['', [Validators.required, Validators.maxLength(30)]],
+            diaChi: ['', [Validators.required, Validators.maxLength(50)]],
+            soDienThoai: ['', [
+                Validators.required,
+                Validators.maxLength(11),
+                Validators.pattern(/^0\d{9,10}$/)  // Bắt đầu bằng 0 và đủ độ dài 10-11 số
+            ]]
+        });
 
-  openModal() {
-    this.isModalOpen = true;
-  }
-
-  openAddCampusModal() {
-    this.addCampusForm.reset();
-    this.openModal();
-  }
-
-  openEditCampusModal(campus: any) {
-    this.selectedCampus = { ...campus };
-    this.editCampusForm.patchValue(this.selectedCampus);
-    this.isEditModalOpen = true;
-  }
-
-  closeModal() {
-    this.isModalOpen = false;
-  }
-
-  closeEditModal() {
-    this.isEditModalOpen = false;
-  }
-
-  saveCampus() {
-    if (this.addCampusForm.valid) {
-      const newCampus = {
-        id: this.campuses.length + 1,
-        ...this.addCampusForm.value,
-        createdAt: new Date().toLocaleDateString(),
-        isDefault: false
-      };
-      this.campuses.push(newCampus);
-      this.closeModal();
+        this.editCampusForm = this.fb.group({
+            ten: ['', Validators.required],
+            diaChi: ['', Validators.required],
+            soDienThoai: ['', [Validators.required, Validators.pattern(/^\d{10,11}$/)]],
+            isActive: [false]  // dùng để bind với toggle switch
+        });
     }
-  }
 
-  updateCampus(updatedCampus: any) {
-    if (this.editCampusForm.valid && this.selectedCampus) {
-      const index = this.campuses.findIndex(c => c.id === this.selectedCampus.id);
-      if (index !== -1) {
-        this.campuses[index] = { ...this.selectedCampus, ...updatedCampus }; // Cập nhật toàn bộ dữ liệu, bao gồm isActive
-        this.closeEditModal();
-      }
+    ngOnInit(): void {
+        this.loadDanhSachCoSo();
     }
-  }
 
-  updateDefaultCampus(campus: any) {
-    this.campuses.forEach(c => c.isDefault = c === campus);
-  }
+    loadDanhSachCoSo() {
+        this.coSoService.getDanhSachCoSo(this.currentPage, this.itemsPerPage, this.searchText)
+            .subscribe(response => {
+                console.log('Dữ liệu nhận từ BE:', response.data.items);
+                this.campuses = response.data.items;
+                this.totalItems = response.data.totalCount;
+                this.cdr.detectChanges();
+            });
+    }
 
-  get paginatedCampuses() {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    return this.campuses.slice(startIndex, endIndex);
-  }
+    openAddCampusModal() {
+        this.addCampusForm.reset();
+        this.isModalOpen = true;
+        this.addCampusForm.markAllAsTouched(); 
+    }
+    
 
-  changePage(page: number) {
-    this.currentPage = page;
-  }
+    openEditCampusModal(campus: CoSo) {
+        this.selectedCampus = { ...campus };
 
-  get totalPages() {
-    return Math.ceil(this.campuses.length / this.itemsPerPage);
-  }
+        const isActive = campus.trangThai === 'open';  // map trạng thái thành boolean
+
+        this.editCampusForm.patchValue({
+            ten: campus.ten,
+            diaChi: campus.diaChi,
+            soDienThoai: campus.soDienThoai,
+            isActive: isActive
+        });
+
+        this.isEditModalOpen = true;
+    }
+
+    saveCampus() {
+        if (this.addCampusForm.invalid) {
+            this.addCampusForm.markAllAsTouched();  // Đánh dấu tất cả field để hiển thị lỗi
+            return;
+        }
+
+        const newCampus = this.addCampusForm.value;
+
+        this.coSoService.createCoSo(newCampus).subscribe({
+            next: (res) => {
+                this.toastr.success('Tạo cơ sở mới thành công');
+                this.closeModal();
+                this.loadDanhSachCoSo();
+            },
+            error: (err) => {
+                console.error('Lỗi khi tạo cơ sở:', err);
+                this.toastr.error('Có lỗi xảy ra khi tạo cơ sở');
+            }
+        });
+    }
+
+    updateCampus() {
+        if (this.editCampusForm.valid && this.selectedCampus) {
+            const updatedCampus = {
+                ...this.selectedCampus,
+                ten: this.editCampusForm.value.ten,
+                diaChi: this.editCampusForm.value.diaChi,
+                soDienThoai: this.editCampusForm.value.soDienThoai,
+                trangThai: this.editCampusForm.value.isActive ? 'open' : 'close'  // map ngược lại khi gửi lên
+            };
+
+            this.coSoService.updateCoSo(updatedCampus).subscribe({
+                next: () => {
+                    this.closeEditModal();
+                    this.loadDanhSachCoSo();
+                },
+                error: (err) => {
+                    console.error('Lỗi cập nhật:', err);
+                    alert('Cập nhật thất bại');
+                }
+            });
+        }
+    }
+
+    updateDefaultCampus(campus: CoSo, isChecked: boolean) {
+        campus.default = isChecked;
+
+        if (isChecked) {
+            this.campuses.forEach(c => {
+                if (c.id !== campus.id) {
+                    c.default = false;
+                }
+            });
+        }
+
+        this.coSoService.updateCoSo(campus).subscribe(() => {
+            this.loadDanhSachCoSo();
+        });
+    }
+
+    closeModal() { this.isModalOpen = false; }
+    closeEditModal() { this.isEditModalOpen = false; }
+    changePage(page: number) { this.currentPage = page; this.loadDanhSachCoSo(); }
+    searchCampus() { this.currentPage = 1; this.loadDanhSachCoSo(); }
+    get totalPages() { return Math.ceil(this.totalItems / this.itemsPerPage); }
+    getPageNumbers(): number[] {
+        const pages: number[] = [];
+        for (let i = 1; i <= this.totalPages; i++) {
+            pages.push(i);
+        }
+        return pages;
+    }
+    get f() {
+        return this.addCampusForm.controls;
+    }
+    
 }

@@ -17,7 +17,7 @@ public class CoSos : EndpointGroupBase
             .MapPost(GetCoSosWithPagination, "getcososwithpagination")
             .MapPut(EditCoSo,"editcoso");
     }
-    [Authorize(Roles = Roles.Administrator)]
+    //[Authorize(Roles = Roles.Administrator)]
     public async Task<Output> CreateCoSo(ISender sender, CreateCoSoComand comand)
     {
         return await sender.Send(comand);
@@ -27,7 +27,7 @@ public class CoSos : EndpointGroupBase
     {
         return await sender.Send(query);
     }
-    [Authorize(Roles = Roles.Administrator)]
+    //[Authorize(Roles = Roles.Administrator)]
     public async Task<Output> EditCoSo(ISender sender, EditCoSoComand comand)
     {
         return await sender.Send(comand);
