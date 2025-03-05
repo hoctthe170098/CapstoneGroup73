@@ -20,7 +20,6 @@ public record CreateNhanVienCommand : IRequest<Output>
     public string? Email { get; init; }
     public string? SoDienThoai { get; init; }
     public required Guid CoSoId { get; init; }
-    public string? UserId { get; init; }
     public required string Role { get; init; }
 }
 
@@ -74,6 +73,15 @@ public class CreateNhanVienCommandHandler : IRequestHandler<CreateNhanVienComman
             throw new NotFoundDataException("Cơ sở không tồn tại");
         }
 
+        // Create identity user
+        var userName = $"{request.Ten.ToLower().Replace(" ", "")}{DateTime.Now.Ticks}@studyflow.com";
+        var (result, userId) = await _identityService.CreateUserAsync(userName, "Default@123");
+
+        if (!result.Succeeded)
+        {
+            throw new Exception("Tạo tài khoản thất bại: " + string.Join(", ", result.Errors));
+        }
+
         // Create new NhanVien entity
         var nhanVien = new NhanVien
         {
@@ -85,16 +93,16 @@ public class CreateNhanVienCommandHandler : IRequestHandler<CreateNhanVienComman
             Email = request.Email,
             SoDienThoai = request.SoDienThoai,
             CoSoId = request.CoSoId,
-            UserId = request.UserId // Can be null
+            UserId = userId
         };
 
         _context.NhanViens.Add(nhanVien);
         await _context.SaveChangesAsync(cancellationToken);
 
-        // ✅ Assign user to role if UserId exists
-        if (!string.IsNullOrEmpty(request.UserId))
+        // Assign user to role if UserId exists
+        if (!string.IsNullOrEmpty(nhanVien.UserId))
         {
-            await _identityService.AssignRoleAsync(request.UserId, request.Role);
+            await _identityService.AssignRoleAsync(userId, request.Role);
         }
 
         return new Output

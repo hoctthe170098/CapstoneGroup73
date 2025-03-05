@@ -20,7 +20,7 @@ public class EditNhanVienCommand : IRequest<Output>
     public string? Email { get; init; }
     public string? SoDienThoai { get; init; }
     public required string CoSoId { get; init; }
-    public string? UserId { get; init; }
+    public required string UserId { get; init; }
     public required string Role { get; init; }
 }
 
@@ -73,8 +73,7 @@ public class EditNhanVienCommandHandler : IRequestHandler<EditNhanVienCommand, O
             throw new NotFoundDataException("Cơ sở không tồn tại");
         }
 
-        Guid g_id = Guid.Parse(request.Code);
-        var nhanVien = await _context.NhanViens.FindAsync(new object[] { g_id }, cancellationToken);
+        var nhanVien = await _context.NhanViens.FindAsync(new object[] { request.Code }, cancellationToken);
 
         if (nhanVien == null) throw new NotFoundIDException();
         else
@@ -87,6 +86,7 @@ public class EditNhanVienCommandHandler : IRequestHandler<EditNhanVienCommand, O
             nhanVien.Email = request.Email;
             nhanVien.SoDienThoai = request.SoDienThoai;
             nhanVien.CoSoId = Guid.Parse(request.CoSoId);
+            await _identityService.AssignRoleAsync(request.UserId, request.Role);
         }
 
         await _context.SaveChangesAsync(cancellationToken);
