@@ -14,4 +14,16 @@ export interface ForgotPassword {
     data: string;  // Token trả về từ API
     message: string;
   }
-  
+ // Interface gửi lên API
+export interface ChangePasswordRequest {
+  token: string;
+  oldPassword: string;
+  newPassword: string;
+}
+
+// Interface dùng trong form Angular (gồm confirmPassword)
+export interface ChangePasswordForm {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
