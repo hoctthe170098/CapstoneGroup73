@@ -29,6 +29,8 @@ import { AuthGuard } from "./shared/auth/auth-guard.service";
 import { WINDOW_PROVIDERS } from './shared/services/window.service';
 import { FormsModule,ReactiveFormsModule  } from '@angular/forms';
 import { QuillModule } from "ngx-quill";
+// import { ChangePasswordComponent } from './pages/content-pages/change-password/change-password.component';
+
 var firebaseConfig = {
   apiKey: "YOUR_API_KEY", //YOUR_API_KEY
   authDomain: "YOUR_AUTH_DOMAIN", //YOUR_AUTH_DOMAIN
@@ -51,7 +53,7 @@ export function createTranslateLoader(http: HttpClient) {
 }
 
 @NgModule({
-  declarations: [AppComponent, FullLayoutComponent, ContentLayoutComponent],
+  declarations: [AppComponent, FullLayoutComponent, ContentLayoutComponent,],
   imports: [
     BrowserAnimationsModule,
     StoreModule.forRoot(fromApp.appReducer),
