@@ -11,8 +11,8 @@ public record CreateLichHocCommand : IRequest<Output>
     public int SlotId { get; set; }
     public string Phong { get; set; } = string.Empty;
     public string TenLop { get; set; } = string.Empty;
-    public string NgayBatDau { get; set; } = string.Empty;
-    public string? NgayKetThuc { get; set; }
+    public DateOnly NgayBatDau { get; set; } 
+    public DateOnly NgayKetThuc { get; set; }
     public int HocPhi { get; set; }
     public string TrangThai { get; set; } = string.Empty;
     public string GiaoVienCode { get; set; } = string.Empty;

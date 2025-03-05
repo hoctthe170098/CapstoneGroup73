@@ -102,7 +102,7 @@
         }
       }
     },
-    "/api/ChuongTrinhs/chuongtrinh/create": {
+    "/api/ChuongTrinhs/createchuongtrinh": {
       "post": {
         "tags": [
           "ChuongTrinhs"
@@ -134,7 +134,7 @@
         }
       }
     },
-    "/api/ChuongTrinhs/chuongtrinh/list": {
+    "/api/ChuongTrinhs/getchuongtrinhs": {
       "get": {
         "tags": [
           "ChuongTrinhs"
@@ -270,7 +270,7 @@
         }
       }
     },
-    "/api/LichHocs/lichhoc/create": {
+    "/api/LichHocs/createlichhoc": {
       "post": {
         "tags": [
           "LichHocs"
@@ -302,7 +302,7 @@
         }
       }
     },
-    "/api/LichHocs/lichhoc/edit": {
+    "/api/LichHocs/editlichhoc": {
       "put": {
         "tags": [
           "LichHocs"
@@ -314,6 +314,38 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/EditLichHocCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/NhanViens/createnhanvien": {
+      "post": {
+        "tags": [
+          "NhanViens"
+        ],
+        "operationId": "CreateNhanVien",
+        "requestBody": {
+          "x-name": "comand",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNhanVienCommand"
               }
             }
           },
@@ -366,7 +398,39 @@
         }
       }
     },
-    "/api/Slots/slots": {
+    "/api/NhanViens/editnhanvien": {
+      "put": {
+        "tags": [
+          "NhanViens"
+        ],
+        "operationId": "EditNhanVien",
+        "requestBody": {
+          "x-name": "comand",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditNhanVienCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Slots/getslots": {
       "get": {
         "tags": [
           "Slots"
@@ -945,11 +1009,12 @@
             "type": "string"
           },
           "ngayBatDau": {
-            "type": "string"
+            "type": "string",
+            "format": "date"
           },
           "ngayKetThuc": {
             "type": "string",
-            "nullable": true
+            "format": "date"
           },
           "hocPhi": {
             "type": "integer",
@@ -995,11 +1060,11 @@
           },
           "ngayBatDau": {
             "type": "string",
-            "nullable": true
+            "format": "date"
           },
           "ngayKetThuc": {
             "type": "string",
-            "nullable": true
+            "format": "date"
           },
           "hocPhi": {
             "type": "integer",
@@ -1018,6 +1083,43 @@
             "type": "integer",
             "format": "int32",
             "nullable": true
+          }
+        }
+      },
+      "CreateNhanVienCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "ten": {
+            "type": "string"
+          },
+          "gioiTinh": {
+            "type": "string"
+          },
+          "diaChi": {
+            "type": "string"
+          },
+          "ngaySinh": {
+            "type": "string",
+            "format": "date"
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "soDienThoai": {
+            "type": "string",
+            "nullable": true
+          },
+          "coSoId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "role": {
+            "type": "string"
           }
         }
       },
@@ -1048,6 +1150,45 @@
           "sortBy": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "EditNhanVienCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "ten": {
+            "type": "string"
+          },
+          "gioiTinh": {
+            "type": "string"
+          },
+          "diaChi": {
+            "type": "string"
+          },
+          "ngaySinh": {
+            "type": "string",
+            "format": "date"
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "soDienThoai": {
+            "type": "string",
+            "nullable": true
+          },
+          "coSoId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
           }
         }
       },

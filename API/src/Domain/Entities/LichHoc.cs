@@ -15,8 +15,8 @@ public class LichHoc
     public Slot Slot { get; set; } = null!;
     public required string Phong { get; set; }
     public required string TenLop { get; set; }
-    public required string NgayBatDau { get; set; }
-    public string? NgayKetThuc {  get; set; }
+    public required DateOnly NgayBatDau { get; set; }
+    public DateOnly? NgayKetThuc {  get; set; }
     public required int HocPhi { get; set; }
     public required string TrangThai { get; set; }
     public required string GiaoVienCode { get; set; }

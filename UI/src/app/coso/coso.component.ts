@@ -53,21 +53,26 @@ export class CosoComponent implements OnInit {
 
     loadDanhSachCoSo() {
         this.coSoService.getDanhSachCoSo(this.currentPage, this.itemsPerPage, this.searchText)
-            .subscribe(response => {
-                console.log('Dữ liệu nhận từ BE:', response.data.items);
-                this.campuses = response.data.items;
-                this.totalItems = response.data.totalCount;
-                this.cdr.detectChanges();
-            });
+            .subscribe(
+                (res: any) => {
+                    if (!res.isError) {
+                        console.log('Dữ liệu nhận từ BE:', res.data.items);
+                        this.campuses = res.data.items;
+                        this.totalItems = res.data.totalCount;
+                        this.cdr.detectChanges();
+                    } else {
+                        this.toastr.error(res.message)
+                    }
+                }, err => {
+                    this.toastr.error('Có lỗi xảy ra, vui lòng thử lại!');
+                });
     }
 
     openAddCampusModal() {
         this.addCampusForm.reset();
         this.isModalOpen = true;
-        this.addCampusForm.markAllAsTouched(); 
+        this.addCampusForm.markAllAsTouched();
     }
-    
-
     openEditCampusModal(campus: CoSo) {
         this.selectedCampus = { ...campus };
 
@@ -93,17 +98,19 @@ export class CosoComponent implements OnInit {
 
         this.coSoService.createCoSo(newCampus).subscribe({
             next: (res) => {
-                this.toastr.success('Tạo cơ sở mới thành công');
-                this.closeModal();
-                this.loadDanhSachCoSo();
+                if (!res.isError) {
+                    this.toastr.success(res.message)
+                    this.closeModal();
+                    this.loadDanhSachCoSo();
+                }else
+                this.toastr.error(res.message)
             },
             error: (err) => {
                 console.error('Lỗi khi tạo cơ sở:', err);
-                this.toastr.error('Có lỗi xảy ra khi tạo cơ sở');
+                this.toastr.error('Có lỗi xảy, vui lòng thử lại!');
             }
         });
     }
-
     updateCampus() {
         if (this.editCampusForm.valid && this.selectedCampus) {
             const updatedCampus = {
@@ -113,15 +120,17 @@ export class CosoComponent implements OnInit {
                 soDienThoai: this.editCampusForm.value.soDienThoai,
                 trangThai: this.editCampusForm.value.isActive ? 'open' : 'close'  // map ngược lại khi gửi lên
             };
-
             this.coSoService.updateCoSo(updatedCampus).subscribe({
-                next: () => {
-                    this.closeEditModal();
-                    this.loadDanhSachCoSo();
+                next: (res) => {
+                    if (!res.isError) {
+                        this.toastr.success(res.message)
+                        this.closeEditModal();
+                        this.loadDanhSachCoSo();
+                    }else
+                    this.toastr.error(res.message)
                 },
                 error: (err) => {
-                    console.error('Lỗi cập nhật:', err);
-                    alert('Cập nhật thất bại');
+                    this.toastr.error('Có lỗi xảy, vui lòng thử lại!');
                 }
             });
         }
@@ -137,7 +146,6 @@ export class CosoComponent implements OnInit {
                 }
             });
         }
-
         this.coSoService.updateCoSo(campus).subscribe(() => {
             this.loadDanhSachCoSo();
         });
@@ -158,5 +166,5 @@ export class CosoComponent implements OnInit {
     get f() {
         return this.addCampusForm.controls;
     }
-    
+
 }
