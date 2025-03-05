@@ -25,7 +25,7 @@ export class ForgotPasswordPageComponent {
   
     if (!emailValue || !this.validateEmail(emailValue)) {
       this.emailInvalid = true;
-      this.toastr.error('Vui lòng nhập email hợp lệ!', 'Lỗi');
+      //this.toastr.error('Vui lòng nhập email hợp lệ!', 'Lỗi');
       return;
     }
   
