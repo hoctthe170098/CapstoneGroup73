@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,4 +21,6 @@ public class CoSo
     public IList<GiaoVien> GiaoViens { get; private set; } = new List<GiaoVien>();
     [JsonIgnore]
     public IList<HocSinh> HocSinhs { get; private set; } = new List<HocSinh>();
+    [JsonIgnore]
+    public IList<LichHoc> LichHocs { get; private set; } = new List<LichHoc>();
 }

@@ -1029,6 +1029,10 @@
           "chuongTrinhId": {
             "type": "integer",
             "format": "int32"
+          },
+          "coSoId": {
+            "type": "string",
+            "nullable": true
           }
         }
       },

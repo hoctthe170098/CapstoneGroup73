@@ -17,6 +17,7 @@ public record CreateLichHocCommand : IRequest<Output>
     public string TrangThai { get; set; } = string.Empty;
     public string GiaoVienCode { get; set; } = string.Empty;
     public int ChuongTrinhId { get; set; }
+    public string? CoSoId { get; set; }
 }
 
 public class CreateLichHocCommandHandler : IRequestHandler<CreateLichHocCommand, Output>
@@ -30,6 +31,7 @@ public class CreateLichHocCommandHandler : IRequestHandler<CreateLichHocCommand,
 
     public async Task<Output> Handle(CreateLichHocCommand request, CancellationToken cancellationToken)
     {
+
         // Validate các trường không được bị để trống và không hợp lệ 
         if (string.IsNullOrWhiteSpace(request.TenLop) ||
             string.IsNullOrWhiteSpace(request.Phong) ||
@@ -39,6 +41,9 @@ public class CreateLichHocCommandHandler : IRequestHandler<CreateLichHocCommand,
             request.SlotId <= 0 ||
             request.ChuongTrinhId <= 0 ||
             request.HocPhi < 0)
+
+        if (string.IsNullOrWhiteSpace(request.TenLop) || string.IsNullOrWhiteSpace(request.Phong)
+            ||string.IsNullOrWhiteSpace(request.CoSoId))
         {
             throw new NotFoundDataException("Các trường thông tin không được để trống hoặc không hợp lệ.");
         }
@@ -54,7 +59,7 @@ public class CreateLichHocCommandHandler : IRequestHandler<CreateLichHocCommand,
         {
             throw new Exception("Lịch học đã tồn tại cho phòng, slot và chương trình này.");
         }
-
+        
         var lichHoc = new LichHoc
         {
             Id = Guid.NewGuid(),
@@ -67,7 +72,8 @@ public class CreateLichHocCommandHandler : IRequestHandler<CreateLichHocCommand,
             HocPhi = request.HocPhi,
             TrangThai = request.TrangThai,
             GiaoVienCode = request.GiaoVienCode,
-            ChuongTrinhId = request.ChuongTrinhId
+            ChuongTrinhId = request.ChuongTrinhId,
+            CoSoId = Guid.Parse(request.CoSoId)
         };
 
         _context.LichHocs.Add(lichHoc);
