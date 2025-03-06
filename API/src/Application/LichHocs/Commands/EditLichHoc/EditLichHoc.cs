@@ -33,8 +33,6 @@ public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Out
             ?? throw new NotFoundDataException($"Không tìm thấy lịch học với ID {request.Id}.");
 
         if (request.Thu.HasValue) lichHoc.Thu = request.Thu.Value;
-        if (request.SlotId.HasValue) lichHoc.SlotId = request.SlotId.Value;
-        if (!string.IsNullOrWhiteSpace(request.Phong)) lichHoc.Phong = request.Phong;
         if (!string.IsNullOrWhiteSpace(request.TenLop)) lichHoc.TenLop = request.TenLop;
         if (request.HocPhi.HasValue) lichHoc.HocPhi = request.HocPhi.Value;
         if (!string.IsNullOrWhiteSpace(request.TrangThai)) lichHoc.TrangThai = request.TrangThai;

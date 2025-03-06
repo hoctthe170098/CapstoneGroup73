@@ -17,7 +17,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<BaiTap> HocSinhs => Set<BaiTap>();
     public DbSet<GiaoVien> GiaoViens => Set<GiaoVien>();
     public DbSet<NhanVien> NhanViens => Set<NhanVien>();
-    public DbSet<Slot> Slots => Set<Slot>();
+    public DbSet<Phong> Phongs => Set<Phong>();
     public DbSet<ChuongTrinh> ChuongTrinhs => Set<ChuongTrinh>();
     public DbSet<LichHoc> LichHocs => Set<LichHoc>();
     public DbSet<ThamGiaLopHoc> ThamGiaLopHocs => Set<ThamGiaLopHoc>();

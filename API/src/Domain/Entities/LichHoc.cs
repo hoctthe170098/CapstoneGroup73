@@ -10,13 +10,14 @@ public class LichHoc
 {
     public Guid Id { get; set; }
     public required int Thu { get; set; }
-    public required int SlotId { get; set; }
+    public required int PhongId { get; set; }
     [JsonIgnore]
-    public Slot Slot { get; set; } = null!;
-    public required string Phong { get; set; }
+    public Phong Phong { get; set; } = null!;
     public required string TenLop { get; set; }
+    public required TimeOnly GioBatDau {  get; set; }
+    public required TimeOnly GioKetThuc { get; set; }
     public required DateOnly NgayBatDau { get; set; }
-    public DateOnly? NgayKetThuc {  get; set; }
+    public required DateOnly NgayKetThuc {  get; set; }
     public required int HocPhi { get; set; }
     public required string TrangThai { get; set; }
     public required string GiaoVienCode { get; set; }
@@ -26,9 +27,6 @@ public class LichHoc
     [JsonIgnore]
     public ChuongTrinh ChuongTrinh { get; set; } = null!;
     [JsonIgnore]
-    public required Guid CoSoId { get; set; }
-    [JsonIgnore]
-    public CoSo CoSo { get; set; } = null!;
     public IList<ThamGiaLopHoc> ThamGiaLopHocs { get; private set; } = new List<ThamGiaLopHoc>();
     [JsonIgnore]
     public IList<BaiTap> BaiTaps { get; private set; } = new List<BaiTap>();

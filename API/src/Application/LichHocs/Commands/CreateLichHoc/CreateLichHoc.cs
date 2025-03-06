@@ -36,8 +36,7 @@ public class CreateLichHocCommandHandler : IRequestHandler<CreateLichHocCommand,
         {
             throw new NotFoundDataException("Tên lớp và phòng không được để trống.");
         }
-        
-        var lichHoc = new LichHoc
+        /*var lichHoc = new LichHoc
         {
             Id = Guid.NewGuid(),
             Thu = request.Thu,
@@ -51,15 +50,15 @@ public class CreateLichHocCommandHandler : IRequestHandler<CreateLichHocCommand,
             GiaoVienCode = request.GiaoVienCode,
             ChuongTrinhId = request.ChuongTrinhId,
             CoSoId = Guid.Parse(request.CoSoId)
-        };
+        };*/
 
-        _context.LichHocs.Add(lichHoc);
+        //_context.LichHocs.Add(lichHoc);
         await _context.SaveChangesAsync(cancellationToken);
 
         return new Output
         {
             isError = false,
-            data = lichHoc,
+            //data = lichHoc,
             code = 200,
             message = "Thêm lịch học thành công."
         };
