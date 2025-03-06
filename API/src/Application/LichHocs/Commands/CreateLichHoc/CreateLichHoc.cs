@@ -11,7 +11,7 @@ public record CreateLichHocCommand : IRequest<Output>
     public int SlotId { get; set; }
     public string Phong { get; set; } = string.Empty;
     public string TenLop { get; set; } = string.Empty;
-    public DateOnly NgayBatDau { get; set; } 
+    public DateOnly NgayBatDau { get; set; }
     public DateOnly NgayKetThuc { get; set; }
     public int HocPhi { get; set; }
     public string TrangThai { get; set; } = string.Empty;
@@ -30,9 +30,29 @@ public class CreateLichHocCommandHandler : IRequestHandler<CreateLichHocCommand,
 
     public async Task<Output> Handle(CreateLichHocCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.TenLop) || string.IsNullOrWhiteSpace(request.Phong))
+        // Validate các trường không được bị để trống và không hợp lệ 
+        if (string.IsNullOrWhiteSpace(request.TenLop) ||
+            string.IsNullOrWhiteSpace(request.Phong) ||
+            string.IsNullOrWhiteSpace(request.TrangThai) ||
+            string.IsNullOrWhiteSpace(request.GiaoVienCode) ||
+            request.Thu <= 0 ||
+            request.SlotId <= 0 ||
+            request.ChuongTrinhId <= 0 ||
+            request.HocPhi < 0)
         {
-            throw new NotFoundDataException("Tên lớp và phòng không được để trống.");
+            throw new NotFoundDataException("Các trường thông tin không được để trống hoặc không hợp lệ.");
+        }
+
+        // Kiểm tra trùng lịch: cùng thứ, SlotId và phòng
+        var isDuplicated = _context.LichHocs.Any(lh =>
+            lh.Thu == request.Thu &&
+            lh.SlotId == request.SlotId &&
+            lh.Phong == request.Phong);
+            
+
+        if (isDuplicated)
+        {
+            throw new Exception("Lịch học đã tồn tại cho phòng, slot và chương trình này.");
         }
 
         var lichHoc = new LichHoc
