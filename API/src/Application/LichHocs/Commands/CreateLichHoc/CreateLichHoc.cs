@@ -17,6 +17,7 @@ public record CreateLichHocCommand : IRequest<Output>
     public string TrangThai { get; set; } = string.Empty;
     public string GiaoVienCode { get; set; } = string.Empty;
     public int ChuongTrinhId { get; set; }
+    public string? CoSoId { get; set; }
 }
 
 public class CreateLichHocCommandHandler : IRequestHandler<CreateLichHocCommand, Output>
@@ -30,11 +31,12 @@ public class CreateLichHocCommandHandler : IRequestHandler<CreateLichHocCommand,
 
     public async Task<Output> Handle(CreateLichHocCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.TenLop) || string.IsNullOrWhiteSpace(request.Phong))
+        if (string.IsNullOrWhiteSpace(request.TenLop) || string.IsNullOrWhiteSpace(request.Phong)
+            ||string.IsNullOrWhiteSpace(request.CoSoId))
         {
             throw new NotFoundDataException("Tên lớp và phòng không được để trống.");
         }
-
+        
         var lichHoc = new LichHoc
         {
             Id = Guid.NewGuid(),
@@ -47,7 +49,8 @@ public class CreateLichHocCommandHandler : IRequestHandler<CreateLichHocCommand,
             HocPhi = request.HocPhi,
             TrangThai = request.TrangThai,
             GiaoVienCode = request.GiaoVienCode,
-            ChuongTrinhId = request.ChuongTrinhId
+            ChuongTrinhId = request.ChuongTrinhId,
+            CoSoId = Guid.Parse(request.CoSoId)
         };
 
         _context.LichHocs.Add(lichHoc);

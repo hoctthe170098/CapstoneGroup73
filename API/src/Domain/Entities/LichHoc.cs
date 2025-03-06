@@ -26,6 +26,9 @@ public class LichHoc
     [JsonIgnore]
     public ChuongTrinh ChuongTrinh { get; set; } = null!;
     [JsonIgnore]
+    public required Guid CoSoId { get; set; }
+    [JsonIgnore]
+    public CoSo CoSo { get; set; } = null!;
     public IList<ThamGiaLopHoc> ThamGiaLopHocs { get; private set; } = new List<ThamGiaLopHoc>();
     [JsonIgnore]
     public IList<BaiTap> BaiTaps { get; private set; } = new List<BaiTap>();

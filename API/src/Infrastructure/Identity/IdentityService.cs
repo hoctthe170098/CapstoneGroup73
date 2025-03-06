@@ -364,5 +364,16 @@ public class IdentityService : IIdentityService
         var result = await _userManager.AddToRoleAsync(user, roleName);
         return result.Succeeded;
     }
-
+    private string genUsername(string name, string code)
+    {
+        string username = "";
+        name = name.ToLower();
+        string[] chuoi = name.Split(' ');
+        for (int i = 0; i < chuoi.Length - 1; i++)
+        {
+            username += chuoi[i][0];
+        }
+        username = username + chuoi[chuoi.Length - 1] + code;
+        return username;
+    }
 }
