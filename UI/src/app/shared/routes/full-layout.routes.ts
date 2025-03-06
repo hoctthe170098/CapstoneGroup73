@@ -16,6 +16,10 @@ export const Full_ROUTES: Routes = [
     loadChildren: () => import('../../coso/coso.module').then(m => m.CosoModule)
   },
   {
+    path: 'chuongtrinh',
+    loadChildren: () => import('../../chuongtrinh/chuongtrinh.module').then(m => m.ChuongtrinhModule)
+  },
+  {
     path: 'calendar',
     loadChildren: () => import('../../calendar/calendar.module').then(m => m.CalendarsModule)
   },

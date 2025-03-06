@@ -32,8 +32,8 @@ export class ForgotPasswordPageComponent {
     this.emailInvalid = false;
     this.authService.forgotPassword({ email: emailValue }).subscribe({
       next: (response) => {
-        if (response.code === 0 && response.message.includes("Email không khớp")) {
-          this.toastr.warning(response.message, 'Cảnh báo');
+        if (response.isError == false && response.message.includes("Email không khớp, vui lòng thử lại!")) {
+          this.toastr.warning("Email không tồn tại, vui lòng thử lại!", 'Cảnh báo');
         } else {
           this.toastr.success('Vui lòng kiểm tra email để đặt lại mật khẩu.', 'Thành công');
           this.forgotPasswordForm.reset();

@@ -48,13 +48,12 @@ export class LoginPageComponent {
       (res) => {
         console.log('Login response:', res);
 
-        if (res.code === 200) {
+        if (res.isError == false && res.message.includes('Đăng nhập thành công')) {   
           localStorage.setItem('token', res.data);
           this.toastr.success('Đăng nhập thành công!', 'Thành công');
           this.router.navigate(['/dashboard/dashboard1']);
         } else {
-          this.isLoginFailed = true; 
-          
+          this.isLoginFailed = true;
           this.toastr.error(res.message, 'Lỗi');
         }
         this.spinner.hide();

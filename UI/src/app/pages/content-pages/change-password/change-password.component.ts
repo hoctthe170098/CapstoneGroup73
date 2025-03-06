@@ -67,7 +67,7 @@ export class ChangePasswordComponent {
       (res: any) => {
         console.log('Response from API:', res); // Debug API response
         
-        if (res && !res.isError && res.code === 0) {
+        if (res && !res.isError) {
           this.toastr.success('Đổi mật khẩu thành công!', 'Thành công');
           this.router.navigate(['/dashboard/dashboard1']);
         } else if (res.isError && res.message.includes('Incorrect password')) {  

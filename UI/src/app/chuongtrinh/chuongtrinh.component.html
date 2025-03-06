@@ -1,0 +1,39 @@
+<div class="container mt-4">
+    <h3>DANH SÁCH CHƯƠNG TRÌNH HỌC</h3>
+
+    <div class="card p-3 mt-3">
+        <div class="d-flex justify-content-between">
+            <input type="text" class="form-control w-75" placeholder="Tìm chương trình học...">
+            <button class="btn btn-success">Thêm</button>
+        </div>
+
+        <div class="card mt-4" *ngFor="let program of programs; let i = index">
+            <div class="card-body">
+                <h5 class="card-title fw-bold">{{ program.title }}</h5>
+                <p class="card-text">{{ program.description }}</p>
+
+                <a href="#" class="text-primary" (click)="toggleContent(i, $event)">
+                    {{ program.expanded ? 'Ẩn' : 'Hiển thị' }}
+                    
+                </a>
+                <span class="text-muted"> | </span>
+                <a href="#" class="text-primary me-3">Sửa</a>
+                <span class="text-muted"> | </span>
+                <a href="#" class="text-danger">Xóa</a>
+
+                <div *ngIf="program.expanded" class="lesson-content mt-3">
+                    <div class="card mt-3" *ngFor="let lesson of program.lessons">
+                        <div class="card-body">
+                            <h6 class="fw-bold">{{ lesson.title }}</h6>
+                            <p class="card-text">{{ lesson.content }}</p>
+                        </div>
+                    </div>
+
+                    <div *ngIf="program.lessons.length === 0" class="text-muted">
+                        Không có bài học nào.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

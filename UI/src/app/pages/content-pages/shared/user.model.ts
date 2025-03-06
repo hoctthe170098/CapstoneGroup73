@@ -10,10 +10,13 @@ export interface ForgotPassword {
   
   
   export interface LoginResponse {
+    isError: boolean;      // Thêm để check lỗi
     code: number;
-    data: string;  // Token trả về từ API
+    data: string;  
     message: string;
-  }
+    errors?: string[];     // Có thể optional nếu đôi khi không có
+}
+
  // Interface gửi lên API
 export interface ChangePasswordRequest {
   token: string;
