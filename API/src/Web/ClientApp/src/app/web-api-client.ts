@@ -210,7 +210,7 @@ export class ChuongTrinhsClient implements IChuongTrinhsClient {
     }
 
     createChuongTrinh(command: CreateChuongTrinhCommand): Observable<Output> {
-        let url_ = this.baseUrl + "/api/ChuongTrinhs/chuongtrinh/create";
+        let url_ = this.baseUrl + "/api/ChuongTrinhs/createchuongtrinh";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(command);
@@ -262,7 +262,7 @@ export class ChuongTrinhsClient implements IChuongTrinhsClient {
     }
 
     getChuongTrinhsWithPagination(pageNumber: number | undefined, pageSize: number | undefined): Observable<PaginatedListOfChuongTrinhDto> {
-        let url_ = this.baseUrl + "/api/ChuongTrinhs/chuongtrinh/list?";
+        let url_ = this.baseUrl + "/api/ChuongTrinhs/getchuongtrinhs?";
         if (pageNumber === null)
             throw new Error("The parameter 'pageNumber' cannot be null.");
         else if (pageNumber !== undefined)
@@ -513,7 +513,7 @@ export class LichHocsClient implements ILichHocsClient {
     }
 
     createLichHoc(command: CreateLichHocCommand): Observable<Output> {
-        let url_ = this.baseUrl + "/api/LichHocs/lichhoc/create";
+        let url_ = this.baseUrl + "/api/LichHocs/createlichhoc";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(command);
@@ -565,7 +565,7 @@ export class LichHocsClient implements ILichHocsClient {
     }
 
     editLichHoc(command: EditLichHocCommand): Observable<Output> {
-        let url_ = this.baseUrl + "/api/LichHocs/lichhoc/edit";
+        let url_ = this.baseUrl + "/api/LichHocs/editlichhoc";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(command);
@@ -618,7 +618,9 @@ export class LichHocsClient implements ILichHocsClient {
 }
 
 export interface INhanViensClient {
+    createNhanVien(comand: CreateNhanVienCommand): Observable<Output>;
     getNhanViensWithPagination(query: GetNhanViensWithPaginationQuery): Observable<Output>;
+    editNhanVien(comand: EditNhanVienCommand): Observable<Output>;
 }
 
 @Injectable({
@@ -632,6 +634,58 @@ export class NhanViensClient implements INhanViensClient {
     constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
         this.http = http;
         this.baseUrl = baseUrl ?? "";
+    }
+
+    createNhanVien(comand: CreateNhanVienCommand): Observable<Output> {
+        let url_ = this.baseUrl + "/api/NhanViens/createnhanvien";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(comand);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateNhanVien(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateNhanVien(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Output>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Output>;
+        }));
+    }
+
+    protected processCreateNhanVien(response: HttpResponseBase): Observable<Output> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Output.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
     }
 
     getNhanViensWithPagination(query: GetNhanViensWithPaginationQuery): Observable<Output> {
@@ -685,6 +739,58 @@ export class NhanViensClient implements INhanViensClient {
         }
         return _observableOf(null as any);
     }
+
+    editNhanVien(comand: EditNhanVienCommand): Observable<Output> {
+        let url_ = this.baseUrl + "/api/NhanViens/editnhanvien";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(comand);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processEditNhanVien(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processEditNhanVien(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Output>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Output>;
+        }));
+    }
+
+    protected processEditNhanVien(response: HttpResponseBase): Observable<Output> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Output.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 export interface ISlotsClient {
@@ -706,7 +812,7 @@ export class SlotsClient implements ISlotsClient {
     }
 
     getSlots(): Observable<SlotDto[]> {
-        let url_ = this.baseUrl + "/api/Slots/slots";
+        let url_ = this.baseUrl + "/api/Slots/getslots";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -1863,8 +1969,8 @@ export class CreateLichHocCommand implements ICreateLichHocCommand {
     slotId?: number;
     phong?: string;
     tenLop?: string;
-    ngayBatDau?: string;
-    ngayKetThuc?: string | undefined;
+    ngayBatDau?: Date;
+    ngayKetThuc?: Date;
     hocPhi?: number;
     trangThai?: string;
     giaoVienCode?: string;
@@ -1885,8 +1991,8 @@ export class CreateLichHocCommand implements ICreateLichHocCommand {
             this.slotId = _data["slotId"];
             this.phong = _data["phong"];
             this.tenLop = _data["tenLop"];
-            this.ngayBatDau = _data["ngayBatDau"];
-            this.ngayKetThuc = _data["ngayKetThuc"];
+            this.ngayBatDau = _data["ngayBatDau"] ? new Date(_data["ngayBatDau"].toString()) : <any>undefined;
+            this.ngayKetThuc = _data["ngayKetThuc"] ? new Date(_data["ngayKetThuc"].toString()) : <any>undefined;
             this.hocPhi = _data["hocPhi"];
             this.trangThai = _data["trangThai"];
             this.giaoVienCode = _data["giaoVienCode"];
@@ -1907,8 +2013,8 @@ export class CreateLichHocCommand implements ICreateLichHocCommand {
         data["slotId"] = this.slotId;
         data["phong"] = this.phong;
         data["tenLop"] = this.tenLop;
-        data["ngayBatDau"] = this.ngayBatDau;
-        data["ngayKetThuc"] = this.ngayKetThuc;
+        data["ngayBatDau"] = this.ngayBatDau ? formatDate(this.ngayBatDau) : <any>undefined;
+        data["ngayKetThuc"] = this.ngayKetThuc ? formatDate(this.ngayKetThuc) : <any>undefined;
         data["hocPhi"] = this.hocPhi;
         data["trangThai"] = this.trangThai;
         data["giaoVienCode"] = this.giaoVienCode;
@@ -1922,8 +2028,8 @@ export interface ICreateLichHocCommand {
     slotId?: number;
     phong?: string;
     tenLop?: string;
-    ngayBatDau?: string;
-    ngayKetThuc?: string | undefined;
+    ngayBatDau?: Date;
+    ngayKetThuc?: Date;
     hocPhi?: number;
     trangThai?: string;
     giaoVienCode?: string;
@@ -1936,8 +2042,8 @@ export class EditLichHocCommand implements IEditLichHocCommand {
     slotId?: number | undefined;
     phong?: string | undefined;
     tenLop?: string | undefined;
-    ngayBatDau?: string | undefined;
-    ngayKetThuc?: string | undefined;
+    ngayBatDau?: Date;
+    ngayKetThuc?: Date;
     hocPhi?: number | undefined;
     trangThai?: string | undefined;
     giaoVienCode?: string | undefined;
@@ -1959,8 +2065,8 @@ export class EditLichHocCommand implements IEditLichHocCommand {
             this.slotId = _data["slotId"];
             this.phong = _data["phong"];
             this.tenLop = _data["tenLop"];
-            this.ngayBatDau = _data["ngayBatDau"];
-            this.ngayKetThuc = _data["ngayKetThuc"];
+            this.ngayBatDau = _data["ngayBatDau"] ? new Date(_data["ngayBatDau"].toString()) : <any>undefined;
+            this.ngayKetThuc = _data["ngayKetThuc"] ? new Date(_data["ngayKetThuc"].toString()) : <any>undefined;
             this.hocPhi = _data["hocPhi"];
             this.trangThai = _data["trangThai"];
             this.giaoVienCode = _data["giaoVienCode"];
@@ -1982,8 +2088,8 @@ export class EditLichHocCommand implements IEditLichHocCommand {
         data["slotId"] = this.slotId;
         data["phong"] = this.phong;
         data["tenLop"] = this.tenLop;
-        data["ngayBatDau"] = this.ngayBatDau;
-        data["ngayKetThuc"] = this.ngayKetThuc;
+        data["ngayBatDau"] = this.ngayBatDau ? formatDate(this.ngayBatDau) : <any>undefined;
+        data["ngayKetThuc"] = this.ngayKetThuc ? formatDate(this.ngayKetThuc) : <any>undefined;
         data["hocPhi"] = this.hocPhi;
         data["trangThai"] = this.trangThai;
         data["giaoVienCode"] = this.giaoVienCode;
@@ -1998,12 +2104,80 @@ export interface IEditLichHocCommand {
     slotId?: number | undefined;
     phong?: string | undefined;
     tenLop?: string | undefined;
-    ngayBatDau?: string | undefined;
-    ngayKetThuc?: string | undefined;
+    ngayBatDau?: Date;
+    ngayKetThuc?: Date;
     hocPhi?: number | undefined;
     trangThai?: string | undefined;
     giaoVienCode?: string | undefined;
     chuongTrinhId?: number | undefined;
+}
+
+export class CreateNhanVienCommand implements ICreateNhanVienCommand {
+    code?: string;
+    ten?: string;
+    gioiTinh?: string;
+    diaChi?: string;
+    ngaySinh?: Date;
+    email?: string | undefined;
+    soDienThoai?: string | undefined;
+    coSoId?: string;
+    role?: string;
+
+    constructor(data?: ICreateNhanVienCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.code = _data["code"];
+            this.ten = _data["ten"];
+            this.gioiTinh = _data["gioiTinh"];
+            this.diaChi = _data["diaChi"];
+            this.ngaySinh = _data["ngaySinh"] ? new Date(_data["ngaySinh"].toString()) : <any>undefined;
+            this.email = _data["email"];
+            this.soDienThoai = _data["soDienThoai"];
+            this.coSoId = _data["coSoId"];
+            this.role = _data["role"];
+        }
+    }
+
+    static fromJS(data: any): CreateNhanVienCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateNhanVienCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["code"] = this.code;
+        data["ten"] = this.ten;
+        data["gioiTinh"] = this.gioiTinh;
+        data["diaChi"] = this.diaChi;
+        data["ngaySinh"] = this.ngaySinh ? formatDate(this.ngaySinh) : <any>undefined;
+        data["email"] = this.email;
+        data["soDienThoai"] = this.soDienThoai;
+        data["coSoId"] = this.coSoId;
+        data["role"] = this.role;
+        return data;
+    }
+}
+
+export interface ICreateNhanVienCommand {
+    code?: string;
+    ten?: string;
+    gioiTinh?: string;
+    diaChi?: string;
+    ngaySinh?: Date;
+    email?: string | undefined;
+    soDienThoai?: string | undefined;
+    coSoId?: string;
+    role?: string;
 }
 
 export class GetNhanViensWithPaginationQuery implements IGetNhanViensWithPaginationQuery {
@@ -2060,6 +2234,78 @@ export interface IGetNhanViensWithPaginationQuery {
     filterTenCoSo?: string | undefined;
     filterTenVaiTro?: string | undefined;
     sortBy?: string | undefined;
+}
+
+export class EditNhanVienCommand implements IEditNhanVienCommand {
+    code?: string;
+    ten?: string;
+    gioiTinh?: string;
+    diaChi?: string;
+    ngaySinh?: Date;
+    email?: string | undefined;
+    soDienThoai?: string | undefined;
+    coSoId?: string;
+    userId?: string;
+    role?: string;
+
+    constructor(data?: IEditNhanVienCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.code = _data["code"];
+            this.ten = _data["ten"];
+            this.gioiTinh = _data["gioiTinh"];
+            this.diaChi = _data["diaChi"];
+            this.ngaySinh = _data["ngaySinh"] ? new Date(_data["ngaySinh"].toString()) : <any>undefined;
+            this.email = _data["email"];
+            this.soDienThoai = _data["soDienThoai"];
+            this.coSoId = _data["coSoId"];
+            this.userId = _data["userId"];
+            this.role = _data["role"];
+        }
+    }
+
+    static fromJS(data: any): EditNhanVienCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new EditNhanVienCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["code"] = this.code;
+        data["ten"] = this.ten;
+        data["gioiTinh"] = this.gioiTinh;
+        data["diaChi"] = this.diaChi;
+        data["ngaySinh"] = this.ngaySinh ? formatDate(this.ngaySinh) : <any>undefined;
+        data["email"] = this.email;
+        data["soDienThoai"] = this.soDienThoai;
+        data["coSoId"] = this.coSoId;
+        data["userId"] = this.userId;
+        data["role"] = this.role;
+        return data;
+    }
+}
+
+export interface IEditNhanVienCommand {
+    code?: string;
+    ten?: string;
+    gioiTinh?: string;
+    diaChi?: string;
+    ngaySinh?: Date;
+    email?: string | undefined;
+    soDienThoai?: string | undefined;
+    coSoId?: string;
+    userId?: string;
+    role?: string;
 }
 
 export class SlotDto implements ISlotDto {
@@ -2735,6 +2981,12 @@ export interface IWeatherForecast {
     temperatureC?: number;
     temperatureF?: number;
     summary?: string | undefined;
+}
+
+function formatDate(d: Date) {
+    return d.getFullYear() + '-' + 
+        (d.getMonth() < 9 ? ('0' + (d.getMonth()+1)) : (d.getMonth()+1)) + '-' +
+        (d.getDate() < 10 ? ('0' + d.getDate()) : d.getDate());
 }
 
 export class SwaggerException extends Error {

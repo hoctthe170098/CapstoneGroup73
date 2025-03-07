@@ -102,7 +102,7 @@
         }
       }
     },
-    "/api/ChuongTrinhs/chuongtrinh/create": {
+    "/api/ChuongTrinhs/createchuongtrinh": {
       "post": {
         "tags": [
           "ChuongTrinhs"
@@ -134,7 +134,7 @@
         }
       }
     },
-    "/api/ChuongTrinhs/chuongtrinh/list": {
+    "/api/ChuongTrinhs/getchuongtrinhs": {
       "get": {
         "tags": [
           "ChuongTrinhs"
@@ -270,7 +270,7 @@
         }
       }
     },
-    "/api/LichHocs/lichhoc/create": {
+    "/api/LichHocs/createlichhoc": {
       "post": {
         "tags": [
           "LichHocs"
@@ -302,7 +302,7 @@
         }
       }
     },
-    "/api/LichHocs/lichhoc/edit": {
+    "/api/LichHocs/editlichhoc": {
       "put": {
         "tags": [
           "LichHocs"
@@ -314,6 +314,38 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/EditLichHocCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/NhanViens/createnhanvien": {
+      "post": {
+        "tags": [
+          "NhanViens"
+        ],
+        "operationId": "CreateNhanVien",
+        "requestBody": {
+          "x-name": "comand",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNhanVienCommand"
               }
             }
           },
@@ -366,41 +398,18 @@
         }
       }
     },
-    "/api/Slots/slots": {
-      "get": {
+    "/api/NhanViens/editnhanvien": {
+      "put": {
         "tags": [
-          "Slots"
+          "NhanViens"
         ],
-        "operationId": "GetSlots",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SlotDto"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/Slots/createslot": {
-      "post": {
-        "tags": [
-          "Slots"
-        ],
-        "operationId": "CreateSlot",
+        "operationId": "EditNhanVien",
         "requestBody": {
-          "x-name": "command",
+          "x-name": "comand",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateSlotCommand"
+                "$ref": "#/components/schemas/EditNhanVienCommand"
               }
             }
           },
@@ -945,11 +954,12 @@
             "type": "string"
           },
           "ngayBatDau": {
-            "type": "string"
+            "type": "string",
+            "format": "date"
           },
           "ngayKetThuc": {
             "type": "string",
-            "nullable": true
+            "format": "date"
           },
           "hocPhi": {
             "type": "integer",
@@ -964,6 +974,10 @@
           "chuongTrinhId": {
             "type": "integer",
             "format": "int32"
+          },
+          "coSoId": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -995,11 +1009,11 @@
           },
           "ngayBatDau": {
             "type": "string",
-            "nullable": true
+            "format": "date"
           },
           "ngayKetThuc": {
             "type": "string",
-            "nullable": true
+            "format": "date"
           },
           "hocPhi": {
             "type": "integer",
@@ -1018,6 +1032,43 @@
             "type": "integer",
             "format": "int32",
             "nullable": true
+          }
+        }
+      },
+      "CreateNhanVienCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "ten": {
+            "type": "string"
+          },
+          "gioiTinh": {
+            "type": "string"
+          },
+          "diaChi": {
+            "type": "string"
+          },
+          "ngaySinh": {
+            "type": "string",
+            "format": "date"
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "soDienThoai": {
+            "type": "string",
+            "nullable": true
+          },
+          "coSoId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "role": {
+            "type": "string"
           }
         }
       },
@@ -1051,44 +1102,42 @@
           }
         }
       },
-      "SlotDto": {
+      "EditNhanVienCommand": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
+          "code": {
+            "type": "string"
           },
           "ten": {
             "type": "string"
           },
-          "batDau": {
-            "type": "string",
-            "format": "time"
+          "gioiTinh": {
+            "type": "string"
           },
-          "ketThuc": {
+          "diaChi": {
+            "type": "string"
+          },
+          "ngaySinh": {
             "type": "string",
-            "format": "time"
-          }
-        }
-      },
-      "CreateSlotCommand": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "ten": {
+            "format": "date"
+          },
+          "email": {
             "type": "string",
             "nullable": true
           },
-          "batDau": {
+          "soDienThoai": {
             "type": "string",
-            "format": "time",
             "nullable": true
           },
-          "ketThuc": {
-            "type": "string",
-            "format": "time",
-            "nullable": true
+          "coSoId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
           }
         }
       },

@@ -12,7 +12,7 @@ public interface IApplicationDbContext
     public DbSet<BaiTap> HocSinhs {  get; }
     public DbSet<GiaoVien> GiaoViens {  get; }
     public DbSet<NhanVien> NhanViens {  get; }
-    public DbSet<Slot> Slots {  get; }
+    public DbSet<Phong> Phongs {  get; }
     public DbSet<ChuongTrinh> ChuongTrinhs {  get; }
     public DbSet<LichHoc> LichHocs {  get; }
     public DbSet<ThamGiaLopHoc> ThamGiaLopHocs {  get; }

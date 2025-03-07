@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudyFlow.Infrastructure.Data;
 
 #nullable disable
 
-namespace CleanArchitecture.Infrastructure.Data.Migrations
+namespace StudyFlow.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250306063634_Lan8MigrationThemKhoaUniqueLichHoc")]
+    partial class Lan8MigrationThemKhoaUniqueLichHoc
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -535,15 +538,12 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                     b.Property<int>("ChuongTrinhId")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("CoSoId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("GiaoVienCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<TimeOnly>("GioBatDau")
-                        .HasColumnType("time");
-
-                    b.Property<TimeOnly>("GioKetThuc")
-                        .HasColumnType("time");
 
                     b.Property<int>("HocPhi")
                         .HasColumnType("int");
@@ -551,10 +551,15 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                     b.Property<DateOnly>("NgayBatDau")
                         .HasColumnType("date");
 
-                    b.Property<DateOnly>("NgayKetThuc")
+                    b.Property<DateOnly?>("NgayKetThuc")
                         .HasColumnType("date");
 
-                    b.Property<int>("PhongId")
+                    b.Property<string>("Phong")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("SlotId")
                         .HasColumnType("int");
 
                     b.Property<string>("TenLop")
@@ -567,15 +572,20 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     b.Property<string>("TrangThai")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ChuongTrinhId");
 
+                    b.HasIndex("CoSoId");
+
                     b.HasIndex("GiaoVienCode");
 
-                    b.HasIndex("PhongId");
+                    b.HasIndex("SlotId");
+
+                    b.HasIndex("Thu", "Phong", "SlotId", "TrangThai", "CoSoId")
+                        .IsUnique();
 
                     b.ToTable("LichHoc", (string)null);
 
@@ -665,7 +675,7 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                     b.ToTable("NoiDungBaiHoc", (string)null);
                 });
 
-            modelBuilder.Entity("StudyFlow.Domain.Entities.Phong", b =>
+            modelBuilder.Entity("StudyFlow.Domain.Entities.Slot", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -673,25 +683,20 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<Guid>("CoSoId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<TimeOnly>("BatDau")
+                        .HasColumnType("time");
+
+                    b.Property<TimeOnly>("KetThuc")
+                        .HasColumnType("time");
 
                     b.Property<string>("Ten")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("TrangThai")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CoSoId");
-
-                    b.ToTable("Phong", (string)null);
-
-                    b.HasAnnotation("CheckConstraint:CK_Phong_TrangThai", "[TrangThai] IN ('Use', 'NonUse')");
+                    b.ToTable("Slot", (string)null);
                 });
 
             modelBuilder.Entity("StudyFlow.Domain.Entities.TaiLieuHocTap", b =>
@@ -1091,23 +1096,31 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("StudyFlow.Domain.Entities.CoSo", "CoSo")
+                        .WithMany("LichHocs")
+                        .HasForeignKey("CoSoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("StudyFlow.Domain.Entities.GiaoVien", "GiaoVien")
                         .WithMany("LicHocs")
                         .HasForeignKey("GiaoVienCode")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("StudyFlow.Domain.Entities.Phong", "Phong")
+                    b.HasOne("StudyFlow.Domain.Entities.Slot", "Slot")
                         .WithMany("LichHocs")
-                        .HasForeignKey("PhongId")
+                        .HasForeignKey("SlotId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ChuongTrinh");
 
+                    b.Navigation("CoSo");
+
                     b.Navigation("GiaoVien");
 
-                    b.Navigation("Phong");
+                    b.Navigation("Slot");
                 });
 
             modelBuilder.Entity("StudyFlow.Domain.Entities.NhanVien", b =>
@@ -1135,17 +1148,6 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("ChuongTrinh");
-                });
-
-            modelBuilder.Entity("StudyFlow.Domain.Entities.Phong", b =>
-                {
-                    b.HasOne("StudyFlow.Domain.Entities.CoSo", "CoSo")
-                        .WithMany("Phongs")
-                        .HasForeignKey("CoSoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CoSo");
                 });
 
             modelBuilder.Entity("StudyFlow.Domain.Entities.TaiLieuHocTap", b =>
@@ -1259,9 +1261,9 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     b.Navigation("HocSinhs");
 
-                    b.Navigation("NhanViens");
+                    b.Navigation("LichHocs");
 
-                    b.Navigation("Phongs");
+                    b.Navigation("NhanViens");
                 });
 
             modelBuilder.Entity("StudyFlow.Domain.Entities.GiaoVien", b =>
@@ -1292,7 +1294,7 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                     b.Navigation("TaiLieuHocTaps");
                 });
 
-            modelBuilder.Entity("StudyFlow.Domain.Entities.Phong", b =>
+            modelBuilder.Entity("StudyFlow.Domain.Entities.Slot", b =>
                 {
                     b.Navigation("LichHocs");
                 });

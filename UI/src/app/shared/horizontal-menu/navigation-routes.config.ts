@@ -16,6 +16,7 @@ export const HROUTES: RouteInfo[] = [
     path: '', title: 'Apps', icon: 'ft-box', class: 'dropdown nav-item has-sub', isExternalLink: false,
     submenu: [
       { path: '/sanpham/danh-sach-san-pham', title: 'Sản phẩm', icon: 'ft-clipboard', class: 'dropdown-item', isExternalLink: false, submenu: [] },
+      { path: '/coso/danh-sach-coso', title: 'Cơ sở', icon: 'ft-clipboard', class: 'dropdown-item', isExternalLink: false, submenu: [] },
       { path: '/inbox', title: 'Email', icon: 'ft-arrow-right submenu-icon', class: 'dropdown-item', isExternalLink: false, submenu: [] },
       { path: '/chat', title: 'Chat', icon: 'ft-arrow-right submenu-icon', class: 'dropdown-item', isExternalLink: false, submenu: [] },
       { path: '/chat-ngrx', title: 'Chat NgRx', icon: 'ft-arrow-right submenu-icon', class: 'dropdown-item', isExternalLink: false, submenu: [] },

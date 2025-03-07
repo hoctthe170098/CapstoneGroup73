@@ -10,8 +10,8 @@ public record EditLichHocCommand : IRequest<Output>
     public int? SlotId { get; set; }
     public string? Phong { get; set; }
     public string? TenLop { get; set; }
-    public string? NgayBatDau { get; set; }
-    public string? NgayKetThuc { get; set; }
+    public DateOnly NgayBatDau { get; set; }
+    public DateOnly NgayKetThuc { get; set; }
     public int? HocPhi { get; set; }
     public string? TrangThai { get; set; }
     public string? GiaoVienCode { get; set; }
@@ -33,11 +33,7 @@ public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Out
             ?? throw new NotFoundDataException($"Không tìm thấy lịch học với ID {request.Id}.");
 
         if (request.Thu.HasValue) lichHoc.Thu = request.Thu.Value;
-        if (request.SlotId.HasValue) lichHoc.SlotId = request.SlotId.Value;
-        if (!string.IsNullOrWhiteSpace(request.Phong)) lichHoc.Phong = request.Phong;
         if (!string.IsNullOrWhiteSpace(request.TenLop)) lichHoc.TenLop = request.TenLop;
-        if (!string.IsNullOrWhiteSpace(request.NgayBatDau)) lichHoc.NgayBatDau = request.NgayBatDau;
-        if (!string.IsNullOrWhiteSpace(request.NgayKetThuc)) lichHoc.NgayKetThuc = request.NgayKetThuc;
         if (request.HocPhi.HasValue) lichHoc.HocPhi = request.HocPhi.Value;
         if (!string.IsNullOrWhiteSpace(request.TrangThai)) lichHoc.TrangThai = request.TrangThai;
         if (!string.IsNullOrWhiteSpace(request.GiaoVienCode))
