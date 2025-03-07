@@ -8,13 +8,14 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using StudyFlow.Domain.Entities;
 
 namespace StudyFlow.Infrastructure.Data.Configurations;
-public class SlotConfiguration : IEntityTypeConfiguration<Slot>
+public class PhongConfiguration : IEntityTypeConfiguration<Phong>
 {
-    public void Configure(EntityTypeBuilder<Slot> builder)
+    public void Configure(EntityTypeBuilder<Phong> builder)
     {
-        builder.ToTable(nameof(Slot));
-        builder.HasKey(x=>x.Id);
+        builder.ToTable(nameof(Phong));
+        builder.HasKey(x => x.Id);
         builder.Property(x => x.Ten)
-            .HasMaxLength(10);
+           .HasMaxLength(20);
+        builder.HasAnnotation($"CheckConstraint:CK_Phong_TrangThai", "[TrangThai] IN ('Use', 'NonUse')");
     }
 }

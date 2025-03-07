@@ -22,5 +22,5 @@ public class CoSo
     [JsonIgnore]
     public IList<HocSinh> HocSinhs { get; private set; } = new List<HocSinh>();
     [JsonIgnore]
-    public IList<LichHoc> LichHocs { get; private set; } = new List<LichHoc>();
+    public IList<Phong> Phongs { get; private set; } = new List<Phong>();
 }
