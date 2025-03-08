@@ -430,6 +430,102 @@
         }
       }
     },
+    "/api/Phongs/createphong": {
+      "post": {
+        "tags": [
+          "Phongs"
+        ],
+        "operationId": "CreatePhong",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePhongCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Phongs/getphongswithpagination": {
+      "post": {
+        "tags": [
+          "Phongs"
+        ],
+        "operationId": "GetPhongsWithPagination",
+        "requestBody": {
+          "x-name": "query",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetPhongsWithPaginationQuery"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Phongs/editphong": {
+      "put": {
+        "tags": [
+          "Phongs"
+        ],
+        "operationId": "EditPhong",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditPhongCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/TodoItems": {
       "get": {
         "tags": [
@@ -943,15 +1039,20 @@
             "type": "integer",
             "format": "int32"
           },
-          "slotId": {
+          "phongId": {
             "type": "integer",
             "format": "int32"
           },
-          "phong": {
-            "type": "string"
-          },
           "tenLop": {
             "type": "string"
+          },
+          "gioBatDau": {
+            "type": "string",
+            "format": "time"
+          },
+          "gioKetThuc": {
+            "type": "string",
+            "format": "time"
           },
           "ngayBatDau": {
             "type": "string",
@@ -974,10 +1075,6 @@
           "chuongTrinhId": {
             "type": "integer",
             "format": "int32"
-          },
-          "coSoId": {
-            "type": "string",
-            "nullable": true
           }
         }
       },
@@ -994,17 +1091,23 @@
             "format": "int32",
             "nullable": true
           },
-          "slotId": {
+          "phongId": {
             "type": "integer",
             "format": "int32",
             "nullable": true
           },
-          "phong": {
+          "tenLop": {
             "type": "string",
             "nullable": true
           },
-          "tenLop": {
+          "gioBatDau": {
             "type": "string",
+            "format": "time",
+            "nullable": true
+          },
+          "gioKetThuc": {
+            "type": "string",
+            "format": "time",
             "nullable": true
           },
           "ngayBatDau": {
@@ -1138,6 +1241,62 @@
           },
           "role": {
             "type": "string"
+          }
+        }
+      },
+      "CreatePhongCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "ten": {
+            "type": "string"
+          },
+          "coSoId": {
+            "type": "string",
+            "format": "guid"
+          }
+        }
+      },
+      "GetPhongsWithPaginationQuery": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "currentRole": {
+            "type": "string",
+            "nullable": true
+          },
+          "currentCoSoId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          }
+        }
+      },
+      "EditPhongCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ten": {
+            "type": "string"
+          },
+          "trangThai": {
+            "type": "string"
+          },
+          "coSoId": {
+            "type": "string",
+            "format": "guid"
           }
         }
       },
