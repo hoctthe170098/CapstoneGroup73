@@ -15,12 +15,12 @@ public class ChuongTrinhs : EndpointGroupBase
             .MapPost(CreateChuongTrinh, "createchuongtrinh")
             .MapGet(GetChuongTrinhsWithPagination, "getchuongtrinhs");
     }
-    [Authorize(Roles = Roles.LearningManager)]
+    //[Authorize(Roles = Roles.LearningManager)]
     public async Task<Output> CreateChuongTrinh(ISender sender, [FromBody] CreateChuongTrinhCommand command)
     {
         return await sender.Send(command);
     }
-    [Authorize(Roles = Roles.LearningManager)]
+    //[Authorize(Roles = Roles.LearningManager)]
     public async Task<PaginatedList<ChuongTrinhDto>> GetChuongTrinhsWithPagination(ISender sender, [AsParameters] GetChuongTrinhsWithPaginationQuery query)
     {
         return await sender.Send(query);

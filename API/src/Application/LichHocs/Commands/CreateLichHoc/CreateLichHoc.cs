@@ -1,4 +1,5 @@
-﻿using StudyFlow.Application.Common.Exceptions;
+﻿using System.Text.Json.Serialization;
+using StudyFlow.Application.Common.Exceptions;
 using StudyFlow.Application.Common.Interfaces;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Domain.Entities;
@@ -8,16 +9,18 @@ namespace StudyFlow.Application.LichHocs.Commands.CreateLichHoc;
 public record CreateLichHocCommand : IRequest<Output>
 {
     public int Thu { get; set; }
-    public int SlotId { get; set; }
-    public string Phong { get; set; } = string.Empty;
+    public int PhongId { get; set; }
     public string TenLop { get; set; } = string.Empty;
+    [JsonConverter(typeof(TimeOnlyConverter))]
+    public TimeOnly GioBatDau { get; set; }
+    [JsonConverter(typeof(TimeOnlyConverter))]
+    public TimeOnly GioKetThuc { get; set; }
     public DateOnly NgayBatDau { get; set; }
     public DateOnly NgayKetThuc { get; set; }
     public int HocPhi { get; set; }
-    public string TrangThai { get; set; } = string.Empty;
+    public string TrangThai { get; set; } = "NotYet";
     public string GiaoVienCode { get; set; } = string.Empty;
     public int ChuongTrinhId { get; set; }
-    public string? CoSoId { get; set; }
 }
 
 public class CreateLichHocCommandHandler : IRequestHandler<CreateLichHocCommand, Output>
@@ -31,57 +34,78 @@ public class CreateLichHocCommandHandler : IRequestHandler<CreateLichHocCommand,
 
     public async Task<Output> Handle(CreateLichHocCommand request, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(request.TenLop))
+            throw new WrongInputException("Tên lớp không được để trống.");
 
-        // Validate các trường không được bị để trống và không hợp lệ 
-        if (string.IsNullOrWhiteSpace(request.TenLop) ||
-            string.IsNullOrWhiteSpace(request.Phong) ||
-            string.IsNullOrWhiteSpace(request.TrangThai) ||
-            string.IsNullOrWhiteSpace(request.GiaoVienCode) ||
-            request.Thu <= 0 ||
-            request.SlotId <= 0 ||
-            request.ChuongTrinhId <= 0 ||
-            request.HocPhi < 0)
+        if (string.IsNullOrWhiteSpace(request.TrangThai))
+            throw new WrongInputException("Trạng thái không được để trống.");
 
-        if (string.IsNullOrWhiteSpace(request.TenLop) || string.IsNullOrWhiteSpace(request.Phong)
-            ||string.IsNullOrWhiteSpace(request.CoSoId))
+        if (string.IsNullOrWhiteSpace(request.GiaoVienCode))
+            throw new WrongInputException("Mã giáo viên không được để trống.");
+
+        if (request.Thu < 2 || request.Thu > 8)
+            throw new WrongInputException("Thứ không hợp lệ, phải từ thứ 2 đến Chủ nhật .");
+
+        if (request.GioBatDau >= request.GioKetThuc)
+            throw new WrongInputException("Giờ bắt đầu phải nhỏ hơn giờ kết thúc.");
+
+        if (request.NgayBatDau > request.NgayKetThuc)
+            throw new WrongInputException("Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc.");
+
+        if (request.HocPhi < 0)
+            throw new WrongInputException("Học phí không hợp lệ.");
+
+        var phong = await _context.Phongs.FindAsync(request.PhongId);
+        if (phong == null)
         {
-            throw new NotFoundDataException("Các trường thông tin không được để trống hoặc không hợp lệ.");
+            throw new NotFoundDataException("Phòng không tồn tại.");
         }
 
-        // Kiểm tra trùng lịch: cùng thứ, SlotId và phòng
-        var isDuplicated = _context.LichHocs.Any(lh =>
+        var giaoVien = await _context.GiaoViens.FirstOrDefaultAsync(g => g.Code == request.GiaoVienCode, cancellationToken);
+        if (giaoVien == null)
+        {
+            throw new NotFoundDataException("Giáo viên không tồn tại.");
+        }
+
+        var chuongTrinh = await _context.ChuongTrinhs.FindAsync(request.ChuongTrinhId);
+        if (chuongTrinh == null)
+        {
+            throw new NotFoundDataException("Chương trình không tồn tại.");
+        }
+
+        var hasConflict = await _context.LichHocs.AnyAsync(lh =>
             lh.Thu == request.Thu &&
-            lh.SlotId == request.SlotId &&
-            lh.Phong == request.Phong);
-            
+            lh.PhongId == request.PhongId &&
+            (request.GioBatDau < lh.GioKetThuc && request.GioKetThuc > lh.GioBatDau), cancellationToken);
 
-        if (isDuplicated)
+        if (hasConflict)
         {
-            throw new Exception("Lịch học đã tồn tại cho phòng, slot và chương trình này.");
+            throw new Exception("Có lịch học trùng phòng, ngày, giờ với lớp khác.");
         }
-        /*var lichHoc = new LichHoc
+            
+        var lichHoc = new LichHoc
         {
             Id = Guid.NewGuid(),
             Thu = request.Thu,
-            SlotId = request.SlotId,
-            Phong = request.Phong,
+            PhongId = request.PhongId,
             TenLop = request.TenLop,
+            GioBatDau = request.GioBatDau,
+            GioKetThuc = request.GioKetThuc,
             NgayBatDau = request.NgayBatDau,
             NgayKetThuc = request.NgayKetThuc,
             HocPhi = request.HocPhi,
-            TrangThai = request.TrangThai,
+            TrangThai = "NotYet",
             GiaoVienCode = request.GiaoVienCode,
-            ChuongTrinhId = request.ChuongTrinhId,
-            CoSoId = Guid.Parse(request.CoSoId)
-        };*/
+            ChuongTrinhId = request.ChuongTrinhId
+        };
 
-        //_context.LichHocs.Add(lichHoc);
+        _context.LichHocs.Add(lichHoc);
         await _context.SaveChangesAsync(cancellationToken);
 
         return new Output
         {
             isError = false,
-            //data = lichHoc,
+            data = lichHoc,
             code = 200,
             message = "Thêm lịch học thành công."
         };
