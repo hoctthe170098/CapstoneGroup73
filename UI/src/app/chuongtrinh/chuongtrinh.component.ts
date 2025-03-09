@@ -1,41 +1,55 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ChuongtrinhService } from './shared/chuongtrinh.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-chuongtrinh',
   templateUrl: './chuongtrinh.component.html',
   styleUrls: ['./chuongtrinh.component.scss']
 })
-export class ChuongtrinhComponent { 
-  programs = [
-    {
-      title: 'Chương trình học 1',
-      description: 'Some quick example text to build on the card title and make up the bulk of the card\'s content.',
-      expanded: false,
-      lessons: [
-        { title: 'Nội dung bài học 1', content: 'With supporting text below as a natural lead-in to additional content.' },
-        { title: 'Nội dung bài học 2', content: 'With supporting text below as a natural lead-in to additional content.' }
-      ]
-    },
-    {
-      title: 'Chương trình học 2',
-      description: 'Some quick example text to build on the card title and make up the bulk of the card\'s content.',
-      expanded: false,
-      lessons: [
-        { title: 'Nội dung bài học', content: 'With supporting text below as a natural lead-in to additional content.' }
-      ]
-    },
-    {
-      title: 'Chương trình học 3',
-      description: 'Some quick example text to build on the card title and make up the bulk of the card\'s content.',
-      expanded: false,
-      lessons: [
-        { title: 'Nội dung bài học', content: 'With supporting text below as a natural lead-in to additional content.' }
-      ]
-    }
-  ];
+export class ChuongtrinhComponent implements OnInit {
+
+  programs: any[] = [];
+
+  constructor(
+    private chuongtrinhService: ChuongtrinhService,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    this.chuongtrinhService.programs$.subscribe(data => {
+      this.programs = data.slice(); // Lưu danh sách chương trình
+    });
+  }
 
   toggleContent(index: number, event: Event) {
-    event.preventDefault(); // Ngăn chặn load lại trang
+    event.preventDefault();
     this.programs[index].expanded = !this.programs[index].expanded;
   }
+
+  downloadFile(fileUrl: string) {
+    if (!fileUrl) {
+      alert('Không có file để tải!');
+      return;
+    }
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.download = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
+    link.click();
+  }
+
+  deleteProgram(index: number) {
+    const confirmDelete = confirm(`Bạn có chắc chắn muốn xóa chương trình "${this.programs[index].title}" không?`);
+    if (confirmDelete) {
+      this.chuongtrinhService.deleteProgram(index);
+  
+      // 🔥 Đảm bảo Angular nhận diện thay đổi danh sách
+      this.programs = this.chuongtrinhService.getPrograms().map(program => Object.assign({}, program));
+
+  
+      alert('Xóa thành công!');
+    }
+  }
+  
+  
 }

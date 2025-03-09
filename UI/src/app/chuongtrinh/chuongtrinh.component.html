@@ -4,9 +4,12 @@
     <div class="card p-3 mt-3">
         <div class="d-flex justify-content-between">
             <input type="text" class="form-control w-75" placeholder="Tìm chương trình học...">
-            <button class="btn btn-success">Thêm</button>
+            <button class="btn btn-success" [routerLink]="['/chuongtrinh','add']">
+                Thêm
+            </button>
         </div>
 
+        <!-- Danh sách chương trình -->
         <div class="card mt-4" *ngFor="let program of programs; let i = index">
             <div class="card-body">
                 <h5 class="card-title fw-bold">{{ program.title }}</h5>
@@ -14,18 +17,18 @@
 
                 <a href="#" class="text-primary" (click)="toggleContent(i, $event)">
                     {{ program.expanded ? 'Ẩn' : 'Hiển thị' }}
-                    
                 </a>
                 <span class="text-muted"> | </span>
-                <a href="#" class="text-primary me-3">Sửa</a>
+                <a [routerLink]="['edit', i]" class="text-primary me-3">Sửa</a>
                 <span class="text-muted"> | </span>
-                <a href="#" class="text-danger">Xóa</a>
+                <a href="#" class="text-danger" (click)="deleteProgram(i)">Xóa</a>
 
                 <div *ngIf="program.expanded" class="lesson-content mt-3">
                     <div class="card mt-3" *ngFor="let lesson of program.lessons">
                         <div class="card-body">
                             <h6 class="fw-bold">{{ lesson.title }}</h6>
-                            <p class="card-text">{{ lesson.content }}</p>
+                            <a [href]="lesson.fileUrl" target="_blank" class="btn btn-primary btn-sm">Xem PDF</a>
+                            <button class="btn btn-secondary btn-sm ms-2" (click)="downloadFile(lesson.fileUrl)">Tải về</button>
                         </div>
                     </div>
 

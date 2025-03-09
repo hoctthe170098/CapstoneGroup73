@@ -1,0 +1,49 @@
+<div class="container mt-4">
+    <h3 class="mb-3">CHỈNH SỬA CHƯƠNG TRÌNH HỌC</h3>
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">Chương Trình Học</label>
+        <div class="mb-2">
+            <label class="form-label">Tiêu Đề</label>
+            <input type="text" class="form-control" placeholder="Nhập tiêu đề" [(ngModel)]="program.title">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Mô Tả</label>
+            <textarea class="form-control" rows="3" placeholder="Viết 1-2 mô tả" [(ngModel)]="program.description"></textarea>
+        </div>
+    </div>
+
+    <div *ngFor="let lesson of program.lessons; let i = index" class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Nội dung bài học {{ i + 1 }}</h5>
+
+            <div class="mb-2">
+                <label class="form-label">Tiêu Đề</label>
+                <input type="text" class="form-control" placeholder="Nhập tiêu đề bài học" [(ngModel)]="lesson.title">
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label">Mô Tả</label>
+                <textarea class="form-control" rows="2" placeholder="Viết mô tả bài học" [(ngModel)]="lesson.description"></textarea>
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label">Tài Liệu Bài Học (PDF)</label>
+                <input type="file" class="form-control" (change)="onFileChange($event, i)">
+            </div>
+
+            <div *ngIf="lesson.fileUrl" class="mt-2">
+                <a [href]="lesson.fileUrl" target="_blank" class="btn btn-link">Xem Tài Liệu Đã Tải Lên</a>
+            </div>
+
+            <button class="btn btn-danger btn-sm mt-2" (click)="removeLesson(i)">Xóa bài học</button>
+        </div>
+    </div>
+
+    <button class="btn btn-primary" (click)="addLesson()">+ Thêm bài học</button>
+
+    <div class="mt-4">
+        <button class="btn btn-success" (click)="saveProgram()">Lưu</button>
+        <button class="btn btn-secondary ms-2" (click)="cancelEdit()">Hủy</button>
+    </div>
+</div>
