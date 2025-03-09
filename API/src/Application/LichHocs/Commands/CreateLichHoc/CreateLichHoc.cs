@@ -11,10 +11,8 @@ public record CreateLichHocCommand : IRequest<Output>
     public int Thu { get; set; }
     public int PhongId { get; set; }
     public string TenLop { get; set; } = string.Empty;
-    [JsonConverter(typeof(TimeOnlyConverter))]
-    public TimeOnly GioBatDau { get; set; }
-    [JsonConverter(typeof(TimeOnlyConverter))]
-    public TimeOnly GioKetThuc { get; set; }
+    public string GioBatDau { get; set; } = string.Empty;
+    public string GioKetThuc { get; set; } = string.Empty;
     public DateOnly NgayBatDau { get; set; }
     public DateOnly NgayKetThuc { get; set; }
     public int HocPhi { get; set; }
@@ -44,9 +42,14 @@ public class CreateLichHocCommandHandler : IRequestHandler<CreateLichHocCommand,
             throw new WrongInputException("Mã giáo viên không được để trống.");
 
         if (request.Thu < 2 || request.Thu > 8)
-            throw new WrongInputException("Thứ không hợp lệ, phải từ thứ 2 đến Chủ nhật .");
+            throw new WrongInputException("Thứ không hợp lệ, phải từ thứ 2 đến Chủ nhật.");
 
-        if (request.GioBatDau >= request.GioKetThuc)
+        if (!TimeOnly.TryParse(request.GioBatDau, out var gioBatDau) || !TimeOnly.TryParse(request.GioKetThuc, out var gioKetThuc))
+        {
+            throw new WrongInputException("Định dạng giờ không hợp lệ. Định dạng hợp lệ: HH:mm.");
+        }
+
+        if (gioBatDau >= gioKetThuc)
             throw new WrongInputException("Giờ bắt đầu phải nhỏ hơn giờ kết thúc.");
 
         if (request.NgayBatDau > request.NgayKetThuc)
@@ -76,21 +79,21 @@ public class CreateLichHocCommandHandler : IRequestHandler<CreateLichHocCommand,
         var hasConflict = await _context.LichHocs.AnyAsync(lh =>
             lh.Thu == request.Thu &&
             lh.PhongId == request.PhongId &&
-            (request.GioBatDau < lh.GioKetThuc && request.GioKetThuc > lh.GioBatDau), cancellationToken);
+            (gioBatDau < lh.GioKetThuc && gioKetThuc > lh.GioBatDau), cancellationToken);
 
         if (hasConflict)
         {
             throw new Exception("Có lịch học trùng phòng, ngày, giờ với lớp khác.");
         }
-            
+
         var lichHoc = new LichHoc
         {
             Id = Guid.NewGuid(),
             Thu = request.Thu,
             PhongId = request.PhongId,
             TenLop = request.TenLop,
-            GioBatDau = request.GioBatDau,
-            GioKetThuc = request.GioKetThuc,
+            GioBatDau = gioBatDau,
+            GioKetThuc = gioKetThuc,
             NgayBatDau = request.NgayBatDau,
             NgayKetThuc = request.NgayKetThuc,
             HocPhi = request.HocPhi,

@@ -13,10 +13,8 @@ public record EditLichHocCommand : IRequest<Output>
     public int? Thu { get; set; }
     public int? PhongId { get; set; }
     public string? TenLop { get; set; }
-    [JsonConverter(typeof(TimeOnlyConverter))]
-    public TimeOnly? GioBatDau { get; set; }
-    [JsonConverter(typeof(TimeOnlyConverter))]
-    public TimeOnly? GioKetThuc { get; set; }
+    public string? GioBatDau { get; set; }
+    public string? GioKetThuc { get; set; }
     public DateOnly NgayBatDau { get; set; }
     public DateOnly NgayKetThuc { get; set; }
     public int? HocPhi { get; set; }
@@ -40,7 +38,7 @@ public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Out
             ?? throw new NotFoundDataException($"Không tìm thấy lịch học với ID {request.Id}.");
 
         if (!request.Thu.HasValue && !request.PhongId.HasValue && string.IsNullOrWhiteSpace(request.TenLop) &&
-            !request.GioBatDau.HasValue && !request.GioKetThuc.HasValue && !request.HocPhi.HasValue &&
+            string.IsNullOrWhiteSpace(request.GioBatDau) && string.IsNullOrWhiteSpace(request.GioKetThuc) && !request.HocPhi.HasValue &&
             string.IsNullOrWhiteSpace(request.TrangThai) && string.IsNullOrWhiteSpace(request.GiaoVienCode) &&
             !request.ChuongTrinhId.HasValue)
         {
@@ -52,7 +50,7 @@ public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Out
             var phong = await _context.Phongs.FindAsync(request.PhongId.Value);
             if (phong == null)
             {
-                throw new Exception("Phòng không tồn tại.");
+                throw new NotFoundDataException("Phòng không tồn tại.");
             }
         }
 
@@ -74,19 +72,27 @@ public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Out
             }
         }
 
-        if (request.GioBatDau.HasValue && request.GioKetThuc.HasValue && request.GioBatDau.Value >= request.GioKetThuc.Value)
+        if (!string.IsNullOrWhiteSpace(request.GioBatDau) && !string.IsNullOrWhiteSpace(request.GioKetThuc))
         {
-            throw new Exception("Giờ bắt đầu phải nhỏ hơn giờ kết thúc.");
+            if (!TimeOnly.TryParse(request.GioBatDau, out var gioBatDau) ||
+                !TimeOnly.TryParse(request.GioKetThuc, out var gioKetThuc))
+            {
+                throw new Exception("Định dạng giờ không hợp lệ. Định dạng hợp lệ: HH:mm.");
+            }
+            if (gioBatDau >= gioKetThuc)
+            {
+                throw new Exception("Giờ bắt đầu phải nhỏ hơn giờ kết thúc.");
+            }
+            lichHoc.GioBatDau = gioBatDau;
+            lichHoc.GioKetThuc = gioKetThuc;
         }
 
         if (request.Thu.HasValue) lichHoc.Thu = request.Thu.Value;
         if (request.PhongId.HasValue) lichHoc.PhongId = request.PhongId.Value;
-        if (!string.IsNullOrEmpty(request.TenLop)) lichHoc.TenLop = request.TenLop;
-        if (request.GioBatDau.HasValue) lichHoc.GioBatDau = request.GioBatDau.Value;
-        if (request.GioKetThuc.HasValue) lichHoc.GioKetThuc = request.GioKetThuc.Value;
+        if (!string.IsNullOrWhiteSpace(request.TenLop)) lichHoc.TenLop = request.TenLop;
         if (request.HocPhi.HasValue) lichHoc.HocPhi = request.HocPhi.Value;
-        if (!string.IsNullOrEmpty(request.TrangThai)) lichHoc.TrangThai = request.TrangThai;
-        if (!string.IsNullOrEmpty(request.GiaoVienCode)) lichHoc.GiaoVienCode = request.GiaoVienCode;
+        if (!string.IsNullOrWhiteSpace(request.TrangThai)) lichHoc.TrangThai = request.TrangThai;
+        if (!string.IsNullOrWhiteSpace(request.GiaoVienCode)) lichHoc.GiaoVienCode = request.GiaoVienCode;
         if (request.ChuongTrinhId.HasValue) lichHoc.ChuongTrinhId = request.ChuongTrinhId.Value;
 
         await _context.SaveChangesAsync(cancellationToken);

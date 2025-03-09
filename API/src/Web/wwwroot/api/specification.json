@@ -1047,12 +1047,10 @@
             "type": "string"
           },
           "gioBatDau": {
-            "type": "string",
-            "format": "time"
+            "type": "string"
           },
           "gioKetThuc": {
-            "type": "string",
-            "format": "time"
+            "type": "string"
           },
           "ngayBatDau": {
             "type": "string",
@@ -1102,12 +1100,10 @@
           },
           "gioBatDau": {
             "type": "string",
-            "format": "time",
             "nullable": true
           },
           "gioKetThuc": {
             "type": "string",
-            "format": "time",
             "nullable": true
           },
           "ngayBatDau": {
