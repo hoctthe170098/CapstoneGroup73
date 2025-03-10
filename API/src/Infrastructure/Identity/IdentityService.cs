@@ -50,7 +50,7 @@ public class IdentityService : IIdentityService
         {
             UserName = userName,
             Email = userName,
-        };
+        };                  
 
         var result = await _userManager.CreateAsync(user, password);
 
@@ -375,5 +375,17 @@ public class IdentityService : IIdentityService
         }
         username = username + chuoi[chuoi.Length - 1] + code;
         return username;
+    }
+
+    public async Task<(Result Result, string userId)> GenerateUser(string name, string code)
+    {
+        var user = new ApplicationUser
+        {
+            UserName = genUsername(name, code),
+        };
+
+        var result = await _userManager.CreateAsync(user, GenerateRandomPassword());
+
+        return (result.ToApplicationResult(), user.Id);
     }
 }

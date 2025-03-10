@@ -1,48 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using StudyFlow.Application.Common.Exceptions;
 using StudyFlow.Application.Common.Interfaces;
 using StudyFlow.Application.Common.Models;
+using StudyFlow.Application.NhanViens.Command.CreateNhanVien;
 using StudyFlow.Domain.Entities;
 
-namespace StudyFlow.Application.NhanViens.Command.CreateNhanVien;
-public record CreateNhanVienCommand : IRequest<Output>
+namespace StudyFlow.Application.GiaoViens.Commands.CreateGiaoVien;
+public record CreateGiaoVienCommand : IRequest<Output>
 {
-    public required string Code { get; init; }
-    public required string Ten { get; init; }
-    public required string GioiTinh { get; init; }
-    public required string DiaChi { get; init; }
-    public required DateOnly NgaySinh { get; init; }
-    public string? Email { get; init; }
-    public string? SoDienThoai { get; init; }
-    public required Guid CoSoId { get; init; }
-    public required string Role { get; init; }
+    public required string Code { get; set; }
+    public required string Ten { get; set; }
+    public required string GioiTinh { get; set; }
+    public required string DiaChi { get; set; }
+    public required string TruongDangDay { get; set; }
+    public required DateOnly NgaySinh { get; set; }
+    public string? Email { get; set; }
+    public string? SoDienThoai { get; set; }
+    public required Guid CoSoId { get; set; }
 }
 
-public class CreateNhanVienCommandHandler : IRequestHandler<CreateNhanVienCommand, Output>
+public class CreateGiaoVienCommandHandler : IRequestHandler<CreateGiaoVienCommand, Output>
 {
     private readonly IApplicationDbContext _context;
-    private readonly IIdentityService _identityService; 
+    private readonly IIdentityService _identityService;
 
-    public CreateNhanVienCommandHandler(IApplicationDbContext context, IIdentityService identityService)
+    public CreateGiaoVienCommandHandler(IApplicationDbContext context, IIdentityService identityService)
     {
         _context = context;
         _identityService = identityService;
     }
 
-    public async Task<Output> Handle(CreateNhanVienCommand request, CancellationToken cancellationToken)
+    public async Task<Output> Handle(CreateGiaoVienCommand request, CancellationToken cancellationToken)
     {
         // Validate required fields
         if (string.IsNullOrWhiteSpace(request.Code) ||
             string.IsNullOrWhiteSpace(request.Ten) ||
             string.IsNullOrWhiteSpace(request.GioiTinh) ||
-            string.IsNullOrWhiteSpace(request.DiaChi))
+            string.IsNullOrWhiteSpace(request.DiaChi) ||
+            string.IsNullOrWhiteSpace(request.TruongDangDay))
         {
             throw new NotFoundDataException("Dữ liệu không được để trống");
+        }
+
+        // Vallidate NgaySinh not in future
+        if (request.NgaySinh > DateOnly.FromDateTime(DateTime.Today))
+        {
+            throw new WrongInputException("Ngày sinh không hợp lệ!");
         }
 
         // Validate length constraints
@@ -73,7 +82,7 @@ public class CreateNhanVienCommandHandler : IRequestHandler<CreateNhanVienComman
             throw new NotFoundDataException("Cơ sở không tồn tại");
         }
 
-        // Create identity user
+        // Create identity user     
         var (result, userId) = await _identityService.GenerateUser(request.Ten, request.Code);
 
         if (!result.Succeeded)
@@ -82,12 +91,13 @@ public class CreateNhanVienCommandHandler : IRequestHandler<CreateNhanVienComman
         }
 
         // Create new NhanVien entity
-        var nhanVien = new NhanVien
+        var giaoVien = new GiaoVien
         {
             Code = request.Code,
             Ten = request.Ten,
             GioiTinh = request.GioiTinh,
             DiaChi = request.DiaChi,
+            TruongDangDay = request.TruongDangDay,
             NgaySinh = request.NgaySinh,
             Email = request.Email,
             SoDienThoai = request.SoDienThoai,
@@ -95,24 +105,24 @@ public class CreateNhanVienCommandHandler : IRequestHandler<CreateNhanVienComman
             UserId = userId
         };
 
-        _context.NhanViens.Add(nhanVien);
+        _context.GiaoViens.Add(giaoVien);
         await _context.SaveChangesAsync(cancellationToken);
 
         // Assign user to role if UserId exists
-        if (!string.IsNullOrEmpty(nhanVien.UserId))
+        if (!string.IsNullOrEmpty(giaoVien.UserId))
         {
-            await _identityService.AssignRoleAsync(userId, request.Role);
+            await _identityService.AssignRoleAsync(userId, "Teacher");
         }
 
         return new Output
         {
             isError = false,
-            data = nhanVien,
+            data = giaoVien,
             code = 200,
-            message = "Tạo nhân viên mới thành công"
+            message = "Tạo giáo viên mới thành công"
         };
     }
-   
 }
+
 
 
