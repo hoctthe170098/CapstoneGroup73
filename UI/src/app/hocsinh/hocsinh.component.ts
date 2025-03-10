@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
   templateUrl: './hocsinh.component.html',
   styleUrls: ['./hocsinh.component.scss']
 })
+
 export class HocsinhComponent implements OnInit {
 
   trangThai: string = '';
@@ -113,7 +114,7 @@ export class HocsinhComponent implements OnInit {
         default: false
       },
       chinhSach: 'Nâng cao',
-      lopHocs: ['Lớp Lập trình', 'Lớp Kỹ năng'],
+      lopHocs: ['Lớp Toán 2', 'Lớp Anh 2'],
       showDetails: false
     }
   ];

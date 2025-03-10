@@ -1,0 +1,148 @@
+.import-hocsinh-wrapper {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 1000px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
+}
+
+/* Chọn file */
+.choose-file-area {
+    margin-bottom: 16px;
+}
+
+.drag-drop-box {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    color: #666;
+    transition: background-color 0.3s;
+}
+
+.drag-drop-box:hover {
+    background-color: #fafafa;
+}
+
+.file-input {
+    display: none;
+}
+
+/* File preview */
+.file-preview-area {
+    margin-top: 16px;
+}
+
+/* Bảng danh sách */
+.student-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.student-table thead tr {
+    background-color: #f8f8f8;
+}
+
+.student-table th,
+.student-table td {
+    vertical-align: middle;
+    border-bottom: 1px solid #e2e2e2;
+    padding: 12px;
+    color: #333;
+    font-size: 14px;
+}
+
+/* Dropdown */
+.dropdown-col {
+    width: 50px;
+    text-align: center;
+}
+
+.dropdown-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    color: #333;
+}
+
+/* Trạng thái */
+.active-status {
+    color: #28a745;
+    font-weight: 500;
+    margin-right: 4px;
+}
+
+/* Hiển thị chi tiết */
+.detail-cell {
+    background-color: #f9f9f9;
+    padding: 16px !important;
+}
+
+.detail-item {
+    margin-bottom: 12px;
+}
+
+.detail-item label {
+    display: block;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 4px;
+}
+
+.detail-box {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 8px;
+    color: #333;
+}
+
+/* Nút hành động */
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.cancel-btn {
+    background-color: #D4D4D4;
+    border: none;
+    color: #333;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+}
+
+.save-btn {
+    background-color: #a3decf;
+    border: none;
+    color: #333;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+}
+
+.cancel-btn:hover, .save-btn:hover {
+    opacity: 0.9;
+}
+
+/* Nút Back */
+.back-btn {
+    margin-top: 10px;
+    background-color: #5a6781;
+    color: white;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 14px;
+}
+
+.back-btn:hover {
+    background-color: #4a5671;
+}

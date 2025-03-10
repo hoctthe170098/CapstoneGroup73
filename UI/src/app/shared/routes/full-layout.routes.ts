@@ -20,7 +20,10 @@ export const Full_ROUTES: Routes = [
     path: 'hocsinh',
     loadChildren: () => import('../../hocsinh/hocsinh.module').then(m => m.HocSinhModule)
   },
-  
+  {
+    path: 'giaovien',
+    loadChildren: () => import('../../giaovien/giaovien.module').then(m => m.GiaovienModule)
+  },
   
   {
     path: 'coso',
