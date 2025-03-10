@@ -16,9 +16,8 @@ public class GetGiaoViensWithPaginationQuery : IRequest<Output>
     public int PageNumber { get; init; } = 1;
     public int PageSize { get; init; } = 10;
     public string? SearchTen { get; init; }
-    public string? FilterTenCoSo { get; init; }
-    public string? FilterGioiTinh { get; init; }
     public string? SortBy { get; init; }
+    public bool? IsActive { get; init; }
 }
 
 public class GetGiaoViensWithPaginationQueryHandler
@@ -26,11 +25,13 @@ public class GetGiaoViensWithPaginationQueryHandler
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
+    private readonly IIdentityService _identityService;
 
-    public GetGiaoViensWithPaginationQueryHandler(IApplicationDbContext context, IMapper mapper)
+    public GetGiaoViensWithPaginationQueryHandler(IApplicationDbContext context, IMapper mapper, IIdentityService identityService)
     {
         _context = context;
         _mapper = mapper;
+        _identityService = identityService;
     }
 
     public async Task<Output> Handle(GetGiaoViensWithPaginationQuery request, CancellationToken cancellationToken)
@@ -38,24 +39,39 @@ public class GetGiaoViensWithPaginationQueryHandler
         try
         {
             if (request.PageNumber < 1 || request.PageSize < 1) throw new WrongInputException();
-            var query = _context.GiaoViens.Include(nv => nv.Coso).AsQueryable();
+            var query = _context.GiaoViens
+                .Include(nv => nv.Coso)
+                .Include(nv => nv.LicHocs)
+                .AsQueryable();
 
             // Search by "Ten"
             if (!string.IsNullOrWhiteSpace(request.SearchTen))
             {
-                query = query.Where(nv => nv.Ten.Contains(request.SearchTen));
+                string nameLower = request.SearchTen.ToLower();
+                query = query.Where(nv => nv.Ten.Contains(nameLower));
             }
 
-            // Filter by "TenCoSo"
-            if (!string.IsNullOrWhiteSpace(request.FilterTenCoSo))
+            // Filter by Status
+            if(request.IsActive.HasValue)
             {
-                query = query.Where(nv => nv.Coso.Ten == request.FilterTenCoSo);
-            }
+                var userIds = await _context.GiaoViens
+                    .Where(gv => gv.UserId != null)
+                    .Select(gv => gv.UserId!)
+                    .Distinct()
+                    .ToListAsync();
 
-            // Filter by "GioiTinh"
-            if (!string.IsNullOrWhiteSpace(request.FilterGioiTinh))
-            {
-                query = query.Where(nv => nv.GioiTinh == request.FilterGioiTinh);
+                var filteredUserIds = new List<string>();
+
+                foreach (var userId in userIds)
+                {
+                    var isActive = await _identityService.IsUserActiveAsync(userId);
+                    if (isActive == request.IsActive.Value)
+                    {
+                        filteredUserIds.Add(userId);
+                    }
+                }
+
+                query = query.Where(gv => gv.UserId != null && filteredUserIds.Contains(gv.UserId!));
             }
 
             // Sorting
@@ -68,7 +84,25 @@ public class GetGiaoViensWithPaginationQueryHandler
 
             var list = await query
                .ProjectTo<GiaoVienDto>(_mapper.ConfigurationProvider)
-               .PaginatedListAsync(request.PageNumber, request.PageSize);
+               .ToListAsync();
+
+            foreach (var giaoVienDto in list)
+            {
+                if (!string.IsNullOrEmpty(giaoVienDto.Code))
+                {
+                    var user = await _context.GiaoViens
+                        .Where(gv => gv.Code == giaoVienDto.Code)
+                        .Select(gv => gv.UserId)
+                        .FirstOrDefaultAsync();
+
+                    giaoVienDto.IsActive = user != null && await _identityService.IsUserActiveAsync(user);
+                }
+            }
+
+            var paginatedList = list
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
 
             return new Output
             {

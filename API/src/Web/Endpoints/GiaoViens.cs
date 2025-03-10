@@ -1,4 +1,5 @@
 ﻿using StudyFlow.Application.Common.Models;
+using StudyFlow.Application.GiaoViens.Commands.AddListGiaoViens;
 using StudyFlow.Application.GiaoViens.Commands.CreateGiaoVien;
 using StudyFlow.Application.GiaoViens.Commands.EditGiaoVien;
 using StudyFlow.Application.GiaoViens.Queries.GetGiaoViensWithPagination;
@@ -12,7 +13,8 @@ public class GiaoViens : EndpointGroupBase
         app.MapGroup(this)
             .MapPost(CreateGiaoVien, "creategiaovien")
             .MapPost(GetGiaoViensWithPagination, "getgiaovienswithpagination")
-            .MapPut(EditGiaoVien, "editgiaovien");
+            .MapPut(EditGiaoVien, "editgiaovien")
+            .MapPost(AddListGiaoViens, "addlistgiaoviens");
     }
     //[Authorize(Roles = Roles.Administrator)]
     public async Task<Output> CreateGiaoVien(ISender sender, CreateGiaoVienCommand comand)
@@ -26,6 +28,11 @@ public class GiaoViens : EndpointGroupBase
     }
     //[Authorize(Roles = Roles.Administrator)]
     public async Task<Output> EditGiaoVien(ISender sender, EditGiaoVienCommand comand)
+    {
+        return await sender.Send(comand);
+    }
+
+    public async Task<Output> AddListGiaoViens(ISender sender, AddListGiaoViensCommand comand)
     {
         return await sender.Send(comand);
     }

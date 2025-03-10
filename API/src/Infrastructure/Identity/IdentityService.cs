@@ -364,6 +364,7 @@ public class IdentityService : IIdentityService
         var result = await _userManager.AddToRoleAsync(user, roleName);
         return result.Succeeded;
     }
+
     private string genUsername(string name, string code)
     {
         string username = "";
@@ -388,4 +389,11 @@ public class IdentityService : IIdentityService
 
         return (result.ToApplicationResult(), user.Id);
     }
+
+    public async Task<bool> IsUserActiveAsync(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        return user != null && user.IsActive; 
+    }
+
 }

@@ -16,4 +16,5 @@ public interface IIdentityService
     Task<List<string>> GetRolesByUserId(string userId);
     Task<bool> AssignRoleAsync(string userId, string role);
     Task<(Result Result, string userId)> GenerateUser(string name, string code);
+    Task<bool> IsUserActiveAsync(string userId);
 }

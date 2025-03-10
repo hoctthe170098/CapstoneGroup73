@@ -18,12 +18,17 @@ public class GiaoVienDto
     public string? Email { get; set; }
     public string? SoDienThoai { get; set; }
     public required string TenCoSo { get; set; }
+    public IList<string> TenLops { get; set; } = new List<string>();
+    public bool IsActive { get; set; }  
     private class Mapping : Profile
     {
         public Mapping()
         {
             CreateMap<GiaoVien, GiaoVienDto>()
-                .ForMember(dest => dest.TenCoSo, opt => opt.MapFrom(src => src.Coso.Ten));
+                .ForMember(dest => dest.TenCoSo, opt => opt.MapFrom(src => src.Coso.Ten))
+                .ForMember(dest => dest.TenLops, opt => opt.MapFrom(src => src.LicHocs.Select(lh => lh.TenLop).Distinct().ToList()))
+                .ForMember(dest => dest.IsActive, opt => opt.Ignore());
         }
     }
 }
+

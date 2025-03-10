@@ -48,6 +48,13 @@ public class CreateGiaoVienCommandHandler : IRequestHandler<CreateGiaoVienComman
             throw new NotFoundDataException("Dữ liệu không được để trống");
         }
 
+        // Validate Code not duplicate
+        var exists = await _context.GiaoViens.AnyAsync(gv => gv.Code == request.Code, cancellationToken);
+        if (exists)
+        {
+            throw new WrongInputException($"Mã giáo viên '{request.Code}' đã tồn tại!");
+        }
+
         // Vallidate NgaySinh not in future
         if (request.NgaySinh > DateOnly.FromDateTime(DateTime.Today))
         {
