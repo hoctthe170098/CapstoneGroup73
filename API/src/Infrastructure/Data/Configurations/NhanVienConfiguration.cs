@@ -24,6 +24,10 @@ public class NhanVienConfiguration : IEntityTypeConfiguration<NhanVien>
         builder.HasAnnotation($"CheckConstraint:CK_NhanVien_GioiTinh", "[GioiTinh] IN ('Male', 'Female')");
         builder.Property(x => x.DiaChi)
             .HasMaxLength(50);
+        builder.Property(x => x.SoDienThoai)
+            .HasMaxLength(11);
+        builder.Property(x => x.Email)
+            .HasMaxLength(50);
         builder.HasAnnotation($"CheckConstraint:CK_NhanVien_SoDienThoai", "[SoDienThoai] LIKE '0%' AND [SoDienThoai] NOT LIKE '%[^0-9]%'");
         builder.HasAnnotation($"CheckConstraint:CK_NhanVien_Email", "[Email] LIKE '%_@_%._%' AND [Email] NOT LIKE '%[^a-zA-Z0-9.@_%+-]%'");
     }
