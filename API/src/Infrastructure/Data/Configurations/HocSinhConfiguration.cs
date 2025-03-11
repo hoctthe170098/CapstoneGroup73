@@ -26,6 +26,10 @@ public class HocSinhConfiguration : IEntityTypeConfiguration<HocSinh>
             .HasMaxLength(50);
         builder.Property(x => x.TruongDangHoc)
             .HasMaxLength(50);
+        builder.Property(x => x.SoDienThoai)
+            .HasMaxLength(11);
+        builder.Property(x => x.Email)
+            .HasMaxLength(50);
         builder.HasAnnotation($"CheckConstraint:CK_HocSinh_SoDienThoai", "[SoDienThoai] LIKE '0%' AND [SoDienThoai] NOT LIKE '%[^0-9]%'");
         builder.HasAnnotation($"CheckConstraint:CK_HocSinh_Email", "[Email] LIKE '%_@_%._%' AND [Email] NOT LIKE '%[^a-zA-Z0-9.@_%+-]%'");
     }
