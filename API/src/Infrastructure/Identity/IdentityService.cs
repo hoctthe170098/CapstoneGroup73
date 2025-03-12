@@ -16,6 +16,7 @@ using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
 using Twilio.Exceptions;
+using System.Globalization;
 
 namespace StudyFlow.Infrastructure.Identity;
 
@@ -368,14 +369,33 @@ public class IdentityService : IIdentityService
     private string genUsername(string name, string code)
     {
         string username = "";
-        name = name.ToLower();
+        name = RemoveDiacritics(name).ToLower(); 
         string[] chuoi = name.Split(' ');
+
         for (int i = 0; i < chuoi.Length - 1; i++)
         {
-            username += chuoi[i][0];
+            username += chuoi[i][0]; 
         }
-        username = username + chuoi[chuoi.Length - 1] + code;
+
+        username = username + chuoi[chuoi.Length - 1] + code; 
         return username;
+    }
+
+    private static string RemoveDiacritics(string text)
+    {
+        var normalizedString = text.Normalize(NormalizationForm.FormD);
+        var stringBuilder = new StringBuilder();
+
+        foreach (var c in normalizedString)
+        {
+            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+            {
+                stringBuilder.Append(c);
+            }
+        }
+
+        return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
     }
 
     public async Task<(Result Result, string userId)> GenerateUser(string name, string code)

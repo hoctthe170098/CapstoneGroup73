@@ -9,48 +9,50 @@ using StudyFlow.Application.Common.Interfaces;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Domain.Entities;
 
-namespace StudyFlow.Application.GiaoViens.Commands.EditGiaoVien;
-public record EditGiaoVienCommand : IRequest<Output>
+namespace StudyFlow.Application.HocSinhs.Commands.CreateHocSinh;
+public record CreateHocSinhCommand : IRequest<Output>
 {
     public required string Code { get; set; }
     public required string Ten { get; set; }
     public required string GioiTinh { get; set; }
     public required string DiaChi { get; set; }
-    public required string TruongDangDay { get; set; }
+    public required string Lop { get; set; }
+    public required string TruongDangHoc { get; set; }
     public required DateOnly NgaySinh { get; set; }
     public string? Email { get; set; }
     public string? SoDienThoai { get; set; }
+    public int? ChinhSachId { get; set; }
     public required Guid CoSoId { get; set; }
 }
 
-public class EditGiaoVienCommandHandler : IRequestHandler<EditGiaoVienCommand, Output>
+public class CreateHocSinhCommandHandler : IRequestHandler<CreateHocSinhCommand, Output>
 {
     private readonly IApplicationDbContext _context;
     private readonly IIdentityService _identityService;
-
-    public EditGiaoVienCommandHandler(IApplicationDbContext context, IIdentityService identityService)
+    public CreateHocSinhCommandHandler(IApplicationDbContext context, IIdentityService identityService)
     {
         _context = context;
         _identityService = identityService;
     }
 
-    public async Task<Output> Handle(EditGiaoVienCommand request, CancellationToken cancellationToken)
+    public async Task<Output> Handle(CreateHocSinhCommand request, CancellationToken cancellationToken)
     {
-        // Validate required fields
         if (string.IsNullOrWhiteSpace(request.Code) ||
             string.IsNullOrWhiteSpace(request.Ten) ||
             string.IsNullOrWhiteSpace(request.GioiTinh) ||
             string.IsNullOrWhiteSpace(request.DiaChi) ||
-            string.IsNullOrWhiteSpace(request.TruongDangDay))
+            string.IsNullOrWhiteSpace(request.TruongDangHoc) ||
+            string.IsNullOrWhiteSpace(request.Lop) ||
+            string.IsNullOrWhiteSpace(request.Email))
         {
             throw new NotFoundDataException("Dữ liệu không được để trống");
         }
 
         // Validate Code not duplicate
-        var exists = await _context.GiaoViens.AnyAsync(gv => gv.Code == request.Code && gv.Code != request.Code, cancellationToken);
+        var exists = await _context.HocSinhs.AnyAsync(gv => gv.Code == request.Code, cancellationToken);
         if (exists)
         {
-            throw new WrongInputException($"Mã giáo viên '{request.Code}' đã tồn tại!");
+            throw new WrongInputException($"Mã học viên '{request.Code}' đã tồn tại!");
         }
 
         // Vallidate NgaySinh not in future
@@ -87,31 +89,46 @@ public class EditGiaoVienCommandHandler : IRequestHandler<EditGiaoVienCommand, O
             throw new NotFoundDataException("Cơ sở không tồn tại");
         }
 
-        var giaoVien = await _context.GiaoViens.FindAsync(new object[] { request.Code }, cancellationToken);
-        
-        if(giaoVien == null) throw new NotFoundIDException();
-        else
-        {
+        // Create identity user     
+        var (result, userId) = await _identityService.GenerateUser(request.Ten, request.Code);
 
-            giaoVien.Code = request.Code;
-            giaoVien.Ten = request.Ten;
-            giaoVien.GioiTinh = request.GioiTinh;
-            giaoVien.DiaChi = request.DiaChi;
-            giaoVien.TruongDangDay = request.TruongDangDay;
-            giaoVien.NgaySinh = request.NgaySinh;
-            giaoVien.Email = request.Email;
-            giaoVien.SoDienThoai = request.SoDienThoai;
-            giaoVien.CoSoId = request.CoSoId;
+        if (!result.Succeeded)
+        {
+            throw new Exception("Tạo tài khoản thất bại: " + string.Join(", ", result.Errors));
         }
 
+        // Create new NhanVien entity
+        var hocSinh = new HocSinh
+        {
+            Code = request.Code,
+            Ten = request.Ten,
+            GioiTinh = request.GioiTinh,
+            DiaChi = request.DiaChi,
+            TruongDangHoc = request.TruongDangHoc,
+            NgaySinh = request.NgaySinh,
+            Email = request.Email,
+            SoDienThoai = request.SoDienThoai,
+            ChinhSachId = request.ChinhSachId,
+            Lop = request.Lop,
+            CoSoId = request.CoSoId,
+            UserId = userId
+        };
+
+        _context.HocSinhs.Add(hocSinh);
         await _context.SaveChangesAsync(cancellationToken);
+
+        // Assign user to role if UserId exists
+        if (!string.IsNullOrEmpty(hocSinh.UserId))
+        {
+            await _identityService.AssignRoleAsync(userId, "Student");
+        }
 
         return new Output
         {
             isError = false,
-            data = giaoVien,
+            data = hocSinh,
             code = 200,
-            message = "Cập nhật giáo viên thành công"
+            message = "Tạo học viên mới thành công"
         };
     }
 }
