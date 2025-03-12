@@ -8,8 +8,6 @@ import { ChuongtrinhService } from '../shared/chuongtrinh.service';
   styleUrls: ['./addchuongtrinh.component.scss']
 })
 export class AddchuongtrinhComponent {
-
-  // Khởi tạo đối tượng program mặc định
   program: any = {
     title: '',
     description: '',
@@ -17,8 +15,8 @@ export class AddchuongtrinhComponent {
       {
         title: '',
         description: '',
-        fileUrl: '',
-        file: null
+        files: [] as any[],
+        expanded: false
       }
     ]
   };
@@ -28,58 +26,66 @@ export class AddchuongtrinhComponent {
     private chuongtrinhService: ChuongtrinhService
   ) { }
 
-  // Thêm bài học mới
   addLesson() {
     this.program.lessons.push({
       title: '',
       description: '',
-      fileUrl: '',
-      file: null
+      files: [],
+      expanded: false
     });
   }
 
-  // Xóa bài học
   removeLesson(index: number) {
     this.program.lessons.splice(index, 1);
   }
 
-  // Bắt sự kiện khi người dùng chọn file
-  onFileChange(event: Event, index: number) {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (file) {
-      // Kiểm tra định dạng file PDF
-      if (file.type !== 'application/pdf') {
-        alert('Chỉ chấp nhận file PDF!');
-        return;
+  toggleLesson(index: number) {
+    this.program.lessons[index].expanded = !this.program.lessons[index].expanded;
+  }
+  
+
+  onFileChange(event: Event, lessonIndex: number) {
+    const files = (event.target as HTMLInputElement).files;
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        this.uploadFile(files[i], lessonIndex);
       }
-      this.uploadFile(file, index);
     }
   }
 
-  // Upload file thông qua service
-  uploadFile(file: File, index: number) {
-    this.chuongtrinhService.uploadFile(file).subscribe(
-      (fileUrl) => {
-        this.program.lessons[index].fileUrl = fileUrl; 
-        console.log(`File uploaded for lesson ${index + 1}: ${fileUrl}`);
-      },
-      (error) => {
-        console.error('Lỗi upload file:', error);
-        alert('Upload file thất bại!');
-      }
-    );
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
   }
 
-  // Lưu chương trình
+  onDrop(event: DragEvent, lessonIndex: number) {
+    event.preventDefault();
+    if (event.dataTransfer?.files.length) {
+      for (let i = 0; i < event.dataTransfer.files.length; i++) {
+        this.uploadFile(event.dataTransfer.files[i], lessonIndex);
+      }
+    }
+  }
+
+  uploadFile(file: File, lessonIndex: number) {
+    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/svg+xml', 'application/zip'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Chỉ chấp nhận file .pdf, .jpg, .png, .svg, .zip!');
+      return;
+    }
+    this.program.lessons[lessonIndex].files.push({ name: file.name });
+  }
+
+  removeFile(lessonIndex: number, fileIndex: number) {
+    this.program.lessons[lessonIndex].files.splice(fileIndex, 1);
+  }
+
   saveProgram() {
-    console.log('Program to add:', JSON.stringify(this.program, null, 2));
-    // Gọi hàm addProgram trong service (bạn cần tự định nghĩa)
+    console.log('Chương trình:', JSON.stringify(this.program, null, 2));
     this.chuongtrinhService.addProgram(this.program);
     alert('Thêm chương trình thành công!');
     this.router.navigate(['/chuongtrinh']);
   }
 
-  // Hủy và quay về danh sách
   cancel() {
     this.router.navigate(['/chuongtrinh']);
   }
