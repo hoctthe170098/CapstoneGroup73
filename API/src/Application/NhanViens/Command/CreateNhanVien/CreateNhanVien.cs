@@ -17,8 +17,8 @@ public record CreateNhanVienCommand : IRequest<Output>
     public required string GioiTinh { get; init; }
     public required string DiaChi { get; init; }
     public required DateOnly NgaySinh { get; init; }
-    public string? Email { get; init; }
-    public string? SoDienThoai { get; init; }
+    public required string Email { get; init; }
+    public required string SoDienThoai { get; init; }
     public required Guid CoSoId { get; init; }
     public required string Role { get; init; }
 }

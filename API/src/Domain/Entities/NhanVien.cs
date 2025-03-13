@@ -15,8 +15,8 @@ public class NhanVien
     public required string GioiTinh { get; set; }
     public required string DiaChi { get; set; }
     public required DateOnly NgaySinh { get; set; }
-    public string? Email { get; set; }
-    public string? SoDienThoai { get; set; }
+    public required string Email { get; set; }
+    public required string SoDienThoai { get; set; }
     public required Guid CoSoId { get; set; }
     [JsonIgnore]
     public CoSo Coso { get; set; } = null!;
