@@ -29,7 +29,7 @@ public class ChuongTrinhs : EndpointGroupBase
     {
         return await sender.Send(command);
     }
-    [Authorize(Roles = Roles.LearningManager)]
+    //[Authorize(Roles = Roles.LearningManager)]
     public async Task<PaginatedList<ChuongTrinhDto>> GetChuongTrinhsWithPagination(ISender sender, [AsParameters] GetChuongTrinhsWithPaginationQuery query)
     {
         return await sender.Send(query);
