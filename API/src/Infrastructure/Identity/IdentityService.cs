@@ -32,7 +32,8 @@ public class IdentityService : IIdentityService
         UserManager<ApplicationUser> userManager,
         IUserClaimsPrincipalFactory<ApplicationUser> userClaimsPrincipalFactory,
         IAuthorizationService authorizationService,
-        IConfiguration configuration, IApplicationDbContext context)
+        IConfiguration configuration,
+        IApplicationDbContext context)
     {
         _userManager = userManager;
         _userClaimsPrincipalFactory = userClaimsPrincipalFactory;
