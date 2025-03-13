@@ -450,7 +450,7 @@ public class IdentityService : IIdentityService
         await SendEmail(email, subject, body);
     }
 
-    public async Task<(Result Result, string userId)> GenerateUser(string name, string code, string email)
+    public async Task<(Result Result, string UserId)> GenerateUser(string name, string code, string email)
     {
         string username = genUsername(name, code);
         string password = GenerateRandomPassword();
