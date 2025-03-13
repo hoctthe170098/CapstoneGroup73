@@ -17,39 +17,49 @@ export class ChuongtrinhComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.chuongtrinhService.programs$.subscribe(data => {
-      this.programs = data.slice(); // Lưu danh sách chương trình
-    });
+    this.loadPrograms();
   }
+  
+  loadPrograms(): void {
+    this.programs = this.chuongtrinhService.getPrograms(); // 🔥 Lấy lại dữ liệu từ service
+    console.log("Danh sách chương trình sau khi cập nhật:", this.programs);
+  }
+  
 
-  toggleContent(index: number, event: Event) {
+  /**
+   * Toggle hiển thị nội dung bài học của chương trình
+   */
+  toggleContent(id: number, event: Event) {
     event.preventDefault();
-    this.programs[index].expanded = !this.programs[index].expanded;
+    const program = this.programs.find(p => p.id === id);
+    if (program) {
+      program.expanded = !program.expanded;
+    }
   }
 
+  /**
+   * Tải file đính kèm của bài học
+   */
   downloadFile(fileUrl: string) {
-  if (!fileUrl) {
-    alert('Không có file để tải!');
-    return;
+    if (!fileUrl) {
+      alert('Không có file để tải!');
+      return;
+    }
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.download = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
+    link.click();
   }
-  const link = document.createElement('a');
-  link.href = fileUrl;
-  link.download = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
-  link.click();
-}
 
-  deleteProgram(index: number) {
-    const confirmDelete = confirm(`Bạn có chắc chắn muốn xóa chương trình "${this.programs[index].title}" không?`);
+  /**
+   * Xóa chương trình học theo ID
+   */
+  deleteProgram(id: number) {
+    const confirmDelete = confirm("Bạn có chắc chắn muốn xóa chương trình này?");
     if (confirmDelete) {
-      this.chuongtrinhService.deleteProgram(index);
-  
-      // 🔥 Đảm bảo Angular nhận diện thay đổi danh sách
-      this.programs = this.chuongtrinhService.getPrograms().map(program => Object.assign({}, program));
-
-  
+      this.chuongtrinhService.deleteProgram(id);
+      this.programs = this.chuongtrinhService.getPrograms().map(program => ({ ...program }));
       alert('Xóa thành công!');
     }
   }
-  
-  
 }

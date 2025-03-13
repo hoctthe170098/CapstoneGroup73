@@ -21,6 +21,10 @@ export const Full_ROUTES: Routes = [
     loadChildren: () => import('../../hocsinh/hocsinh.module').then(m => m.HocSinhModule)
   },
   {
+    path: 'accountmanager',
+    loadChildren: () => import('../../accountmanager/accountmanager.module').then(m => m.AccountmanagerModule)
+  },
+  {
     path: 'giaovien',
     loadChildren: () => import('../../giaovien/giaovien.module').then(m => m.GiaovienModule)
   },

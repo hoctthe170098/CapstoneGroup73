@@ -1,115 +1,128 @@
+export interface CreateChuongTrinh {
+  id: number;
+  tieuDe: string;
+  moTa: string;
+  noiDungBaiHocs?: CreateNoiDungBaiHoc[];
+}
+
+export interface CreateNoiDungBaiHoc {
+  tieuDe: string;
+  mota: string;
+  soThuTu: number;
+  taiLieuHocTaps?: CreateTaiLieuHocTap[];
+}
+
+export interface CreateTaiLieuHocTap {
+  urlType: string;
+  file?: File;
+}
+
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+providedIn: 'root'
 })
 export class ChuongtrinhService {
 
-  private programsSource = new BehaviorSubject<any[]>(this.getStoredPrograms());
-  programs$ = this.programsSource.asObservable();
+private programsSource = new BehaviorSubject<CreateChuongTrinh[]>(this.getStoredPrograms());
+programs$ = this.programsSource.asObservable();
 
-  constructor() {}
+constructor() {}
 
-  // 🔥 Lấy danh sách từ localStorage hoặc dữ liệu mặc định
-  private getStoredPrograms(): any[] {
-    const storedData = localStorage.getItem('programs');
-    if (storedData) {
-      const programs = JSON.parse(storedData);
-      if (programs.length > 0) {
-        return programs;
-      }
+private getStoredPrograms(): CreateChuongTrinh[] {
+  const storedData = localStorage.getItem('programs');
+  if (storedData) {
+    return JSON.parse(storedData) as CreateChuongTrinh[];
+  }
+  
+  const defaultPrograms: CreateChuongTrinh[] = [
+    {
+      id: 1,
+      tieuDe: 'Chương trình học 1',
+      moTa: 'Mô tả chương trình học 1',
+      noiDungBaiHocs: [
+        {
+          
+          tieuDe: 'Bài 1',
+          mota: '',
+          soThuTu: 1,
+          taiLieuHocTaps: [
+            { urlType: 'pdf', file: new File([], 'sample-lesson-1.pdf') }
+          ]
+        },
+        {
+          tieuDe: 'Bài 2',
+          mota: '',
+          soThuTu: 2,
+          taiLieuHocTaps: [
+            { urlType: 'pdf', file: new File([], 'sample-lesson-2.pdf') }
+          ]
+        },
+        {
+          tieuDe: 'Bài 3',
+          mota: '',
+          soThuTu: 3,
+          taiLieuHocTaps: [
+            { urlType: 'pdf', file: new File([], 'sample-lesson-3.pdf') }
+          ]
+        }
+        
+      ]
     }
+  ];
   
-    // Khởi tạo defaultPrograms với mỗi lesson có danh sách file
-    const defaultPrograms = [
-      {
-        title: 'Chương trình học 1',
-        description: 'Mô tả chương trình học 1',
-        isHidden: false,
-        lessons: [
-          {
-            title: 'Bài 1',
-            description: '',
-            files: [
-              { name: 'sample-lesson-1.pdf', fileUrl: 'assets/files/sample-lesson-1.pdf' }
-            ]
-          },
-          {
-            title: 'Bài 2',
-            description: '',
-            files: [
-              { name: 'sample-lesson-2.pdf', fileUrl: 'assets/files/sample-lesson-2.pdf' }
-            ]
-          }
-        ]
-      },
-      {
-        title: 'Chương trình học 2',
-        description: 'Mô tả chương trình học 2',
-        isHidden: false,
-        lessons: [
-          {
-            title: 'Bài 1',
-            description: '',
-            files: [
-              { name: 'sample-lesson-3.pdf', fileUrl: 'assets/files/sample-lesson-3.pdf' }
-            ]
-          }
-        ]
-      }
-    ];
+  localStorage.setItem('programs', JSON.stringify(defaultPrograms));
+  return defaultPrograms;
+}
+
+private updateLocalStorage(programs: CreateChuongTrinh[]) {
+  localStorage.setItem('programs', JSON.stringify(programs));
+}
+
+getPrograms(): CreateChuongTrinh[] {
+  const storedData = localStorage.getItem('programs');
+  return storedData ? JSON.parse(storedData) : [];
+}
+
+
+getProgram(id: number): CreateChuongTrinh | null {
+  const programs = this.programsSource.value;
+  return programs.find(program => program.id === id) || null; 
+}
+
+
+updateProgram(id: number, updatedProgram: CreateChuongTrinh): void {
+  let programs = this.getPrograms();
+  const index = programs.findIndex(p => p.id === id);
   
-    localStorage.setItem('programs', JSON.stringify(defaultPrograms));
-    return defaultPrograms;
+  if (index !== -1) {
+    programs[index] = { ...updatedProgram };
+    this.updateLocalStorage(programs);
+    this.programsSource.next(programs);  
   }
-  
+}
 
-  // 🔥 Cập nhật localStorage sau mỗi thay đổi
-  private updateLocalStorage(programs: any[]) {
-    localStorage.setItem('programs', JSON.stringify(programs));
-  }
 
-  // 📌 Lấy danh sách chương trình
-  getPrograms(): any[] {
-    return this.programsSource.value.slice(); // 🔥 Thay thế spread (...)
-  }
+addProgram(newProgram: CreateChuongTrinh): void {
+  const programs = this.programsSource.value.slice();
+  const newId = programs.reduce((max, p) => (p.id > max ? p.id : max), 0) + 1;
+  programs.push({ ...newProgram, id: newId }); // Gán id mới
+  this.programsSource.next(programs);
+  this.updateLocalStorage(programs);
+}
 
-  // 📌 Lấy một chương trình theo index
-  getProgram(index: number): any {
-    return this.programsSource.value[index] ? Object.assign({}, this.programsSource.value[index]) : null;
-  }
 
-  // 📌 Cập nhật chương trình
-  updateProgram(index: number, updatedProgram: any): void {
-    const programs = this.programsSource.value.slice(); // 🔥 Thay thế spread (...)
-    if (index >= 0 && index < programs.length) {
-      programs[index] = Object.assign({}, updatedProgram); // 🔥 Tránh spread object
-      this.programsSource.next(programs);
-      this.updateLocalStorage(programs); // 🔥 Lưu lại thay đổi vào localStorage
-    }
-  }
+deleteProgram(index: number): void {
+  const programs = this.programsSource.value.slice();
+  programs.splice(index, 1);
+  this.programsSource.next(programs);
+  this.updateLocalStorage(programs);
+}
 
-  // 📌 Thêm chương trình mới
-  addProgram(newProgram: any): void {
-    const programs = this.programsSource.value.slice(); // 🔥 Thay thế spread (...)
-    programs.push(newProgram);
-    this.programsSource.next(programs);
-    this.updateLocalStorage(programs); // 🔥 Lưu vào localStorage
-  }
-
-  // 📌 Xóa chương trình
-  deleteProgram(index: number): void {
-    const programs = this.programsSource.value.slice(); // 🔥 Thay thế spread (...)
-    programs.splice(index, 1);
-    this.programsSource.next(programs);
-    this.updateLocalStorage(programs); // 🔥 Cập nhật lại localStorage
-  }
-
-  // 📌 Giả lập upload file (chưa có backend)
-  uploadFile(file: File): Observable<string> {
-    const fileName = encodeURIComponent(file.name);
-    const fakeServerUrl = `https://example.com/uploads/${fileName}`;
-    return of(fakeServerUrl); // Giả lập trả về URL thật từ server
-  }
+uploadFile(file: File): Observable<string> {
+  const fileName = encodeURIComponent(file.name);
+  const fakeServerUrl = `https://example.com/uploads/${fileName}`;
+  return of(fakeServerUrl);
+}
 }
