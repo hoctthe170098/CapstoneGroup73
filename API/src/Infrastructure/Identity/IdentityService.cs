@@ -297,7 +297,6 @@ public class IdentityService : IIdentityService
                 phoneNumber = "+84" + phoneNumber;
             }
         }
-
         return phoneNumber;
     }
     private async Task SendSms(string toPhoneNumber, string message)
@@ -480,6 +479,26 @@ public class IdentityService : IIdentityService
 
     public Guid GetCampusId(string token)
     {
-        throw new NotImplementedException();
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var secretKey = _configuration["Jwt:SecretKey"] ?? throw
+            new ArgumentNullException(nameof(_configuration)
+            , "Jwt:SecretKey is missing in configuration.");
+        var key = Encoding.ASCII.GetBytes(secretKey);
+        tokenHandler.ValidateToken(token, new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
+            ClockSkew = TimeSpan.Zero
+        }, out SecurityToken validatedToken);
+
+        var jwtToken = (JwtSecurityToken)validatedToken;
+        var campusIdString = jwtToken.Claims
+            .First(x => x.Type == ClaimTypes.Locality).Value;
+        var chuyendoi = Guid.TryParse(campusIdString, out var campusId);
+        if(chuyendoi) return campusId;
+        else return Guid.Empty;
     }
 }
