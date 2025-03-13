@@ -12,8 +12,8 @@ public class CreateLichHocDto
     public string TenLop { get; set; } = string.Empty;
     public string GioBatDau { get; set; } = string.Empty;
     public string GioKetThuc { get; set; } = string.Empty;
-    public DateOnly NgayBatDau { get; set; }
-    public DateOnly NgayKetThuc { get; set; }
+    public string NgayBatDau { get; set; } = string.Empty;
+    public string NgayKetThuc { get; set; } = string.Empty;
     public int HocPhi { get; set; }
     public string TrangThai { get; set; } = "NotYet";
     public string GiaoVienCode { get; set; } = string.Empty;
