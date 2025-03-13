@@ -89,7 +89,7 @@ public class AddListGiaoViensCommandHandler : IRequestHandler<AddListGiaoViensCo
             }
 
             // Create identity user
-            var (result, userId) = await _identityService.GenerateUser(req.Ten, req.Code);
+            var (result, userId) = await _identityService.GenerateUser(req.Ten, req.Code, req.Email);
             if (!result.Succeeded)
             {
                 throw new Exception($"Tạo tài khoản thất bại cho giáo viên có mã {req.Code}: {string.Join(", ", result.Errors)}");

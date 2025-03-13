@@ -19,7 +19,7 @@ public record CreateHocSinhCommand : IRequest<Output>
     public required string Lop { get; set; }
     public required string TruongDangHoc { get; set; }
     public required DateOnly NgaySinh { get; set; }
-    public string? Email { get; set; }
+    public required string Email { get; set; }
     public string? SoDienThoai { get; set; }
     public int? ChinhSachId { get; set; }
     public required Guid CoSoId { get; set; }
@@ -90,7 +90,7 @@ public class CreateHocSinhCommandHandler : IRequestHandler<CreateHocSinhCommand,
         }
 
         // Create identity user     
-        var (result, userId) = await _identityService.GenerateUser(request.Ten, request.Code);
+        var (result, userId) = await _identityService.GenerateUser(request.Ten, request.Code, request.Email);
 
         if (!result.Succeeded)
         {

@@ -32,7 +32,7 @@ public class AddListHocSinhsCommandHandler : IRequestHandler<AddListHocSinhsComm
     {
         if (request.HocSinhs == null || !request.HocSinhs.Any())
         {
-            throw new WrongInputException("Danh sách giáo viên không được rỗng.");
+            throw new WrongInputException("Danh sách học viên không được rỗng.");
         }
 
         var codes = request.HocSinhs.Select(gv => gv.Code).ToList();
@@ -45,7 +45,7 @@ public class AddListHocSinhsCommandHandler : IRequestHandler<AddListHocSinhsComm
 
         if (existingCodes.Any())
         {
-            throw new WrongInputException($"Mã giáo viên đã tồn tại: {string.Join(", ", existingCodes)}");
+            throw new WrongInputException($"Mã học viên đã tồn tại: {string.Join(", ", existingCodes)}");
         }
 
         var hocSinhsToAdd = new List<HocSinh>();
@@ -92,7 +92,7 @@ public class AddListHocSinhsCommandHandler : IRequestHandler<AddListHocSinhsComm
             }
 
             // Create identity user
-            var (result, userId) = await _identityService.GenerateUser(req.Ten, req.Code);
+            var (result, userId) = await _identityService.GenerateUser(req.Ten, req.Code, req.Email);
             if (!result.Succeeded)
             {
                 throw new Exception($"Tạo tài khoản thất bại cho học viên có mã {req.Code}: {string.Join(", ", result.Errors)}");

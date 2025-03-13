@@ -18,7 +18,7 @@ public record CreateNhanVienCommand : IRequest<Output>
     public required string DiaChi { get; init; }
     public required DateOnly NgaySinh { get; init; }
     public required string Email { get; init; }
-    public required string SoDienThoai { get; init; }
+    public string? SoDienThoai { get; init; }
     public required Guid CoSoId { get; init; }
     public required string Role { get; init; }
 }
@@ -40,7 +40,8 @@ public class CreateNhanVienCommandHandler : IRequestHandler<CreateNhanVienComman
         if (string.IsNullOrWhiteSpace(request.Code) ||
             string.IsNullOrWhiteSpace(request.Ten) ||
             string.IsNullOrWhiteSpace(request.GioiTinh) ||
-            string.IsNullOrWhiteSpace(request.DiaChi))
+            string.IsNullOrWhiteSpace(request.DiaChi) ||
+            string.IsNullOrWhiteSpace(request.Email))
         {
             throw new NotFoundDataException("Dữ liệu không được để trống");
         }
@@ -74,7 +75,7 @@ public class CreateNhanVienCommandHandler : IRequestHandler<CreateNhanVienComman
         }
 
         // Create identity user
-        var (result, userId) = await _identityService.GenerateUser(request.Ten, request.Code);
+        var (result, userId) = await _identityService.GenerateUser(request.Ten, request.Code, request.Email);
 
         if (!result.Succeeded)
         {

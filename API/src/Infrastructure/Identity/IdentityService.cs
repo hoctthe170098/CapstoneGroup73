@@ -207,7 +207,15 @@ public class IdentityService : IIdentityService
             client.EnableSsl = true;
             client.Credentials = new NetworkCredential(smtpUsername, smtpPassword);
 
-            var mailMessage = new MailMessage(smtpUsername, toEmail, subject, body);
+
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(smtpUsername),
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true
+            };
+            mailMessage.To.Add(toEmail);
 
             await client.SendMailAsync(mailMessage);
         }
@@ -398,14 +406,49 @@ public class IdentityService : IIdentityService
         return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
     }
 
-    public async Task<(Result Result, string userId)> GenerateUser(string name, string code)
+    private async Task SendAccountInfoEmail(string email, string name, string username, string password)
     {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return; 
+        }
+
+        string subject = "Thông tin tài khoản đăng nhập";
+
+        string body = $@"
+        <html>
+        <body>
+            <p>Xin chào <b>{name}</b>,</p>
+            <p>Tài khoản của bạn đã được tạo thành công. Dưới đây là thông tin đăng nhập của bạn:</p>
+            <p><b>Username:</b> {username}</p>
+            <p><b>Password:</b> {password}</p>
+            <p style='color:red;'><i>Vui lòng đăng nhập và đổi mật khẩu ngay sau khi đăng nhập.</i></p>
+            <p>Trân trọng,</p>
+            <p><b>Đội ngũ StudyFlow</b></p>
+        </body>
+        </html>
+        ";
+
+        await SendEmail(email, subject, body);
+    }
+
+    public async Task<(Result Result, string userId)> GenerateUser(string name, string code, string email)
+    {
+        string username = genUsername(name, code); 
+        string password = GenerateRandomPassword();
+
         var user = new ApplicationUser
         {
-            UserName = genUsername(name, code),
+            UserName = username,
+            Email = email
         };
 
-        var result = await _userManager.CreateAsync(user, GenerateRandomPassword());
+        var result = await _userManager.CreateAsync(user, password);
+
+        if (result.Succeeded)
+        {
+            await SendAccountInfoEmail(email, name, username, password);
+        }
 
         return (result.ToApplicationResult(), user.Id);
     }
