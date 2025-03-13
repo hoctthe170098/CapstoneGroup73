@@ -19,4 +19,5 @@ public interface IIdentityService
     Task<bool> IsUserActiveAsync(string userId);
     Task<bool> AssignRoleAsync(string userId, string role);
     Guid GetCampusId(string token);
+    Task<Result> disableUser(string userId);
 }

@@ -50,7 +50,7 @@ internal sealed class GlobalExceptionHandler : IExceptionHandler
                 break;
             default:
                 output.code = 500;
-                output.message = exception.Message;
+                output.message =  string.Join("; ", new[] { exception.Message });
                 break;
         }
         httpContext.Response.StatusCode = StatusCodes.Status200OK;
