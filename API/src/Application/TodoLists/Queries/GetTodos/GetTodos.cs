@@ -1,11 +1,12 @@
 ﻿using StudyFlow.Application.Common.Interfaces;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Application.Common.Security;
+using StudyFlow.Domain.Constants;
 using StudyFlow.Domain.Enums;
 
 namespace StudyFlow.Application.TodoLists.Queries.GetTodos;
 
-[Authorize]
+[Authorize(Roles = Roles.Administrator)]
 public record GetTodosQuery : IRequest<TodosVm>;
 
 public class GetTodosQueryHandler : IRequestHandler<GetTodosQuery, TodosVm>

@@ -17,10 +17,10 @@ public record EditGiaoVienCommand : IRequest<Output>
     public required string GioiTinh { get; set; }
     public required string DiaChi { get; set; }
     public required string TruongDangDay { get; set; }
-    public required DateOnly NgaySinh { get; set; }
+    public required string NgaySinh { get; set; }
     public required string Email { get; set; }
     public required string SoDienThoai { get; set; }
-    public required Guid CoSoId { get; set; }
+    public required string token { get; set; }
 }
 
 public class EditGiaoVienCommandHandler : IRequestHandler<EditGiaoVienCommand, Output>
@@ -55,10 +55,16 @@ public class EditGiaoVienCommandHandler : IRequestHandler<EditGiaoVienCommand, O
             throw new WrongInputException($"Mã giáo viên '{request.Code}' đã tồn tại!");
         }
 
-        // Vallidate NgaySinh not in future
-        if (request.NgaySinh > DateOnly.FromDateTime(DateTime.Today))
+        // Validate NgaySinh (Date of Birth) format
+        if (!DateOnly.TryParseExact(request.NgaySinh, "yyyy-MM-dd", out DateOnly ngaySinh))
         {
-            throw new WrongInputException("Ngày sinh không hợp lệ!");
+            throw new FormatException("Ngày sinh không hợp lệ. Định dạng phải là yyyy-MM-dd");
+        }
+        // Validate NgaySinh (Date of Birth) is at least 18 years old
+        var eighteenYearsAgo = DateOnly.FromDateTime(DateTime.Now.AddYears(-18));
+        if (ngaySinh > eighteenYearsAgo)
+        {
+            throw new WrongInputException("Giáo viên phải đủ 18 tuổi trở lên");
         }
 
         // Validate length constraints
@@ -66,7 +72,11 @@ public class EditGiaoVienCommandHandler : IRequestHandler<EditGiaoVienCommand, O
         {
             throw new WrongInputException("Độ dài dữ liệu không hợp lệ!");
         }
-
+        Guid coSoId = _identityService.GetCampusId(request.token);
+        if (coSoId == Guid.Empty)
+        {
+            throw new FormatException("CoSo không hợp lệ");
+        }
         // Validate phone number 
         if (!string.IsNullOrEmpty(request.SoDienThoai))
         {
@@ -83,12 +93,11 @@ public class EditGiaoVienCommandHandler : IRequestHandler<EditGiaoVienCommand, O
         }
 
         // Check if CoSo exists
-        var coSoExists = await _context.CoSos.AnyAsync(c => c.Id == request.CoSoId, cancellationToken);
+        var coSoExists = await _context.CoSos.AnyAsync(c => c.Id == coSoId, cancellationToken);
         if (!coSoExists)
         {
             throw new NotFoundDataException("Cơ sở không tồn tại");
         }
-
         var giaoVien = await _context.GiaoViens.FindAsync(new object[] { request.Code }, cancellationToken);
         
         if(giaoVien == null) throw new NotFoundIDException();
@@ -100,10 +109,10 @@ public class EditGiaoVienCommandHandler : IRequestHandler<EditGiaoVienCommand, O
             giaoVien.GioiTinh = request.GioiTinh;
             giaoVien.DiaChi = request.DiaChi;
             giaoVien.TruongDangDay = request.TruongDangDay;
-            giaoVien.NgaySinh = request.NgaySinh;
+            giaoVien.NgaySinh = ngaySinh;
             giaoVien.Email = request.Email;
             giaoVien.SoDienThoai = request.SoDienThoai;
-            giaoVien.CoSoId = request.CoSoId;
+            giaoVien.CoSoId = coSoId;
         }
 
         await _context.SaveChangesAsync(cancellationToken);

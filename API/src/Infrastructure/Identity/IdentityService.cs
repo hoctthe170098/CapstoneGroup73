@@ -125,15 +125,15 @@ public class IdentityService : IIdentityService
                 var student = _context.HocSinhs.FirstOrDefault(s => s.UserId == user.Id);
                 if (staff != null)
                 {
-                    claims.Add(new Claim(ClaimTypes.Locality, staff.Coso.Id.ToString()));
+                    claims.Add(new Claim(ClaimTypes.Locality, staff.CoSoId.ToString()));
                 }
                 else if (teacher != null)
                 {
-                    claims.Add(new Claim(ClaimTypes.Locality, teacher.Coso.Id.ToString()));
+                    claims.Add(new Claim(ClaimTypes.Locality, teacher.CoSoId.ToString()));
                 }
                 else if (student != null)
                 {
-                    claims.Add(new Claim(ClaimTypes.Locality, student.Coso.Id.ToString()));
+                    claims.Add(new Claim(ClaimTypes.Locality, student.CoSoId.ToString()));
                 }
             }
             foreach (var role in roles)

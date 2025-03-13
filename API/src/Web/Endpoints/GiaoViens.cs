@@ -1,8 +1,10 @@
-﻿using StudyFlow.Application.Common.Models;
+﻿using Microsoft.AspNetCore.Authorization;
+using StudyFlow.Application.Common.Models;
 using StudyFlow.Application.GiaoViens.Commands.AddListGiaoViens;
 using StudyFlow.Application.GiaoViens.Commands.CreateGiaoVien;
 using StudyFlow.Application.GiaoViens.Commands.EditGiaoVien;
 using StudyFlow.Application.GiaoViens.Queries.GetGiaoViensWithPagination;
+using StudyFlow.Domain.Constants;
 
 namespace StudyFlow.Web.Endpoints;
 
@@ -16,22 +18,22 @@ public class GiaoViens : EndpointGroupBase
             .MapPut(EditGiaoVien, "editgiaovien")
             .MapPost(AddListGiaoViens, "addlistgiaoviens");
     }
-    //[Authorize(Roles = Roles.Administrator)]
+    [Authorize(Roles = Roles.CampusManager)]
     public async Task<Output> CreateGiaoVien(ISender sender, CreateGiaoVienCommand comand)
     {
         return await sender.Send(comand);
     }
-    //[Authorize(Roles = Roles.Administrator)]
+    [Authorize(Roles = Roles.CampusManager)]
     public async Task<Output> GetGiaoViensWithPagination(ISender sender, GetGiaoViensWithPaginationQuery query)
     {
         return await sender.Send(query);
     }
-    //[Authorize(Roles = Roles.Administrator)]
+    [Authorize(Roles = Roles.CampusManager)]
     public async Task<Output> EditGiaoVien(ISender sender, EditGiaoVienCommand comand)
     {
         return await sender.Send(comand);
     }
-
+    [Authorize(Roles = Roles.CampusManager)]
     public async Task<Output> AddListGiaoViens(ISender sender, AddListGiaoViensCommand comand)
     {
         return await sender.Send(comand);
