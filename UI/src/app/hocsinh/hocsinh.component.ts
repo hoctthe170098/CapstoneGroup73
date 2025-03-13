@@ -19,6 +19,7 @@ export class HocsinhComponent implements OnInit {
     { code: 'Lớp 2', name: 'Lớp 2' },
     { code: 'Lớp 3', name: 'Lớp 3' },
     { code: 'Lớp 4', name: 'Lớp 4' },
+    { code: 'Lớp 5 Anh', name: 'Lớp 5 Anh' },
   ];
    // Mảng lọc khi tìm kiếm
    filteredClassOptions = this.classOptions.slice();

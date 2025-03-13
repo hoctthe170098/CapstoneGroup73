@@ -24,7 +24,10 @@ export const Full_ROUTES: Routes = [
     path: 'giaovien',
     loadChildren: () => import('../../giaovien/giaovien.module').then(m => m.GiaovienModule)
   },
-  
+  {
+    path: 'lophoc',
+    loadChildren: () => import('../../lophoc/lophoc.module').then(m => m.LophocModule)
+  },
   {
     path: 'coso',
     loadChildren: () => import('../../coso/coso.module').then(m => m.CosoModule)
