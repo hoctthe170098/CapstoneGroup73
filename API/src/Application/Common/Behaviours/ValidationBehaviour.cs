@@ -1,4 +1,5 @@
-﻿using ValidationException = StudyFlow.Application.Common.Exceptions.ValidationException;
+﻿using StudyFlow.Application.Common.Exceptions;
+using ValidationException = StudyFlow.Application.Common.Exceptions.ValidationException;
 
 namespace StudyFlow.Application.Common.Behaviours;
 
@@ -28,7 +29,14 @@ public class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TReque
                 .ToList();
 
             if (failures.Any())
-                throw new ValidationException(failures);
+            {
+                if (failures[0].ErrorCode == "STT") 
+                    throw new WrongInputException("Số thứ tự nội dung bài" +
+                        " học phải bắt đầu từ 1 và tăng dần, không được trùng lặp.");
+                if (failures[0].ErrorCode == "Format")
+                    throw new WrongInputException("Dữ liệu nhập sai format, vui lòng nhập lại");
+            }
+               
         }
         return await next();
     }

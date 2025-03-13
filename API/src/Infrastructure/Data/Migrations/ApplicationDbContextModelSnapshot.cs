@@ -272,13 +272,13 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     b.Property<string>("MoTa")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
 
                     b.Property<string>("TieuDe")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("TrangThai")
                         .IsRequired()
@@ -302,8 +302,8 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     b.Property<string>("DiaChi")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("SoDienThoai")
                         .IsRequired()
@@ -382,11 +382,13 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     b.Property<string>("DiaChi")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("GioiTinh")
                         .IsRequired()
@@ -397,7 +399,9 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                         .HasColumnType("date");
 
                     b.Property<string>("SoDienThoai")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
 
                     b.Property<string>("Ten")
                         .IsRequired()
@@ -442,11 +446,13 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     b.Property<string>("DiaChi")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("GioiTinh")
                         .IsRequired()
@@ -461,7 +467,9 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                         .HasColumnType("date");
 
                     b.Property<string>("SoDienThoai")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
 
                     b.Property<string>("Ten")
                         .IsRequired()
@@ -539,21 +547,22 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<TimeOnly>("GioBatDau")
+                        .HasColumnType("time");
+
+                    b.Property<TimeOnly>("GioKetThuc")
+                        .HasColumnType("time");
+
                     b.Property<int>("HocPhi")
                         .HasColumnType("int");
 
                     b.Property<DateOnly>("NgayBatDau")
                         .HasColumnType("date");
 
-                    b.Property<DateOnly?>("NgayKetThuc")
+                    b.Property<DateOnly>("NgayKetThuc")
                         .HasColumnType("date");
 
-                    b.Property<string>("Phong")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<int>("SlotId")
+                    b.Property<int>("PhongId")
                         .HasColumnType("int");
 
                     b.Property<string>("TenLop")
@@ -566,7 +575,7 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     b.Property<string>("TrangThai")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -574,10 +583,7 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     b.HasIndex("GiaoVienCode");
 
-                    b.HasIndex("SlotId");
-
-                    b.HasIndex("Thu", "Phong", "SlotId", "TrangThai")
-                        .IsUnique();
+                    b.HasIndex("PhongId");
 
                     b.ToTable("LichHoc", (string)null);
 
@@ -597,11 +603,13 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     b.Property<string>("DiaChi")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("GioiTinh")
                         .IsRequired()
@@ -612,7 +620,9 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                         .HasColumnType("date");
 
                     b.Property<string>("SoDienThoai")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
 
                     b.Property<string>("Ten")
                         .IsRequired()
@@ -649,16 +659,16 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     b.Property<string>("Mota")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
 
                     b.Property<int>("SoThuTu")
                         .HasColumnType("int");
 
                     b.Property<string>("TieuDe")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
@@ -667,7 +677,7 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                     b.ToTable("NoiDungBaiHoc", (string)null);
                 });
 
-            modelBuilder.Entity("StudyFlow.Domain.Entities.Slot", b =>
+            modelBuilder.Entity("StudyFlow.Domain.Entities.Phong", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -675,20 +685,25 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<TimeOnly>("BatDau")
-                        .HasColumnType("time");
-
-                    b.Property<TimeOnly>("KetThuc")
-                        .HasColumnType("time");
+                    b.Property<Guid>("CoSoId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Ten")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("TrangThai")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Slot", (string)null);
+                    b.HasIndex("CoSoId");
+
+                    b.ToTable("Phong", (string)null);
+
+                    b.HasAnnotation("CheckConstraint:CK_Phong_TrangThai", "[TrangThai] IN ('Use', 'NonUse')");
                 });
 
             modelBuilder.Entity("StudyFlow.Domain.Entities.TaiLieuHocTap", b =>
@@ -1094,9 +1109,9 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("StudyFlow.Domain.Entities.Slot", "Slot")
+                    b.HasOne("StudyFlow.Domain.Entities.Phong", "Phong")
                         .WithMany("LichHocs")
-                        .HasForeignKey("SlotId")
+                        .HasForeignKey("PhongId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -1104,7 +1119,7 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     b.Navigation("GiaoVien");
 
-                    b.Navigation("Slot");
+                    b.Navigation("Phong");
                 });
 
             modelBuilder.Entity("StudyFlow.Domain.Entities.NhanVien", b =>
@@ -1132,6 +1147,17 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("ChuongTrinh");
+                });
+
+            modelBuilder.Entity("StudyFlow.Domain.Entities.Phong", b =>
+                {
+                    b.HasOne("StudyFlow.Domain.Entities.CoSo", "CoSo")
+                        .WithMany("Phongs")
+                        .HasForeignKey("CoSoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CoSo");
                 });
 
             modelBuilder.Entity("StudyFlow.Domain.Entities.TaiLieuHocTap", b =>
@@ -1246,6 +1272,8 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                     b.Navigation("HocSinhs");
 
                     b.Navigation("NhanViens");
+
+                    b.Navigation("Phongs");
                 });
 
             modelBuilder.Entity("StudyFlow.Domain.Entities.GiaoVien", b =>
@@ -1276,7 +1304,7 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                     b.Navigation("TaiLieuHocTaps");
                 });
 
-            modelBuilder.Entity("StudyFlow.Domain.Entities.Slot", b =>
+            modelBuilder.Entity("StudyFlow.Domain.Entities.Phong", b =>
                 {
                     b.Navigation("LichHocs");
                 });

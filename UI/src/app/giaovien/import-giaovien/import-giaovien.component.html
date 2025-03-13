@@ -1,0 +1,139 @@
+<div class="import-hocsinh-wrapper">
+    <h3>Import Giáo Viên</h3>
+
+    <div *ngIf="!fileSelected" class="choose-file-area">
+        <div class="drag-drop-box" (drop)="onDropFile($event)" (dragover)="onDragOver($event)">
+          <p>Drag your file(s) or <strong>browse</strong></p>
+          <input type="file" (change)="onFileSelected($event)" />
+        </div>
+      </div>
+
+    <button class="btn btn-secondary back-btn" (click)="goBack()" *ngIf="!fileSelected">
+        <i class="fa fa-arrow-left"></i> Back
+    </button>
+
+    <div *ngIf="fileSelected" class="file-preview-area">
+        <h4>File đã chọn: <strong>{{ fileName }}</strong></h4>
+
+        <div class="table-responsive">
+            <table class="table student-table">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Tên</th>
+                  <th>Giới Tính</th>
+                  <th>Ngày Sinh</th>
+                  <th>Email</th>
+                  <th>Số điện thoại</th>
+                  <th>Trạng thái</th>
+                  <th class="dropdown-col"></th>
+                  <th class="edit-col">Sửa</th>
+                </tr>
+              </thead>
+              <tbody>
+                <ng-container *ngFor="let hs of importedTeachers; let i = index">
+                  <!-- Hàng tóm tắt -->
+                  <tr>
+                    <td>{{ hs.code }}</td>
+                    <td>{{ hs.ten }}</td>
+                    <td>{{ hs.gioiTinh }}</td>
+                    <td>{{ hs.ngaySinh | date:'dd-MM-yyyy' }}</td>
+                    <td>{{ hs.email }}</td>
+                    <td>{{ hs.soDienThoai }}</td>
+                    <td>
+                      <span class="active-status">Hoạt động</span>
+                      <i class="check-icon"></i>
+                    </td>
+                    <!-- Nút dropdown -->
+                    <td class="dropdown-col">
+                      <button class="btn dropdown-btn" (click)="toggleDetails(i)">
+                        <i *ngIf="!hs.showDetails" class="fas fa-caret-down"></i>
+                        <i *ngIf="hs.showDetails" class="fas fa-caret-up"></i>
+                      </button>
+        
+                    </td>
+                    <!-- Nút sửa (bên phải) -->
+                    <td class="edit-col">
+                      <button class="btn edit-btn" (click)="onEditStudentClick(i)">
+                        <i class="fas fa-pencil-alt"></i>
+                      </button>
+                    </td>
+                  </tr>
+        
+                  <!-- Hàng chi tiết (hiển thị ngay dưới item đó) -->
+                  <tr *ngIf="hs.showDetails">
+                    <td colspan="9" class="detail-cell">
+                      <!-- Bố cục chia làm 4 hàng, theo ảnh mẫu -->
+                      <div class="container-fluid">
+                        <!-- Row 1: Code, Họ và Tên, Giới Tính, Ngày Sinh -->
+                        <div class="row">
+                          <div class="col-md-3 detail-item">
+                            <label>Code</label>
+                            <div class="detail-box">{{ hs.code }}</div>
+                          </div>
+                          <div class="col-md-3 detail-item">
+                            <label>Họ và Tên</label>
+                            <div class="detail-box">{{ hs.ten }}</div>
+                          </div>
+                          <div class="col-md-3 detail-item">
+                            <label>Giới Tính</label>
+                            <div class="detail-box">{{ hs.gioiTinh }}</div>
+                          </div>
+                          <div class="col-md-3 detail-item">
+                            <label>Ngày Sinh</label>
+                            <div class="detail-box">{{ hs.ngaySinh | date:'dd-MM-yyyy' }}</div>
+                          </div>
+                        </div>
+        
+                        <!-- Row 2: Số Điện Thoại, Email, Địa Chỉ -->
+                        <div class="row mt-3">
+                          <div class="col-md-4 detail-item">
+                            <label>Số Điện Thoại</label>
+                            <div class="detail-box">{{ hs.soDienThoai }}</div>
+                          </div>
+                          <div class="col-md-4 detail-item">
+                            <label>Email</label>
+                            <div class="detail-box">{{ hs.email }}</div>
+                          </div>
+                          <div class="col-md-4 detail-item">
+                            <label>Địa Chỉ</label>
+                            <div class="detail-box">{{ hs.diaChi }}</div>
+                          </div>
+                        </div>
+        
+                        <!-- Row 3: Trường Đang Học, Cơ Sở, Chính Sách Học Phí -->
+                        <div class="row mt-3">
+                          <div class="col-md-4 detail-item">
+                            <label>Trường Đang Dạy</label>
+                            <div class="detail-box">{{ hs.truongDangDay }}</div>
+                          </div>
+                          <div class="col-md-4 detail-item">
+                            <label>Cơ Sở</label>
+                            <div class="detail-box">{{ hs.coso }}</div>
+                        </div>
+        
+                        </div>
+        
+                        <!-- Row 4: Danh Sách Lớp Đang Học -->
+                        <div class="row mt-3">
+                          <div class="col-12 detail-item">
+                            <label>Danh Sách Lớp Đang Dạy</label>
+                            <div class="detail-box">
+                              {{ hs.lopHocs.join(', ') }}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </table>
+          </div>
+
+        <div class="action-buttons">
+            <button class="btn cancel-btn" (click)="onCancel()">Hủy</button>
+            <button class="btn save-btn" (click)="onConfirmImport()">Xác nhận</button>
+        </div>
+    </div>
+</div>

@@ -48,7 +48,7 @@ public static class DependencyInjection
                 provider.GetRequiredService<UserManager<ApplicationUser>>(),
                 provider.GetRequiredService<IUserClaimsPrincipalFactory<ApplicationUser>>(),
                 provider.GetRequiredService<IAuthorizationService>(),
-                configuration)); // Truyền configuration vào constructor
+                configuration,provider.GetRequiredService<IApplicationDbContext>())); // Truyền configuration vào constructor
 
         services.AddAuthorization(options =>
         {

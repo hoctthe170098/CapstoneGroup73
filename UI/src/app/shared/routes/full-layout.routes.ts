@@ -11,6 +11,23 @@ export const Full_ROUTES: Routes = [
     path: 'sanpham',
     loadChildren: () => import('../../sanpham/sanpham.module').then(m => m.SanphamModule)
   },
+  
+  {
+    path: 'slot',
+    loadChildren: () => import('../../slot/slot.module').then(m => m.SlotModule)
+  },
+  {
+    path: 'hocsinh',
+    loadChildren: () => import('../../hocsinh/hocsinh.module').then(m => m.HocSinhModule)
+  },
+  {
+    path: 'giaovien',
+    loadChildren: () => import('../../giaovien/giaovien.module').then(m => m.GiaovienModule)
+  },
+  {
+    path: 'lophoc',
+    loadChildren: () => import('../../lophoc/lophoc.module').then(m => m.LophocModule)
+  },
   {
     path: 'coso',
     loadChildren: () => import('../../coso/coso.module').then(m => m.CosoModule)

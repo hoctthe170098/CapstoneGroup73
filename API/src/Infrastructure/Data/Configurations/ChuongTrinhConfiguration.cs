@@ -15,9 +15,9 @@ public class ChuongTrinhConfiguration : IEntityTypeConfiguration<ChuongTrinh>
         builder.ToTable(nameof(ChuongTrinh));
         builder.HasKey(t => t.Id);
         builder.Property(x => x.TieuDe)
-            .HasMaxLength(30);
+            .HasMaxLength(200);
         builder.Property(x => x.MoTa)
-            .HasMaxLength(100);
+            .HasMaxLength(300);
         builder.HasAnnotation($"CheckConstraint:CK_ChuongTrinh_TrangThai", "[TrangThai] IN ('use', 'notuse')");
     }
 }

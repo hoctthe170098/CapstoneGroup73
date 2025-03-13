@@ -1,0 +1,94 @@
+<div class="row slot-container">
+    <!-- Cột trái: Form thêm slot -->
+    <div class="col-md-4 form-section">
+      <h3>Thêm Slot Mới</h3>
+      <form (ngSubmit)="addSlot()">
+        <div class="form-group">
+          <label for="slotName">Tên</label>
+          <input
+            type="text"
+            id="slotName"
+            [(ngModel)]="slotName"
+            name="slotName"
+            placeholder="Nhập tên slot"
+            class="form-control"
+          />
+        </div>
+  
+        <div class="form-group">
+          <label for="startTime">Bắt Đầu</label>
+          <input
+            type="time"
+            id="startTime"
+            [(ngModel)]="startTime"
+            name="startTime"
+            class="form-control"
+          />
+        </div>
+  
+        <div class="form-group">
+          <label for="endTime">Kết Thúc</label>
+          <input
+            type="time"
+            id="endTime"
+            [(ngModel)]="endTime"
+            name="endTime"
+            class="form-control"
+          />
+        </div>
+  
+        <div class="form-buttons">
+          <button type="submit" class="btn btn-success mr-2">Thêm</button>
+          <button type="button" class="btn btn-danger" (click)="resetForm()">Reset</button>
+        </div>
+      </form>
+    </div>
+  
+    <!-- Cột phải: Bảng hiển thị slot -->
+    <div class="col-md-8 table-section">
+      <section id="ng-tables">
+        <div class="row text-left">
+          <div class="col-12">
+            <h3 class="content-header">Danh Sách Slot Học</h3>
+          </div>
+        </div>
+  
+        <div class="row text-left">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-content">
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th scope="col">ID</th>
+                          <th scope="col">Tên</th>
+                          <th scope="col">Bắt Đầu</th>
+                          <th scope="col">Kết Thúc</th>
+                          <th scope="col">Thao Tác</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let slot of slots; let i = index">
+                          <th scope="row">{{ i + 1 }}</th>
+                          <td>{{ slot.name }}</td>
+                          <td>{{ slot.startTime }}</td>
+                          <td>{{ slot.endTime }}</td>
+                          <td>
+                            <button class="btn-edit" (click)="editSlot(i)">✏️</button>
+                            <button class="btn-delete" (click)="deleteSlot(i)">❌</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div> <!-- table-responsive -->
+                </div> <!-- card-body -->
+              </div> <!-- card-content -->
+            </div> <!-- card -->
+          </div> <!-- col-12 -->
+        </div> <!-- row -->
+      </section>
+    </div>
+  </div>
+  

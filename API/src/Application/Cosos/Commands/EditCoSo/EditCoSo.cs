@@ -34,7 +34,7 @@ public class EditCoSoComandHandler : IRequestHandler<EditCoSoComand, Output>
            || string.IsNullOrWhiteSpace(request.SoDienThoai)
            || string.IsNullOrWhiteSpace(request.TrangThai))
             throw new NotFoundDataException("Dữ liệu không được để trống");
-        if (request.Ten.Length > 30 || request.DiaChi.Length > 50
+        if (request.Ten.Length > 30 || request.DiaChi.Length > 200
             || request.SoDienThoai.Length > 11
             ||(request.TrangThai!="close"&&request.TrangThai!="open")) 
             throw new WrongInputException("Độ dài dữ liệu không hợp lệ!");
