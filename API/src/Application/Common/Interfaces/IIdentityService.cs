@@ -1,4 +1,5 @@
-﻿using StudyFlow.Application.Common.Models;
+﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using StudyFlow.Application.Common.Models;
 
 namespace StudyFlow.Application.Common.Interfaces;
 
@@ -15,6 +16,6 @@ public interface IIdentityService
     Task<Output> ChangePassword(string token, string oldPassword, string newPassword);
     Task<List<string>> GetRolesByUserId(string userId);
     Task<bool> AssignRoleAsync(string userId, string role);
-    Task<(Result Result, string userId)> GenerateUser(string name, string code, string email);
-    Task<bool> IsUserActiveAsync(string userId);
+
+    Guid GetCampusId(string token);
 }

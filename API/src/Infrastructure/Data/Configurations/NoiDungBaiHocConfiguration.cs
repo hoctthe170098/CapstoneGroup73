@@ -15,8 +15,8 @@ public class NoiDungBaiHocConfiguration : IEntityTypeConfiguration<NoiDungBaiHoc
         builder.ToTable(nameof(NoiDungBaiHoc));
         builder.HasKey(x => x.Id);
         builder.Property(x => x.TieuDe)
-            .HasMaxLength(50);
-        builder.Property(x => x.Mota)
             .HasMaxLength(200);
+        builder.Property(x => x.Mota)
+            .HasMaxLength(300);
     }
 }

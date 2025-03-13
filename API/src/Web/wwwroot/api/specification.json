@@ -108,18 +108,48 @@
           "ChuongTrinhs"
         ],
         "operationId": "CreateChuongTrinh",
-        "requestBody": {
-          "x-name": "command",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateChuongTrinhCommand"
+        "parameters": [
+          {
+            "name": "command",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CreateChuongTrinhCommand"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
               }
             }
-          },
-          "required": true,
-          "x-position": 1
-        },
+          }
+        }
+      }
+    },
+    "/api/ChuongTrinhs/updatechuongtrinh": {
+      "put": {
+        "tags": [
+          "ChuongTrinhs"
+        ],
+        "operationId": "UpdateChuongTrinh",
+        "parameters": [
+          {
+            "name": "command",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UpdateChuongTrinhCommand"
+            },
+            "x-position": 1
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -823,11 +853,141 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "chuongTrinhDto": {
+            "$ref": "#/components/schemas/CreateChuongTrinhDto"
+          }
+        }
+      },
+      "CreateChuongTrinhDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
           "tieuDe": {
             "type": "string"
           },
           "moTa": {
             "type": "string"
+          },
+          "noiDungBaiHocs": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/CreateNoiDungBaiHocDto"
+            }
+          }
+        }
+      },
+      "CreateNoiDungBaiHocDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tieuDe": {
+            "type": "string"
+          },
+          "mota": {
+            "type": "string"
+          },
+          "soThuTu": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "taiLieuHocTaps": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/CreateTaiLieuHocTapDto"
+            }
+          }
+        }
+      },
+      "CreateTaiLieuHocTapDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "urlType": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "nullable": true
+          }
+        }
+      },
+      "UpdateChuongTrinhCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "chuongTrinhDto": {
+            "$ref": "#/components/schemas/UpdateChuongTrinhDto"
+          }
+        }
+      },
+      "UpdateChuongTrinhDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tieuDe": {
+            "type": "string"
+          },
+          "moTa": {
+            "type": "string"
+          },
+          "noiDungBaiHocs": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/UpdateNoiDungBaiHocDto"
+            }
+          }
+        }
+      },
+      "UpdateNoiDungBaiHocDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "tieuDe": {
+            "type": "string"
+          },
+          "mota": {
+            "type": "string"
+          },
+          "soThuTu": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "taiLieuHocTaps": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/UpdateTaiLieuHocTapDto"
+            }
+          }
+        }
+      },
+      "UpdateTaiLieuHocTapDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "urlType": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "nullable": true
           }
         }
       },
@@ -1056,12 +1216,10 @@
             "format": "date"
           },
           "email": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "soDienThoai": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "coSoId": {
             "type": "string",
@@ -1123,12 +1281,10 @@
             "format": "date"
           },
           "email": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "soDienThoai": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "coSoId": {
             "type": "string"
