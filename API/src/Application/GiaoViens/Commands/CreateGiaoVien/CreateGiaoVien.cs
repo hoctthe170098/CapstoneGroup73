@@ -21,7 +21,7 @@ public record CreateGiaoVienCommand : IRequest<Output>
     public required string TruongDangDay { get; set; }
     public required DateOnly NgaySinh { get; set; }
     public required string Email { get; set; }
-    public string? SoDienThoai { get; set; }
+    public required string SoDienThoai { get; set; }
     public required Guid CoSoId { get; set; }
 }
 
@@ -44,6 +44,7 @@ public class CreateGiaoVienCommandHandler : IRequestHandler<CreateGiaoVienComman
             string.IsNullOrWhiteSpace(request.GioiTinh) ||
             string.IsNullOrWhiteSpace(request.DiaChi) ||
             string.IsNullOrWhiteSpace(request.TruongDangDay) ||
+            string.IsNullOrWhiteSpace(request.SoDienThoai) ||
             string.IsNullOrWhiteSpace(request.Email))
         {
             throw new NotFoundDataException("Dữ liệu không được để trống");

@@ -59,6 +59,7 @@ public class AddListHocSinhsCommandHandler : IRequestHandler<AddListHocSinhsComm
                 string.IsNullOrWhiteSpace(req.DiaChi) ||
                 string.IsNullOrWhiteSpace(req.TruongDangHoc) ||
                 string.IsNullOrWhiteSpace(req.Lop) ||
+                string.IsNullOrWhiteSpace(req.SoDienThoai) ||
                 string.IsNullOrWhiteSpace(req.Email))
             {
                 throw new NotFoundDataException($"Dữ liệu không hợp lệ cho học viên có mã {req.Code}");

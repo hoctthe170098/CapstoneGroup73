@@ -20,7 +20,7 @@ public record CreateHocSinhCommand : IRequest<Output>
     public required string TruongDangHoc { get; set; }
     public required DateOnly NgaySinh { get; set; }
     public required string Email { get; set; }
-    public string? SoDienThoai { get; set; }
+    public required string SoDienThoai { get; set; }
     public int? ChinhSachId { get; set; }
     public required Guid CoSoId { get; set; }
 }
@@ -43,7 +43,8 @@ public class CreateHocSinhCommandHandler : IRequestHandler<CreateHocSinhCommand,
             string.IsNullOrWhiteSpace(request.DiaChi) ||
             string.IsNullOrWhiteSpace(request.TruongDangHoc) ||
             string.IsNullOrWhiteSpace(request.Lop) ||
-            string.IsNullOrWhiteSpace(request.Email))
+            string.IsNullOrWhiteSpace(request.Email) ||
+            string.IsNullOrWhiteSpace(request.SoDienThoai))
         {
             throw new NotFoundDataException("Dữ liệu không được để trống");
         }

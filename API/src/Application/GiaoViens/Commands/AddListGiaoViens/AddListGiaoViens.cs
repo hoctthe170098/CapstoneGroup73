@@ -56,6 +56,7 @@ public class AddListGiaoViensCommandHandler : IRequestHandler<AddListGiaoViensCo
                 string.IsNullOrWhiteSpace(req.Ten) ||
                 string.IsNullOrWhiteSpace(req.GioiTinh) ||
                 string.IsNullOrWhiteSpace(req.DiaChi) ||
+                string.IsNullOrWhiteSpace(req.SoDienThoai) ||
                 string.IsNullOrWhiteSpace(req.TruongDangDay))
             {
                 throw new NotFoundDataException($"Dữ liệu không hợp lệ cho giáo viên có mã {req.Code}");

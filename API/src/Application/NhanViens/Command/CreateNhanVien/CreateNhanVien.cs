@@ -18,7 +18,7 @@ public record CreateNhanVienCommand : IRequest<Output>
     public required string DiaChi { get; init; }
     public required DateOnly NgaySinh { get; init; }
     public required string Email { get; init; }
-    public string? SoDienThoai { get; init; }
+    public required string SoDienThoai { get; init; }
     public required Guid CoSoId { get; init; }
     public required string Role { get; init; }
 }
@@ -41,6 +41,7 @@ public class CreateNhanVienCommandHandler : IRequestHandler<CreateNhanVienComman
             string.IsNullOrWhiteSpace(request.Ten) ||
             string.IsNullOrWhiteSpace(request.GioiTinh) ||
             string.IsNullOrWhiteSpace(request.DiaChi) ||
+            string.IsNullOrWhiteSpace(request.SoDienThoai) ||
             string.IsNullOrWhiteSpace(request.Email))
         {
             throw new NotFoundDataException("Dữ liệu không được để trống");
