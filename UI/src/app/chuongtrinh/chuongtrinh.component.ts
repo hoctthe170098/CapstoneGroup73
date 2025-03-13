@@ -28,15 +28,15 @@ export class ChuongtrinhComponent implements OnInit {
   }
 
   downloadFile(fileUrl: string) {
-    if (!fileUrl) {
-      alert('Không có file để tải!');
-      return;
-    }
-    const link = document.createElement('a');
-    link.href = fileUrl;
-    link.download = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
-    link.click();
+  if (!fileUrl) {
+    alert('Không có file để tải!');
+    return;
   }
+  const link = document.createElement('a');
+  link.href = fileUrl;
+  link.download = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
+  link.click();
+}
 
   deleteProgram(index: number) {
     const confirmDelete = confirm(`Bạn có chắc chắn muốn xóa chương trình "${this.programs[index].title}" không?`);

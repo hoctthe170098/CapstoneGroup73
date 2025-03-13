@@ -72,7 +72,9 @@ export class AddchuongtrinhComponent {
       alert('Chỉ chấp nhận file .pdf, .jpg, .png, .svg, .zip!');
       return;
     }
-    this.program.lessons[lessonIndex].files.push({ name: file.name });
+    // Giả lập fileUrl, bạn có thể gọi service.uploadFile(file) nếu muốn lấy URL thật
+    const fileUrl = `assets/files/${file.name}`;
+    this.program.lessons[lessonIndex].files.push({ name: file.name, fileUrl });
   }
 
   removeFile(lessonIndex: number, fileIndex: number) {

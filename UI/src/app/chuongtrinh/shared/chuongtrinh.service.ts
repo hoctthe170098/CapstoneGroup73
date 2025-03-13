@@ -17,19 +17,31 @@ export class ChuongtrinhService {
     if (storedData) {
       const programs = JSON.parse(storedData);
       if (programs.length > 0) {
-        return programs; // Nếu danh sách vẫn còn, sử dụng dữ liệu từ localStorage
+        return programs;
       }
     }
   
-    // 🛠 Nếu không có dữ liệu hoặc danh sách rỗng, khôi phục lại danh sách mặc định
+    // Khởi tạo defaultPrograms với mỗi lesson có danh sách file
     const defaultPrograms = [
       {
         title: 'Chương trình học 1',
         description: 'Mô tả chương trình học 1',
         isHidden: false,
         lessons: [
-          { title: 'Bài 1', fileUrl: 'assets/files/sample-lesson-1.pdf' },
-          { title: 'Bài 2', fileUrl: 'assets/files/sample-lesson-2.pdf' }
+          {
+            title: 'Bài 1',
+            description: '',
+            files: [
+              { name: 'sample-lesson-1.pdf', fileUrl: 'assets/files/sample-lesson-1.pdf' }
+            ]
+          },
+          {
+            title: 'Bài 2',
+            description: '',
+            files: [
+              { name: 'sample-lesson-2.pdf', fileUrl: 'assets/files/sample-lesson-2.pdf' }
+            ]
+          }
         ]
       },
       {
@@ -37,12 +49,18 @@ export class ChuongtrinhService {
         description: 'Mô tả chương trình học 2',
         isHidden: false,
         lessons: [
-          { title: 'Bài 1', fileUrl: 'assets/files/sample-lesson-3.pdf' }
+          {
+            title: 'Bài 1',
+            description: '',
+            files: [
+              { name: 'sample-lesson-3.pdf', fileUrl: 'assets/files/sample-lesson-3.pdf' }
+            ]
+          }
         ]
       }
     ];
   
-    localStorage.setItem('programs', JSON.stringify(defaultPrograms)); // 🔥 Lưu lại danh sách mặc định vào localStorage
+    localStorage.setItem('programs', JSON.stringify(defaultPrograms));
     return defaultPrograms;
   }
   
