@@ -12,20 +12,18 @@ using System.Security.Claims;
 
 namespace StudyFlow.Application.Phongs.Queries.GetPhongsWithPagination;
 
-public record GetPhongsWithPaginationQuery : IRequest<Output>
+public record GetPhongsQuery : IRequest<Output>
 {
-    public int PageNumber { get; init; } = 1;
-    public int PageSize { get; init; } = 10;
 }
 
-public class GetPhongsWithPaginationQueryHandler : IRequestHandler<GetPhongsWithPaginationQuery, Output>
+public class GetPhongsQueryHandler : IRequestHandler<GetPhongsQuery, Output>
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
     private readonly IIdentityService _identityService;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public GetPhongsWithPaginationQueryHandler(IApplicationDbContext context,
+    public GetPhongsQueryHandler(IApplicationDbContext context,
         IMapper mapper,
         IIdentityService identityService,
         IHttpContextAccessor httpContextAccessor)
@@ -36,30 +34,24 @@ public class GetPhongsWithPaginationQueryHandler : IRequestHandler<GetPhongsWith
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<Output> Handle(GetPhongsWithPaginationQuery request, CancellationToken cancellationToken)
+    public async Task<Output> Handle(GetPhongsQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            if (request.PageNumber < 1 || request.PageSize < 1)
-                throw new WrongInputException("Số trang hoặc kích thước trang không hợp lệ!");
-
             // Lấy token từ request header
             var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             if (string.IsNullOrEmpty(token))
                 throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
 
-            // Lấy CoSoId từ JWT token của người dùng (Fix: use await)
-            var coSoId =  _identityService.GetCampusId(token);
-           
+            // Lấy CoSoId từ JWT token của người dùng
+            var coSoId = _identityService.GetCampusId(token);
 
             // Chỉ lấy danh sách phòng thuộc cơ sở của Campus Manager
-            var query = _context.Phongs
+            var list = await _context.Phongs
                 .AsNoTracking()
-                .Where(p => p.CoSoId == coSoId);
-
-            var list = await query
+                .Where(p => p.CoSoId == coSoId)
                 .ProjectTo<PhongDto>(_mapper.ConfigurationProvider)
-                .PaginatedListAsync(request.PageNumber, request.PageSize);
+                .ToListAsync(cancellationToken);
 
             return new Output
             {

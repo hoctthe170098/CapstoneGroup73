@@ -17,19 +17,19 @@ public class Phongs : EndpointGroupBase
             .MapPut(EditPhong, "editphong");
     }
 
-    //[Authorize(Roles = Roles.CampusManager)]
+    [Authorize(Roles = Roles.CampusManager)]
     public async Task<Output> CreatePhong(ISender sender, CreatePhongCommand command)
     {
         return await sender.Send(command);
     }
 
-    //[Authorize(Roles = Roles.CampusManager)]
-    public async Task<Output> GetPhongsWithPagination(ISender sender, GetPhongsWithPaginationQuery query)
+    [Authorize(Roles = Roles.CampusManager)]
+    public async Task<Output> GetPhongsWithPagination(ISender sender, GetPhongsQuery query)
     {
         return await sender.Send(query);    
     }
 
-    //[Authorize(Roles = Roles.CampusManager)]
+    [Authorize(Roles = Roles.CampusManager)]
     public async Task<Output> EditPhong(ISender sender, EditPhongCommand command)
     {
         return await sender.Send(command);
