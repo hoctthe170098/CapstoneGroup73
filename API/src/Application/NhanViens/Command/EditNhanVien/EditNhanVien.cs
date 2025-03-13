@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using StudyFlow.Application.Common.Exceptions;
 using StudyFlow.Application.Common.Interfaces;
 using StudyFlow.Application.Common.Models;
+using StudyFlow.Domain.Constants;
 using StudyFlow.Domain.Entities;
-
 namespace StudyFlow.Application.NhanViens.Command.EditNhanVien;
 public class EditNhanVienCommand : IRequest<Output>
 {
@@ -22,6 +22,7 @@ public class EditNhanVienCommand : IRequest<Output>
     public required string CoSoId { get; init; }
     public required string UserId { get; init; }
     public required string Role { get; init; }
+    public required string Status { get; init; }
 }
 
 public class EditNhanVienCommandHandler : IRequestHandler<EditNhanVienCommand, Output>
@@ -45,7 +46,13 @@ public class EditNhanVienCommandHandler : IRequestHandler<EditNhanVienCommand, O
         {
             throw new NotFoundDataException("Dữ liệu không được để trống");
         }
-
+        //Validate Status
+        if (request.Status.ToLower() != "true" && request.Status.ToLower() != "false")
+            throw new FormatException("Trạng thái không hợp lệ" +
+                ", chỉ có thể là true hoặc false");
+        // Validate role
+        if (request.Role != Roles.CampusManager && request.Role != Roles.LearningManager)
+            throw new WrongInputException("Vai trò không hợp lệ!");
         // Validate length constraints
         if (request.Code.Length > 20 || request.Ten.Length > 50 || request.DiaChi.Length > 100)
         {
@@ -60,13 +67,11 @@ public class EditNhanVienCommandHandler : IRequestHandler<EditNhanVienCommand, O
                 throw new FormatException("Số điện thoại không hợp lệ");
             }
         }
-
         // Validate email 
         if (!string.IsNullOrEmpty(request.Email) && !new EmailAddressAttribute().IsValid(request.Email))
         {
             throw new FormatException("Email không hợp lệ");
         }
-
         // Check if CoSo exists
         var coSoExists = await _context.CoSos.AnyAsync(c => c.Id == Guid.Parse(request.CoSoId), cancellationToken);
         if (!coSoExists)
@@ -79,7 +84,6 @@ public class EditNhanVienCommandHandler : IRequestHandler<EditNhanVienCommand, O
         if (nhanVien == null) throw new NotFoundIDException();
         else
         {
-            nhanVien.Code = request.Code;
             nhanVien.Ten = request.Ten;
             nhanVien.GioiTinh = request.GioiTinh;
             nhanVien.DiaChi = request.DiaChi;
@@ -89,7 +93,10 @@ public class EditNhanVienCommandHandler : IRequestHandler<EditNhanVienCommand, O
             nhanVien.CoSoId = Guid.Parse(request.CoSoId);
             await _identityService.AssignRoleAsync(request.UserId, request.Role);
         }
-
+        if (nhanVien.UserId != null && request.Status.ToLower() == "false")
+        {
+            await _identityService.disableUser(nhanVien.UserId);
+        }
         await _context.SaveChangesAsync(cancellationToken);
 
         return new Output

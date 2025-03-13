@@ -6,7 +6,6 @@ using StudyFlow.Application.Cosos.Commands.EditCoSo;
 using StudyFlow.Application.Cosos.Queries.GetAllCoSo;
 using StudyFlow.Application.Cosos.Queries.GetCososWithPagination;
 using StudyFlow.Domain.Constants;
-
 namespace StudyFlow.Web.Endpoints;
 
 public class CoSos : EndpointGroupBase
