@@ -13,8 +13,8 @@ public class EditlLichHocDto
     public string? TenLop { get; set; }
     public string? GioBatDau { get; set; }
     public string? GioKetThuc { get; set; }
-    public DateOnly NgayBatDau { get; set; }
-    public DateOnly NgayKetThuc { get; set; }
+    public string? NgayBatDau { get; set; }
+    public string? NgayKetThuc { get; set; }
     public int? HocPhi { get; set; }
     public string? TrangThai { get; set; }
     public string? GiaoVienCode { get; set; }
