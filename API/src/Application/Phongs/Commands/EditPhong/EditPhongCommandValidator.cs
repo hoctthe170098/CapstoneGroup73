@@ -11,12 +11,10 @@ public class EditPhongCommandValidator : AbstractValidator<EditPhongCommand>
 
         RuleFor(v => v.Ten)
             .NotEmpty().WithMessage("Tên phòng không được để trống!")
-            .MaximumLength(50).WithMessage("Tên phòng không được dài quá 50 ký tự!");
+            .MaximumLength(20).WithMessage("Tên phòng không được dài quá 20 ký tự!");
 
         RuleFor(v => v.TrangThai)
             .NotEmpty().WithMessage("Trạng thái không được để trống!");
 
-        RuleFor(v => v.CoSoId)
-            .NotEmpty().WithMessage("CoSoId không hợp lệ!");
     }
 }
