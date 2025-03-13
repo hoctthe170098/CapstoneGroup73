@@ -19,10 +19,10 @@ public record CreateGiaoVienCommand : IRequest<Output>
     public required string GioiTinh { get; set; }
     public required string DiaChi { get; set; }
     public required string TruongDangDay { get; set; }
-    public required DateOnly NgaySinh { get; set; }
+    public required string NgaySinh { get; set; }
     public required string Email { get; set; }
     public required string SoDienThoai { get; set; }
-    public required Guid CoSoId { get; set; }
+    public required string token { get; set; }
 }
 
 public class CreateGiaoVienCommandHandler : IRequestHandler<CreateGiaoVienCommand, Output>
@@ -45,11 +45,11 @@ public class CreateGiaoVienCommandHandler : IRequestHandler<CreateGiaoVienComman
             string.IsNullOrWhiteSpace(request.DiaChi) ||
             string.IsNullOrWhiteSpace(request.TruongDangDay) ||
             string.IsNullOrWhiteSpace(request.SoDienThoai) ||
-            string.IsNullOrWhiteSpace(request.Email))
+            string.IsNullOrWhiteSpace(request.Email) ||
+            string.IsNullOrWhiteSpace(request.NgaySinh))
         {
             throw new NotFoundDataException("Dữ liệu không được để trống");
         }
-
         // Validate Code not duplicate
         var exists = await _context.GiaoViens.AnyAsync(gv => gv.Code == request.Code, cancellationToken);
         if (exists)
@@ -57,12 +57,22 @@ public class CreateGiaoVienCommandHandler : IRequestHandler<CreateGiaoVienComman
             throw new WrongInputException($"Mã giáo viên '{request.Code}' đã tồn tại!");
         }
 
-        // Vallidate NgaySinh not in future
-        if (request.NgaySinh > DateOnly.FromDateTime(DateTime.Today))
+        // Validate NgaySinh (Date of Birth) format
+        if (!DateOnly.TryParseExact(request.NgaySinh, "yyyy-MM-dd", out DateOnly ngaySinh))
         {
-            throw new WrongInputException("Ngày sinh không hợp lệ!");
+            throw new FormatException("Ngày sinh không hợp lệ. Định dạng phải là yyyy-MM-dd");
         }
-
+        // Validate NgaySinh (Date of Birth) is at least 18 years old
+        var eighteenYearsAgo = DateOnly.FromDateTime(DateTime.Now.AddYears(-18));
+        if (ngaySinh > eighteenYearsAgo)
+        {
+            throw new WrongInputException("Giáo viên phải đủ 18 tuổi trở lên");
+        }
+        Guid coSoId = _identityService.GetCampusId(request.token);
+        if(coSoId == Guid.Empty)
+        {
+            throw new FormatException("CoSo không hợp lệ");
+        }
         // Validate length constraints
         if (request.Code.Length > 20 || request.Ten.Length > 50 || request.DiaChi.Length > 100)
         {
@@ -85,7 +95,8 @@ public class CreateGiaoVienCommandHandler : IRequestHandler<CreateGiaoVienComman
         }
 
         // Check if CoSo exists
-        var coSoExists = await _context.CoSos.AnyAsync(c => c.Id == request.CoSoId, cancellationToken);
+        var coSoExists = await _context.CoSos
+            .AnyAsync(c => c.Id == coSoId&&c.TrangThai=="open", cancellationToken);
         if (!coSoExists)
         {
             throw new NotFoundDataException("Cơ sở không tồn tại");
@@ -107,10 +118,10 @@ public class CreateGiaoVienCommandHandler : IRequestHandler<CreateGiaoVienComman
             GioiTinh = request.GioiTinh,
             DiaChi = request.DiaChi,
             TruongDangDay = request.TruongDangDay,
-            NgaySinh = request.NgaySinh,
+            NgaySinh = ngaySinh,
             Email = request.Email,
             SoDienThoai = request.SoDienThoai,
-            CoSoId = request.CoSoId,
+            CoSoId = coSoId,
             UserId = userId
         };
 
