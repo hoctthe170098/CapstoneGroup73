@@ -17,6 +17,7 @@ using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
 using Twilio.Exceptions;
 using System.Globalization;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace StudyFlow.Infrastructure.Identity;
 
@@ -26,16 +27,18 @@ public class IdentityService : IIdentityService
     private readonly IUserClaimsPrincipalFactory<ApplicationUser> _userClaimsPrincipalFactory;
     private readonly IAuthorizationService _authorizationService;
     private readonly IConfiguration _configuration;
+    private readonly IApplicationDbContext _context;
     public IdentityService(
         UserManager<ApplicationUser> userManager,
         IUserClaimsPrincipalFactory<ApplicationUser> userClaimsPrincipalFactory,
         IAuthorizationService authorizationService,
-        IConfiguration configuration)
+        IConfiguration configuration, IApplicationDbContext context)
     {
         _userManager = userManager;
         _userClaimsPrincipalFactory = userClaimsPrincipalFactory;
         _authorizationService = authorizationService;
         _configuration = configuration;
+        _context = context;
     }
 
     public async Task<string?> GetUserNameAsync(string userId)
@@ -109,10 +112,29 @@ public class IdentityService : IIdentityService
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
+            
             var claims = new List<Claim>
     {
         new Claim(ClaimTypes.Name, username)
     };
+            if (!roles.Contains(Roles.Administrator))
+            {
+                var staff = _context.NhanViens.FirstOrDefault(s => s.UserId == user.Id);
+                var teacher = _context.GiaoViens.FirstOrDefault(s => s.UserId == user.Id);
+                var student = _context.HocSinhs.FirstOrDefault(s => s.UserId == user.Id);
+                if (staff != null)
+                {
+                    claims.Add(new Claim(ClaimTypes.Locality, staff.Coso.Id.ToString()));
+                }
+                else if (teacher != null)
+                {
+                    claims.Add(new Claim(ClaimTypes.Locality, teacher.Coso.Id.ToString()));
+                }
+                else if (student != null)
+                {
+                    claims.Add(new Claim(ClaimTypes.Locality, student.Coso.Id.ToString()));
+                }
+            }
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
@@ -123,7 +145,6 @@ public class IdentityService : IIdentityService
                 claims,
                 expires: DateTime.Now.AddMinutes(120), // Token hết hạn sau 2 giờ
                 signingCredentials: credentials);
-
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
         else return null;
@@ -220,7 +241,6 @@ public class IdentityService : IIdentityService
             await client.SendMailAsync(mailMessage);
         }
     }
-
     public async Task<Output> ForgotPasswordByPhone(string phone)
     {
         Output output = new Output();
@@ -296,7 +316,6 @@ public class IdentityService : IIdentityService
 
         await MessageResource.CreateAsync(messageOptions);
     }
-
     public async Task<Output> ChangePassword(string token, string oldPassword, string newPassword)
     {
         Output output = new Output();
@@ -405,36 +424,35 @@ public class IdentityService : IIdentityService
 
         return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
     }
-
     private async Task SendAccountInfoEmail(string email, string name, string username, string password)
     {
         if (string.IsNullOrWhiteSpace(email))
         {
-            return; 
+            return;
         }
 
         string subject = "Thông tin tài khoản đăng nhập";
 
         string body = $@"
-        <html>
-        <body>
-            <p>Xin chào <b>{name}</b>,</p>
-            <p>Tài khoản của bạn đã được tạo thành công. Dưới đây là thông tin đăng nhập của bạn:</p>
-            <p><b>Username:</b> {username}</p>
-            <p><b>Password:</b> {password}</p>
-            <p style='color:red;'><i>Vui lòng đăng nhập và đổi mật khẩu ngay sau khi đăng nhập.</i></p>
-            <p>Trân trọng,</p>
-            <p><b>Đội ngũ StudyFlow</b></p>
-        </body>
-        </html>
-        ";
+    <html>
+    <body>
+        <p>Xin chào <b>{name}</b>,</p>
+        <p>Tài khoản của bạn đã được tạo thành công. Dưới đây là thông tin đăng nhập của bạn:</p>
+        <p><b>Username:</b> {username}</p>
+        <p><b>Password:</b> {password}</p>
+        <p style='color:red;'><i>Vui lòng đăng nhập và đổi mật khẩu ngay sau khi đăng nhập.</i></p>
+        <p>Trân trọng,</p>
+        <p><b>Đội ngũ StudyFlow</b></p>
+    </body>
+    </html>
+    ";
 
         await SendEmail(email, subject, body);
     }
 
     public async Task<(Result Result, string userId)> GenerateUser(string name, string code, string email)
     {
-        string username = genUsername(name, code); 
+        string username = genUsername(name, code);
         string password = GenerateRandomPassword();
 
         var user = new ApplicationUser
@@ -456,7 +474,11 @@ public class IdentityService : IIdentityService
     public async Task<bool> IsUserActiveAsync(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
-        return user != null && user.IsActive; 
+        return user != null && user.IsActive;
     }
 
+    public Guid GetCampusId(string token)
+    {
+        throw new NotImplementedException();
+    }
 }
