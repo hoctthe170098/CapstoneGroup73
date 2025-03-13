@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using StudyFlow.Application.Common.Exceptions;
 using StudyFlow.Application.Common.Interfaces;
@@ -15,19 +16,24 @@ public record GetPhongsWithPaginationQuery : IRequest<Output>
 {
     public int PageNumber { get; init; } = 1;
     public int PageSize { get; init; } = 10;
-    public string? CurrentRole { get; init; }
-    public Guid? CurrentCoSoId { get; init; }  
 }
 
 public class GetPhongsWithPaginationQueryHandler : IRequestHandler<GetPhongsWithPaginationQuery, Output>
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
+    private readonly IIdentityService _identityService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public GetPhongsWithPaginationQueryHandler(IApplicationDbContext context, IMapper mapper)
+    public GetPhongsWithPaginationQueryHandler(IApplicationDbContext context,
+        IMapper mapper,
+        IIdentityService identityService,
+        IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
         _mapper = mapper;
+        _identityService = identityService;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<Output> Handle(GetPhongsWithPaginationQuery request, CancellationToken cancellationToken)
@@ -36,18 +42,20 @@ public class GetPhongsWithPaginationQueryHandler : IRequestHandler<GetPhongsWith
         {
             if (request.PageNumber < 1 || request.PageSize < 1)
                 throw new WrongInputException("Số trang hoặc kích thước trang không hợp lệ!");
-            // Lấy danh sách phòng - mặc định cho Admin (xem tất cả)
-            var query = _context.Phongs.AsNoTracking();
-            // Nếu là Campus Manager, chỉ xem phòng trong CoSo của mình
-            if (request.CurrentRole == Roles.CampusManager)
-            {
-                if (request.CurrentCoSoId == null)
-                {
-                    throw new Exception("Campus Manager không có thông tin cơ sở.");
-                }
 
-                query = query.Where(p => p.CoSoId == request.CurrentCoSoId);
-            }
+            // Lấy token từ request header
+            var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            if (string.IsNullOrEmpty(token))
+                throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+
+            // Lấy CoSoId từ JWT token của người dùng (Fix: use await)
+            var coSoId =  _identityService.GetCampusId(token);
+           
+
+            // Chỉ lấy danh sách phòng thuộc cơ sở của Campus Manager
+            var query = _context.Phongs
+                .AsNoTracking()
+                .Where(p => p.CoSoId == coSoId);
 
             var list = await query
                 .ProjectTo<PhongDto>(_mapper.ConfigurationProvider)
