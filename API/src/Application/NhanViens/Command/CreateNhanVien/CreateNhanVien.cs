@@ -26,7 +26,7 @@ public record CreateNhanVienCommand : IRequest<Output>
 public class CreateNhanVienCommandHandler : IRequestHandler<CreateNhanVienCommand, Output>
 {
     private readonly IApplicationDbContext _context;
-    private readonly IIdentityService _identityService; // To link with user roles
+    private readonly IIdentityService _identityService; 
 
     public CreateNhanVienCommandHandler(IApplicationDbContext context, IIdentityService identityService)
     {
@@ -40,7 +40,9 @@ public class CreateNhanVienCommandHandler : IRequestHandler<CreateNhanVienComman
         if (string.IsNullOrWhiteSpace(request.Code) ||
             string.IsNullOrWhiteSpace(request.Ten) ||
             string.IsNullOrWhiteSpace(request.GioiTinh) ||
-            string.IsNullOrWhiteSpace(request.DiaChi))
+            string.IsNullOrWhiteSpace(request.DiaChi) ||
+            string.IsNullOrWhiteSpace(request.SoDienThoai) ||
+            string.IsNullOrWhiteSpace(request.Email))
         {
             throw new NotFoundDataException("Dữ liệu không được để trống");
         }
@@ -74,8 +76,7 @@ public class CreateNhanVienCommandHandler : IRequestHandler<CreateNhanVienComman
         }
 
         // Create identity user
-        var userName = $"{request.Ten.ToLower().Replace(" ", "")}{DateTime.Now.Ticks}@studyflow.com";
-        var (result, userId) = await _identityService.CreateUserAsync(userName, "Default@123");
+        var (result, userId) = await _identityService.GenerateUser(request.Ten, request.Code, request.Email);
 
         if (!result.Succeeded)
         {

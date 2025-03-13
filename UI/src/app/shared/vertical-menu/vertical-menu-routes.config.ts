@@ -12,6 +12,8 @@ export const ROUTES: RouteInfo[] = [
       { path: '/dashboard/loainhansu', title: 'Loại nhân sự', icon: 'ft-arrow-right submenu-icon', class: 'dropdown-item', isExternalLink: false, submenu: [] }
     ]
   },
+  {path: '/giaovien', title: 'Giáo Viên', icon: 'ft-briefcase', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
+  {path: '/hocsinh', title: 'Học Sinh', icon: 'ft-map-pin', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
   { path: '/sanpham/danh-sach-san-pham', title: 'Sản phẩm', icon: 'ft-clipboard', class: 'dropdown-item', isExternalLink: false, submenu: [] },
   { path: '/coso/danh-sach-coso', title: 'Cơ sở', icon: 'ft-clipboard', class: 'dropdown-item', isExternalLink: false, submenu: [] },
   { path: '/inbox', title: 'Email', icon: 'ft-mail', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },

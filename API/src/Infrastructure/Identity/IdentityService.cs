@@ -16,6 +16,8 @@ using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
 using Twilio.Exceptions;
+using System.Globalization;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace StudyFlow.Infrastructure.Identity;
 
@@ -25,16 +27,19 @@ public class IdentityService : IIdentityService
     private readonly IUserClaimsPrincipalFactory<ApplicationUser> _userClaimsPrincipalFactory;
     private readonly IAuthorizationService _authorizationService;
     private readonly IConfiguration _configuration;
+    private readonly IApplicationDbContext _context;
     public IdentityService(
         UserManager<ApplicationUser> userManager,
         IUserClaimsPrincipalFactory<ApplicationUser> userClaimsPrincipalFactory,
         IAuthorizationService authorizationService,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IApplicationDbContext context)
     {
         _userManager = userManager;
         _userClaimsPrincipalFactory = userClaimsPrincipalFactory;
         _authorizationService = authorizationService;
         _configuration = configuration;
+        _context = context;
     }
 
     public async Task<string?> GetUserNameAsync(string userId)
@@ -50,7 +55,7 @@ public class IdentityService : IIdentityService
         {
             UserName = userName,
             Email = userName,
-        };
+        };                  
 
         var result = await _userManager.CreateAsync(user, password);
 
@@ -108,10 +113,29 @@ public class IdentityService : IIdentityService
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
+            
             var claims = new List<Claim>
     {
         new Claim(ClaimTypes.Name, username)
     };
+            if (!roles.Contains(Roles.Administrator))
+            {
+                var staff = _context.NhanViens.FirstOrDefault(s => s.UserId == user.Id);
+                var teacher = _context.GiaoViens.FirstOrDefault(s => s.UserId == user.Id);
+                var student = _context.HocSinhs.FirstOrDefault(s => s.UserId == user.Id);
+                if (staff != null)
+                {
+                    claims.Add(new Claim(ClaimTypes.Locality, staff.Coso.Id.ToString()));
+                }
+                else if (teacher != null)
+                {
+                    claims.Add(new Claim(ClaimTypes.Locality, teacher.Coso.Id.ToString()));
+                }
+                else if (student != null)
+                {
+                    claims.Add(new Claim(ClaimTypes.Locality, student.Coso.Id.ToString()));
+                }
+            }
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
@@ -122,7 +146,6 @@ public class IdentityService : IIdentityService
                 claims,
                 expires: DateTime.Now.AddMinutes(120), // Token hết hạn sau 2 giờ
                 signingCredentials: credentials);
-
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
         else return null;
@@ -206,12 +229,19 @@ public class IdentityService : IIdentityService
             client.EnableSsl = true;
             client.Credentials = new NetworkCredential(smtpUsername, smtpPassword);
 
-            var mailMessage = new MailMessage(smtpUsername, toEmail, subject, body);
+
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(smtpUsername),
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true
+            };
+            mailMessage.To.Add(toEmail);
 
             await client.SendMailAsync(mailMessage);
         }
     }
-
     public async Task<Output> ForgotPasswordByPhone(string phone)
     {
         Output output = new Output();
@@ -267,7 +297,6 @@ public class IdentityService : IIdentityService
                 phoneNumber = "+84" + phoneNumber;
             }
         }
-
         return phoneNumber;
     }
     private async Task SendSms(string toPhoneNumber, string message)
@@ -287,7 +316,6 @@ public class IdentityService : IIdentityService
 
         await MessageResource.CreateAsync(messageOptions);
     }
-
     public async Task<Output> ChangePassword(string token, string oldPassword, string newPassword)
     {
         Output output = new Output();
@@ -364,16 +392,113 @@ public class IdentityService : IIdentityService
         var result = await _userManager.AddToRoleAsync(user, roleName);
         return result.Succeeded;
     }
+
     private string genUsername(string name, string code)
     {
         string username = "";
-        name = name.ToLower();
+        name = RemoveDiacritics(name).ToLower(); 
         string[] chuoi = name.Split(' ');
+
         for (int i = 0; i < chuoi.Length - 1; i++)
         {
-            username += chuoi[i][0];
+            username += chuoi[i][0]; 
         }
-        username = username + chuoi[chuoi.Length - 1] + code;
+
+        username = username + chuoi[chuoi.Length - 1] + code; 
         return username;
+    }
+
+    private static string RemoveDiacritics(string text)
+    {
+        var normalizedString = text.Normalize(NormalizationForm.FormD);
+        var stringBuilder = new StringBuilder();
+
+        foreach (var c in normalizedString)
+        {
+            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+            {
+                stringBuilder.Append(c);
+            }
+        }
+
+        return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+    }
+    private async Task SendAccountInfoEmail(string email, string name, string username, string password)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return;
+        }
+
+        string subject = "Thông tin tài khoản đăng nhập";
+
+        string body = $@"
+    <html>
+    <body>
+        <p>Xin chào <b>{name}</b>,</p>
+        <p>Tài khoản của bạn đã được tạo thành công. Dưới đây là thông tin đăng nhập của bạn:</p>
+        <p><b>Username:</b> {username}</p>
+        <p><b>Password:</b> {password}</p>
+        <p style='color:red;'><i>Vui lòng đăng nhập và đổi mật khẩu ngay sau khi đăng nhập.</i></p>
+        <p>Trân trọng,</p>
+        <p><b>Đội ngũ StudyFlow</b></p>
+    </body>
+    </html>
+    ";
+
+        await SendEmail(email, subject, body);
+    }
+
+    public async Task<(Result Result, string UserId)> GenerateUser(string name, string code, string email)
+    {
+        string username = genUsername(name, code);
+        string password = GenerateRandomPassword();
+
+        var user = new ApplicationUser
+        {
+            UserName = username,
+            Email = email
+        };
+
+        var result = await _userManager.CreateAsync(user, password);
+
+        if (result.Succeeded)
+        {
+            await SendAccountInfoEmail(email, name, username, password);
+        }
+
+        return (result.ToApplicationResult(), user.Id);
+    }
+
+    public async Task<bool> IsUserActiveAsync(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        return user != null && user.IsActive;
+    }
+
+    public Guid GetCampusId(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var secretKey = _configuration["Jwt:SecretKey"] ?? throw
+            new ArgumentNullException(nameof(_configuration)
+            , "Jwt:SecretKey is missing in configuration.");
+        var key = Encoding.ASCII.GetBytes(secretKey);
+        tokenHandler.ValidateToken(token, new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
+            ClockSkew = TimeSpan.Zero
+        }, out SecurityToken validatedToken);
+
+        var jwtToken = (JwtSecurityToken)validatedToken;
+        var campusIdString = jwtToken.Claims
+            .First(x => x.Type == ClaimTypes.Locality).Value;
+        var chuyendoi = Guid.TryParse(campusIdString, out var campusId);
+        if(chuyendoi) return campusId;
+        else return Guid.Empty;
     }
 }

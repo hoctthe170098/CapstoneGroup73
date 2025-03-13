@@ -1,0 +1,121 @@
+<div class="import-hocsinh-wrapper">
+    <h3>Import Học Sinh</h3>
+  
+    <div *ngIf="!fileSelected" class="choose-file-area">
+      <div class="drag-drop-box" (drop)="onDropFile($event)" (dragover)="onDragOver($event)">
+        <p>Drag your file(s) or <strong>browse</strong></p>
+        <input type="file" (change)="onFileSelected($event)" />
+      </div>
+    </div>
+    <button class="btn btn-secondary mb-3" (click)="goBack()" *ngIf="!fileSelected">
+        <i class="fa fa-arrow-left"></i> Back
+      </button>
+    <div *ngIf="fileSelected" class="file-preview-area">
+      <h4>File đã chọn: {{ fileName }}</h4>
+  
+      <div class="table-responsive">
+        <table class="table student-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Tên</th>
+              <th>Giới Tính</th>
+              <th>Ngày Sinh</th>
+              <th>Email</th>
+              <th>Số điện thoại</th>
+              <th>Trạng thái</th>
+              <th class="dropdown-col">
+                <i class="fas fa-caret-down"></i>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let s of importedStudents; let i = index">
+              <!-- Hàng tóm tắt -->
+              <tr>
+                <td>{{ s.code }}</td>
+                <td>{{ s.ten }}</td>
+                <td>{{ s.gioiTinh }}</td>
+                <td>{{ s.ngaySinh | date:'dd-MM-yyyy' }}</td>
+                <td>{{ s.email }}</td>
+                <td>{{ s.soDienThoai }}</td>
+                <td>
+                  <span class="active-status">{{ s.status }}</span>
+                  <i class="check-icon"></i>
+                </td>
+                <td class="dropdown-col">
+                  <button class="btn dropdown-btn" (click)="toggleDetails(i)">
+                    <i *ngIf="!s.showDetails" class="fas fa-caret-down"></i>
+                    <i *ngIf="s.showDetails" class="fas fa-caret-up"></i>
+                  </button>
+                </td>
+                
+              </tr>
+              <tr *ngIf="s.showDetails">
+                <td colspan="9" class="detail-cell">
+                  <div class="container-fluid">
+                    <div class="row">
+                      <div class="col-md-3 detail-item">
+                        <label>Code</label>
+                        <div class="detail-box">{{ s.code }}</div>
+                      </div>
+                      <div class="col-md-3 detail-item">
+                        <label>Tên</label>
+                        <div class="detail-box">{{ s.ten }}</div>
+                      </div>
+                      <div class="col-md-3 detail-item">
+                        <label>Giới Tính</label>
+                        <div class="detail-box">{{ s.gioiTinh }}</div>
+                      </div>
+                      <div class="col-md-3 detail-item">
+                        <label>Ngày Sinh</label>
+                        <div class="detail-box">{{ s.ngaySinh | date:'dd-MM-yyyy' }}</div>
+                      </div>
+                    </div>
+                    <div class="row mt-3">
+                      <div class="col-md-4 detail-item">
+                        <label>Số Điện Thoại</label>
+                        <div class="detail-box">{{ s.soDienThoai }}</div>
+                      </div>
+                      <div class="col-md-4 detail-item">
+                        <label>Email</label>
+                        <div class="detail-box">{{ s.email }}</div>
+                      </div>
+                      <div class="col-md-4 detail-item">
+                        <label>Địa Chỉ</label>
+                        <div class="detail-box">{{ s.diaChi }}</div>
+                      </div>
+                    </div>
+                    <div class="row mt-3">
+                      <div class="col-md-6 detail-item">
+                        <label>Trường</label>
+                        <div class="detail-box">{{ s.truongDangHoc }}</div>
+                      </div>
+                      <div class="col-md-6 detail-item">
+                        <label>Chính Sách Học Phí</label>
+                        <div class="detail-box">{{ s.chinhSach }}</div>
+                      </div>
+                    </div>
+                    <div class="row mt-3">
+                      <div class="col-12 detail-item">
+                        <label>Danh Sách Lớp Đang Học</label>
+                        <div class="detail-box">
+                          {{ s.lopHocs.join(', ') }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+  
+      <div class="action-buttons">
+        <button class="btn cancel-btn" (click)="onCancel()">Hủy</button>
+        <button class="btn save-btn" (click)="onConfirmImport()">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+  

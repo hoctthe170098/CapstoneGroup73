@@ -40,6 +40,7 @@ public class EditNhanVienCommandHandler : IRequestHandler<EditNhanVienCommand, O
         if (string.IsNullOrWhiteSpace(request.Code) ||
             string.IsNullOrWhiteSpace(request.Ten) ||
             string.IsNullOrWhiteSpace(request.GioiTinh) ||
+            string.IsNullOrWhiteSpace(request.SoDienThoai) ||
             string.IsNullOrWhiteSpace(request.DiaChi))
         {
             throw new NotFoundDataException("Dữ liệu không được để trống");

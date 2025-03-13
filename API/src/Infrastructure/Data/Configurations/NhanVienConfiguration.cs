@@ -23,7 +23,7 @@ public class NhanVienConfiguration : IEntityTypeConfiguration<NhanVien>
             .HasMaxLength(10);
         builder.HasAnnotation($"CheckConstraint:CK_NhanVien_GioiTinh", "[GioiTinh] IN ('Male', 'Female')");
         builder.Property(x => x.DiaChi)
-            .HasMaxLength(50);
+            .HasMaxLength(200);
         builder.Property(x => x.SoDienThoai)
             .HasMaxLength(11);
         builder.Property(x => x.Email)

@@ -9,7 +9,7 @@ public interface IApplicationDbContext
     DbSet<TodoItem> TodoItems { get; }
     public DbSet<CoSo> CoSos {  get; }
     public DbSet<ChinhSach> ChinhSaches {  get; }
-    public DbSet<BaiTap> HocSinhs {  get; }
+    public DbSet<HocSinh> HocSinhs {  get; }
     public DbSet<GiaoVien> GiaoViens {  get; }
     public DbSet<NhanVien> NhanViens {  get; }
     public DbSet<Phong> Phongs {  get; }
