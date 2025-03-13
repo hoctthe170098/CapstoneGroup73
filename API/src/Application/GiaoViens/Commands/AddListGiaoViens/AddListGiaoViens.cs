@@ -62,11 +62,22 @@ public class AddListGiaoViensCommandHandler : IRequestHandler<AddListGiaoViensCo
                 throw new NotFoundDataException($"Dữ liệu không hợp lệ cho giáo viên có mã {req.Code}");
             }
 
-            if (req.NgaySinh > DateOnly.FromDateTime(DateTime.Today))
+            // Validate NgaySinh (Date of Birth) format
+            if (!DateOnly.TryParseExact(req.NgaySinh, "yyyy-MM-dd", out DateOnly ngaySinh))
             {
-                throw new WrongInputException($"Ngày sinh không hợp lệ cho giáo viên có mã {req.Code}");
+                throw new FormatException("Ngày sinh không hợp lệ. Định dạng phải là yyyy-MM-dd");
             }
-
+            // Validate NgaySinh (Date of Birth) is at least 18 years old
+            var eighteenYearsAgo = DateOnly.FromDateTime(DateTime.Now.AddYears(-18));
+            if (ngaySinh > eighteenYearsAgo)
+            {
+                throw new WrongInputException("Giáo viên phải đủ 18 tuổi trở lên");
+            }
+            Guid coSoId = _identityService.GetCampusId(req.token);
+            if (coSoId == Guid.Empty)
+            {
+                throw new FormatException("CoSo không hợp lệ");
+            }
             if (req.Code.Length > 20 || req.Ten.Length > 50 || req.DiaChi.Length > 100)
             {
                 throw new WrongInputException($"Dữ liệu vượt quá giới hạn cho giáo viên có mã {req.Code}");
@@ -83,7 +94,8 @@ public class AddListGiaoViensCommandHandler : IRequestHandler<AddListGiaoViensCo
                 throw new FormatException($"Email không hợp lệ cho giáo viên có mã {req.Code}");
             }
 
-            var coSoExists = await _context.CoSos.AnyAsync(c => c.Id == req.CoSoId, cancellationToken);
+            var coSoExists = await _context.CoSos
+                .AnyAsync(c => c.Id == coSoId&&c.TrangThai=="open", cancellationToken);
             if (!coSoExists)
             {
                 throw new NotFoundDataException($"Cơ sở không tồn tại cho giáo viên có mã {req.Code}");
@@ -103,10 +115,10 @@ public class AddListGiaoViensCommandHandler : IRequestHandler<AddListGiaoViensCo
                 GioiTinh = req.GioiTinh,
                 DiaChi = req.DiaChi,
                 TruongDangDay = req.TruongDangDay,
-                NgaySinh = req.NgaySinh,
+                NgaySinh = ngaySinh,
                 Email = req.Email,
                 SoDienThoai = req.SoDienThoai,
-                CoSoId = req.CoSoId,
+                CoSoId = coSoId,
                 UserId = userId
             });
         }

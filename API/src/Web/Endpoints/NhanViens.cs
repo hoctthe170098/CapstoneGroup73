@@ -16,17 +16,17 @@ public class NhanViens : EndpointGroupBase
             .MapPost(GetNhanViensWithPagination, "getnhanvienswithpagination")
             .MapPut(EditNhanVien, "editnhanvien");
     }
-    //[Authorize(Roles = Roles.Administrator)]
+    [Authorize(Roles = Roles.Administrator)]
     public async Task<Output> CreateNhanVien(ISender sender, CreateNhanVienCommand comand)
     {
         return await sender.Send(comand);
     }
-    //[Authorize(Roles = Roles.Administrator)]
+    [Authorize(Roles = Roles.Administrator)]
     public async Task<Output> GetNhanViensWithPagination(ISender sender, GetNhanViensWithPaginationQuery query)
     {
         return await sender.Send(query);
     }
-    //[Authorize(Roles = Roles.Administrator)]
+    [Authorize(Roles = Roles.Administrator)]
     public async Task<Output> EditNhanVien(ISender sender, EditNhanVienCommand comand)
     {
         return await sender.Send(comand);

@@ -3,6 +3,7 @@ using StudyFlow.Application.ApplicationUsers.Commands.Login;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Application.Cosos.Commands.CreateCoSo;
 using StudyFlow.Application.Cosos.Commands.EditCoSo;
+using StudyFlow.Application.Cosos.Queries.GetAllCoSo;
 using StudyFlow.Application.Cosos.Queries.GetCososWithPagination;
 using StudyFlow.Domain.Constants;
 
@@ -15,6 +16,7 @@ public class CoSos : EndpointGroupBase
         app.MapGroup(this)
             .MapPost(CreateCoSo,"createcoso")
             .MapPost(GetCoSosWithPagination, "getcososwithpagination")
+            .MapGet(GetAllCoSos,"getallcosos")
             .MapPut(EditCoSo,"editcoso");
     }
     [Authorize(Roles = Roles.Administrator)]
@@ -24,6 +26,11 @@ public class CoSos : EndpointGroupBase
     }
     [Authorize(Roles = Roles.Administrator)]
     public async Task<Output> GetCoSosWithPagination(ISender sender, GetCososWithPaginationQuery query)
+    {
+        return await sender.Send(query);
+    }
+    [Authorize(Roles = Roles.Administrator)]
+    public async Task<Output> GetAllCoSos(ISender sender,[AsParameters] GetAllCoSosQuery query)
     {
         return await sender.Send(query);
     }
