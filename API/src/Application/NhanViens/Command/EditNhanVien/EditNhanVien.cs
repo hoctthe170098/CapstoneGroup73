@@ -17,8 +17,8 @@ public class EditNhanVienCommand : IRequest<Output>
     public required string GioiTinh { get; init; }
     public required string DiaChi { get; init; }
     public required DateOnly NgaySinh { get; init; }
-    public string? Email { get; init; }
-    public string? SoDienThoai { get; init; }
+    public required string Email { get; init; }
+    public required string SoDienThoai { get; init; }
     public required string CoSoId { get; init; }
     public required string UserId { get; init; }
     public required string Role { get; init; }
@@ -40,6 +40,7 @@ public class EditNhanVienCommandHandler : IRequestHandler<EditNhanVienCommand, O
         if (string.IsNullOrWhiteSpace(request.Code) ||
             string.IsNullOrWhiteSpace(request.Ten) ||
             string.IsNullOrWhiteSpace(request.GioiTinh) ||
+            string.IsNullOrWhiteSpace(request.SoDienThoai) ||
             string.IsNullOrWhiteSpace(request.DiaChi))
         {
             throw new NotFoundDataException("Dữ liệu không được để trống");

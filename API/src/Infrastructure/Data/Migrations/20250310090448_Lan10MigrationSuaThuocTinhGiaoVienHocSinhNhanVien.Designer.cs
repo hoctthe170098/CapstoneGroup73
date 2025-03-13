@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudyFlow.Infrastructure.Data;
 
 #nullable disable
 
-namespace CleanArchitecture.Infrastructure.Data.Migrations
+namespace StudyFlow.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250310090448_Lan10MigrationSuaThuocTinhGiaoVienHocSinhNhanVien")]
+    partial class Lan10MigrationSuaThuocTinhGiaoVienHocSinhNhanVien
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -272,13 +275,13 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     b.Property<string>("MoTa")
                         .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("TieuDe")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("TrangThai")
                         .IsRequired()
@@ -302,8 +305,8 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     b.Property<string>("DiaChi")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("SoDienThoai")
                         .IsRequired()
@@ -382,8 +385,8 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     b.Property<string>("DiaChi")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -446,8 +449,8 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     b.Property<string>("DiaChi")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -603,8 +606,8 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     b.Property<string>("DiaChi")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -659,16 +662,16 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     b.Property<string>("Mota")
                         .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("SoThuTu")
                         .HasColumnType("int");
 
                     b.Property<string>("TieuDe")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
