@@ -384,12 +384,33 @@ public class IdentityService : IIdentityService
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null) return false;
 
-        var validRoles = new List<string> { "Administrator", "Student", "LearningManager", "Teacher", "CampusManager" }; 
+        var validRoles = new List<string> { "Administrator", "Student", "LearningManager", "Teacher", "CampusManager" };
         if (!validRoles.Contains(roleName))
         {
             throw new Exception($"Vai trò '{roleName}' không hợp lệ.");
         }
 
+        // Lấy danh sách vai trò hiện tại của người dùng
+        var currentRoles = await _userManager.GetRolesAsync(user);
+
+        if (currentRoles.Any())
+        {
+            // Người dùng đã có vai trò, cập nhật vai trò
+            var currentRole = currentRoles.First(); // Giả sử chỉ có một vai trò
+            if (currentRole != roleName)
+            {
+                // Xóa vai trò cũ
+                var removeResult = await _userManager.RemoveFromRoleAsync(user, currentRole);
+                if (!removeResult.Succeeded) return false;
+
+                // Thêm vai trò mới
+                var addResult = await _userManager.AddToRoleAsync(user, roleName);
+                return addResult.Succeeded;
+            }
+            return true; // Vai trò không thay đổi
+        }
+
+        // Người dùng chưa có vai trò, thêm vai trò
         var result = await _userManager.AddToRoleAsync(user, roleName);
         return result.Succeeded;
     }
