@@ -9,13 +9,14 @@ import { ChuongtrinhService } from '../shared/chuongtrinh.service';
 })
 export class AddchuongtrinhComponent {
   program: any = {
-    title: '',
-    description: '',
-    lessons: [
+    tieuDe: '',
+    moTa: '',
+    noiDungBaiHocs: [
       {
-        title: '',
-        description: '',
-        files: [] as any[],
+        tieuDe: '',
+        mota: '',
+        soThuTu: 1,
+        taiLieuHocTaps: [],
         expanded: false
       }
     ]
@@ -24,26 +25,35 @@ export class AddchuongtrinhComponent {
   constructor(
     private router: Router,
     private chuongtrinhService: ChuongtrinhService
-  ) { }
+  ) {}
 
+  /** ✅ Thêm bài học mới */
   addLesson() {
-    this.program.lessons.push({
-      title: '',
-      description: '',
-      files: [],
+    const soThuTu = this.program.noiDungBaiHocs.length + 1;
+    this.program.noiDungBaiHocs.push({
+      tieuDe: '',
+      mota: '',
+      soThuTu,
+      taiLieuHocTaps: [],
       expanded: false
     });
   }
 
+  /** ✅ Xóa bài học */
   removeLesson(index: number) {
-    this.program.lessons.splice(index, 1);
+    this.program.noiDungBaiHocs.splice(index, 1);
+    // Cập nhật lại số thứ tự
+    this.program.noiDungBaiHocs.forEach((lesson, i) => {
+      lesson.soThuTu = i + 1;
+    });
   }
 
+  /** ✅ Toggle mở rộng nội dung bài học */
   toggleLesson(index: number) {
-    this.program.lessons[index].expanded = !this.program.lessons[index].expanded;
+    this.program.noiDungBaiHocs[index].expanded = !this.program.noiDungBaiHocs[index].expanded;
   }
-  
 
+  /** ✅ Xử lý tải file lên */
   onFileChange(event: Event, lessonIndex: number) {
     const files = (event.target as HTMLInputElement).files;
     if (files) {
@@ -53,6 +63,7 @@ export class AddchuongtrinhComponent {
     }
   }
 
+  /** ✅ Xử lý kéo thả file */
   onDragOver(event: DragEvent) {
     event.preventDefault();
   }
@@ -66,29 +77,59 @@ export class AddchuongtrinhComponent {
     }
   }
 
+  /** ✅ Upload file vào danh sách */
   uploadFile(file: File, lessonIndex: number) {
-    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/svg+xml', 'application/zip'];
+    const allowedTypes = ['application/pdf', 'video/mp4', 'application/msword'];
     if (!allowedTypes.includes(file.type)) {
-      alert('Chỉ chấp nhận file .pdf, .jpg, .png, .svg, .zip!');
+      alert('Chỉ chấp nhận file .pdf, .mp4, .doc!');
       return;
     }
-    // Giả lập fileUrl, bạn có thể gọi service.uploadFile(file) nếu muốn lấy URL thật
-    const fileUrl = `assets/files/${file.name}`;
-    this.program.lessons[lessonIndex].files.push({ name: file.name, fileUrl });
+
+    this.program.noiDungBaiHocs[lessonIndex].taiLieuHocTaps.push({
+      urlType: file.type.includes('video') ? 'video' : 'pdf',
+      file
+    });
   }
 
+  /** ✅ Xóa file khỏi danh sách */
   removeFile(lessonIndex: number, fileIndex: number) {
-    this.program.lessons[lessonIndex].files.splice(fileIndex, 1);
+    this.program.noiDungBaiHocs[lessonIndex].taiLieuHocTaps.splice(fileIndex, 1);
   }
 
+  /** ✅ Gửi chương trình lên API */
   saveProgram() {
-    console.log('Chương trình:', JSON.stringify(this.program, null, 2));
-    this.chuongtrinhService.addProgram(this.program);
-    alert('Thêm chương trình thành công!');
-    this.router.navigate(['/chuongtrinh']);
+    const formData = new FormData();
+    
+    formData.append('chuongTrinhDto.tieuDe', this.program.tieuDe);
+    formData.append('chuongTrinhDto.moTa', this.program.moTa);
+
+    this.program.noiDungBaiHocs.forEach((lesson, i) => {
+      formData.append(`chuongTrinhDto.noiDungBaiHocs[${i}].tieuDe`, lesson.tieuDe);
+      formData.append(`chuongTrinhDto.noiDungBaiHocs[${i}].mota`, lesson.mota);
+      formData.append(`chuongTrinhDto.noiDungBaiHocs[${i}].soThuTu`, lesson.soThuTu.toString());
+
+      lesson.taiLieuHocTaps.forEach((file, j) => {
+        formData.append(`chuongTrinhDto.noiDungBaiHocs[${i}].taiLieuHocTaps[${j}].urlType`, file.urlType);
+        formData.append(`chuongTrinhDto.noiDungBaiHocs[${i}].taiLieuHocTaps[${j}].file`, file.file);
+      });
+    });
+
+    this.chuongtrinhService.addProgram(formData).subscribe({
+      next: (response) => {
+        console.log('✅ Thêm chương trình thành công:', response);
+        alert('Thêm chương trình thành công!');
+        this.router.navigate(['/chuongtrinh']);
+      },
+      error: (error) => {
+        console.error('❌ Lỗi khi thêm chương trình:', error);
+        alert('Lỗi khi thêm chương trình!');
+      }
+    });
   }
 
+  /** ✅ Hủy thêm */
   cancel() {
     this.router.navigate(['/chuongtrinh']);
   }
 }
+  

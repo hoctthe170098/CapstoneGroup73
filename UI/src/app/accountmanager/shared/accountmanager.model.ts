@@ -5,13 +5,13 @@ export class Accountmanager {
   ten: string = '';
   gioiTinh: string = '';
   diaChi: string = '';
-  lop: string = '';
+ 
   ngaySinh: Date = new Date();
   email?: string;
   soDienThoai?: string;
   coSoId: string = '';
   coso: CoSo = new CoSo();
-  role: string ='';
+  role: string ='CampusManager';
  
   province?: string;  // Mã hoặc tên tỉnh/thành
   district?: string;  // Mã hoặc tên quận/huyện
