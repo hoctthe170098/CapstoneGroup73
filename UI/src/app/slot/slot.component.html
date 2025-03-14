@@ -33,15 +33,15 @@
       <table class="table">
         <thead class="thead-light">
           <tr>
-            <th scope="col">ID</th>
+            <th scope="col">STT</th>
             <th scope="col">Tên</th>
             <th scope="col">Trạng Thái</th>
             <th scope="col">Sửa</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let r of rooms">
-            <th scope="row">{{ r.id }}</th>
+          <tr *ngFor="let r of rooms; let i = index">
+            <th scope="row">{{ i+1 }}</th>
             <td>{{ r.ten }}</td>
             <td>{{ r.trangThai }}</td>
             <td>

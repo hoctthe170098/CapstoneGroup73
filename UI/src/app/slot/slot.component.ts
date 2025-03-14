@@ -11,7 +11,6 @@ import { ToastrService } from 'ngx-toastr';
 export class SlotComponent implements OnInit {
   // Danh sách phòng
   rooms: Slot[] = [];
-
   // Form thêm
   roomName: string = '';
 
@@ -109,7 +108,7 @@ export class SlotComponent implements OnInit {
           // Reset form
           this.roomName = '';
           this.isSubmittedAdd = false;
-
+          this.loadRooms();
           this.toastr.success('Tạo phòng thành công!');
         } else {
           this.toastr.error(res.message || 'Không thể tạo phòng.');
@@ -155,7 +154,7 @@ export class SlotComponent implements OnInit {
     if (!confirmResult) {
       this.isEditModalOpen = false;
       return;
-    }
+    }else this.isEditModalOpen = false;
 
     // Chuyển UI -> API: "Mở" -> "use", "Đóng" -> "nonuse"
     const apiStatus = (this.editRoomStatus === 'Mở') ? 'use' : 'nonuse';
@@ -186,7 +185,6 @@ export class SlotComponent implements OnInit {
       }
     });
   }
-
   // Bấm nút "Sửa" trong bảng
   editRoom(roomId: number): void {
     this.openEditRoomModal(roomId);
