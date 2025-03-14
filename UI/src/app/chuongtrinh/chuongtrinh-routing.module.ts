@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ChuongtrinhComponent } from './chuongtrinh.component';
-import { EditchuongtrinhComponent } from './editchuongtrinh/editchuongtrinh.component';
+// import { EditchuongtrinhComponent } from './editchuongtrinh/editchuongtrinh.component';
 import { AddchuongtrinhComponent } from './addchuongtrinh/addchuongtrinh.component';
 
 const routes: Routes = [
@@ -23,13 +23,13 @@ const routes: Routes = [
       title: 'Thêm Chương Trình'
     }
   },
-  {
-    path: 'edit/:id',
-    component: EditchuongtrinhComponent,
-    data: {
-      title: 'Chỉnh Sửa Chương Trình'
-    }
-  }
+  // {
+  //   path: 'edit/:id',
+  //   component: EditchuongtrinhComponent,
+  //   data: {
+  //     title: 'Chỉnh Sửa Chương Trình'
+  //   }
+  // }
 ];
 
 @NgModule({

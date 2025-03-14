@@ -1,55 +1,56 @@
 ﻿using StudyFlow.Application.Common.Interfaces;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Application.Common.Exceptions;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+using System.ComponentModel;
+using Microsoft.AspNetCore.Http;
+
 namespace StudyFlow.Application.LichHocs.Commands.EditLichHoc;
 
 public record EditLichHocCommand : IRequest<Output>
 {
-    public Guid Id { get; set; }
-    public int? Thu { get; set; }
-    public int? SlotId { get; set; }
-    public string? Phong { get; set; }
-    public string? TenLop { get; set; }
-    public DateOnly NgayBatDau { get; set; }
-    public DateOnly NgayKetThuc { get; set; }
-    public int? HocPhi { get; set; }
-    public string? TrangThai { get; set; }
-    public string? GiaoVienCode { get; set; }
-    public int? ChuongTrinhId { get; set; }
+   public required EditlLichHocDto LichHocDto { get; init; }
 }
 
 public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Output>
 {
     private readonly IApplicationDbContext _context;
+    private readonly IIdentityService _identityService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public EditLichHocCommandHandler(IApplicationDbContext context)
+    public EditLichHocCommandHandler(IApplicationDbContext context, IIdentityService identityService,
+        IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
+        _identityService = identityService;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<Output> Handle(EditLichHocCommand request, CancellationToken cancellationToken)
     {
-        var lichHoc = await _context.LichHocs.FindAsync(request.Id)
-            ?? throw new NotFoundDataException($"Không tìm thấy lịch học với ID {request.Id}.");
+        var lichHocDto = request.LichHocDto;
 
-        if (request.Thu.HasValue) lichHoc.Thu = request.Thu.Value;
-        if (!string.IsNullOrWhiteSpace(request.TenLop)) lichHoc.TenLop = request.TenLop;
-        if (request.HocPhi.HasValue) lichHoc.HocPhi = request.HocPhi.Value;
-        if (!string.IsNullOrWhiteSpace(request.TrangThai)) lichHoc.TrangThai = request.TrangThai;
-        if (!string.IsNullOrWhiteSpace(request.GiaoVienCode))
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+
+        var coSoId =  _identityService.GetCampusId(token);
+        var lichHoc = await _context.LichHocs.FindAsync(lichHocDto.Id)
+            ?? throw new NotFoundDataException($"Không tìm thấy lịch học với ID {lichHocDto.Id}.");
+
+        if (lichHocDto.PhongId.HasValue)
         {
-            lichHoc.GiaoVien = await _context.GiaoViens.FirstOrDefaultAsync(g => g.Code == request.GiaoVienCode, cancellationToken)
-                ?? throw new NotFoundDataException("Giáo viên không tồn tại.");
-            lichHoc.GiaoVienCode = request.GiaoVienCode;
+            var phong = await _context.Phongs.FirstOrDefaultAsync(p => p.Id == lichHocDto.PhongId.Value && p.CoSoId == coSoId);
+            if (phong == null)
+                throw new NotFoundDataException("Phòng không tồn tại hoặc không thuộc cơ sở của bạn.");
         }
-        if (request.ChuongTrinhId.HasValue)
-        {
-            lichHoc.ChuongTrinh = await _context.ChuongTrinhs.FindAsync(request.ChuongTrinhId.Value)
-                ?? throw new NotFoundDataException("Chương trình không tồn tại.");
-        }
+
+        if (lichHocDto.Thu.HasValue) lichHoc.Thu = lichHocDto.Thu.Value;
+        if (lichHocDto.PhongId.HasValue) lichHoc.PhongId = lichHocDto.PhongId.Value;
+        if (!string.IsNullOrWhiteSpace(lichHocDto.TenLop)) lichHoc.TenLop = lichHocDto.TenLop;
 
         await _context.SaveChangesAsync(cancellationToken);
-
         return new Output
         {
             isError = false,

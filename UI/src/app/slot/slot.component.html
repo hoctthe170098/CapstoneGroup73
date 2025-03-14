@@ -1,94 +1,95 @@
 <div class="row slot-container">
-    <!-- Cột trái: Form thêm slot -->
-    <div class="col-md-4 form-section">
-      <h3>Thêm Slot Mới</h3>
-      <form (ngSubmit)="addSlot()">
+  <!-- Form thêm phòng -->
+  <div class="col-md-4 form-section">
+    <h3>Thêm Phòng Học Mới</h3>
+    <form (ngSubmit)="addRoom()">
+      <div class="form-group">
+        <label for="roomName">TÊN</label>
+        <input
+          type="text"
+          id="roomName"
+          [(ngModel)]="roomName"
+          name="roomName"
+          placeholder="Nhập tên phòng"
+          class="form-control"
+        />
+        <div class="error-message" *ngIf="isSubmittedAdd">
+          <div *ngIf="!roomName.trim()">Tên phòng không được để trống.</div>
+          <div *ngIf="roomName.trim().length > 20">Tên phòng tối đa 20 ký tự.</div>
+          <div *ngIf="isDuplicateRoomName(roomName)">Tên phòng đã tồn tại.</div>
+        </div>
+      </div>
+      <div class="form-buttons">
+        <button type="submit" class="btn btn-success mr-2">Thêm</button>
+        <button type="button" class="btn btn-danger" (click)="roomName=''">Reset</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Danh sách phòng -->
+  <div class="col-md-8 table-section">
+    <h3 class="content-header">Danh Sách Phòng Học</h3>
+    <div class="table-responsive">
+      <table class="table">
+        <thead class="thead-light">
+          <tr>
+            <th scope="col">STT</th>
+            <th scope="col">Tên</th>
+            <th scope="col">Trạng Thái</th>
+            <th scope="col">Sửa</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of rooms; let i = index">
+            <th scope="row">{{ i+1 }}</th>
+            <td>{{ r.ten }}</td>
+            <td>{{ r.trangThai }}</td>
+            <td>
+              <button class="btn-edit" (click)="editRoom(r.id)">Sửa</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Pop-up Edit -->
+<div class="modal-container" *ngIf="isEditModalOpen">
+  <div class="modal-overlay" (click)="isEditModalOpen = false"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>CHỈNH SỬA PHÒNG HỌC</h2>
+      <button class="close-btn" (click)="isEditModalOpen = false">✕</button>
+    </div>
+    <div class="modal-body">
+      <form>
         <div class="form-group">
-          <label for="slotName">Tên</label>
+          <label>Tên Phòng</label>
           <input
             type="text"
-            id="slotName"
-            [(ngModel)]="slotName"
-            name="slotName"
-            placeholder="Nhập tên slot"
             class="form-control"
+            [(ngModel)]="editRoomName"
+            name="editRoomName"
           />
+          <div class="error-message" *ngIf="isSubmittedEdit">
+            <div *ngIf="!editRoomName.trim()">Tên phòng không được để trống.</div>
+            <div *ngIf="editRoomName.trim().length > 20">Tên phòng tối đa 20 ký tự.</div>
+            <div *ngIf="isDuplicateEditRoomName(editRoomName)">Tên phòng đã tồn tại.</div>
+          </div>
         </div>
-  
         <div class="form-group">
-          <label for="startTime">Bắt Đầu</label>
-          <input
-            type="time"
-            id="startTime"
-            [(ngModel)]="startTime"
-            name="startTime"
-            class="form-control"
-          />
-        </div>
-  
-        <div class="form-group">
-          <label for="endTime">Kết Thúc</label>
-          <input
-            type="time"
-            id="endTime"
-            [(ngModel)]="endTime"
-            name="endTime"
-            class="form-control"
-          />
-        </div>
-  
-        <div class="form-buttons">
-          <button type="submit" class="btn btn-success mr-2">Thêm</button>
-          <button type="button" class="btn btn-danger" (click)="resetForm()">Reset</button>
+          <label>Trạng Thái</label>
+          <select class="form-control" [(ngModel)]="editRoomStatus" name="editRoomStatus">
+            <option value="Mở">Mở</option>
+            <option value="Đóng">Đóng</option>
+          </select>
         </div>
       </form>
     </div>
-  
-    <!-- Cột phải: Bảng hiển thị slot -->
-    <div class="col-md-8 table-section">
-      <section id="ng-tables">
-        <div class="row text-left">
-          <div class="col-12">
-            <h3 class="content-header">Danh Sách Slot Học</h3>
-          </div>
-        </div>
-  
-        <div class="row text-left">
-          <div class="col-12">
-            <div class="card">
-              <div class="card-content">
-                <div class="card-body">
-                  <div class="table-responsive">
-                    <table class="table table-striped">
-                      <thead>
-                        <tr>
-                          <th scope="col">ID</th>
-                          <th scope="col">Tên</th>
-                          <th scope="col">Bắt Đầu</th>
-                          <th scope="col">Kết Thúc</th>
-                          <th scope="col">Thao Tác</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr *ngFor="let slot of slots; let i = index">
-                          <th scope="row">{{ i + 1 }}</th>
-                          <td>{{ slot.name }}</td>
-                          <td>{{ slot.startTime }}</td>
-                          <td>{{ slot.endTime }}</td>
-                          <td>
-                            <button class="btn-edit" (click)="editSlot(i)">✏️</button>
-                            <button class="btn-delete" (click)="deleteSlot(i)">❌</button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div> <!-- table-responsive -->
-                </div> <!-- card-body -->
-              </div> <!-- card-content -->
-            </div> <!-- card -->
-          </div> <!-- col-12 -->
-        </div> <!-- row -->
-      </section>
+    <div class="modal-footer">
+      <button type="button" class="btn cancel-btn" (click)="isEditModalOpen = false">Hủy</button>
+      <button type="button" class="btn save-btn" (click)="applyEditRoom()">ÁP DỤNG</button>
     </div>
   </div>
-  
+</div>

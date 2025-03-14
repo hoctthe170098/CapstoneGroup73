@@ -13,7 +13,7 @@ export const Full_ROUTES: Routes = [
   },
   
   {
-    path: 'slot',
+    path: 'phong',
     loadChildren: () => import('../../slot/slot.module').then(m => m.SlotModule)
   },
   {

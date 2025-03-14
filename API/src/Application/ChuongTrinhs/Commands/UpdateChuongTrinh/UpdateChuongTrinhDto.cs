@@ -8,23 +8,24 @@ using Microsoft.AspNetCore.Http;
 namespace StudyFlow.Application.ChuongTrinhs.Commands.UpdateChuongTrinh;
 public class UpdateChuongTrinhDto
 {
-    public required int Id { get; set; }
-    public required string TieuDe { get; set; }
-    public required string MoTa { get; set; }
-    public List<UpdateNoiDungBaiHocDto>? NoiDungBaiHocs { get; set; } = new List<UpdateNoiDungBaiHocDto>();
+    public required int Id { get; init; }
+    public required string TieuDe { get; init; }
+    public required string MoTa { get; init; }
+    public required string TrangThai {  get; init; }
+    public List<UpdateNoiDungBaiHocDto>? NoiDungBaiHocs { get; init; } = new List<UpdateNoiDungBaiHocDto>();
 }
 public class UpdateNoiDungBaiHocDto
 {
-    public string? Id { get; set; }
-    public required string TieuDe { get; set; }
-    public required string Mota { get; set; }
-    public required int SoThuTu { get; set; }
-    public List<UpdateTaiLieuHocTapDto>? TaiLieuHocTaps { get; set; } = new List<UpdateTaiLieuHocTapDto>();
+    public string? Id { get; init; }
+    public required string TieuDe { get; init; }
+    public required string Mota { get; init; }
+    public required int SoThuTu { get; init; }
+    public List<UpdateTaiLieuHocTapDto>? TaiLieuHocTaps { get; init; } = new List<UpdateTaiLieuHocTapDto>();
 }
 
 public class UpdateTaiLieuHocTapDto
 {
-    public string? Id { get; set; }
-    public required string urlType { get; set; }
-    public IFormFile? File { get; set; } // Thêm thuộc tính này
+    public string? Id { get; init; }
+    public required string urlType { get; init; }
+    public IFormFile? File { get; init; } // Thêm thuộc tính này
 }

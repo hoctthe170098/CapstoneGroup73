@@ -17,13 +17,18 @@ export class ChuongtrinhComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadPrograms();
+    this.chuongtrinhService.getPrograms(); // 🚀 Gọi API khi vào trang
+  
+    this.chuongtrinhService.programs$.subscribe(data => {
+      if (data && data.length > 0) {
+        this.programs = data; // ✅ Cập nhật danh sách
+        console.log("📌 Cập nhật danh sách chương trình:", this.programs);
+      } else {
+        console.warn("⚠️ Không có chương trình nào!");
+      }
+    });
   }
   
-  loadPrograms(): void {
-    this.programs = this.chuongtrinhService.getPrograms(); // 🔥 Lấy lại dữ liệu từ service
-    console.log("Danh sách chương trình sau khi cập nhật:", this.programs);
-  }
   
 
   /**
@@ -54,12 +59,12 @@ export class ChuongtrinhComponent implements OnInit {
   /**
    * Xóa chương trình học theo ID
    */
-  deleteProgram(id: number) {
-    const confirmDelete = confirm("Bạn có chắc chắn muốn xóa chương trình này?");
-    if (confirmDelete) {
-      this.chuongtrinhService.deleteProgram(id);
-      this.programs = this.chuongtrinhService.getPrograms().map(program => ({ ...program }));
-      alert('Xóa thành công!');
-    }
-  }
+  // deleteProgram(id: number) {
+  //   const confirmDelete = confirm("Bạn có chắc chắn muốn xóa chương trình này?");
+  //   if (confirmDelete) {
+  //     this.chuongtrinhService.deleteProgram(id);
+  //     this.programs = this.chuongtrinhService.getPrograms().map(program => ({ ...program }));
+  //     alert('Xóa thành công!');
+  //   }
+  // }
 }

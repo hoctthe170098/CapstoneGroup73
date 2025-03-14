@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using CleanArchitecture.Application.ChuongTrinhs.Commands.DeleteChuongTrinh;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StudyFlow.Application.ChuongTrinhs.Commands.CreateChuongTrinh;
 using StudyFlow.Application.ChuongTrinhs.Commands.UpdateChuongTrinh;
+using StudyFlow.Application.ChuongTrinhs.Queries.GetAllChuongTrinhs;
 using StudyFlow.Application.ChuongTrinhs.Queries.GetChuongTrinhsWithPagination;
 using StudyFlow.Application.Common.Models;
+using StudyFlow.Application.Cosos.Queries.GetAllCoSo;
 using StudyFlow.Domain.Constants;
 using Twilio.Rest.Microvisor.V1;
-
 namespace StudyFlow.Web.Endpoints;
-
 public class ChuongTrinhs : EndpointGroupBase
 {
     public override void Map(WebApplication app)
@@ -17,21 +18,40 @@ public class ChuongTrinhs : EndpointGroupBase
             .DisableAntiforgery()
             .MapPost(CreateChuongTrinh, "createchuongtrinh")
             .MapPut(UpdateChuongTrinh,"updatechuongtrinh")
-            .MapGet(GetChuongTrinhsWithPagination, "getchuongtrinhs");
+            .MapPost(GetChuongTrinhsWithPagination, "getchuongtrinhs")
+            .MapGet(GetAllChuongTrinhs, "getallchuongtrinhs")
+            .MapDelete(DeleteChuongTrinh,"deletechuongtrinh/{id}");
     }
-    //[Authorize(Roles = Roles.LearningManager)]
+    [Authorize(Roles = Roles.LearningManager)]
     public async Task<Output> CreateChuongTrinh(ISender sender, [FromForm] CreateChuongTrinhCommand command)
     {
         return await sender.Send(command);
     }
-    //[Authorize(Roles = Roles.LearningManager)]
+    [Authorize(Roles = Roles.LearningManager)]
     public async Task<Output> UpdateChuongTrinh(ISender sender, [FromForm] UpdateChuongTrinhCommand command)
     {
         return await sender.Send(command);
     }
     [Authorize(Roles = Roles.LearningManager)]
-    public async Task<PaginatedList<ChuongTrinhDto>> GetChuongTrinhsWithPagination(ISender sender, [AsParameters] GetChuongTrinhsWithPaginationQuery query)
+    public async Task<Output> GetChuongTrinhsWithPagination(ISender sender, GetChuongTrinhsWithPaginationQuery query)
     {
         return await sender.Send(query);
+    }
+    [Authorize(Roles = Roles.LearningManager)]
+    public async Task<Output> GetAllChuongTrinhs(ISender sender, [AsParameters] GetAllChuongTrinhsQuery query)
+    {
+        return await sender.Send(query);
+    }
+    [Authorize(Roles = Roles.LearningManager)]
+    public async Task<Output> DeleteChuongTrinh(ISender sender, string id)
+    {
+        try
+        {
+            int i_id = Int32.Parse(id);
+            return await sender.Send(new DeleteChuongTrinhComand(i_id));
+        }catch (Exception)
+        {
+            throw;
+        }
     }
 }

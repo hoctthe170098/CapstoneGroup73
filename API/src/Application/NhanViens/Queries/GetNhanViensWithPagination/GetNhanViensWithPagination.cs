@@ -65,16 +65,17 @@ public class GetNhanViensWithPaginationQueryHandler
             var list = await query
                .ProjectTo<NhanVienDto>(_mapper.ConfigurationProvider)
                .PaginatedListAsync(request.PageNumber, request.PageSize);
-
-
             // Fetch Role Names Using IIdentityService
             foreach (var dto in list.Items) 
             {
                 var nhanVien = await _context.NhanViens.FirstOrDefaultAsync(nv => nv.Code == dto.Code);
                 if (nhanVien != null && !string.IsNullOrEmpty(nhanVien.UserId))
                 {
-                    var roles = await _identityService.GetRolesByUserId(nhanVien.UserId);
+                    var roles = await _identityService
+                        .GetRolesByUserId(nhanVien.UserId);
                     dto.TenVaiTro = roles.FirstOrDefault();
+                    dto.TrangThai = await _identityService
+                        .IsUserActiveAsync(nhanVien.UserId);
                 }
             }
 

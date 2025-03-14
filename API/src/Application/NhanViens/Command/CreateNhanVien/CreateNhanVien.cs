@@ -48,6 +48,7 @@ public class CreateNhanVienCommandHandler : IRequestHandler<CreateNhanVienComman
         {
             throw new NotFoundDataException("Dữ liệu không được để trống");
         }
+        // Validate role
         if(request.Role!=Roles.CampusManager&&request.Role!=Roles.LearningManager) 
             throw new WrongInputException("Vai trò không hợp lệ!");
         // Validate length constraints
@@ -69,7 +70,6 @@ public class CreateNhanVienCommandHandler : IRequestHandler<CreateNhanVienComman
                 throw new FormatException("Số điện thoại không hợp lệ");
             }
         }
-
         // Validate email 
         if (!string.IsNullOrEmpty(request.Email) && !new EmailAddressAttribute().IsValid(request.Email))
         {
@@ -98,7 +98,19 @@ public class CreateNhanVienCommandHandler : IRequestHandler<CreateNhanVienComman
         {
             throw new NotFoundDataException("Cơ sở không tồn tại");
         }
-
+        // Check If phone or email exist
+        var phoneExists = await _context.NhanViens.AnyAsync(nv => nv.SoDienThoai == request.SoDienThoai, cancellationToken);
+        var emailExists = await _context.NhanViens.AnyAsync(nv => nv.Email == request.Email, cancellationToken);
+        if (phoneExists || emailExists)
+        {
+            throw new WrongInputException($"Số điện thoại hoặc email đã tồn tại");
+        }
+        // Validate Code not duplicate
+        var codeExists = await _context.NhanViens.AnyAsync(nv => nv.Code.Substring(2) == request.Code, cancellationToken);
+        if (codeExists)
+        {
+            throw new WrongInputException($"Mã nhân viên '{request.Code}' đã tồn tại!");
+        }
         // Create identity user
         var (result, userId) = await _identityService.GenerateUser(request.Ten, request.Code, request.Email);
 
@@ -110,7 +122,7 @@ public class CreateNhanVienCommandHandler : IRequestHandler<CreateNhanVienComman
         // Create new NhanVien entity
         var nhanVien = new NhanVien
         {
-            Code = request.Code,
+            Code = "NV"+request.Code,
             Ten = request.Ten,
             GioiTinh = request.GioiTinh,
             DiaChi = request.DiaChi,
@@ -129,7 +141,6 @@ public class CreateNhanVienCommandHandler : IRequestHandler<CreateNhanVienComman
         {
             await _identityService.AssignRoleAsync(userId, request.Role);
         }
-
         return new Output
         {
             isError = false,

@@ -21,7 +21,9 @@ public class UpdateChuongTrinhCommandHandler : IRequestHandler<UpdateChuongTrinh
     private readonly string _uploadFolderPath;
     private readonly ILogger<UpdateChuongTrinhCommandHandler> _logger;
 
-    public UpdateChuongTrinhCommandHandler(IApplicationDbContext context, IWebHostEnvironment webHostEnvironment, ILogger<UpdateChuongTrinhCommandHandler> logger)
+    public UpdateChuongTrinhCommandHandler(IApplicationDbContext context
+        , IWebHostEnvironment webHostEnvironment
+        , ILogger<UpdateChuongTrinhCommandHandler> logger)
     {
         _context = Guard.Against.Null(context);
         _webHostEnvironment = Guard.Against.Null(webHostEnvironment);
@@ -79,33 +81,32 @@ public class UpdateChuongTrinhCommandHandler : IRequestHandler<UpdateChuongTrinh
         var noiDungHienTai = await _context.NoiDungBaiHocs
             .Where(n => n.ChuongTrinhId == chuongTrinhDto.Id)
             .ToListAsync(cancellationToken);
-
+        var noiDungCanXoas = new List<NoiDungBaiHoc>();
         if (chuongTrinhDto.NoiDungBaiHocs != null)
         {
             var noiDungIdsCapNhat = chuongTrinhDto.NoiDungBaiHocs
                 .Where(n => !string.IsNullOrEmpty(n.Id))
                 .Select(n => Guid.Parse(n.Id!))
                 .ToList();
-            var noiDungCanXoas = noiDungHienTai
+             noiDungCanXoas = noiDungHienTai
                 .Where(n => !noiDungIdsCapNhat.Contains(n.Id)).ToList();
-            foreach(var noidungCanXoa in noiDungCanXoas)
-            {
-                var tailieucanxoas = await _context.TaiLieuHocTaps
-                    .Where(n=>n.NoiDungBaiHocId==noidungCanXoa.Id)
-                    .ToListAsync(cancellationToken);
-                foreach(var tailieucanxoa in tailieucanxoas)
-                {
-                    DeleteFile(tailieucanxoa.urlFile);
-                }
-                _context.TaiLieuHocTaps.RemoveRange(tailieucanxoas);
-            }
-            _context.NoiDungBaiHocs.RemoveRange(noiDungCanXoas);
         }
         else
         {
-            _context.NoiDungBaiHocs.RemoveRange(noiDungHienTai);
+             noiDungCanXoas = noiDungHienTai;
         }
-
+        foreach (var noidungCanXoa in noiDungCanXoas)
+        {
+            var tailieucanxoas = await _context.TaiLieuHocTaps
+                .Where(n => n.NoiDungBaiHocId == noidungCanXoa.Id)
+                .ToListAsync(cancellationToken);
+            foreach (var tailieucanxoa in tailieucanxoas)
+            {
+                DeleteFile(tailieucanxoa.urlFile);
+            }
+            _context.TaiLieuHocTaps.RemoveRange(tailieucanxoas);
+        }
+        _context.NoiDungBaiHocs.RemoveRange(noiDungCanXoas);
         // 3. Thêm/Cập nhật NộiDungBaiHoc
         if (chuongTrinhDto.NoiDungBaiHocs != null)
         {
@@ -195,6 +196,7 @@ public class UpdateChuongTrinhCommandHandler : IRequestHandler<UpdateChuongTrinh
         // Cập nhật thông tin ChuongTrinh
         chuongTrinh.TieuDe = chuongTrinhDto.TieuDe;
         chuongTrinh.MoTa = chuongTrinhDto.MoTa;
+        chuongTrinh.TrangThai = chuongTrinhDto.TrangThai;
         _context.ChuongTrinhs.Update(chuongTrinh);
         await _context.SaveChangesAsync(cancellationToken);
         return new Output

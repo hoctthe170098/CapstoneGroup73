@@ -1,6 +1,6 @@
 <div class="hoc-sinh-wrapper">
     <!-- Tiêu đề -->
-    <h2 class="page-title">DANH SÁCH GIÁO VIÊN</h2>
+    <h2 class="page-title">DANH SÁCH NHÂN vIÊN</h2>
     <div class="filter-row">
       <select class="form-control dropdown-filter" [(ngModel)]="trangThai">
         <option value="">Trạng thái</option>
@@ -15,14 +15,7 @@
   
   
       <div class="btn-group-right">
-  
-        
-  
-  
-        
-  
-  
-        <button class="btn add-student-btn" (click)="openAddStudentModal()">+ Thêm Học Viên</button>
+  <button class="btn add-student-btn" (click)="openAddStudentModal()">+ Thêm Nhân Viên</button>
       </div>
     </div>
   
@@ -34,7 +27,7 @@
       <!-- Khung trắng pop-up -->
       <div class="modal-content">
         <div class="modal-header">
-          <h2>THÊM HỌC VIÊN MỚI</h2>
+          <h2>THÊM NHÂN VIÊN MỚI</h2>
           <button class="close-btn" (click)="closeModal()">✕</button>
         </div>
   
@@ -42,13 +35,18 @@
           <form>
             <div class="form-group">
               <label>Code</label>
-              <input type="text" class="form-control" placeholder="Code">
-            </div>
+              <input type="text" class="form-control"
+                     [(ngModel)]="newStudent.code"
+                     name="code"
+                     required
+                     (input)="forceNVPrefix()"
+                     autocomplete="off"/>
+          </div>
   
             <div class="form-row">
               <div class="form-group">
                 <label>Họ và Tên</label>
-                <input type="text" class="form-control" placeholder="Nhập tên" />
+                <input type="text" class="form-control" [(ngModel)]="newStudent.ten" name="ten" required />
               </div>
               <div class="form-group">
                 <label>Giới Tính</label>
@@ -60,41 +58,85 @@
               <div class="form-group">
                 <label>Ngày Sinh</label>
                 <div class="input-group">
-                  <input type="date" class="form-control" />
+                  <input 
+                    type="date" 
+                    class="form-control" 
+                    [(ngModel)]="newStudent.ngaySinh" 
+                    name="ngaySinh" 
+                    required 
+                    (change)="checkAge(newStudent.ngaySinh)"
+                    #dobInput="ngModel"
+                    [ngClass]="{'is-invalid': (isUnderage || dobInput.invalid) && (dobInput.dirty || dobInput.touched)}"
+                  />
                   <div class="input-group-append">
                     <span class="input-group-text">
                       <i class="fa fa-calendar"></i>
                     </span>
                   </div>
                 </div>
+              
+                <!-- Hiển thị lỗi nếu chưa đủ 18 tuổi -->
+                <small *ngIf="isUnderage && (dobInput.dirty || dobInput.touched)" class="text-danger">
+                  <i class="ft-alert-circle align-middle"></i>
+                  Nhân viên phải đủ ít nhất 18 tuổi.
+                </small>
               </div>
             </div>
   
             <div class="form-row">
               <div class="form-group">
                 <label>Email</label>
-                <input type="email" class="form-control" placeholder="Nhập email" />
+                <input 
+                  type="email" 
+                  class="form-control" 
+                  [(ngModel)]="newStudent.email" 
+                  name="email" 
+                  required 
+                  #emailInput="ngModel"
+                  pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                  [ngClass]="{'is-invalid': emailInput.invalid && (emailInput.dirty || emailInput.touched)}"
+                />
+                
+                <!-- Hiển thị lỗi nếu email không hợp lệ -->
+                <small *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)" class="text-danger">
+                  <i class="ft-alert-circle align-middle"></i>
+                  <span *ngIf="emailInput.errors?.required">Vui lòng nhập email!</span>
+                  <span *ngIf="emailInput.errors?.pattern">Email không hợp lệ! Định dạng đúng: example@domain.com</span>
+                </small>
               </div>
               <div class="form-group">
                 <label>Số Điện Thoại</label>
-                <input type="tel" class="form-control" placeholder="Nhập số điện thoại" />
+                <input 
+                  type="tel" 
+                  class="form-control" 
+                  [(ngModel)]="newStudent.soDienThoai" 
+                  name="soDienThoai" 
+                  required
+                  #phoneInput="ngModel"
+                  pattern="0[0-9]{9}"
+                  [ngClass]="{'is-invalid': phoneInput.invalid && (phoneInput.dirty || phoneInput.touched)}"
+                />
+              
+                <!-- Hiển thị lỗi nếu số điện thoại không hợp lệ -->
+                <small *ngIf="phoneInput.invalid && (phoneInput.dirty || phoneInput.touched)" class="text-danger">
+                  <i class="ft-alert-circle align-middle"></i>
+                  <span *ngIf="phoneInput.errors?.required">Vui lòng nhập số điện thoại!</span>
+                  <span *ngIf="phoneInput.errors?.pattern">Số điện thoại không hợp lệ! Định dạng: 0xxxxxxxxx (10 số)</span>
+                </small>
               </div>
             </div>
   
             <div class="form-row">
+              
               <div class="form-group">
-                <label>Trường</label>
-                <input type="text" class="form-control" placeholder="Nhập trường" />
-              </div>
-              <div class="form-group">
-                <label>Cơ sở</label>
-                <select class="form-control" [(ngModel)]="editStudent.coSoId" name="edit_coSoId">
-                  <option value="">-- Chọn Cơ Sở --</option>
-                  <option *ngFor="let cs of cosoList" [value]="cs.id">
-                    {{ cs.ten }}
-                  </option>
-                </select>
-              </div>
+  <label>Cơ sở</label>
+  <select class="form-control" [(ngModel)]="newStudent.coSoId" name="coSoId">
+    <option value="">-- Chọn Cơ Sở --</option>
+    <option *ngFor="let cs of cosoList" [value]="cs.id">
+      {{ cs.ten }}
+    </option>
+  </select>
+</div>
             </div>
   
             <div class="form-row">
@@ -110,11 +152,13 @@
               </div>
               <div class="form-group">
                 <label>Quận/Huyện</label>
-                <select class="form-control" [(ngModel)]="newStudent.district" name="district">
-                  <option value="">-- Chọn Quận/Huyện --</option>
-                  <option *ngFor="let district of districts" [value]="district.code">
-                    {{ district.name }}
-                  </option>
+                <select class="form-control" [(ngModel)]="newStudent.district" name="district"
+        (change)="onDistrictChange($event.target.value)">
+    <option value="">-- Chọn Quận/Huyện --</option>
+    <option *ngFor="let district of districts" [value]="district.code">
+        {{ district.name }}
+    </option>
+
                 </select>
               </div>
               <div class="form-group">
@@ -125,7 +169,7 @@
   
             <div class="modal-footer">
               <button type="button" class="btn cancel-btn" (click)="closeModal()">Hủy</button>
-              <button type="submit" class="btn save-btn">Thêm</button>
+              <button type="button" class="btn save-btn" (click)="submitNewStudent()">Thêm</button>
             </div>
           </form>
         </div>
@@ -138,7 +182,7 @@
       <div class="modal-overlay" (click)="closeEditModal()"></div>
       <div class="modal-content">
         <div class="modal-header">
-          <h2>CHỈNH SỬA GIÁO VIÊN</h2>
+          <h2>CHỈNH SỬA NHÂN VIÊN</h2>
           <button class="close-btn" (click)="closeEditModal()">✕</button>
         </div>
         <div class="modal-body">
@@ -184,10 +228,7 @@
             </div>
             <!-- Row 4: Trường, Cơ Sở -->
             <div class="form-row">
-              <div class="form-group">
-                <label>Trường</label>
-                <input type="text" class="form-control" [(ngModel)]="editStudent.truongDangDay" name="edit_truongDangDay">
-              </div>
+              
               <div class="form-group">
                 <label>Cơ sở</label>
                 <select class="form-control" [(ngModel)]="editStudent.coSoId" name="edit_coSoId">
@@ -214,12 +255,14 @@
               </div>
               <div class="form-group">
                 <label>Quận/Huyện</label>
-                <select class="form-control" [(ngModel)]="editStudent.district" name="edit_district">
-                  <option value="">-- Chọn Quận/Huyện --</option>
-                  <option *ngFor="let d of editDistricts" [value]="d.code">
-                    {{ d.name }}
-                  </option>
-                </select>
+                <select class="form-control" [(ngModel)]="editStudent.district" name="edit_district"
+        (change)="onDistrictChangeForEdit($event.target.value)"> 
+            <option value="">-- Chọn Quận/Huyện --</option>
+            <option *ngFor="let d of editDistricts" [value]="d.code">
+                {{ d.name }}
+            </option>
+        </select>
+        
               </div>
               <div class="form-group">
                 <label>Địa chỉ cụ thể</label>
@@ -326,9 +369,10 @@
                   <!-- Row 3: Trường Đang Học, Cơ Sở, Chính Sách Học Phí -->
                   <div class="row mt-3">
                     
+                    
                     <div class="col-md-4 detail-item">
                       <label>Cơ Sở</label>
-                      <div class="detail-box">{{ hs.coso.ten }}</div>
+                      <div class="detail-box">{{ hs.tenCoSo }}</div>
                     </div>
   
                   </div>
@@ -344,7 +388,7 @@
     </div>
   
     <!-- Phân trang -->
-    <div class="pagination-container">
+    <!-- <div class="pagination-container">
       <ul class="pagination">
         <li class="page-item" [class.active]="currentPage === 1">
           <a class="page-link" (click)="goToPage(1)">1</a>
@@ -353,4 +397,4 @@
           <a class="page-link" (click)="goToPage(2)">2</a>
         </li>
       </ul>
-    </div>
+    </div> -->
