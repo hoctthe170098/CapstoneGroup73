@@ -83,6 +83,7 @@ public class GetGiaoViensWithPaginationQueryHandler
                 }
                 query = query.Where(gv => gv.UserId != null && filteredUserIds.Contains(gv.UserId!));
             }
+
             // Sorting
             query = request.SortBy switch
             {
