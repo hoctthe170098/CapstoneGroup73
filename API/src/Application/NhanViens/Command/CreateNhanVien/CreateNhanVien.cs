@@ -109,7 +109,7 @@ public class CreateNhanVienCommandHandler : IRequestHandler<CreateNhanVienComman
         var codeExists = await _context.NhanViens.AnyAsync(nv => nv.Code.Substring(2) == request.Code, cancellationToken);
         if (codeExists)
         {
-            throw new WrongInputException($"Mã nhân viên '{request.Code}' đã tồn tại!");
+            throw new Exception($"Mã nhân viên '{request.Code}' đã tồn tại!");
         }
         // Create identity user
         var (result, userId) = await _identityService.GenerateUser(request.Ten, request.Code, request.Email);

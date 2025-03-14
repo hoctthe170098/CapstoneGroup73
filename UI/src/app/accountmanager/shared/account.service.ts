@@ -40,12 +40,15 @@ export class AccountmanagerService {
 
     return this.http.post<any>(`${this.baseUrl}/createnhanvien`, nhanVienData, { headers });
   }
-  getDanhSachCoSo(pageNumber: number = 1, pageSize: number = 100, search: string = ''): Observable<any> {
-    const token = localStorage.getItem('token'); // Lấy token từ localStorage
+  getDanhSachCoSo(): Observable<any> {
+    const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    const body = { pageNumber, pageSize, search };
 
-    return this.http.post<any>(`${this.cosoUrl}/getcososwithpagination`, body, { headers });
+    // Tạo URL với query parameters
+    const url = `${this.cosoUrl}/getallcosos`;
+
+    // Gửi yêu cầu GET với headers và query parameters
+    return this.http.get<any>(url, { headers: headers });
 }
 updateNhanVien(nhanVienData: any): Observable<any> {
   const token = localStorage.getItem('token');

@@ -34,6 +34,8 @@ public class CreateCoSoComandHandler : IRequestHandler<CreateCoSoComand, Output>
         {
             throw new FormatException("Số điện thoại nhập không hợp lệ");
         }
+        var check = await _context.CoSos.AnyAsync(c => c.Ten.Equals(request.Ten));
+        if (check) throw new Exception("Tên cơ sở đã tồn tại");
         var coso = new CoSo
         {
             Id = new Guid(),

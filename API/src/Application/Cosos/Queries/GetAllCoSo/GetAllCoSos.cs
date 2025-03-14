@@ -30,6 +30,7 @@ public class GetAllCoSosQueryHandler : IRequestHandler<GetAllCoSosQuery, Output>
             isError = false,
             code=200,
             data = await _context.CoSos
+            .Where(c=>c.TrangThai=="open")
                 .ProjectTo<GetAllCoSoDto>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken),
             message = "Lấy danh sách cơ sở thành công"
