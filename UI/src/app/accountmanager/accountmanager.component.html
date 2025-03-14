@@ -35,8 +35,13 @@
           <form>
             <div class="form-group">
               <label>Code</label>
-              <input type="text" class="form-control" [(ngModel)]="newStudent.code" name="code" required />
-            </div>
+              <input type="text" class="form-control"
+                     [(ngModel)]="newStudent.code"
+                     name="code"
+                     required
+                     (input)="forceNVPrefix()"
+                     autocomplete="off"/>
+          </div>
   
             <div class="form-row">
               <div class="form-group">
@@ -53,24 +58,71 @@
               <div class="form-group">
                 <label>Ngày Sinh</label>
                 <div class="input-group">
-                    <input type="date" class="form-control" [(ngModel)]="newStudent.ngaySinh" name="ngaySinh" required />
+                  <input 
+                    type="date" 
+                    class="form-control" 
+                    [(ngModel)]="newStudent.ngaySinh" 
+                    name="ngaySinh" 
+                    required 
+                    (change)="checkAge(newStudent.ngaySinh)"
+                    #dobInput="ngModel"
+                    [ngClass]="{'is-invalid': (isUnderage || dobInput.invalid) && (dobInput.dirty || dobInput.touched)}"
+                  />
                   <div class="input-group-append">
                     <span class="input-group-text">
                       <i class="fa fa-calendar"></i>
                     </span>
                   </div>
                 </div>
+              
+                <!-- Hiển thị lỗi nếu chưa đủ 18 tuổi -->
+                <small *ngIf="isUnderage && (dobInput.dirty || dobInput.touched)" class="text-danger">
+                  <i class="ft-alert-circle align-middle"></i>
+                  Nhân viên phải đủ ít nhất 18 tuổi.
+                </small>
               </div>
             </div>
   
             <div class="form-row">
               <div class="form-group">
                 <label>Email</label>
-                <input type="email" class="form-control" [(ngModel)]="newStudent.email" name="email" required />
+                <input 
+                  type="email" 
+                  class="form-control" 
+                  [(ngModel)]="newStudent.email" 
+                  name="email" 
+                  required 
+                  #emailInput="ngModel"
+                  pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                  [ngClass]="{'is-invalid': emailInput.invalid && (emailInput.dirty || emailInput.touched)}"
+                />
+                
+                <!-- Hiển thị lỗi nếu email không hợp lệ -->
+                <small *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)" class="text-danger">
+                  <i class="ft-alert-circle align-middle"></i>
+                  <span *ngIf="emailInput.errors?.required">Vui lòng nhập email!</span>
+                  <span *ngIf="emailInput.errors?.pattern">Email không hợp lệ! Định dạng đúng: example@domain.com</span>
+                </small>
               </div>
               <div class="form-group">
                 <label>Số Điện Thoại</label>
-                <input type="tel" class="form-control" [(ngModel)]="newStudent.soDienThoai" name="soDienThoai" required />
+                <input 
+                  type="tel" 
+                  class="form-control" 
+                  [(ngModel)]="newStudent.soDienThoai" 
+                  name="soDienThoai" 
+                  required
+                  #phoneInput="ngModel"
+                  pattern="0[0-9]{9}"
+                  [ngClass]="{'is-invalid': phoneInput.invalid && (phoneInput.dirty || phoneInput.touched)}"
+                />
+              
+                <!-- Hiển thị lỗi nếu số điện thoại không hợp lệ -->
+                <small *ngIf="phoneInput.invalid && (phoneInput.dirty || phoneInput.touched)" class="text-danger">
+                  <i class="ft-alert-circle align-middle"></i>
+                  <span *ngIf="phoneInput.errors?.required">Vui lòng nhập số điện thoại!</span>
+                  <span *ngIf="phoneInput.errors?.pattern">Số điện thoại không hợp lệ! Định dạng: 0xxxxxxxxx (10 số)</span>
+                </small>
               </div>
             </div>
   

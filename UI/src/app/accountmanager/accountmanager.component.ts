@@ -69,6 +69,7 @@ export class AccountmanagerComponent implements OnInit {
     );
   }
   
+  
 
   // Tải danh sách cơ sở
   loadDanhSachCoSo() {
@@ -95,15 +96,12 @@ export class AccountmanagerComponent implements OnInit {
   closeModal() { this.isModalOpen = false; }
 
   submitNewStudent() {
-    if (!this.newStudent.code.startsWith("NV")) {
-      this.newStudent.code = "NV" + this.newStudent.code;
-  }
+    
     const provinceName = this.getProvinceName();
     const districtName = this.getDistrictName();
 
-    console.log("📌 Province Name:", provinceName);
-    console.log("📌 District Name:", districtName);
-    console.log("📌 Selected District:", this.selectedDistrict);
+    // Đảm bảo mã nhân viên luôn có tiền tố "NV"
+    
 
     const fullAddress = `${this.newStudent.diaChi}, ${districtName}, ${provinceName}`;
 
@@ -133,6 +131,31 @@ export class AccountmanagerComponent implements OnInit {
         }
     );
 }
+isUnderage: boolean = false;
+validateEmail(email: string): boolean {
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return emailPattern.test(email);
+}
+validatePhoneNumber(phone: string): boolean {
+  const phonePattern = /^0[0-9]{9}$/; // Bắt đầu bằng số 0 và có tổng cộng 10 chữ số
+  return phonePattern.test(phone);
+}
+checkAge(ngaySinh: string) {
+  if (!ngaySinh) {
+    this.isUnderage = false;
+    return;
+  }
+
+  const birthDate = new Date(ngaySinh);
+  const today = new Date();
+  const age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  const dayDiff = today.getDate() - birthDate.getDate();
+
+  // Kiểm tra nếu chưa đủ 18 tuổi
+  this.isUnderage = (age < 18 || (age === 18 && (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0))));
+}
+
 
   
 getProvinceName(): string {
@@ -146,6 +169,14 @@ getProvinceName(): string {
 getDistrictName(): string {
   return this.selectedDistrict ? this.selectedDistrict.name : "Không xác định";
 }
+forceNVPrefix() {
+  if (!this.newStudent.code.startsWith("NV-")) {
+      this.newStudent.code = "NV-" + this.newStudent.code.replace(/^NV-/, ""); 
+  }
+}
+
+
+
 
 
 
@@ -229,6 +260,7 @@ onEditStudentClick(index: number) {
   closeEditModal() { this.isEditModalOpen = false; }
 
   submitEditStudent() {
+    
     const provinceName = this.getProvinceName();
     const districtName = this.getDistrictName();
 
