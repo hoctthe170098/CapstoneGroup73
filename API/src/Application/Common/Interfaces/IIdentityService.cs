@@ -20,4 +20,5 @@ public interface IIdentityService
     Task<bool> AssignRoleAsync(string userId, string role);
     Guid GetCampusId(string token);
     Task<Result> disableUser(string userId);
+    Task<Result> changeEmail(string userId,string email);
 }

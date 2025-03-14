@@ -112,6 +112,10 @@ public class EditNhanVienCommandHandler : IRequestHandler<EditNhanVienCommand, O
             nhanVien.CoSoId = coSoId;
             await _identityService.AssignRoleAsync(nhanVien.UserId, request.Role);
         }
+        if (nhanVien.UserId != null)
+        {
+            await _identityService.changeEmail(nhanVien.UserId,request.Email);
+        }
         if (nhanVien.UserId != null && request.Status.ToLower() == "false")
         {
             await _identityService.disableUser(nhanVien.UserId);
