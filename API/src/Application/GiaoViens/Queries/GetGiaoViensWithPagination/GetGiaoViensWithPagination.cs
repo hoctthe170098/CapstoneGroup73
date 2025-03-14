@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using StudyFlow.Application.Common.Exceptions;
 using StudyFlow.Application.Common.Interfaces;
 using StudyFlow.Application.Common.Mappings;
@@ -26,12 +27,14 @@ public class GetGiaoViensWithPaginationQueryHandler
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
     private readonly IIdentityService _identityService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public GetGiaoViensWithPaginationQueryHandler(IApplicationDbContext context, IMapper mapper, IIdentityService identityService)
+    public GetGiaoViensWithPaginationQueryHandler(IApplicationDbContext context, IMapper mapper, IIdentityService identityService, IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
         _mapper = mapper;
         _identityService = identityService;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<Output> Handle(GetGiaoViensWithPaginationQuery request, CancellationToken cancellationToken)
@@ -39,9 +42,17 @@ public class GetGiaoViensWithPaginationQueryHandler
         try
         {
             if (request.PageNumber < 1 || request.PageSize < 1) throw new WrongInputException();
+
+            // Lấy token từ request header
+            var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            if (string.IsNullOrEmpty(token))
+                throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+            var coSoId = _identityService.GetCampusId(token);
+
             var query = _context.GiaoViens
                 .Include(nv => nv.Coso)
                 .Include(nv => nv.LicHocs)
+                .Where(gv => gv.CoSoId == coSoId)
                 .AsQueryable();
 
             // Search by "Ten"
