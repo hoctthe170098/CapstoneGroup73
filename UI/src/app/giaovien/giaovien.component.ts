@@ -108,7 +108,7 @@ export class GiaovienComponent implements OnInit {
     }
   
     submitNewStudent() {
-      console.log('Thêm học viên mới:', this.newStudent);
+      console.log('Thêm giáo viên mới:', this.newStudent);
       const newHs: Giaovien & { showDetails: boolean } = {
         code: this.newStudent.code,
         ten: this.newStudent.ten,
