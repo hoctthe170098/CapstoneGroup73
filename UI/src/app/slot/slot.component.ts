@@ -12,7 +12,6 @@ export class SlotComponent implements OnInit {
   
   rooms: Slot[] = [];
 
- 
   roomName: string = '';
 
   
@@ -108,7 +107,7 @@ export class SlotComponent implements OnInit {
           
           this.roomName = '';
           this.isSubmittedAdd = false;
-
+          this.loadRooms();
           this.toastr.success('Tạo phòng thành công!');
         } else {
           this.toastr.error(res.message || 'Không thể tạo phòng.');
@@ -154,7 +153,7 @@ export class SlotComponent implements OnInit {
     if (!confirmResult) {
       this.isEditModalOpen = false;
       return;
-    }
+    }else this.isEditModalOpen = false;
 
     const apiStatus = (this.editRoomStatus === 'Mở') ? 'use' : 'nonuse';
     const data: Slot = {
@@ -184,6 +183,7 @@ export class SlotComponent implements OnInit {
       }
     });
   }
+
   editRoom(roomId: number): void {
     this.openEditRoomModal(roomId);
   }

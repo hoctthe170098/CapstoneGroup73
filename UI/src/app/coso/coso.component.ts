@@ -50,7 +50,6 @@ export class CosoComponent implements OnInit {
     ngOnInit(): void {
         this.loadDanhSachCoSo();
     }
-
     loadDanhSachCoSo() {
         this.coSoService.getDanhSachCoSo(this.currentPage, this.itemsPerPage, this.searchText)
             .subscribe(
@@ -93,9 +92,7 @@ export class CosoComponent implements OnInit {
             this.addCampusForm.markAllAsTouched();  // Đánh dấu tất cả field để hiển thị lỗi
             return;
         }
-
         const newCampus = this.addCampusForm.value;
-
         this.coSoService.createCoSo(newCampus).subscribe({
             next: (res) => {
                 if (!res.isError) {
@@ -135,10 +132,8 @@ export class CosoComponent implements OnInit {
             });
         }
     }
-
     updateDefaultCampus(campus: CoSo, isChecked: boolean) {
         campus.default = isChecked;
-
         if (isChecked) {
             this.campuses.forEach(c => {
                 if (c.id !== campus.id) {
@@ -150,7 +145,6 @@ export class CosoComponent implements OnInit {
             this.loadDanhSachCoSo();
         });
     }
-
     closeModal() { this.isModalOpen = false; }
     closeEditModal() { this.isEditModalOpen = false; }
     changePage(page: number) { this.currentPage = page; this.loadDanhSachCoSo(); }

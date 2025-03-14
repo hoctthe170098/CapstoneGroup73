@@ -277,8 +277,8 @@ onEditStudentClick(index: number) {
         email: this.editStudent.email,
         soDienThoai: this.editStudent.soDienThoai,
         coSoId: this.editStudent.coSoId || null, 
-        userId: this.editStudent.userId || null,
-        role: "CampusManager"
+        role: "CampusManager",
+        status:"true"
     };
 
     console.log("📌 Dữ liệu gửi lên API khi sửa:", updatedHs);
