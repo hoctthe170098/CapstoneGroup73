@@ -34,6 +34,7 @@ export class CoSoService {
         return this.http.put(`${this.baseUrl}/editcoso`, data,{headers});
     }
     getProvinces(): Observable<any> {
-        return this.http.get<any>(this.provinceApiUrl);
-      }
+        return this.http.get<any>('https://provinces.open-api.vn/api/?depth=2');
+    }
+    
 }

@@ -4,5 +4,7 @@ export class CoSo {
     diaChi: string = '';
     soDienThoai: string = '';
     trangThai: string = '';      
-    default: boolean = false;    
+    default: boolean = false;   
+    province?: string;  // Mã hoặc tên tỉnh/thành
+    district?: string;  // Mã hoặc tên quận/huyện
 }
