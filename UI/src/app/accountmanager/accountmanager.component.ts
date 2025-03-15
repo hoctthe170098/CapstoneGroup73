@@ -18,19 +18,21 @@ export class AccountmanagerComponent implements OnInit {
   students: any[] = [];
 
   currentPage: number = 1;
-  totalPages: number = 2;
+  totalPages: number = 1;
+  totalItems: number = 0; // Tổng số bản ghi
+  pageSize: number = 8;
 
   isModalOpen: boolean = false;
   isEditModalOpen: boolean = false;
 
   newStudent: any = {
     code: '', ten: '', gioiTinh: '', ngaySinh: '', email: '',
-    soDienThoai: '', coSoId: '', province: '', district: '', diaChi: '',role:''
+    soDienThoai: '', coSoId: '', province: '', district: '', diaChi: '',role:'',status: 'true'
   };
 
   editStudent: any = {
     code: '', ten: '', gioiTinh: '', ngaySinh: '', email: '',
-    soDienThoai: '', coSoId: '', province: '', district: '', diaChi: '',role:''
+    soDienThoai: '', coSoId: '', province: '', district: '', diaChi: '',role:'',status: ''
   };
 
   provinces: any[] = [];
@@ -38,6 +40,9 @@ export class AccountmanagerComponent implements OnInit {
   editDistricts: any[] = [];
   isUnderage: boolean = false;
   isCodeEmpty: boolean = false;
+  isRoleInvalid: boolean = false;
+  isCoSoInvalid: boolean = false;
+
   constructor(private accountmanagerService: AccountmanagerService, private cd: ChangeDetectorRef,private toastr: ToastrService) {}
 
 
@@ -55,20 +60,56 @@ export class AccountmanagerComponent implements OnInit {
   
   // Tải danh sách nhân viên
   loadDanhSachNhanVien() {
-    this.accountmanagerService.getDanhSachNhanVien(1, 100, '').subscribe(
-      response => {
-        console.log('Dữ liệu nhân viên từ API:', response);
-        if (response && response.data) {
-          this.students = response.data.items.map(student => ({
+    // Chuyển dropdown "trangThai" sang giá trị isActive (true, false, hoặc null nếu không chọn)
+    let isActiveFilter: boolean | null = null;
+    if (this.trangThai === 'Hoạt động') {
+      isActiveFilter = true;
+    } else if (this.trangThai === 'Tạm ngừng') {
+      isActiveFilter = false;
+    }
+  
+    console.log(`🔎 Filter trạng thái: ${this.trangThai}, isActive =`, isActiveFilter);
+  
+    // Gọi API với payload bao gồm isActive
+    this.accountmanagerService.getDanhSachNhanVien(
+      this.currentPage,  // trang hiện tại
+      this.pageSize,     // số bản ghi mỗi trang
+      this.searchTerm,   // từ khóa tìm kiếm
+      '',                // sortBy (nếu cần)
+      isActiveFilter     // filter trạng thái theo isActive (boolean)
+    ).subscribe(
+      (response: any) => {
+        if (!response.isError && response.data) {
+          console.log('Dữ liệu nhân viên từ API:', response);
+          // Map dữ liệu từ API, sử dụng trường isActive của API và tạo thuộc tính hiển thị trạng thái
+          this.students = response.data.items.map((student: any) => ({
             ...student,
-             // Hiển thị luôn khi load trang
+            showDetails: false,
+            isActive: student.isActive, // sử dụng isActive từ API (boolean)
+            displayStatus: student.isActive ? 'Hoạt động' : 'Tạm ngừng'
           }));
-          this.cd.detectChanges();  // Buộc Angular cập nhật UI ngay
+  
+          this.totalItems = response.data.totalCount || 0;
+          this.totalPages = Math.ceil(this.totalItems / this.pageSize);
+        } else {
+          console.error("Lỗi khi tải danh sách nhân viên", response?.message || 'Không có response.message');
         }
+        this.cd.detectChanges();
       },
-      error => console.error('Lỗi tải danh sách nhân viên:', error)
+      error => {
+        console.error("Lỗi kết nối API", error);
+      }
     );
   }
+  
+    /** 🟢 Chuyển trang */
+    changePage(page: number) {
+      if (page >= 1 && page <= this.totalPages) {
+        this.currentPage = page;
+        this.loadDanhSachNhanVien();
+      }
+    }
+  
   
   
 
@@ -118,6 +159,7 @@ export class AccountmanagerComponent implements OnInit {
       return;
       
     }
+    
     
     
     
@@ -175,6 +217,20 @@ export class AccountmanagerComponent implements OnInit {
           }
         }
     );
+}
+validateCoSo() {
+  if (!this.newStudent.coSoId || this.newStudent.coSoId.trim() === '') {
+    this.isCoSoInvalid = true;
+  } else {
+    this.isCoSoInvalid = false;
+  }
+}
+validateRole() {
+  if (!this.newStudent.role || this.newStudent.role.trim() === '') {
+    this.isRoleInvalid = true;
+  } else {
+    this.isRoleInvalid = false;
+  }
 }
 
 validateEmail(email: string): boolean {
@@ -287,20 +343,24 @@ onEditStudentClick(index: number) {
   this.editStudent = { 
     ...hs, 
     ngaySinh: this.formatDate(hs.ngaySinh),
+    status: hs.isActive ? "true" : "false"
+   
    
 };
+console.log("📌 Trạng thái trước khi sửa:", this.editStudent.status);
 console.log("📌 Vai trò của nhân viên trước khi sửa:", this.editStudent)
 console.log("📌 Vai trò của nhân viên trước khi sửa:", this.editStudent.role)
   // Tìm cosoId từ cosoList dựa trên hs.tenCoSo
   console.log('Dữ liệu nhân viên:', hs);
   console.log('Các key của hs:', Object.keys(hs));
-
-  console.log('Giá trị role nhận từ API:', hs.role);
+ 
+  console.log('Giá trị role nhận từ API:', hs.tenVaiTro);
   const coSo = this.cosoList.find(cs => cs.ten === hs.tenCoSo);
   this.editStudent.coSoId = coSo ? coSo.id : null;
   if (!this.editStudent.gioiTinh) {
     this.editStudent.gioiTinh = "Nam"; 
 }
+
 const validRoles = ["CampusManager", "LearningManager"];
   if (!validRoles.includes(this.editStudent.role)) {
     // Nếu API trả về giá trị không hợp lệ (hoặc rỗng) thì không gán mặc định để tránh ép cứng
@@ -363,6 +423,7 @@ const validRoles = ["CampusManager", "LearningManager"];
    
     return;
   }
+  
     const provinceName = this.selectedProvince ? this.selectedProvince.name : "Không xác định";
     const districtName = this.selectedDistrict ? this.selectedDistrict.name : "Không xác định";
 
@@ -378,7 +439,7 @@ const validRoles = ["CampusManager", "LearningManager"];
         soDienThoai: this.editStudent.soDienThoai,
         coSoId: this.editStudent.coSoId || null, 
         role: this.editStudent.tenVaiTro,
-        status: "true"
+        trangThai: this.editStudent.status 
     };
 
     console.log("📌 Dữ liệu cập nhật gửi API:", updatedHs);
@@ -400,9 +461,16 @@ const validRoles = ["CampusManager", "LearningManager"];
     );
 }
 
+searchNhanVien() {
+  this.currentPage = 1;
+  this.loadDanhSachNhanVien();
+}
 
 
-
+filterByStatus() {
+  this.currentPage = 1;
+  this.loadDanhSachNhanVien();
+}
 
 
 onProvinceChangeForEdit(provinceCode: string) {
