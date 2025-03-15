@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CoSo } from './shared/coso.model';
 import { CoSoService } from './shared/coso.service';
-import { ChangeDetectorRef } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+
 @Component({
     selector: 'app-coso',
     templateUrl: './coso.component.html',
@@ -23,6 +23,10 @@ export class CosoComponent implements OnInit {
     addCampusForm: FormGroup;
     editCampusForm: FormGroup;
 
+    provinces: any[] = [];  // Danh sách tỉnh/thành phố
+    districts: any[] = [];  // Danh sách quận/huyện khi chọn tỉnh
+    editDistricts: any[] = [];  // Danh sách quận/huyện khi chỉnh sửa cơ sở
+
     constructor(
         private fb: FormBuilder,
         private coSoService: CoSoService,
@@ -35,118 +39,224 @@ export class CosoComponent implements OnInit {
             soDienThoai: ['', [
                 Validators.required,
                 Validators.maxLength(11),
-                Validators.pattern(/^0\d{9,10}$/)  // Bắt đầu bằng 0 và đủ độ dài 10-11 số
-            ]]
+                Validators.pattern(/^0\d{9,10}$/)
+            ]],
+            province: ['', Validators.required],
+            district: ['', Validators.required]
         });
 
         this.editCampusForm = this.fb.group({
-            ten: ['', Validators.required],
-            diaChi: ['', Validators.required],
+            ten: ['', [Validators.required, Validators.maxLength(30)]],
+            diaChi: ['', [Validators.required, Validators.maxLength(50)]],
             soDienThoai: ['', [Validators.required, Validators.pattern(/^\d{10,11}$/)]],
-            isActive: [false]  // dùng để bind với toggle switch
+            province: ['', Validators.required],
+            district: ['', Validators.required],
+            isActive: [false]
         });
     }
 
     ngOnInit(): void {
         this.loadDanhSachCoSo();
+        this.loadProvinces();
     }
+
+    getProvinceName(provinceCode: string): string {
+        const province = this.provinces.find(p => p.code == provinceCode);
+        return province ? province.name : '';
+    }
+
+    getDistrictName(districtCode: string): string {
+        const district = this.districts.find(d => d.code == districtCode);
+        return district ? district.name : '';
+    }
+    extractAddressParts(diaChi: string): { province: string, district: string, detail: string } {
+        const parts = diaChi.split(', ').map(part => part.trim());
+        return {
+            province: parts[0] || '',
+            district: parts[1] || '',
+            detail: parts.slice(2).join(', ') || ''
+        };
+    }
+    
+    // Lấy danh sách cơ sở từ server
     loadDanhSachCoSo() {
         this.coSoService.getDanhSachCoSo(this.currentPage, this.itemsPerPage, this.searchText)
             .subscribe(
                 (res: any) => {
                     if (!res.isError) {
-                        console.log('Dữ liệu nhận từ BE:', res.data.items);
                         this.campuses = res.data.items;
                         this.totalItems = res.data.totalCount;
                         this.cdr.detectChanges();
                     } else {
-                        this.toastr.error(res.message)
+                        this.toastr.error(res.message);
                     }
                 }, err => {
                     this.toastr.error('Có lỗi xảy ra, vui lòng thử lại!');
                 });
     }
 
+    // Lấy danh sách tỉnh/thành phố
+    loadProvinces() {
+        this.coSoService.getProvinces().subscribe(
+            data => {
+                console.log("Dữ liệu tỉnh/thành phố từ API:", data); // Debug xem API có trả về dữ liệu không
+                this.provinces = data;
+            },
+            error => {
+                console.error('Lỗi tải tỉnh/thành phố:', error);
+            }
+        );
+    }
+    
+
+    // Khi chọn tỉnh/thành phố -> cập nhật quận/huyện
+    onProvinceChange(provinceCode: string) {
+        console.log("Giá trị tỉnh/thành phố được chọn:", provinceCode); // Kiểm tra giá trị từ select dropdown
+    
+        const selectedProvince = this.provinces.find(p => p.code == provinceCode); // Kiểm tra kiểu dữ liệu
+    
+        if (selectedProvince) {
+            console.log("Tỉnh đã chọn:", selectedProvince);
+            console.log("Danh sách quận/huyện:", selectedProvince.districts);
+            this.districts = selectedProvince.districts;
+        } else {
+            console.warn("Không tìm thấy tỉnh/thành phố trong danh sách!");
+            this.districts = [];
+        }
+    
+        this.addCampusForm.patchValue({ district: '' }); // Reset quận/huyện khi đổi tỉnh
+    }
+    
+    
+
+    // Khi chọn tỉnh/thành phố trong modal chỉnh sửa -> cập nhật quận/huyện
+    onProvinceChangeForEdit(provinceCode: string) {
+        console.log("Giá trị tỉnh/thành phố được chọn trong Edit:", provinceCode);
+    
+        const selectedProvince = this.provinces.find(p => String(p.code) === String(provinceCode));
+    
+        if (selectedProvince) {
+            console.log("Tỉnh đã chọn trong Edit:", selectedProvince);
+            console.log("Danh sách quận/huyện trong Edit:", selectedProvince.districts);
+            this.editDistricts = selectedProvince.districts;
+        } else {
+            console.warn("Không tìm thấy tỉnh/thành phố trong danh sách Edit!");
+            this.editDistricts = [];
+        }
+    
+        this.editCampusForm.patchValue({ district: '' }); // Reset dropdown quận/huyện
+    }
+    
+
+    // Mở modal thêm cơ sở
     openAddCampusModal() {
         this.addCampusForm.reset();
         this.isModalOpen = true;
         this.addCampusForm.markAllAsTouched();
     }
+
+    // Mở modal chỉnh sửa cơ sở
     openEditCampusModal(campus: CoSo) {
         this.selectedCampus = { ...campus };
+        const isActive = campus.trangThai === 'open';
 
-        const isActive = campus.trangThai === 'open';  // map trạng thái thành boolean
+        const addressParts = this.extractAddressParts(campus.diaChi);
+        const province = this.provinces.find(p => p.name === addressParts.province);
+        const provinceCode = province ? province.code : '';
+
+        this.onProvinceChangeForEdit(provinceCode);
+
+        const district = province?.districts.find(d => d.name === addressParts.district);
+        const districtCode = district ? district.code : '';
 
         this.editCampusForm.patchValue({
             ten: campus.ten,
-            diaChi: campus.diaChi,
+            diaChi: addressParts.detail,
             soDienThoai: campus.soDienThoai,
+            province: provinceCode,
+            district: districtCode,
             isActive: isActive
         });
 
         this.isEditModalOpen = true;
     }
+    
 
+    // Lưu cơ sở mới
     saveCampus() {
         if (this.addCampusForm.invalid) {
-            this.addCampusForm.markAllAsTouched();  // Đánh dấu tất cả field để hiển thị lỗi
+            this.addCampusForm.markAllAsTouched();
             return;
         }
-        const newCampus = this.addCampusForm.value;
+
+        const formData = this.addCampusForm.value;
+        const diaChiFormatted = `${this.getProvinceName(formData.province)}, ${this.getDistrictName(formData.district)}, ${formData.diaChi}`;
+
+        const newCampus: CoSo = {
+            id: '',
+            ten: formData.ten,
+            diaChi: diaChiFormatted,
+            soDienThoai: formData.soDienThoai,
+            province: formData.province,
+            district: formData.district,
+            trangThai: 'open',
+            default: false
+        };
+
         this.coSoService.createCoSo(newCampus).subscribe({
             next: (res) => {
                 if (!res.isError) {
-                    this.toastr.success(res.message)
+                    this.toastr.success(res.message);
                     this.closeModal();
                     this.loadDanhSachCoSo();
-                }else
-                this.toastr.error(res.message)
+                } else {
+                    this.toastr.error(res.message);
+                }
             },
-            error: (err) => {
-                console.error('Lỗi khi tạo cơ sở:', err);
-                this.toastr.error('Có lỗi xảy, vui lòng thử lại!');
+            error: () => {
+                this.toastr.error('Có lỗi xảy ra, vui lòng thử lại!');
             }
         });
     }
+
+    // Cập nhật cơ sở
     updateCampus() {
         if (this.editCampusForm.valid && this.selectedCampus) {
-            const updatedCampus = {
+            const formData = this.editCampusForm.value;
+            const diaChiFormatted = `${this.getProvinceName(formData.province)}, ${this.getDistrictName(formData.district)}, ${formData.diaChi}`;
+
+            const updatedCampus: CoSo = {
                 ...this.selectedCampus,
-                ten: this.editCampusForm.value.ten,
-                diaChi: this.editCampusForm.value.diaChi,
-                soDienThoai: this.editCampusForm.value.soDienThoai,
-                trangThai: this.editCampusForm.value.isActive ? 'open' : 'close'  // map ngược lại khi gửi lên
+                ten: formData.ten,
+                diaChi: diaChiFormatted,
+                soDienThoai: formData.soDienThoai,
+                province: formData.province,
+                district: formData.district,
+                trangThai: formData.isActive ? 'open' : 'close'
             };
+
             this.coSoService.updateCoSo(updatedCampus).subscribe({
                 next: (res) => {
                     if (!res.isError) {
-                        this.toastr.success(res.message)
+                        this.toastr.success(res.message);
                         this.closeEditModal();
                         this.loadDanhSachCoSo();
-                    }else
-                    this.toastr.error(res.message)
+                    } else {
+                        this.toastr.error(res.message);
+                    }
                 },
-                error: (err) => {
-                    this.toastr.error('Có lỗi xảy, vui lòng thử lại!');
+                error: () => {
+                    this.toastr.error('Có lỗi xảy ra, vui lòng thử lại!');
                 }
             });
         }
     }
-    updateDefaultCampus(campus: CoSo, isChecked: boolean) {
-        campus.default = isChecked;
-        if (isChecked) {
-            this.campuses.forEach(c => {
-                if (c.id !== campus.id) {
-                    c.default = false;
-                }
-            });
-        }
-        this.coSoService.updateCoSo(campus).subscribe(() => {
-            this.loadDanhSachCoSo();
-        });
-    }
+
+    // Đóng modal
     closeModal() { this.isModalOpen = false; }
     closeEditModal() { this.isEditModalOpen = false; }
+
+    // Phân trang
     changePage(page: number) { this.currentPage = page; this.loadDanhSachCoSo(); }
     searchCampus() { this.currentPage = 1; this.loadDanhSachCoSo(); }
     get totalPages() { return Math.ceil(this.totalItems / this.itemsPerPage); }
@@ -157,8 +267,4 @@ export class CosoComponent implements OnInit {
         }
         return pages;
     }
-    get f() {
-        return this.addCampusForm.controls;
-    }
-
 }

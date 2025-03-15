@@ -10,7 +10,7 @@ import { CoSo } from './coso.model';
 export class CoSoService {
 
     private baseUrl = `${environment.apiURL}/CoSos`;
-
+    private provinceApiUrl = 'https://provinces.open-api.vn/api/?depth=2';
     constructor(private http: HttpClient) {}
     
     getDanhSachCoSo(pageNumber: number, pageSize: number, search: string): Observable<any> {
@@ -33,4 +33,8 @@ export class CoSoService {
         const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
         return this.http.put(`${this.baseUrl}/editcoso`, data,{headers});
     }
+    getProvinces(): Observable<any> {
+        return this.http.get<any>('https://provinces.open-api.vn/api/?depth=2');
+    }
+    
 }
