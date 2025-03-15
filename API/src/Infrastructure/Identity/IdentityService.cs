@@ -18,6 +18,7 @@ using Twilio.Types;
 using Twilio.Exceptions;
 using System.Globalization;
 using static System.Net.Mime.MediaTypeNames;
+using StudyFlow.Application.Common.Exceptions;
 
 namespace StudyFlow.Infrastructure.Identity;
 
@@ -383,12 +384,33 @@ public class IdentityService : IIdentityService
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null) return false;
 
-        var validRoles = new List<string> { "Administrator", "Student", "LearningManager", "Teacher", "CampusManager" }; 
+        var validRoles = new List<string> { "Administrator", "Student", "LearningManager", "Teacher", "CampusManager" };
         if (!validRoles.Contains(roleName))
         {
             throw new Exception($"Vai trò '{roleName}' không hợp lệ.");
         }
 
+        // Lấy danh sách vai trò hiện tại của người dùng
+        var currentRoles = await _userManager.GetRolesAsync(user);
+
+        if (currentRoles.Any())
+        {
+            // Người dùng đã có vai trò, cập nhật vai trò
+            var currentRole = currentRoles.First(); // Giả sử chỉ có một vai trò
+            if (currentRole != roleName)
+            {
+                // Xóa vai trò cũ
+                var removeResult = await _userManager.RemoveFromRoleAsync(user, currentRole);
+                if (!removeResult.Succeeded) return false;
+
+                // Thêm vai trò mới
+                var addResult = await _userManager.AddToRoleAsync(user, roleName);
+                return addResult.Succeeded;
+            }
+            return true; // Vai trò không thay đổi
+        }
+
+        // Người dùng chưa có vai trò, thêm vai trò
         var result = await _userManager.AddToRoleAsync(user, roleName);
         return result.Succeeded;
     }
@@ -410,6 +432,9 @@ public class IdentityService : IIdentityService
 
     private static string RemoveDiacritics(string text)
     {
+        if (string.IsNullOrEmpty(text))
+            return text;
+
         var normalizedString = text.Normalize(NormalizationForm.FormD);
         var stringBuilder = new StringBuilder();
 
@@ -418,11 +443,39 @@ public class IdentityService : IIdentityService
             var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
             if (unicodeCategory != UnicodeCategory.NonSpacingMark)
             {
-                stringBuilder.Append(c);
+                // Thay thế ký tự có dấu bằng ký tự không dấu tương ứng
+                stringBuilder.Append(RemoveSpecificDiacritics(c));
             }
         }
 
         return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+    }
+
+    private static char RemoveSpecificDiacritics(char c)
+    {
+        // Bảng thay thế ký tự có dấu bằng ký tự không dấu
+        switch (c)
+        {
+            case 'À': case 'Á': case 'Â': case 'Ã': case 'Ä': case 'Å': return 'A';
+            case 'à': case 'á': case 'â': case 'ã': case 'ä': case 'å': return 'a';
+            case 'Ç': return 'C';
+            case 'ç': return 'c';
+            case 'È': case 'É': case 'Ê': case 'Ë': return 'E';
+            case 'è': case 'é': case 'ê': case 'ë': return 'e';
+            case 'Ì': case 'Í': case 'Î': case 'Ï': return 'I';
+            case 'ì': case 'í': case 'î': case 'ï': return 'i';
+            case 'Ñ': return 'N';
+            case 'ñ': return 'n';
+            case 'Ò': case 'Ó': case 'Ô': case 'Õ': case 'Ö': return 'O';
+            case 'ò': case 'ó': case 'ô': case 'õ': case 'ö': return 'o';
+            case 'Ù': case 'Ú': case 'Û': case 'Ü': return 'U';
+            case 'ù': case 'ú': case 'û': case 'ü': return 'u';
+            case 'Ý': return 'Y';
+            case 'ý': return 'y';
+            case 'Đ': return 'D'; // Thêm xử lý cho 'Đ'
+            case 'đ': return 'd'; // Thêm xử lý cho 'đ'
+            default: return c;
+        }
     }
     private async Task SendAccountInfoEmail(string email, string name, string username, string password)
     {
@@ -512,5 +565,25 @@ public class IdentityService : IIdentityService
             return result.Succeeded ? Result.Success() : Result.Failure(result.Errors.Select(e => e.Description));
         }
         return Result.Success();
+    }
+    public async Task<Result> changeEmail(string userId, string email)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+
+        if (user == null)
+        {
+            throw new NotFoundIDException();
+        }
+        // Kiểm tra xem email mới có hợp lệ không
+        var emailToken = await _userManager.GenerateChangeEmailTokenAsync(user, email);
+        var changeEmailResult = await _userManager.ChangeEmailAsync(user, email, emailToken);
+        if (!changeEmailResult.Succeeded)
+        {
+            return Result.Success();
+        }
+        else
+        {
+            return Result.Failure(changeEmailResult.Errors.Select(e => e.Description));
+        }
     }
 }

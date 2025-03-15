@@ -19,6 +19,7 @@ public class NhanVienDto
     public string? SoDienThoai { get; set; }
     public required string TenCoSo { get; set; }
     public string? TenVaiTro { get; set; }
+    public bool TrangThai { get; set; }
     private class Mapping : Profile
     {
         public Mapping()

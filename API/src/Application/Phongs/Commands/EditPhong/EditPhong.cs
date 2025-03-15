@@ -88,6 +88,5 @@ public class EditPhongCommandHandler : IRequestHandler<EditPhongCommand, Output>
 
         if (request.TrangThai != "use" && request.TrangThai != "nonuse")
             throw new WrongInputException("Trạng thái chỉ được là 'use' hoặc 'nonuse'!");
-
     }
 }

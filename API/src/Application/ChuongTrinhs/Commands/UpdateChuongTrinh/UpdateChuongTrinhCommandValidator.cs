@@ -23,6 +23,11 @@ public class UpdateChuongTrinhCommandValidator : AbstractValidator<UpdateChuongT
         RuleFor(v => v.ChuongTrinhDto.MoTa)
             .MaximumLength(100)
             .NotEmpty();
+        RuleFor(v=>v.ChuongTrinhDto.TrangThai)
+            .NotEmpty()
+            .Must(BeValidStatus)
+            .WithMessage("Trạng thái không hợp lệ.")
+            .WithErrorCode("Format");
         When(v => v.ChuongTrinhDto.NoiDungBaiHocs != null && v.ChuongTrinhDto.NoiDungBaiHocs.Any(), () =>
         {
             RuleFor(v => v.ChuongTrinhDto.NoiDungBaiHocs)
@@ -78,7 +83,6 @@ public class UpdateChuongTrinhCommandValidator : AbstractValidator<UpdateChuongT
             soThuTuDaDung.Add(noiDung.SoThuTu);
             soThuTuDuKien++;
         }
-
         return true;
     }
     private bool BeValidGuidOrNull(string? id)
@@ -92,5 +96,10 @@ public class UpdateChuongTrinhCommandValidator : AbstractValidator<UpdateChuongT
     private bool BeValidInt(int id)
     {
         return int.TryParse(id.ToString(), out _);
+    }
+    private bool BeValidStatus(string ? status)
+    {
+        if (status == "use" || status == "notuse") return true;
+        return false;
     }
 }

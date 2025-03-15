@@ -164,7 +164,6 @@ public class AddListGiaoViensCommandHandler : IRequestHandler<AddListGiaoViensCo
                 await _identityService.AssignRoleAsync(giaoVien.UserId!, Roles.Teacher);
             }
         }
-
         // Trả về kết quả
         return new Output
         {

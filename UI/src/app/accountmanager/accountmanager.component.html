@@ -1,350 +1,371 @@
 <div class="hoc-sinh-wrapper">
-    <!-- Tiêu đề -->
-    <h2 class="page-title">DANH SÁCH GIÁO VIÊN</h2>
-    <div class="filter-row">
-      <select class="form-control dropdown-filter" [(ngModel)]="trangThai">
-        <option value="">Trạng thái</option>
-        <option value="Hoạt động">Hoạt động</option>
-        <option value="Tạm ngừng">Tạm ngừng</option>
-      </select>
-  
-  
-  
-      <input type="text" class="form-control search-input" placeholder="Tìm tên/code giáo viên..."
-        [(ngModel)]="searchTerm" />
-  
-  
-      <div class="btn-group-right">
-  
-        
-  
-  
-        
-  
-  
-        <button class="btn add-student-btn" (click)="openAddStudentModal()">+ Thêm Học Viên</button>
+  <!-- Tiêu đề -->
+  <h2 class="page-title">DANH SÁCH NHÂN VIÊN</h2>
+  <div class="filter-row">
+    <select class="form-control dropdown-filter" [(ngModel)]="trangThai">
+      <option value="">Trạng thái</option>
+      <option value="Hoạt động">Hoạt động</option>
+      <option value="Tạm ngừng">Tạm ngừng</option>
+    </select>
+    <input type="text" class="form-control search-input" placeholder="Tìm tên/code giáo viên..."
+      [(ngModel)]="searchTerm" />
+
+
+    <div class="btn-group-right">
+      <button class="btn add-student-btn" (click)="openAddStudentModal()">+ Thêm Nhân Viên</button>
+    </div>
+  </div>
+
+  <!-- Pop-up Thêm Học Viên -->
+  <div class="modal-container" *ngIf="isModalOpen">
+    <!-- Lớp overlay -->
+    <div class="modal-overlay" (click)="closeModal()"></div>
+
+    <!-- Khung trắng pop-up -->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>THÊM NHÂN VIÊN MỚI</h2>
+        <button class="close-btn" (click)="closeModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label>Code</label>
+            <input type="text" class="form-control" [(ngModel)]="newStudent.code" name="code" required
+              (input)="forceNVPrefix()" autocomplete="off" />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Họ và Tên</label>
+              <input type="text" class="form-control" [(ngModel)]="newStudent.ten" name="ten" required />
+            </div>
+            <div class="form-group">
+              <label>Giới Tính</label>
+              <select class="form-control">
+                <option>Nam</option>
+                <option>Nữ</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Ngày Sinh</label>
+              <div class="input-group">
+                <input type="date" class="form-control" [(ngModel)]="newStudent.ngaySinh" name="ngaySinh" required
+                  (change)="checkAge(newStudent.ngaySinh)" #dobInput="ngModel"
+                  [ngClass]="{'is-invalid': (isUnderage || dobInput.invalid) && (dobInput.dirty || dobInput.touched)}" />
+                <div class="input-group-append">
+                  <span class="input-group-text">
+                    <i class="fa fa-calendar"></i>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Hiển thị lỗi nếu chưa đủ 18 tuổi -->
+              <small *ngIf="isUnderage && (dobInput.dirty || dobInput.touched)" class="text-danger">
+                <i class="ft-alert-circle align-middle"></i>
+                Nhân viên phải đủ ít nhất 18 tuổi.
+              </small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" class="form-control" [(ngModel)]="newStudent.email" name="email" required
+                #emailInput="ngModel" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                [ngClass]="{'is-invalid': emailInput.invalid && (emailInput.dirty || emailInput.touched)}" />
+
+              <!-- Hiển thị lỗi nếu email không hợp lệ -->
+              <small *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)" class="text-danger">
+                <i class="ft-alert-circle align-middle"></i>
+                <span *ngIf="emailInput.errors?.required">Vui lòng nhập email!</span>
+                <span *ngIf="emailInput.errors?.pattern">Email không hợp lệ! Định dạng đúng: example@domain.com</span>
+              </small>
+            </div>
+            <div class="form-group">
+              <label>Số Điện Thoại</label>
+              <input type="tel" class="form-control" [(ngModel)]="newStudent.soDienThoai" name="soDienThoai" required
+                #phoneInput="ngModel" pattern="0[0-9]{9}"
+                [ngClass]="{'is-invalid': phoneInput.invalid && (phoneInput.dirty || phoneInput.touched)}" />
+
+              <!-- Hiển thị lỗi nếu số điện thoại không hợp lệ -->
+              <small *ngIf="phoneInput.invalid && (phoneInput.dirty || phoneInput.touched)" class="text-danger">
+                <i class="ft-alert-circle align-middle"></i>
+                <span *ngIf="phoneInput.errors?.required">Vui lòng nhập số điện thoại!</span>
+                <span *ngIf="phoneInput.errors?.pattern">Số điện thoại không hợp lệ! Định dạng: 0xxxxxxxxx (10
+                  số)</span>
+              </small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Cơ sở</label>
+              <select class="form-control" [(ngModel)]="newStudent.coSoId" name="coSoId">
+                <option value="">-- Chọn Cơ Sở --</option>
+                <option *ngFor="let cs of cosoList" [value]="cs.id">
+                  {{ cs.ten }}
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Vai trò</label>
+              <select class="form-control" [(ngModel)]="newStudent.role" name="role">
+                <option value="">-- Chọn Vai Trò --</option>
+                <option value="CampusManager">Quản lý cơ sở</option>
+                <option value="LearningManager">Quản lý tài liệu học tập</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Thành phố</label>
+              <select class="form-control" [(ngModel)]="newStudent.province" name="province"
+                (change)="onProvinceChange($event.target.value)">
+                <option value="">-- Chọn Thành phố --</option>
+                <option *ngFor="let province of provinces" [value]="province.code">
+                  {{ province.name }}
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Quận/Huyện</label>
+              <select class="form-control" [(ngModel)]="newStudent.district" name="district"
+                (change)="onDistrictChange($event.target.value)">
+                <option value="">-- Chọn Quận/Huyện --</option>
+                <option *ngFor="let district of districts" [value]="district.code">
+                  {{ district.name }}
+                </option>
+
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Địa chỉ cụ thể</label>
+              <input type="text" class="form-control" placeholder="" [(ngModel)]="newStudent.diaChi" name="diaChi">
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn cancel-btn" (click)="closeModal()">Hủy</button>
+            <button type="button" class="btn save-btn" (click)="submitNewStudent()">Thêm</button>
+          </div>
+        </form>
       </div>
     </div>
-  
-    <!-- Pop-up Thêm Học Viên -->
-    <div class="modal-container" *ngIf="isModalOpen">
-      <!-- Lớp overlay -->
-      <div class="modal-overlay" (click)="closeModal()"></div>
-  
-      <!-- Khung trắng pop-up -->
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>THÊM HỌC VIÊN MỚI</h2>
-          <button class="close-btn" (click)="closeModal()">✕</button>
-        </div>
-  
-        <div class="modal-body">
-          <form>
+  </div>
+
+
+  <!-- POP-UP CHỈNH SỬA GIÁO VIÊN -->
+  <div class="modal-container" *ngIf="isEditModalOpen">
+    <div class="modal-overlay" (click)="closeEditModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>CHỈNH SỬA NHÂN VIÊN</h2>
+        <button class="close-btn" (click)="closeEditModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <!-- Row 1: CODE (disabled) -->
+          <div class="form-group">
+            <label>CODE</label>
+            <input type="text" class="form-control" [(ngModel)]="editStudent.code" name="edit_code" disabled>
+          </div>
+          <!-- Row 2: Họ và Tên, Giới Tính, Ngày Sinh -->
+          <div class="form-row">
             <div class="form-group">
-              <label>Code</label>
-              <input type="text" class="form-control" placeholder="Code">
+              <label>Họ và Tên</label>
+              <input type="text" class="form-control" [(ngModel)]="editStudent.ten" name="edit_ten">
             </div>
-  
-            <div class="form-row">
-              <div class="form-group">
-                <label>Họ và Tên</label>
-                <input type="text" class="form-control" placeholder="Nhập tên" />
-              </div>
-              <div class="form-group">
-                <label>Giới Tính</label>
-                <select class="form-control">
-                  <option>Nam</option>
-                  <option>Nữ</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Ngày Sinh</label>
-                <div class="input-group">
-                  <input type="date" class="form-control" />
-                  <div class="input-group-append">
-                    <span class="input-group-text">
-                      <i class="fa fa-calendar"></i>
-                    </span>
-                  </div>
+            <div class="form-group">
+              <label>Giới Tính</label>
+              <select class="form-control" [(ngModel)]="editStudent.gioiTinh" name="edit_gioiTinh">
+                <option>Nam</option>
+                <option>Nữ</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Ngày Sinh</label>
+              <div class="input-group">
+                <input type="date" class="form-control" [(ngModel)]="editStudent.ngaySinh" name="edit_ngaySinh">
+                <div class="input-group-append">
+                  <span class="input-group-text"><i class="fa fa-calendar"></i></span>
                 </div>
               </div>
             </div>
-  
-            <div class="form-row">
-              <div class="form-group">
-                <label>Email</label>
-                <input type="email" class="form-control" placeholder="Nhập email" />
-              </div>
-              <div class="form-group">
-                <label>Số Điện Thoại</label>
-                <input type="tel" class="form-control" placeholder="Nhập số điện thoại" />
-              </div>
-            </div>
-  
-            <div class="form-row">
-              <div class="form-group">
-                <label>Trường</label>
-                <input type="text" class="form-control" placeholder="Nhập trường" />
-              </div>
-              <div class="form-group">
-                <label>Cơ sở</label>
-                <select class="form-control" [(ngModel)]="editStudent.coSoId" name="edit_coSoId">
-                  <option value="">-- Chọn Cơ Sở --</option>
-                  <option *ngFor="let cs of cosoList" [value]="cs.id">
-                    {{ cs.ten }}
-                  </option>
-                </select>
-              </div>
-            </div>
-  
-            <div class="form-row">
-              <div class="form-group">
-                <label>Thành phố</label>
-                <select class="form-control" [(ngModel)]="newStudent.province" name="province"
-                  (change)="onProvinceChange($event.target.value)">
-                  <option value="">-- Chọn Thành phố --</option>
-                  <option *ngFor="let province of provinces" [value]="province.code">
-                    {{ province.name }}
-                  </option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Quận/Huyện</label>
-                <select class="form-control" [(ngModel)]="newStudent.district" name="district">
-                  <option value="">-- Chọn Quận/Huyện --</option>
-                  <option *ngFor="let district of districts" [value]="district.code">
-                    {{ district.name }}
-                  </option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Địa chỉ cụ thể</label>
-                <input type="text" class="form-control" placeholder="" [(ngModel)]="newStudent.diaChi" name="diaChi">
-              </div>
-            </div>
-  
-            <div class="modal-footer">
-              <button type="button" class="btn cancel-btn" (click)="closeModal()">Hủy</button>
-              <button type="submit" class="btn save-btn">Thêm</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  
-  
-    <!-- POP-UP CHỈNH SỬA GIÁO VIÊN -->
-    <div class="modal-container" *ngIf="isEditModalOpen">
-      <div class="modal-overlay" (click)="closeEditModal()"></div>
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>CHỈNH SỬA GIÁO VIÊN</h2>
-          <button class="close-btn" (click)="closeEditModal()">✕</button>
-        </div>
-        <div class="modal-body">
-          <form>
-            <!-- Row 1: CODE (disabled) -->
+          </div>
+          <!-- Row 3: Email, Số Điện Thoại -->
+          <div class="form-row">
             <div class="form-group">
-              <label>CODE</label>
-              <input type="text" class="form-control" [(ngModel)]="editStudent.code" name="edit_code" disabled>
+              <label>Email</label>
+              <input type="email" class="form-control" [(ngModel)]="editStudent.email" name="edit_email">
             </div>
-            <!-- Row 2: Họ và Tên, Giới Tính, Ngày Sinh -->
-            <div class="form-row">
-              <div class="form-group">
-                <label>Họ và Tên</label>
-                <input type="text" class="form-control" [(ngModel)]="editStudent.ten" name="edit_ten">
-              </div>
-              <div class="form-group">
-                <label>Giới Tính</label>
-                <select class="form-control" [(ngModel)]="editStudent.gioiTinh" name="edit_gioiTinh">
-                  <option>Nam</option>
-                  <option>Nữ</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Ngày Sinh</label>
-                <div class="input-group">
-                  <input type="date" class="form-control" [(ngModel)]="editStudent.ngaySinh" name="edit_ngaySinh">
-                  <div class="input-group-append">
-                    <span class="input-group-text"><i class="fa fa-calendar"></i></span>
-                  </div>
-                </div>
-              </div>
+            <div class="form-group">
+              <label>Số Điện Thoại</label>
+              <input type="tel" class="form-control" [(ngModel)]="editStudent.soDienThoai" name="edit_soDienThoai">
             </div>
-            <!-- Row 3: Email, Số Điện Thoại -->
-            <div class="form-row">
-              <div class="form-group">
-                <label>Email</label>
-                <input type="email" class="form-control" [(ngModel)]="editStudent.email" name="edit_email">
-              </div>
-              <div class="form-group">
-                <label>Số Điện Thoại</label>
-                <input type="tel" class="form-control" [(ngModel)]="editStudent.soDienThoai" name="edit_soDienThoai">
-              </div>
+          </div>
+          <!-- Row 4: Trường, Cơ Sở -->
+          <div class="form-row">
+            <div class="form-group">
+              <label>Cơ sở</label>
+              <select class="form-control" [(ngModel)]="editStudent.coSoId" name="edit_coSoId">
+                <option value="">-- Chọn Cơ Sở --</option>
+                <option *ngFor="let cs of cosoList" [value]="cs.id">
+                  {{ cs.ten }}
+                </option>
+              </select>
             </div>
-            <!-- Row 4: Trường, Cơ Sở -->
-            <div class="form-row">
-              <div class="form-group">
-                <label>Trường</label>
-                <input type="text" class="form-control" [(ngModel)]="editStudent.truongDangDay" name="edit_truongDangDay">
-              </div>
-              <div class="form-group">
-                <label>Cơ sở</label>
-                <select class="form-control" [(ngModel)]="editStudent.coSoId" name="edit_coSoId">
-                  <option value="">-- Chọn Cơ Sở --</option>
-                  <option *ngFor="let cs of cosoList" [value]="cs.id">
-                    {{ cs.ten }}
-                  </option>
-                </select>
-              </div>
+            <div class="form-group">
+              <label>Vai trò</label>
+              <select class="form-control" [(ngModel)]="editStudent.tenVaiTro" name="role">
+                <option value="">-- Chọn Vai Trò --</option>
+                <option value="CampusManager">Quản lý cơ sở</option>
+                <option value="LearningManager">Quản lý tài liệu học tập</option>
+              </select>
             </div>
-  
-  
-            <!-- Row 5: Thành phố, Quận/Huyện, Địa chỉ cụ thể -->
-            <div class="form-row">
-              <div class="form-group">
-                <label>TP / Tỉnh</label>
-                <select class="form-control" [(ngModel)]="editStudent.province" name="edit_province"
-                  (change)="onProvinceChangeForEdit($event.target.value)">
-                  <option value="">-- Chọn Thành phố --</option>
-                  <option *ngFor="let province of provinces" [value]="province.code">
-                    {{ province.name }}
-                  </option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Quận/Huyện</label>
-                <select class="form-control" [(ngModel)]="editStudent.district" name="edit_district">
-                  <option value="">-- Chọn Quận/Huyện --</option>
-                  <option *ngFor="let d of editDistricts" [value]="d.code">
-                    {{ d.name }}
-                  </option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Địa chỉ cụ thể</label>
-                <input type="text" class="form-control" placeholder="VD: Phạm Ngọc Thạch, số 245"
-                  [(ngModel)]="editStudent.diaChi" name="edit_diaChi">
-              </div>
+          </div>
+          <!-- Row 5: Thành phố, Quận/Huyện, Địa chỉ cụ thể -->
+          <div class="form-row">
+            <div class="form-group">
+              <label>TP / Tỉnh</label>
+              <select class="form-control" [(ngModel)]="editStudent.province" name="edit_province"
+                (change)="onProvinceChangeForEdit($event.target.value)">
+                <option value="">-- Chọn Thành phố --</option>
+                <option *ngFor="let province of provinces" [value]="province.code">
+                  {{ province.name }}
+                </option>
+              </select>
             </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn cancel-btn" (click)="closeEditModal()">Hủy</button>
-          <button type="button" class="btn save-btn" (click)="submitEditStudent()">ÁP DỤNG</button>
-        </div>
+            <div class="form-group">
+              <label>Quận/Huyện</label>
+              <select class="form-control" [(ngModel)]="editStudent.district" name="edit_district"
+                (change)="onDistrictChangeForEdit($event.target.value)">
+                <option value="">-- Chọn Quận/Huyện --</option>
+                <option *ngFor="let d of editDistricts" [value]="d.code">
+                  {{ d.name }}
+                </option>
+              </select>
+
+            </div>
+            <div class="form-group">
+              <label>Địa chỉ cụ thể</label>
+              <input type="text" class="form-control" placeholder="VD: Phạm Ngọc Thạch, số 245"
+                [(ngModel)]="editStudent.diaChi" name="edit_diaChi">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn cancel-btn" (click)="closeEditModal()">Hủy</button>
+        <button type="button" class="btn save-btn" (click)="submitEditStudent()">ÁP DỤNG</button>
       </div>
     </div>
-  
-  
-    <div class="table-responsive">
-      <table class="table student-table">
-        <thead>
+  </div>
+
+
+  <div class="table-responsive">
+    <table class="table student-table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Tên</th>
+          <th>Giới Tính</th>
+          <th>Ngày Sinh</th>
+          <th>Email</th>
+          <th>Số điện thoại</th>
+          <th>Trạng thái</th>
+          <th class="dropdown-col"></th>
+          <th class="edit-col">Sửa</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let hs of students; let i = index">
+          <!-- Hàng tóm tắt -->
           <tr>
-            <th>Code</th>
-            <th>Tên</th>
-            <th>Giới Tính</th>
-            <th>Ngày Sinh</th>
-            <th>Email</th>
-            <th>Số điện thoại</th>
-            <th>Trạng thái</th>
-            <th class="dropdown-col"></th>
-            <th class="edit-col">Sửa</th>
+            <td>{{ hs.code }}</td>
+            <td>{{ hs.ten }}</td>
+            <td>{{ hs.gioiTinh }}</td>
+            <td>{{ hs.ngaySinh | date:'dd-MM-yyyy' }}</td>
+            <td>{{ hs.email }}</td>
+            <td>{{ hs.soDienThoai }}</td>
+            <td>
+              <span class="active-status">Hoạt động</span>
+              <i class="check-icon"></i>
+            </td>
+            <!-- Nút dropdown -->
+            <td class="dropdown-col">
+              <button class="btn dropdown-btn" (click)="toggleDetails(i)">
+                <i *ngIf="!hs.showDetails" class="fas fa-caret-down"></i>
+                <i *ngIf="hs.showDetails" class="fas fa-caret-up"></i>
+              </button>
+
+            </td>
+            <!-- Nút sửa (bên phải) -->
+            <td class="edit-col">
+              <button class="btn edit-btn" (click)="onEditStudentClick(i)">
+                <i class="fas fa-pencil-alt"></i>
+              </button>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          <ng-container *ngFor="let hs of students; let i = index">
-            <!-- Hàng tóm tắt -->
-            <tr>
-              <td>{{ hs.code }}</td>
-              <td>{{ hs.ten }}</td>
-              <td>{{ hs.gioiTinh }}</td>
-              <td>{{ hs.ngaySinh | date:'dd-MM-yyyy' }}</td>
-              <td>{{ hs.email }}</td>
-              <td>{{ hs.soDienThoai }}</td>
-              <td>
-                <span class="active-status">Hoạt động</span>
-                <i class="check-icon"></i>
-              </td>
-              <!-- Nút dropdown -->
-              <td class="dropdown-col">
-                <button class="btn dropdown-btn" (click)="toggleDetails(i)">
-                  <i *ngIf="!hs.showDetails" class="fas fa-caret-down"></i>
-                  <i *ngIf="hs.showDetails" class="fas fa-caret-up"></i>
-                </button>
-  
-              </td>
-              <!-- Nút sửa (bên phải) -->
-              <td class="edit-col">
-                <button class="btn edit-btn" (click)="onEditStudentClick(i)">
-                  <i class="fas fa-pencil-alt"></i>
-                </button>
-              </td>
-            </tr>
-  
-            <!-- Hàng chi tiết (hiển thị ngay dưới item đó) -->
-            <tr *ngIf="hs.showDetails">
-              <td colspan="9" class="detail-cell">
-                <!-- Bố cục chia làm 4 hàng, theo ảnh mẫu -->
-                <div class="container-fluid">
-                  <!-- Row 1: Code, Họ và Tên, Giới Tính, Ngày Sinh -->
-                  <div class="row">
-                    <div class="col-md-3 detail-item">
-                      <label>Code</label>
-                      <div class="detail-box">{{ hs.code }}</div>
-                    </div>
-                    <div class="col-md-3 detail-item">
-                      <label>Họ và Tên</label>
-                      <div class="detail-box">{{ hs.ten }}</div>
-                    </div>
-                    <div class="col-md-3 detail-item">
-                      <label>Giới Tính</label>
-                      <div class="detail-box">{{ hs.gioiTinh }}</div>
-                    </div>
-                    <div class="col-md-3 detail-item">
-                      <label>Ngày Sinh</label>
-                      <div class="detail-box">{{ hs.ngaySinh | date:'dd-MM-yyyy' }}</div>
-                    </div>
+
+          <!-- Hàng chi tiết (hiển thị ngay dưới item đó) -->
+          <tr *ngIf="hs.showDetails">
+            <td colspan="9" class="detail-cell">
+              <!-- Bố cục chia làm 4 hàng, theo ảnh mẫu -->
+              <div class="container-fluid">
+                <!-- Row 1: Code, Họ và Tên, Giới Tính, Ngày Sinh -->
+                <div class="row">
+                  <div class="col-md-3 detail-item">
+                    <label>Code</label>
+                    <div class="detail-box">{{ hs.code }}</div>
                   </div>
-  
-                  <!-- Row 2: Số Điện Thoại, Email, Địa Chỉ -->
-                  <div class="row mt-3">
-                    <div class="col-md-4 detail-item">
-                      <label>Số Điện Thoại</label>
-                      <div class="detail-box">{{ hs.soDienThoai }}</div>
-                    </div>
-                    <div class="col-md-4 detail-item">
-                      <label>Email</label>
-                      <div class="detail-box">{{ hs.email }}</div>
-                    </div>
-                    <div class="col-md-4 detail-item">
-                      <label>Địa Chỉ</label>
-                      <div class="detail-box">{{ hs.diaChi }}</div>
-                    </div>
+                  <div class="col-md-3 detail-item">
+                    <label>Họ và Tên</label>
+                    <div class="detail-box">{{ hs.ten }}</div>
                   </div>
-  
-                  <!-- Row 3: Trường Đang Học, Cơ Sở, Chính Sách Học Phí -->
-                  <div class="row mt-3">
-                    
-                    <div class="col-md-4 detail-item">
-                      <label>Cơ Sở</label>
-                      <div class="detail-box">{{ hs.coso.ten }}</div>
-                    </div>
-  
+                  <div class="col-md-3 detail-item">
+                    <label>Giới Tính</label>
+                    <div class="detail-box">{{ hs.gioiTinh }}</div>
                   </div>
-  
-                 
-                  
+                  <div class="col-md-3 detail-item">
+                    <label>Ngày Sinh</label>
+                    <div class="detail-box">{{ hs.ngaySinh | date:'dd-MM-yyyy' }}</div>
+                  </div>
                 </div>
-              </td>
-            </tr>
-          </ng-container>
-        </tbody>
-      </table>
-    </div>
-  
-    <!-- Phân trang -->
-    <div class="pagination-container">
+                <!-- Row 2: Số Điện Thoại, Email, Địa Chỉ -->
+                <div class="row mt-3">
+                  <div class="col-md-4 detail-item">
+                    <label>Số Điện Thoại</label>
+                    <div class="detail-box">{{ hs.soDienThoai }}</div>
+                  </div>
+                  <div class="col-md-4 detail-item">
+                    <label>Email</label>
+                    <div class="detail-box">{{ hs.email }}</div>
+                  </div>
+                  <div class="col-md-4 detail-item">
+                    <label>Địa Chỉ</label>
+                    <div class="detail-box">{{ hs.diaChi }}</div>
+                  </div>
+                </div>
+                <!-- Row 3: Trường Đang Học, Cơ Sở, Chính Sách Học Phí -->
+                <div class="row mt-3">
+                  <div class="col-md-4 detail-item">
+                    <label>Cơ Sở</label>
+                    <div class="detail-box">{{ hs.tenCoSo }}</div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Phân trang -->
+  <!-- <div class="pagination-container">
       <ul class="pagination">
         <li class="page-item" [class.active]="currentPage === 1">
           <a class="page-link" (click)="goToPage(1)">1</a>
@@ -353,4 +374,4 @@
           <a class="page-link" (click)="goToPage(2)">2</a>
         </li>
       </ul>
-    </div>
+    </div> -->

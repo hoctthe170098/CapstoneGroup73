@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Accountmanager } from './shared/accountmanager.model';
 import { AccountmanagerService } from './shared/account.service';
 import { Router } from '@angular/router';
+import { ChangeDetectorRef } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-accountmanager',
@@ -9,104 +10,82 @@ import { Router } from '@angular/router';
   styleUrls: ['./accountmanager.component.scss']
 })
 export class AccountmanagerComponent implements OnInit {
+  selectedProvince: any = null;
+  selectedDistrict: any = null;
   trangThai: string = '';
-  lop: string = '';
   searchTerm: string = '';
   cosoList: any[] = [];
-  
-  students: (Accountmanager & { showDetails: boolean, role: string })[] = [
-    {
-      code: 'HE171450',
-      ten: 'Bùi Ngọc Dũng',
-      gioiTinh: 'Nam',
-      diaChi: '245 Phạm Ngọc Thạch, Đống Đa, TP Hà Nội',
-      lop: 'Lớp 1',
-      ngaySinh: new Date(2003, 6, 23),
-      email: 'dungbnhe17457@fpt.edu.vn',
-      soDienThoai: '0123-456-789',
-      coSoId: 'cs1',
-      coso: {
-        id: 'cs1',
-        ten: 'Hoàng Văn Thái',
-        diaChi: '',
-        soDienThoai: '',
-        trangThai: '',
-        default: false
-      },
-      role: 'Sinh viên',
-      showDetails: false
-    },
-    {
-      code: 'HE171466',
-      ten: 'Ngô Minh Kiên',
-      gioiTinh: 'Nam',
-      diaChi: 'Long Biên, Hà Nội',
-      lop: 'Lớp 1',
-      ngaySinh: new Date(2003, 4, 10),
-      email: 'kiennmhe17146@fpt.edu.vn',
-      soDienThoai: '0987-654-321',
-      coSoId: 'cs2',
-      coso: {
-        id: 'cs2',
-        ten: 'Phạm Văn Đồng',
-        diaChi: '',
-        soDienThoai: '',
-        trangThai: '',
-        default: false
-      },
-      role: 'Sinh viên',
-      showDetails: false
-    }
-  ];
+  students: any[] = [];
 
   currentPage: number = 1;
   totalPages: number = 2;
-
-  goToPage(page: number) {
-    this.currentPage = page;
-  }
 
   isModalOpen: boolean = false;
   isEditModalOpen: boolean = false;
 
   newStudent: any = {
     code: '', ten: '', gioiTinh: 'Nam', ngaySinh: '', email: '',
-    soDienThoai: '', truongDangDay: '', province: '', district: '', diaChi: ''
+    soDienThoai: '', coSoId: '', province: '', district: '', diaChi: '',role:''
   };
 
   editStudent: any = {
     code: '', ten: '', gioiTinh: 'Nam', ngaySinh: '', email: '',
-    soDienThoai: '', truongDangDay: '', province: '', district: '', diaChi: ''
+    soDienThoai: '', coSoId: '', province: '', district: '', diaChi: ''
   };
 
   provinces: any[] = [];
   districts: any[] = [];
   editDistricts: any[] = [];
 
-  constructor(private giaovienService: AccountmanagerService, private router: Router) {}
+  constructor(private accountmanagerService: AccountmanagerService, private cd: ChangeDetectorRef,private toastr: ToastrService) {}
+
 
   ngOnInit(): void {
-    this.giaovienService.getProvinces().subscribe(
-      data => this.provinces = data,
+    this.accountmanagerService.getProvinces().subscribe(
+      data => {
+        this.provinces = data;
+      },
       error => console.error('Error fetching provinces:', error)
     );
-    this.loadDanhSachCoSo();
+    this.loadDanhSachNhanVien();
+    this.loadDanhSachCoSo(); // Tải danh sách cơ sở khi khởi tạo component
+    console.log(this.cosoList);
   }
-
-  loadDanhSachCoSo() {
-    this.giaovienService.getDanhSachCoSo(1, 100, '').subscribe(
+  
+  // Tải danh sách nhân viên
+  loadDanhSachNhanVien() {
+    this.accountmanagerService.getDanhSachNhanVien(1, 100, '').subscribe(
       response => {
+        console.log('Dữ liệu nhân viên từ API:', response);
         if (response && response.data) {
-          this.cosoList = response.data.items;
+          this.students = response.data.items.map(student => ({
+            ...student,
+             // Hiển thị luôn khi load trang
+          }));
+          this.cd.detectChanges();  // Buộc Angular cập nhật UI ngay
         }
       },
-      error => console.error('Lỗi tải danh sách cơ sở:', error)
+      error => console.error('Lỗi tải danh sách nhân viên:', error)
     );
   }
   
   
-  
 
+  // Tải danh sách cơ sở
+  loadDanhSachCoSo() {
+    this.accountmanagerService.getDanhSachCoSo().subscribe(
+      response => {
+        console.log('Dữ liệu từ API:', response); 
+        if (response && response.data) {
+          this.cosoList = response.data; 
+        }
+      },
+      error => {
+        console.error('Lỗi tải danh sách cơ sở:', error);
+      }
+    );
+  }
+  
   toggleDetails(index: number) {
     this.students[index].showDetails = !this.students[index].showDetails;
   }
@@ -115,49 +94,279 @@ export class AccountmanagerComponent implements OnInit {
   closeModal() { this.isModalOpen = false; }
 
   submitNewStudent() {
-    const newHs: Accountmanager & { showDetails: boolean, role: string } = {
-      ...this.newStudent,
-      ngaySinh: this.newStudent.ngaySinh ? new Date(this.newStudent.ngaySinh) : new Date(),
-      coSoId: '', coso: { id: '', ten: '', diaChi: '', soDienThoai: '', trangThai: '', default: false },
-      lopHocs: [],
-      showDetails: false,
-      role: 'Sinh viên'
+    
+    const provinceName = this.getProvinceName();
+    const districtName = this.getDistrictName();
+
+    // Đảm bảo mã nhân viên luôn có tiền tố "NV"
+    
+
+    const fullAddress = `${this.newStudent.diaChi}, ${districtName}, ${provinceName}`;
+
+    const newHs = {
+      code: this.newStudent.code && this.newStudent.code.startsWith("NV") 
+      ? this.newStudent.code.replace(/^NV/, "") 
+      : this.newStudent.code,
+        ten: this.newStudent.ten,
+        gioiTinh: this.newStudent.gioiTinh,
+        ngaySinh: this.newStudent.ngaySinh ? this.formatDate(this.newStudent.ngaySinh) : '',
+        email: this.newStudent.email,
+        soDienThoai: this.newStudent.soDienThoai,
+        coSoId: this.newStudent.coSoId || null,  
+        diaChi: fullAddress.trim() !== ", ," ? fullAddress : "Không xác định",
+        role: this.newStudent.role
     };
-    this.students.push(newHs);
-    this.newStudent = { code: '', ten: '', gioiTinh: 'Nam', ngaySinh: '', email: '',
-      soDienThoai: '', truongDangDay: '', province: '', district: '', diaChi: '' };
-    this.isModalOpen = false;
+
+    console.log("📌 Dữ liệu gửi lên API:", newHs);
+
+    this.accountmanagerService.createNhanVien(newHs).subscribe(
+        response => {
+            if(!response.isError) {
+              this.toastr.success(response.message);
+              this.loadDanhSachNhanVien(); 
+              this.isModalOpen = false;
+            }else{
+              this.toastr.error(response.message);
+              this.isModalOpen = true;
+            }                  
+        },
+        error => {
+            console.error('❌ Lỗi khi thêm nhân viên:', error);
+            alert('Lỗi khi thêm nhân viên. Kiểm tra API hoặc dữ liệu đầu vào!');
+        }
+    );
+}
+isUnderage: boolean = false;
+validateEmail(email: string): boolean {
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return emailPattern.test(email);
+}
+validatePhoneNumber(phone: string): boolean {
+  const phonePattern = /^0[0-9]{9}$/; // Bắt đầu bằng số 0 và có tổng cộng 10 chữ số
+  return phonePattern.test(phone);
+}
+checkAge(ngaySinh: string) {
+  if (!ngaySinh) {
+    this.isUnderage = false;
+    return;
   }
 
-  onProvinceChange(provinceCode: string) {
-    const selectedProvince = this.provinces.find(p => p.code == provinceCode);
-    this.districts = selectedProvince ? selectedProvince.districts : [];
-  }
+  const birthDate = new Date(ngaySinh);
+  const today = new Date();
+  const age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  const dayDiff = today.getDate() - birthDate.getDate();
 
-  onEditStudentClick(index: number) {
-    const hs = this.students[index];
-    this.editStudent = { ...hs, ngaySinh: this.formatDate(hs.ngaySinh) };
-    this.onProvinceChangeForEdit(this.editStudent.province);
-    this.isEditModalOpen = true;
+  // Kiểm tra nếu chưa đủ 18 tuổi
+  this.isUnderage = (age < 18 || (age === 18 && (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0))));
+}
+
+
+  
+getProvinceName(): string {
+  if (this.selectedProvince) {
+      console.log("🔍 Tỉnh/Thành phố đã chọn:", this.selectedProvince.name);
+      return this.selectedProvince.name;
   }
+  return "Không xác định";
+}
+
+getDistrictName(): string {
+  return this.selectedDistrict ? this.selectedDistrict.name : "Không xác định";
+}
+forceNVPrefix() {
+  if (!this.newStudent.code.startsWith("NV")) {
+      this.newStudent.code = "NV" + this.newStudent.code.replace(/^NV/, ""); 
+  }
+}
+
+onProvinceChange(provinceCode: string) {
+  this.selectedProvince = this.provinces.find(p => p.code == provinceCode);
+  this.selectedDistrict = null; // Reset district khi chọn tỉnh/thành phố mới
+
+  if (this.selectedProvince) {
+      this.districts = this.selectedProvince.districts || [];  
+      console.log("🌍 Đã chọn tỉnh/thành phố:", this.selectedProvince.name);
+      console.log("🏙️ Danh sách quận/huyện cập nhật:", this.districts);
+  } else {
+      this.districts = [];
+      console.log("⚠️ Không tìm thấy tỉnh/thành phố!");
+  }
+}
+
+
+onDistrictChange(districtCode: string) {
+    console.log("📌 Mã quận/huyện nhận được khi thêm mới:", districtCode);
+
+    if (!this.districts || this.districts.length === 0) {
+        console.error("⚠️ Không có danh sách quận/huyện để tìm kiếm khi thêm mới!");
+        return;
+    }
+
+    // Chuyển districtCode về cùng kiểu dữ liệu với danh sách
+    const isDistrictCodeString = typeof this.districts[0].code === "string";
+    const districtCodeFormatted = isDistrictCodeString ? String(districtCode) : Number(districtCode);
+
+    const availableDistrictCodes = this.districts.map(d => isDistrictCodeString ? String(d.code) : Number(d.code));
+    console.log("📌 Danh sách mã quận/huyện có sẵn khi thêm mới:", availableDistrictCodes);
+
+    if (!availableDistrictCodes.includes(districtCodeFormatted)) {
+        console.error(`⚠️ Không tìm thấy quận/huyện với mã: ${districtCodeFormatted}`);
+        return;
+    }
+
+    this.selectedDistrict = this.districts.find(d => isDistrictCodeString ? String(d.code) === String(districtCodeFormatted) : Number(d.code) === Number(districtCodeFormatted));
+    console.log("🏙️ Đã chọn quận/huyện khi thêm mới:", this.selectedDistrict?.name);
+}
+
+
+
+
+
+onEditStudentClick(index: number) {
+  const hs = this.students[index];
+
+  // Sao chép dữ liệu để chỉnh sửa
+  this.editStudent = { 
+      ...hs, 
+      ngaySinh: this.formatDate(hs.ngaySinh) 
+  };
+  // Tìm cosoId từ cosoList dựa trên hs.tenCoSo
+ const coSo = this.cosoList.find(cs => cs.ten === hs.tenCoSo);
+ if (coSo) {
+  this.editStudent.coSoId = coSo.id;
+} else {
+  // Xử lý trường hợp không tìm thấy cơ sở (ví dụ: gán null hoặc thông báo lỗi)
+  this.editStudent.coSoId = null; 
+  console.error(`Không tìm thấy cơ sở có tên ${hs.tenCoSo}`);
+}
+  // Loại bỏ tỉnh/thành phố và quận/huyện ra khỏi địa chỉ cụ thể
+  if (this.editStudent.diaChi) {
+      const parts = this.editStudent.diaChi.split(',').map(p => p.trim());
+      console.log(parts)
+      const province = this.provinces.find(p => p.name === parts[2]);
+      if(province){
+        this.selectedProvince = province;
+        this.editStudent.province = this.selectedProvince.code;
+      }   
+      //const district = parts[1];
+      this.editDistricts = this.selectedProvince ? this.selectedProvince.districts || [] : [];
+      const district = this.editDistricts.find(d=>d.name==parts[1]);
+      if(district)
+      this.editStudent.district = district.code;
+      this.editStudent.diaChi = parts[0];
+  }
+  this.isEditModalOpen = true;
+}
+
+
+
 
   closeEditModal() { this.isEditModalOpen = false; }
 
   submitEditStudent() {
-    const idx = this.students.findIndex(h => h.code === this.editStudent.code);
-    if (idx !== -1) {
-      this.students[idx] = { ...this.students[idx], ...this.editStudent, ngaySinh: new Date(this.editStudent.ngaySinh) };
-    }
-    this.isEditModalOpen = false;
+    
+    const provinceName = this.getProvinceName();
+    const districtName = this.getDistrictName();
+
+    // Chỉ lấy địa chỉ cụ thể mà không bao gồm tỉnh/thành phố và quận/huyện
+    const fullAddress = `${this.editStudent.diaChi.trim()}, ${districtName}, ${provinceName}`;
+
+    // Chuẩn bị dữ liệu gửi API
+    const updatedHs = {
+        code: this.editStudent.code,
+        ten: this.editStudent.ten,
+        gioiTinh: this.editStudent.gioiTinh,
+        diaChi: fullAddress.trim() !== ", ," ? fullAddress : "Không xác định",
+        ngaySinh: this.editStudent.ngaySinh ? this.formatDate(this.editStudent.ngaySinh) : '',
+        email: this.editStudent.email,
+        soDienThoai: this.editStudent.soDienThoai,
+        coSoId: this.editStudent.coSoId || null, 
+        role: this.editStudent.tenVaiTro,
+        status:"true"
+    };
+
+    console.log("📌 Dữ liệu gửi lên API khi sửa:", updatedHs);
+
+    this.accountmanagerService.updateNhanVien(updatedHs).subscribe(
+        response => {
+          if(!response.isError){
+            this.toastr.success(response.message)
+            this.isEditModalOpen = false;
+          }else{
+            this.toastr.error(response.message)
+            this.isEditModalOpen = true;
+          }
+            this.loadDanhSachNhanVien();          
+        },
+        error => {
+            console.error('❌ Lỗi khi cập nhật nhân viên:', error);
+            alert('Lỗi khi cập nhật nhân viên. Kiểm tra API hoặc dữ liệu đầu vào!');
+        }
+    );
+}
+
+
+
+
+
+onProvinceChangeForEdit(provinceCode: string) {
+  console.log("📌 Mã tỉnh/thành phố nhận được khi chỉnh sửa:", provinceCode);
+  
+  // Tìm tỉnh/thành phố theo mã
+  this.selectedProvince = this.provinces.find(p => String(p.code) === String(provinceCode));
+
+  if (this.selectedProvince) {
+      this.editDistricts = this.selectedProvince.districts || [];
+      console.log("🏙️ Danh sách quận/huyện mới khi chỉnh sửa:", this.editDistricts);
+  } else {
+      this.editDistricts = [];
+      console.log("⚠️ Không tìm thấy tỉnh/thành phố khi chỉnh sửa!");
   }
 
-  onProvinceChangeForEdit(provinceCode: string) {
-    const selectedProvince = this.provinces.find(p => p.code === provinceCode);
-    this.editDistricts = selectedProvince ? selectedProvince.districts : [];
+  // Reset quận/huyện khi chọn tỉnh mới
+  this.selectedDistrict = null;
+}
+
+onDistrictChangeForEdit(districtCode: string) {
+  console.log("📌 Mã quận/huyện nhận được khi chỉnh sửa:", districtCode);
+
+  if (!this.editDistricts || this.editDistricts.length === 0) {
+      console.error("⚠️ Không có danh sách quận/huyện để tìm kiếm khi chỉnh sửa!");
+      return;
   }
 
-  formatDate(date: Date) {
-    return date ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}` : '';
+  // Đảm bảo kiểu dữ liệu quận/huyện khớp với danh sách
+  const isDistrictCodeString = typeof this.editDistricts[0].code === "string";
+  const districtCodeFormatted = isDistrictCodeString ? String(districtCode).trim() : Number(districtCode.trim());
+
+  console.log("📌 Danh sách mã quận/huyện có sẵn khi chỉnh sửa:", 
+              this.editDistricts.map(d => d.code));
+
+  // Tìm quận/huyện tương ứng
+  this.selectedDistrict = this.editDistricts.find(d => 
+      isDistrictCodeString ? String(d.code) === String(districtCodeFormatted) 
+                           : Number(d.code) === Number(districtCodeFormatted)
+  );
+
+  if (this.selectedDistrict) {
+      console.log("🏙️ Đã chọn quận/huyện khi chỉnh sửa:", this.selectedDistrict.name);
+  } else {
+      console.error(`⚠️ Không tìm thấy quận/huyện với mã: ${districtCodeFormatted}`);
+  }
+}
+
+
+
+
+
+
+
+
+  formatDate(date: any) {
+    if (!date) return '';
+    const d = new Date(date);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }
   
 }

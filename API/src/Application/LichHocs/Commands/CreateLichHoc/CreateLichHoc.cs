@@ -11,8 +11,6 @@ public record CreateLichHocCommand : IRequest<Output>
 {
     public required CreateLichHocDto LichHocDto { get; init; }
 }
-
-
     public class CreateLichHocCommandHandler : IRequestHandler<CreateLichHocCommand, Output>
     {
         private readonly IApplicationDbContext _context;

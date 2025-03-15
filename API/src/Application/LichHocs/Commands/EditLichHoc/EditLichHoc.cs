@@ -51,7 +51,6 @@ public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Out
         if (!string.IsNullOrWhiteSpace(lichHocDto.TenLop)) lichHoc.TenLop = lichHocDto.TenLop;
 
         await _context.SaveChangesAsync(cancellationToken);
-
         return new Output
         {
             isError = false,
