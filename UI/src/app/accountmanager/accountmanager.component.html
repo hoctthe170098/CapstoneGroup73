@@ -115,37 +115,21 @@
                 <span *ngIf="emailInput.errors?.pattern">Email không hợp lệ! Định dạng đúng: example@domain.com</span>
               </small>
             </div>
-           <div class="form-group">
-  <label>Số Điện Thoại</label>
-  <input 
-  type="tel" 
-  class="form-control" 
-  [(ngModel)]="newStudent.soDienThoai" 
-  name="soDienThoai"
-  required
-  pattern="^0\d{9,10}$"
-  #phoneInput="ngModel"
-  [ngClass]="{'is-invalid': phoneInput.invalid && (phoneInput.dirty || phoneInput.touched)}" />
 
 
-  <!-- Hiển thị lỗi nếu Số Điện Thoại không hợp lệ -->
-  <small *ngIf="phoneInput.invalid && (phoneInput.dirty || phoneInput.touched)" class="text-danger">
-    <i class="ft-alert-circle align-middle"></i>
-    <span *ngIf="phoneInput.errors?.required">Vui lòng nhập Số Điện Thoại!</span>
-    <span *ngIf="phoneInput.errors?.pattern">Số Điện Thoại không hợp lệ! Phải có từ 10 đến 11 số và bắt đầu bằng số 0.</span>
-  </small>
-</div>
-          </div>
+            <!-- Row 4: Trường, Cơ Sở -->
+            <div class="form-row">
+              
+              <div class="form-group">
+                <label>Cơ sở</label>
+                <select class="form-control" [(ngModel)]="editStudent.coSoId" name="edit_coSoId">
+                  <option value="">-- Chọn Cơ Sở --</option>
+                  <option *ngFor="let cs of cosoList" [value]="cs.id">
+                    {{ cs.ten }} 
+                  </option>
+                </select>
+              </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label>Cơ sở</label>
-              <select class="form-control" [(ngModel)]="newStudent.coSoId" name="coSoId">
-                <option value="">-- Chọn Cơ Sở --</option>
-                <option *ngFor="let cs of cosoList" [value]="cs.id">
-                  {{ cs.ten }}
-                </option>
-              </select>
             </div>
             <div class="form-group">
               <label>Vai trò</label>
@@ -326,13 +310,13 @@
             </div>
             <div class="form-group">
               <label>Vai trò</label>
-              <select class="form-control" [(ngModel)]="editStudent.role" name="edit_role" required>
+              <select class="form-control" [(ngModel)]="editStudent.tenVaiTro" name="edit_role" required>
                 <option value="">-- Chọn Vai Trò --</option>
                 <option value="CampusManager">Quản lý cơ sở</option>
                 <option value="LearningManager">Quản lý tài liệu học tập</option>
               </select>
             
-              <small *ngIf="!editStudent.role" class="text-danger">
+              <small *ngIf="!editStudent.tenVaiTro" class="text-danger">
                 <i class="ft-alert-circle align-middle"></i> Vui lòng chọn vai trò!
               </small>
             </div>

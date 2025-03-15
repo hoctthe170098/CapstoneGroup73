@@ -289,6 +289,7 @@ onEditStudentClick(index: number) {
     ngaySinh: this.formatDate(hs.ngaySinh),
    
 };
+console.log("📌 Vai trò của nhân viên trước khi sửa:", this.editStudent)
 console.log("📌 Vai trò của nhân viên trước khi sửa:", this.editStudent.role)
   // Tìm cosoId từ cosoList dựa trên hs.tenCoSo
   console.log('Dữ liệu nhân viên:', hs);
@@ -376,7 +377,7 @@ const validRoles = ["CampusManager", "LearningManager"];
         email: this.editStudent.email,
         soDienThoai: this.editStudent.soDienThoai,
         coSoId: this.editStudent.coSoId || null, 
-        role: this.editStudent.role,
+        role: this.editStudent.tenVaiTro,
         status: "true"
     };
 
