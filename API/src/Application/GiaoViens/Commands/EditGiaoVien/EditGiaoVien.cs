@@ -98,9 +98,9 @@ public class EditGiaoVienCommandHandler : IRequestHandler<EditGiaoVienCommand, O
         }
         // Check If phone or email exist
         var phoneExists = await _context.GiaoViens
-            .AnyAsync(nv => nv.SoDienThoai == request.SoDienThoai, cancellationToken);
+            .AnyAsync(nv => nv.SoDienThoai == request.SoDienThoai && nv.Code != request.Code, cancellationToken);
         var emailExists = await _context.GiaoViens
-            .AnyAsync(nv => nv.Email == request.Email, cancellationToken);
+            .AnyAsync(nv => nv.Email == request.Email && nv.Code != request.Code, cancellationToken);
         if (phoneExists || emailExists)
         {
             throw new WrongInputException($"Số điện thoại hoặc email đã tồn tại");
