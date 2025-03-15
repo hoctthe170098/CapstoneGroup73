@@ -30,13 +30,13 @@ public class ChinhSachs : EndpointGroupBase
         return await sender.Send(command);
     }
 
-    //[Authorize(Roles = Roles.Administrator)]
+    [Authorize(Roles = Roles.Administrator)]
     public async Task<Output> UpdateChinhSach(ISender sender, [FromBody] UpdateChinhSachCommand command)
     {
         return await sender.Send(command);
     }
 
-    //[Authorize(Roles = Roles.Administrator)]
+    [Authorize(Roles = Roles.Administrator)]
     public async Task<Output> GetChinhSachsWithPagination(ISender sender, GetChinhSachsWithPaginationQuery query)
     {
         return await sender.Send(query);
@@ -48,7 +48,7 @@ public class ChinhSachs : EndpointGroupBase
         return await sender.Send(query);
     }
 
-    //[Authorize(Roles = Roles.Administrator)]
+    [Authorize(Roles = Roles.Administrator)]
     public async Task<Output> DeleteChinhSach(ISender sender, string id)
     {
         try

@@ -191,9 +191,289 @@ export class ApplicationUsersClient implements IApplicationUsersClient {
     }
 }
 
+export interface IChinhSachsClient {
+    createChinhSach(command: CreateChinhSachCommand): Observable<Output>;
+    updateChinhSach(command: UpdateChinhSachCommand): Observable<Output>;
+    getChinhSachsWithPagination(query: GetChinhSachsWithPaginationQuery): Observable<Output>;
+    getAllChinhSachs(): Observable<Output>;
+    deleteChinhSach(id: string): Observable<Output>;
+}
+
+@Injectable({
+    providedIn: 'root'
+})
+export class ChinhSachsClient implements IChinhSachsClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    createChinhSach(command: CreateChinhSachCommand): Observable<Output> {
+        let url_ = this.baseUrl + "/api/ChinhSachs/createchinhsach";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateChinhSach(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateChinhSach(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Output>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Output>;
+        }));
+    }
+
+    protected processCreateChinhSach(response: HttpResponseBase): Observable<Output> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Output.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    updateChinhSach(command: UpdateChinhSachCommand): Observable<Output> {
+        let url_ = this.baseUrl + "/api/ChinhSachs/updatechinhsach";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateChinhSach(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateChinhSach(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Output>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Output>;
+        }));
+    }
+
+    protected processUpdateChinhSach(response: HttpResponseBase): Observable<Output> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Output.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getChinhSachsWithPagination(query: GetChinhSachsWithPaginationQuery): Observable<Output> {
+        let url_ = this.baseUrl + "/api/ChinhSachs/getchinhsachs";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(query);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetChinhSachsWithPagination(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetChinhSachsWithPagination(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Output>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Output>;
+        }));
+    }
+
+    protected processGetChinhSachsWithPagination(response: HttpResponseBase): Observable<Output> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Output.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getAllChinhSachs(): Observable<Output> {
+        let url_ = this.baseUrl + "/api/ChinhSachs/getallchinhsachs";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllChinhSachs(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllChinhSachs(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Output>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Output>;
+        }));
+    }
+
+    protected processGetAllChinhSachs(response: HttpResponseBase): Observable<Output> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Output.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    deleteChinhSach(id: string): Observable<Output> {
+        let url_ = this.baseUrl + "/api/ChinhSachs/deletechinhsach/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteChinhSach(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteChinhSach(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Output>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Output>;
+        }));
+    }
+
+    protected processDeleteChinhSach(response: HttpResponseBase): Observable<Output> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Output.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
 export interface IChuongTrinhsClient {
     createChuongTrinh(command: CreateChuongTrinhCommand): Observable<Output>;
-    getChuongTrinhsWithPagination(pageNumber: number | undefined, pageSize: number | undefined): Observable<PaginatedListOfChuongTrinhDto>;
+    updateChuongTrinh(command: UpdateChuongTrinhCommand): Observable<Output>;
+    getChuongTrinhsWithPagination(query: GetChuongTrinhsWithPaginationQuery): Observable<Output>;
+    getAllChuongTrinhs(): Observable<Output>;
+    deleteChuongTrinh(id: string): Observable<Output>;
 }
 
 @Injectable({
@@ -210,17 +490,17 @@ export class ChuongTrinhsClient implements IChuongTrinhsClient {
     }
 
     createChuongTrinh(command: CreateChuongTrinhCommand): Observable<Output> {
-        let url_ = this.baseUrl + "/api/ChuongTrinhs/createchuongtrinh";
+        let url_ = this.baseUrl + "/api/ChuongTrinhs/createchuongtrinh?";
+        if (command === undefined || command === null)
+            throw new Error("The parameter 'command' must be defined and cannot be null.");
+        else
+            url_ += "command=" + encodeURIComponent("" + command) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(command);
-
         let options_ : any = {
-            body: content_,
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
-                "Content-Type": "application/json",
                 "Accept": "application/json"
             })
         };
@@ -261,16 +541,112 @@ export class ChuongTrinhsClient implements IChuongTrinhsClient {
         return _observableOf(null as any);
     }
 
-    getChuongTrinhsWithPagination(pageNumber: number | undefined, pageSize: number | undefined): Observable<PaginatedListOfChuongTrinhDto> {
-        let url_ = this.baseUrl + "/api/ChuongTrinhs/getchuongtrinhs?";
-        if (pageNumber === null)
-            throw new Error("The parameter 'pageNumber' cannot be null.");
-        else if (pageNumber !== undefined)
-            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
-        if (pageSize === null)
-            throw new Error("The parameter 'pageSize' cannot be null.");
-        else if (pageSize !== undefined)
-            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+    updateChuongTrinh(command: UpdateChuongTrinhCommand): Observable<Output> {
+        let url_ = this.baseUrl + "/api/ChuongTrinhs/updatechuongtrinh?";
+        if (command === undefined || command === null)
+            throw new Error("The parameter 'command' must be defined and cannot be null.");
+        else
+            url_ += "command=" + encodeURIComponent("" + command) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateChuongTrinh(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateChuongTrinh(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Output>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Output>;
+        }));
+    }
+
+    protected processUpdateChuongTrinh(response: HttpResponseBase): Observable<Output> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Output.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getChuongTrinhsWithPagination(query: GetChuongTrinhsWithPaginationQuery): Observable<Output> {
+        let url_ = this.baseUrl + "/api/ChuongTrinhs/getchuongtrinhs";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(query);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetChuongTrinhsWithPagination(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetChuongTrinhsWithPagination(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Output>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Output>;
+        }));
+    }
+
+    protected processGetChuongTrinhsWithPagination(response: HttpResponseBase): Observable<Output> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Output.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getAllChuongTrinhs(): Observable<Output> {
+        let url_ = this.baseUrl + "/api/ChuongTrinhs/getallchuongtrinhs";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -282,20 +658,20 @@ export class ChuongTrinhsClient implements IChuongTrinhsClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetChuongTrinhsWithPagination(response_);
+            return this.processGetAllChuongTrinhs(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetChuongTrinhsWithPagination(response_ as any);
+                    return this.processGetAllChuongTrinhs(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<PaginatedListOfChuongTrinhDto>;
+                    return _observableThrow(e) as any as Observable<Output>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<PaginatedListOfChuongTrinhDto>;
+                return _observableThrow(response_) as any as Observable<Output>;
         }));
     }
 
-    protected processGetChuongTrinhsWithPagination(response: HttpResponseBase): Observable<PaginatedListOfChuongTrinhDto> {
+    protected processGetAllChuongTrinhs(response: HttpResponseBase): Observable<Output> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -306,7 +682,58 @@ export class ChuongTrinhsClient implements IChuongTrinhsClient {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = PaginatedListOfChuongTrinhDto.fromJS(resultData200);
+            result200 = Output.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    deleteChuongTrinh(id: string): Observable<Output> {
+        let url_ = this.baseUrl + "/api/ChuongTrinhs/deletechuongtrinh/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteChuongTrinh(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteChuongTrinh(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Output>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Output>;
+        }));
+    }
+
+    protected processDeleteChuongTrinh(response: HttpResponseBase): Observable<Output> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Output.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -321,6 +748,7 @@ export class ChuongTrinhsClient implements IChuongTrinhsClient {
 export interface ICoSosClient {
     createCoSo(comand: CreateCoSoComand): Observable<Output>;
     getCoSosWithPagination(query: GetCososWithPaginationQuery): Observable<Output>;
+    getAllCoSos(): Observable<Output>;
     editCoSo(comand: EditCoSoComand): Observable<Output>;
 }
 
@@ -441,6 +869,54 @@ export class CoSosClient implements ICoSosClient {
         return _observableOf(null as any);
     }
 
+    getAllCoSos(): Observable<Output> {
+        let url_ = this.baseUrl + "/api/CoSos/getallcosos";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllCoSos(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllCoSos(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Output>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Output>;
+        }));
+    }
+
+    protected processGetAllCoSos(response: HttpResponseBase): Observable<Output> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Output.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
     editCoSo(comand: EditCoSoComand): Observable<Output> {
         let url_ = this.baseUrl + "/api/CoSos/editcoso";
         url_ = url_.replace(/[?&]$/, "");
@@ -472,6 +948,464 @@ export class CoSosClient implements ICoSosClient {
     }
 
     protected processEditCoSo(response: HttpResponseBase): Observable<Output> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Output.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+export interface IGiaoViensClient {
+    createGiaoVien(comand: CreateGiaoVienCommand): Observable<Output>;
+    getGiaoViensWithPagination(query: GetGiaoViensWithPaginationQuery): Observable<Output>;
+    editGiaoVien(comand: EditGiaoVienCommand): Observable<Output>;
+    addListGiaoViens(comand: AddListGiaoViensCommand): Observable<Output>;
+}
+
+@Injectable({
+    providedIn: 'root'
+})
+export class GiaoViensClient implements IGiaoViensClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    createGiaoVien(comand: CreateGiaoVienCommand): Observable<Output> {
+        let url_ = this.baseUrl + "/api/GiaoViens/creategiaovien";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(comand);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateGiaoVien(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateGiaoVien(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Output>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Output>;
+        }));
+    }
+
+    protected processCreateGiaoVien(response: HttpResponseBase): Observable<Output> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Output.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getGiaoViensWithPagination(query: GetGiaoViensWithPaginationQuery): Observable<Output> {
+        let url_ = this.baseUrl + "/api/GiaoViens/getgiaovienswithpagination";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(query);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetGiaoViensWithPagination(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetGiaoViensWithPagination(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Output>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Output>;
+        }));
+    }
+
+    protected processGetGiaoViensWithPagination(response: HttpResponseBase): Observable<Output> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Output.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    editGiaoVien(comand: EditGiaoVienCommand): Observable<Output> {
+        let url_ = this.baseUrl + "/api/GiaoViens/editgiaovien";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(comand);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processEditGiaoVien(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processEditGiaoVien(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Output>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Output>;
+        }));
+    }
+
+    protected processEditGiaoVien(response: HttpResponseBase): Observable<Output> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Output.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    addListGiaoViens(comand: AddListGiaoViensCommand): Observable<Output> {
+        let url_ = this.baseUrl + "/api/GiaoViens/addlistgiaoviens";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(comand);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddListGiaoViens(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddListGiaoViens(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Output>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Output>;
+        }));
+    }
+
+    protected processAddListGiaoViens(response: HttpResponseBase): Observable<Output> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Output.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+export interface IHocSinhsClient {
+    createHocSinh(command: CreateHocSinhCommand): Observable<Output>;
+    getHocSinhsWithPagination(query: GetHocSinhsWithPaginationQuery): Observable<Output>;
+    editHocSinh(command: EditHocSinhCommand): Observable<Output>;
+    addListHocSinhs(command: AddListHocSinhsCommand): Observable<Output>;
+}
+
+@Injectable({
+    providedIn: 'root'
+})
+export class HocSinhsClient implements IHocSinhsClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    createHocSinh(command: CreateHocSinhCommand): Observable<Output> {
+        let url_ = this.baseUrl + "/api/HocSinhs/createhocsinh";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateHocSinh(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateHocSinh(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Output>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Output>;
+        }));
+    }
+
+    protected processCreateHocSinh(response: HttpResponseBase): Observable<Output> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Output.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getHocSinhsWithPagination(query: GetHocSinhsWithPaginationQuery): Observable<Output> {
+        let url_ = this.baseUrl + "/api/HocSinhs/gethocsinhswithpagination";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(query);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetHocSinhsWithPagination(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetHocSinhsWithPagination(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Output>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Output>;
+        }));
+    }
+
+    protected processGetHocSinhsWithPagination(response: HttpResponseBase): Observable<Output> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Output.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    editHocSinh(command: EditHocSinhCommand): Observable<Output> {
+        let url_ = this.baseUrl + "/api/HocSinhs/edithocsinh";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processEditHocSinh(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processEditHocSinh(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Output>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Output>;
+        }));
+    }
+
+    protected processEditHocSinh(response: HttpResponseBase): Observable<Output> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Output.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    addListHocSinhs(command: AddListHocSinhsCommand): Observable<Output> {
+        let url_ = this.baseUrl + "/api/HocSinhs/addlisthocsinhs";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddListHocSinhs(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddListHocSinhs(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Output>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Output>;
+        }));
+    }
+
+    protected processAddListHocSinhs(response: HttpResponseBase): Observable<Output> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -795,7 +1729,7 @@ export class NhanViensClient implements INhanViensClient {
 
 export interface IPhongsClient {
     createPhong(command: CreatePhongCommand): Observable<Output>;
-    getPhongsWithPagination(query: GetPhongsWithPaginationQuery): Observable<Output>;
+    getPhongsWithPagination(query: GetPhongsQuery): Observable<Output>;
     editPhong(command: EditPhongCommand): Observable<Output>;
 }
 
@@ -864,7 +1798,7 @@ export class PhongsClient implements IPhongsClient {
         return _observableOf(null as any);
     }
 
-    getPhongsWithPagination(query: GetPhongsWithPaginationQuery): Observable<Output> {
+    getPhongsWithPagination(query: GetPhongsQuery): Observable<Output> {
         let url_ = this.baseUrl + "/api/Phongs/getphongswithpagination";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1730,9 +2664,212 @@ export interface IChangePasswordComand {
     newPassword?: string | undefined;
 }
 
+export class CreateChinhSachCommand implements ICreateChinhSachCommand {
+    createChinhSachDto?: CreateChinhSachDto;
+
+    constructor(data?: ICreateChinhSachCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.createChinhSachDto = _data["createChinhSachDto"] ? CreateChinhSachDto.fromJS(_data["createChinhSachDto"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): CreateChinhSachCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateChinhSachCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["createChinhSachDto"] = this.createChinhSachDto ? this.createChinhSachDto.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface ICreateChinhSachCommand {
+    createChinhSachDto?: CreateChinhSachDto;
+}
+
+export class CreateChinhSachDto implements ICreateChinhSachDto {
+    ten?: string;
+    mota?: string;
+    phanTramGiam?: number;
+
+    constructor(data?: ICreateChinhSachDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.ten = _data["ten"];
+            this.mota = _data["mota"];
+            this.phanTramGiam = _data["phanTramGiam"];
+        }
+    }
+
+    static fromJS(data: any): CreateChinhSachDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateChinhSachDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["ten"] = this.ten;
+        data["mota"] = this.mota;
+        data["phanTramGiam"] = this.phanTramGiam;
+        return data;
+    }
+}
+
+export interface ICreateChinhSachDto {
+    ten?: string;
+    mota?: string;
+    phanTramGiam?: number;
+}
+
+export class UpdateChinhSachCommand implements IUpdateChinhSachCommand {
+    updateChinhSachDto?: UpdateChinhSachDto;
+
+    constructor(data?: IUpdateChinhSachCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.updateChinhSachDto = _data["updateChinhSachDto"] ? UpdateChinhSachDto.fromJS(_data["updateChinhSachDto"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): UpdateChinhSachCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateChinhSachCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["updateChinhSachDto"] = this.updateChinhSachDto ? this.updateChinhSachDto.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IUpdateChinhSachCommand {
+    updateChinhSachDto?: UpdateChinhSachDto;
+}
+
+export class UpdateChinhSachDto implements IUpdateChinhSachDto {
+    id?: number;
+    ten?: string | undefined;
+    mota?: string | undefined;
+    phanTramGiam?: number | undefined;
+
+    constructor(data?: IUpdateChinhSachDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.ten = _data["ten"];
+            this.mota = _data["mota"];
+            this.phanTramGiam = _data["phanTramGiam"];
+        }
+    }
+
+    static fromJS(data: any): UpdateChinhSachDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateChinhSachDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["ten"] = this.ten;
+        data["mota"] = this.mota;
+        data["phanTramGiam"] = this.phanTramGiam;
+        return data;
+    }
+}
+
+export interface IUpdateChinhSachDto {
+    id?: number;
+    ten?: string | undefined;
+    mota?: string | undefined;
+    phanTramGiam?: number | undefined;
+}
+
+export class GetChinhSachsWithPaginationQuery implements IGetChinhSachsWithPaginationQuery {
+    pageNumber?: number;
+    pageSize?: number;
+
+    constructor(data?: IGetChinhSachsWithPaginationQuery) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+        }
+    }
+
+    static fromJS(data: any): GetChinhSachsWithPaginationQuery {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetChinhSachsWithPaginationQuery();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        return data;
+    }
+}
+
+export interface IGetChinhSachsWithPaginationQuery {
+    pageNumber?: number;
+    pageSize?: number;
+}
+
 export class CreateChuongTrinhCommand implements ICreateChuongTrinhCommand {
-    tieuDe?: string;
-    moTa?: string;
+    chuongTrinhDto?: CreateChuongTrinhDto;
 
     constructor(data?: ICreateChuongTrinhCommand) {
         if (data) {
@@ -1745,8 +2882,7 @@ export class CreateChuongTrinhCommand implements ICreateChuongTrinhCommand {
 
     init(_data?: any) {
         if (_data) {
-            this.tieuDe = _data["tieuDe"];
-            this.moTa = _data["moTa"];
+            this.chuongTrinhDto = _data["chuongTrinhDto"] ? CreateChuongTrinhDto.fromJS(_data["chuongTrinhDto"]) : <any>undefined;
         }
     }
 
@@ -1759,26 +2895,21 @@ export class CreateChuongTrinhCommand implements ICreateChuongTrinhCommand {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["tieuDe"] = this.tieuDe;
-        data["moTa"] = this.moTa;
+        data["chuongTrinhDto"] = this.chuongTrinhDto ? this.chuongTrinhDto.toJSON() : <any>undefined;
         return data;
     }
 }
 
 export interface ICreateChuongTrinhCommand {
-    tieuDe?: string;
-    moTa?: string;
+    chuongTrinhDto?: CreateChuongTrinhDto;
 }
 
-export class PaginatedListOfChuongTrinhDto implements IPaginatedListOfChuongTrinhDto {
-    items?: ChuongTrinhDto[];
-    pageNumber?: number;
-    totalPages?: number;
-    totalCount?: number;
-    hasPreviousPage?: boolean;
-    hasNextPage?: boolean;
+export class CreateChuongTrinhDto implements ICreateChuongTrinhDto {
+    tieuDe?: string;
+    moTa?: string;
+    noiDungBaiHocs?: CreateNoiDungBaiHocDto[] | undefined;
 
-    constructor(data?: IPaginatedListOfChuongTrinhDto) {
+    constructor(data?: ICreateChuongTrinhDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1789,57 +2920,182 @@ export class PaginatedListOfChuongTrinhDto implements IPaginatedListOfChuongTrin
 
     init(_data?: any) {
         if (_data) {
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(ChuongTrinhDto.fromJS(item));
+            this.tieuDe = _data["tieuDe"];
+            this.moTa = _data["moTa"];
+            if (Array.isArray(_data["noiDungBaiHocs"])) {
+                this.noiDungBaiHocs = [] as any;
+                for (let item of _data["noiDungBaiHocs"])
+                    this.noiDungBaiHocs!.push(CreateNoiDungBaiHocDto.fromJS(item));
             }
-            this.pageNumber = _data["pageNumber"];
-            this.totalPages = _data["totalPages"];
-            this.totalCount = _data["totalCount"];
-            this.hasPreviousPage = _data["hasPreviousPage"];
-            this.hasNextPage = _data["hasNextPage"];
         }
     }
 
-    static fromJS(data: any): PaginatedListOfChuongTrinhDto {
+    static fromJS(data: any): CreateChuongTrinhDto {
         data = typeof data === 'object' ? data : {};
-        let result = new PaginatedListOfChuongTrinhDto();
+        let result = new CreateChuongTrinhDto();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item.toJSON());
+        data["tieuDe"] = this.tieuDe;
+        data["moTa"] = this.moTa;
+        if (Array.isArray(this.noiDungBaiHocs)) {
+            data["noiDungBaiHocs"] = [];
+            for (let item of this.noiDungBaiHocs)
+                data["noiDungBaiHocs"].push(item.toJSON());
         }
-        data["pageNumber"] = this.pageNumber;
-        data["totalPages"] = this.totalPages;
-        data["totalCount"] = this.totalCount;
-        data["hasPreviousPage"] = this.hasPreviousPage;
-        data["hasNextPage"] = this.hasNextPage;
         return data;
     }
 }
 
-export interface IPaginatedListOfChuongTrinhDto {
-    items?: ChuongTrinhDto[];
-    pageNumber?: number;
-    totalPages?: number;
-    totalCount?: number;
-    hasPreviousPage?: boolean;
-    hasNextPage?: boolean;
+export interface ICreateChuongTrinhDto {
+    tieuDe?: string;
+    moTa?: string;
+    noiDungBaiHocs?: CreateNoiDungBaiHocDto[] | undefined;
 }
 
-export class ChuongTrinhDto implements IChuongTrinhDto {
+export class CreateNoiDungBaiHocDto implements ICreateNoiDungBaiHocDto {
+    tieuDe?: string;
+    mota?: string;
+    soThuTu?: number;
+    taiLieuHocTaps?: CreateTaiLieuHocTapDto[] | undefined;
+
+    constructor(data?: ICreateNoiDungBaiHocDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.tieuDe = _data["tieuDe"];
+            this.mota = _data["mota"];
+            this.soThuTu = _data["soThuTu"];
+            if (Array.isArray(_data["taiLieuHocTaps"])) {
+                this.taiLieuHocTaps = [] as any;
+                for (let item of _data["taiLieuHocTaps"])
+                    this.taiLieuHocTaps!.push(CreateTaiLieuHocTapDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): CreateNoiDungBaiHocDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateNoiDungBaiHocDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["tieuDe"] = this.tieuDe;
+        data["mota"] = this.mota;
+        data["soThuTu"] = this.soThuTu;
+        if (Array.isArray(this.taiLieuHocTaps)) {
+            data["taiLieuHocTaps"] = [];
+            for (let item of this.taiLieuHocTaps)
+                data["taiLieuHocTaps"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface ICreateNoiDungBaiHocDto {
+    tieuDe?: string;
+    mota?: string;
+    soThuTu?: number;
+    taiLieuHocTaps?: CreateTaiLieuHocTapDto[] | undefined;
+}
+
+export class CreateTaiLieuHocTapDto implements ICreateTaiLieuHocTapDto {
+    urlType?: string;
+    file?: string | undefined;
+
+    constructor(data?: ICreateTaiLieuHocTapDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.urlType = _data["urlType"];
+            this.file = _data["file"];
+        }
+    }
+
+    static fromJS(data: any): CreateTaiLieuHocTapDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateTaiLieuHocTapDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["urlType"] = this.urlType;
+        data["file"] = this.file;
+        return data;
+    }
+}
+
+export interface ICreateTaiLieuHocTapDto {
+    urlType?: string;
+    file?: string | undefined;
+}
+
+export class UpdateChuongTrinhCommand implements IUpdateChuongTrinhCommand {
+    chuongTrinhDto?: UpdateChuongTrinhDto;
+
+    constructor(data?: IUpdateChuongTrinhCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.chuongTrinhDto = _data["chuongTrinhDto"] ? UpdateChuongTrinhDto.fromJS(_data["chuongTrinhDto"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): UpdateChuongTrinhCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateChuongTrinhCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["chuongTrinhDto"] = this.chuongTrinhDto ? this.chuongTrinhDto.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IUpdateChuongTrinhCommand {
+    chuongTrinhDto?: UpdateChuongTrinhDto;
+}
+
+export class UpdateChuongTrinhDto implements IUpdateChuongTrinhDto {
     id?: number;
     tieuDe?: string;
     moTa?: string;
+    trangThai?: string;
+    noiDungBaiHocs?: UpdateNoiDungBaiHocDto[] | undefined;
 
-    constructor(data?: IChuongTrinhDto) {
+    constructor(data?: IUpdateChuongTrinhDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1853,12 +3109,18 @@ export class ChuongTrinhDto implements IChuongTrinhDto {
             this.id = _data["id"];
             this.tieuDe = _data["tieuDe"];
             this.moTa = _data["moTa"];
+            this.trangThai = _data["trangThai"];
+            if (Array.isArray(_data["noiDungBaiHocs"])) {
+                this.noiDungBaiHocs = [] as any;
+                for (let item of _data["noiDungBaiHocs"])
+                    this.noiDungBaiHocs!.push(UpdateNoiDungBaiHocDto.fromJS(item));
+            }
         }
     }
 
-    static fromJS(data: any): ChuongTrinhDto {
+    static fromJS(data: any): UpdateChuongTrinhDto {
         data = typeof data === 'object' ? data : {};
-        let result = new ChuongTrinhDto();
+        let result = new UpdateChuongTrinhDto();
         result.init(data);
         return result;
     }
@@ -1868,14 +3130,170 @@ export class ChuongTrinhDto implements IChuongTrinhDto {
         data["id"] = this.id;
         data["tieuDe"] = this.tieuDe;
         data["moTa"] = this.moTa;
+        data["trangThai"] = this.trangThai;
+        if (Array.isArray(this.noiDungBaiHocs)) {
+            data["noiDungBaiHocs"] = [];
+            for (let item of this.noiDungBaiHocs)
+                data["noiDungBaiHocs"].push(item.toJSON());
+        }
         return data;
     }
 }
 
-export interface IChuongTrinhDto {
+export interface IUpdateChuongTrinhDto {
     id?: number;
     tieuDe?: string;
     moTa?: string;
+    trangThai?: string;
+    noiDungBaiHocs?: UpdateNoiDungBaiHocDto[] | undefined;
+}
+
+export class UpdateNoiDungBaiHocDto implements IUpdateNoiDungBaiHocDto {
+    id?: string | undefined;
+    tieuDe?: string;
+    mota?: string;
+    soThuTu?: number;
+    taiLieuHocTaps?: UpdateTaiLieuHocTapDto[] | undefined;
+
+    constructor(data?: IUpdateNoiDungBaiHocDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.tieuDe = _data["tieuDe"];
+            this.mota = _data["mota"];
+            this.soThuTu = _data["soThuTu"];
+            if (Array.isArray(_data["taiLieuHocTaps"])) {
+                this.taiLieuHocTaps = [] as any;
+                for (let item of _data["taiLieuHocTaps"])
+                    this.taiLieuHocTaps!.push(UpdateTaiLieuHocTapDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): UpdateNoiDungBaiHocDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateNoiDungBaiHocDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["tieuDe"] = this.tieuDe;
+        data["mota"] = this.mota;
+        data["soThuTu"] = this.soThuTu;
+        if (Array.isArray(this.taiLieuHocTaps)) {
+            data["taiLieuHocTaps"] = [];
+            for (let item of this.taiLieuHocTaps)
+                data["taiLieuHocTaps"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IUpdateNoiDungBaiHocDto {
+    id?: string | undefined;
+    tieuDe?: string;
+    mota?: string;
+    soThuTu?: number;
+    taiLieuHocTaps?: UpdateTaiLieuHocTapDto[] | undefined;
+}
+
+export class UpdateTaiLieuHocTapDto implements IUpdateTaiLieuHocTapDto {
+    id?: string | undefined;
+    urlType?: string;
+    file?: string | undefined;
+
+    constructor(data?: IUpdateTaiLieuHocTapDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.urlType = _data["urlType"];
+            this.file = _data["file"];
+        }
+    }
+
+    static fromJS(data: any): UpdateTaiLieuHocTapDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateTaiLieuHocTapDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["urlType"] = this.urlType;
+        data["file"] = this.file;
+        return data;
+    }
+}
+
+export interface IUpdateTaiLieuHocTapDto {
+    id?: string | undefined;
+    urlType?: string;
+    file?: string | undefined;
+}
+
+export class GetChuongTrinhsWithPaginationQuery implements IGetChuongTrinhsWithPaginationQuery {
+    search?: string | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+
+    constructor(data?: IGetChuongTrinhsWithPaginationQuery) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.search = _data["search"];
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+        }
+    }
+
+    static fromJS(data: any): GetChuongTrinhsWithPaginationQuery {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetChuongTrinhsWithPaginationQuery();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["search"] = this.search;
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        return data;
+    }
+}
+
+export interface IGetChuongTrinhsWithPaginationQuery {
+    search?: string | undefined;
+    pageNumber?: number;
+    pageSize?: number;
 }
 
 export class CreateCoSoComand implements ICreateCoSoComand {
@@ -2014,20 +3432,536 @@ export interface IEditCoSoComand {
     trangThai?: string | undefined;
 }
 
+export class CreateGiaoVienCommand implements ICreateGiaoVienCommand {
+    code?: string;
+    ten?: string;
+    gioiTinh?: string;
+    diaChi?: string;
+    truongDangDay?: string;
+    ngaySinh?: string;
+    email?: string;
+    soDienThoai?: string;
+
+    constructor(data?: ICreateGiaoVienCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.code = _data["code"];
+            this.ten = _data["ten"];
+            this.gioiTinh = _data["gioiTinh"];
+            this.diaChi = _data["diaChi"];
+            this.truongDangDay = _data["truongDangDay"];
+            this.ngaySinh = _data["ngaySinh"];
+            this.email = _data["email"];
+            this.soDienThoai = _data["soDienThoai"];
+        }
+    }
+
+    static fromJS(data: any): CreateGiaoVienCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateGiaoVienCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["code"] = this.code;
+        data["ten"] = this.ten;
+        data["gioiTinh"] = this.gioiTinh;
+        data["diaChi"] = this.diaChi;
+        data["truongDangDay"] = this.truongDangDay;
+        data["ngaySinh"] = this.ngaySinh;
+        data["email"] = this.email;
+        data["soDienThoai"] = this.soDienThoai;
+        return data;
+    }
+}
+
+export interface ICreateGiaoVienCommand {
+    code?: string;
+    ten?: string;
+    gioiTinh?: string;
+    diaChi?: string;
+    truongDangDay?: string;
+    ngaySinh?: string;
+    email?: string;
+    soDienThoai?: string;
+}
+
+export class GetGiaoViensWithPaginationQuery implements IGetGiaoViensWithPaginationQuery {
+    pageNumber?: number;
+    pageSize?: number;
+    searchTen?: string | undefined;
+    sortBy?: string | undefined;
+    isActive?: boolean | undefined;
+
+    constructor(data?: IGetGiaoViensWithPaginationQuery) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.searchTen = _data["searchTen"];
+            this.sortBy = _data["sortBy"];
+            this.isActive = _data["isActive"];
+        }
+    }
+
+    static fromJS(data: any): GetGiaoViensWithPaginationQuery {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetGiaoViensWithPaginationQuery();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["searchTen"] = this.searchTen;
+        data["sortBy"] = this.sortBy;
+        data["isActive"] = this.isActive;
+        return data;
+    }
+}
+
+export interface IGetGiaoViensWithPaginationQuery {
+    pageNumber?: number;
+    pageSize?: number;
+    searchTen?: string | undefined;
+    sortBy?: string | undefined;
+    isActive?: boolean | undefined;
+}
+
+export class EditGiaoVienCommand implements IEditGiaoVienCommand {
+    code?: string;
+    ten?: string;
+    gioiTinh?: string;
+    diaChi?: string;
+    truongDangDay?: string;
+    ngaySinh?: string;
+    email?: string;
+    soDienThoai?: string;
+    status?: string;
+
+    constructor(data?: IEditGiaoVienCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.code = _data["code"];
+            this.ten = _data["ten"];
+            this.gioiTinh = _data["gioiTinh"];
+            this.diaChi = _data["diaChi"];
+            this.truongDangDay = _data["truongDangDay"];
+            this.ngaySinh = _data["ngaySinh"];
+            this.email = _data["email"];
+            this.soDienThoai = _data["soDienThoai"];
+            this.status = _data["status"];
+        }
+    }
+
+    static fromJS(data: any): EditGiaoVienCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new EditGiaoVienCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["code"] = this.code;
+        data["ten"] = this.ten;
+        data["gioiTinh"] = this.gioiTinh;
+        data["diaChi"] = this.diaChi;
+        data["truongDangDay"] = this.truongDangDay;
+        data["ngaySinh"] = this.ngaySinh;
+        data["email"] = this.email;
+        data["soDienThoai"] = this.soDienThoai;
+        data["status"] = this.status;
+        return data;
+    }
+}
+
+export interface IEditGiaoVienCommand {
+    code?: string;
+    ten?: string;
+    gioiTinh?: string;
+    diaChi?: string;
+    truongDangDay?: string;
+    ngaySinh?: string;
+    email?: string;
+    soDienThoai?: string;
+    status?: string;
+}
+
+export class AddListGiaoViensCommand implements IAddListGiaoViensCommand {
+    giaoViens?: CreateGiaoVienCommand[];
+
+    constructor(data?: IAddListGiaoViensCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["giaoViens"])) {
+                this.giaoViens = [] as any;
+                for (let item of _data["giaoViens"])
+                    this.giaoViens!.push(CreateGiaoVienCommand.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): AddListGiaoViensCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new AddListGiaoViensCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.giaoViens)) {
+            data["giaoViens"] = [];
+            for (let item of this.giaoViens)
+                data["giaoViens"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IAddListGiaoViensCommand {
+    giaoViens?: CreateGiaoVienCommand[];
+}
+
+export class CreateHocSinhCommand implements ICreateHocSinhCommand {
+    code?: string;
+    ten?: string;
+    gioiTinh?: string;
+    diaChi?: string;
+    lop?: string;
+    truongDangHoc?: string;
+    ngaySinh?: Date;
+    email?: string;
+    soDienThoai?: string;
+    chinhSachId?: number | undefined;
+    coSoId?: string;
+
+    constructor(data?: ICreateHocSinhCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.code = _data["code"];
+            this.ten = _data["ten"];
+            this.gioiTinh = _data["gioiTinh"];
+            this.diaChi = _data["diaChi"];
+            this.lop = _data["lop"];
+            this.truongDangHoc = _data["truongDangHoc"];
+            this.ngaySinh = _data["ngaySinh"] ? new Date(_data["ngaySinh"].toString()) : <any>undefined;
+            this.email = _data["email"];
+            this.soDienThoai = _data["soDienThoai"];
+            this.chinhSachId = _data["chinhSachId"];
+            this.coSoId = _data["coSoId"];
+        }
+    }
+
+    static fromJS(data: any): CreateHocSinhCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateHocSinhCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["code"] = this.code;
+        data["ten"] = this.ten;
+        data["gioiTinh"] = this.gioiTinh;
+        data["diaChi"] = this.diaChi;
+        data["lop"] = this.lop;
+        data["truongDangHoc"] = this.truongDangHoc;
+        data["ngaySinh"] = this.ngaySinh ? formatDate(this.ngaySinh) : <any>undefined;
+        data["email"] = this.email;
+        data["soDienThoai"] = this.soDienThoai;
+        data["chinhSachId"] = this.chinhSachId;
+        data["coSoId"] = this.coSoId;
+        return data;
+    }
+}
+
+export interface ICreateHocSinhCommand {
+    code?: string;
+    ten?: string;
+    gioiTinh?: string;
+    diaChi?: string;
+    lop?: string;
+    truongDangHoc?: string;
+    ngaySinh?: Date;
+    email?: string;
+    soDienThoai?: string;
+    chinhSachId?: number | undefined;
+    coSoId?: string;
+}
+
+export class GetHocSinhsWithPaginationQuery implements IGetHocSinhsWithPaginationQuery {
+    pageNumber?: number;
+    pageSize?: number;
+    searchTen?: string | undefined;
+    sortBy?: string | undefined;
+    filterIsActive?: boolean | undefined;
+    filterByClass?: string | undefined;
+
+    constructor(data?: IGetHocSinhsWithPaginationQuery) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.searchTen = _data["searchTen"];
+            this.sortBy = _data["sortBy"];
+            this.filterIsActive = _data["filterIsActive"];
+            this.filterByClass = _data["filterByClass"];
+        }
+    }
+
+    static fromJS(data: any): GetHocSinhsWithPaginationQuery {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetHocSinhsWithPaginationQuery();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["searchTen"] = this.searchTen;
+        data["sortBy"] = this.sortBy;
+        data["filterIsActive"] = this.filterIsActive;
+        data["filterByClass"] = this.filterByClass;
+        return data;
+    }
+}
+
+export interface IGetHocSinhsWithPaginationQuery {
+    pageNumber?: number;
+    pageSize?: number;
+    searchTen?: string | undefined;
+    sortBy?: string | undefined;
+    filterIsActive?: boolean | undefined;
+    filterByClass?: string | undefined;
+}
+
+export class EditHocSinhCommand implements IEditHocSinhCommand {
+    code?: string;
+    ten?: string;
+    gioiTinh?: string;
+    diaChi?: string;
+    lop?: string;
+    truongDangHoc?: string;
+    ngaySinh?: Date;
+    email?: string;
+    soDienThoai?: string;
+    chinhSachId?: number | undefined;
+    coSoId?: string;
+
+    constructor(data?: IEditHocSinhCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.code = _data["code"];
+            this.ten = _data["ten"];
+            this.gioiTinh = _data["gioiTinh"];
+            this.diaChi = _data["diaChi"];
+            this.lop = _data["lop"];
+            this.truongDangHoc = _data["truongDangHoc"];
+            this.ngaySinh = _data["ngaySinh"] ? new Date(_data["ngaySinh"].toString()) : <any>undefined;
+            this.email = _data["email"];
+            this.soDienThoai = _data["soDienThoai"];
+            this.chinhSachId = _data["chinhSachId"];
+            this.coSoId = _data["coSoId"];
+        }
+    }
+
+    static fromJS(data: any): EditHocSinhCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new EditHocSinhCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["code"] = this.code;
+        data["ten"] = this.ten;
+        data["gioiTinh"] = this.gioiTinh;
+        data["diaChi"] = this.diaChi;
+        data["lop"] = this.lop;
+        data["truongDangHoc"] = this.truongDangHoc;
+        data["ngaySinh"] = this.ngaySinh ? formatDate(this.ngaySinh) : <any>undefined;
+        data["email"] = this.email;
+        data["soDienThoai"] = this.soDienThoai;
+        data["chinhSachId"] = this.chinhSachId;
+        data["coSoId"] = this.coSoId;
+        return data;
+    }
+}
+
+export interface IEditHocSinhCommand {
+    code?: string;
+    ten?: string;
+    gioiTinh?: string;
+    diaChi?: string;
+    lop?: string;
+    truongDangHoc?: string;
+    ngaySinh?: Date;
+    email?: string;
+    soDienThoai?: string;
+    chinhSachId?: number | undefined;
+    coSoId?: string;
+}
+
+export class AddListHocSinhsCommand implements IAddListHocSinhsCommand {
+    hocSinhs?: CreateHocSinhCommand[];
+
+    constructor(data?: IAddListHocSinhsCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["hocSinhs"])) {
+                this.hocSinhs = [] as any;
+                for (let item of _data["hocSinhs"])
+                    this.hocSinhs!.push(CreateHocSinhCommand.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): AddListHocSinhsCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new AddListHocSinhsCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.hocSinhs)) {
+            data["hocSinhs"] = [];
+            for (let item of this.hocSinhs)
+                data["hocSinhs"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IAddListHocSinhsCommand {
+    hocSinhs?: CreateHocSinhCommand[];
+}
+
 export class CreateLichHocCommand implements ICreateLichHocCommand {
+    lichHocDto?: CreateLichHocDto;
+
+    constructor(data?: ICreateLichHocCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.lichHocDto = _data["lichHocDto"] ? CreateLichHocDto.fromJS(_data["lichHocDto"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): CreateLichHocCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateLichHocCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["lichHocDto"] = this.lichHocDto ? this.lichHocDto.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface ICreateLichHocCommand {
+    lichHocDto?: CreateLichHocDto;
+}
+
+export class CreateLichHocDto implements ICreateLichHocDto {
     thu?: number;
     phongId?: number;
     tenLop?: string;
     gioBatDau?: string;
     gioKetThuc?: string;
-    ngayBatDau?: Date;
-    ngayKetThuc?: Date;
+    ngayBatDau?: string;
+    ngayKetThuc?: string;
     hocPhi?: number;
     trangThai?: string;
     giaoVienCode?: string;
     chuongTrinhId?: number;
 
-    constructor(data?: ICreateLichHocCommand) {
+    constructor(data?: ICreateLichHocDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -2043,8 +3977,8 @@ export class CreateLichHocCommand implements ICreateLichHocCommand {
             this.tenLop = _data["tenLop"];
             this.gioBatDau = _data["gioBatDau"];
             this.gioKetThuc = _data["gioKetThuc"];
-            this.ngayBatDau = _data["ngayBatDau"] ? new Date(_data["ngayBatDau"].toString()) : <any>undefined;
-            this.ngayKetThuc = _data["ngayKetThuc"] ? new Date(_data["ngayKetThuc"].toString()) : <any>undefined;
+            this.ngayBatDau = _data["ngayBatDau"];
+            this.ngayKetThuc = _data["ngayKetThuc"];
             this.hocPhi = _data["hocPhi"];
             this.trangThai = _data["trangThai"];
             this.giaoVienCode = _data["giaoVienCode"];
@@ -2052,9 +3986,9 @@ export class CreateLichHocCommand implements ICreateLichHocCommand {
         }
     }
 
-    static fromJS(data: any): CreateLichHocCommand {
+    static fromJS(data: any): CreateLichHocDto {
         data = typeof data === 'object' ? data : {};
-        let result = new CreateLichHocCommand();
+        let result = new CreateLichHocDto();
         result.init(data);
         return result;
     }
@@ -2066,8 +4000,8 @@ export class CreateLichHocCommand implements ICreateLichHocCommand {
         data["tenLop"] = this.tenLop;
         data["gioBatDau"] = this.gioBatDau;
         data["gioKetThuc"] = this.gioKetThuc;
-        data["ngayBatDau"] = this.ngayBatDau ? formatDate(this.ngayBatDau) : <any>undefined;
-        data["ngayKetThuc"] = this.ngayKetThuc ? formatDate(this.ngayKetThuc) : <any>undefined;
+        data["ngayBatDau"] = this.ngayBatDau;
+        data["ngayKetThuc"] = this.ngayKetThuc;
         data["hocPhi"] = this.hocPhi;
         data["trangThai"] = this.trangThai;
         data["giaoVienCode"] = this.giaoVienCode;
@@ -2076,14 +4010,14 @@ export class CreateLichHocCommand implements ICreateLichHocCommand {
     }
 }
 
-export interface ICreateLichHocCommand {
+export interface ICreateLichHocDto {
     thu?: number;
     phongId?: number;
     tenLop?: string;
     gioBatDau?: string;
     gioKetThuc?: string;
-    ngayBatDau?: Date;
-    ngayKetThuc?: Date;
+    ngayBatDau?: string;
+    ngayKetThuc?: string;
     hocPhi?: number;
     trangThai?: string;
     giaoVienCode?: string;
@@ -2091,20 +4025,56 @@ export interface ICreateLichHocCommand {
 }
 
 export class EditLichHocCommand implements IEditLichHocCommand {
+    lichHocDto?: EditlLichHocDto;
+
+    constructor(data?: IEditLichHocCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.lichHocDto = _data["lichHocDto"] ? EditlLichHocDto.fromJS(_data["lichHocDto"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): EditLichHocCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new EditLichHocCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["lichHocDto"] = this.lichHocDto ? this.lichHocDto.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IEditLichHocCommand {
+    lichHocDto?: EditlLichHocDto;
+}
+
+export class EditlLichHocDto implements IEditlLichHocDto {
     id?: string;
     thu?: number | undefined;
     phongId?: number | undefined;
     tenLop?: string | undefined;
     gioBatDau?: string | undefined;
     gioKetThuc?: string | undefined;
-    ngayBatDau?: Date;
-    ngayKetThuc?: Date;
+    ngayBatDau?: string | undefined;
+    ngayKetThuc?: string | undefined;
     hocPhi?: number | undefined;
     trangThai?: string | undefined;
     giaoVienCode?: string | undefined;
     chuongTrinhId?: number | undefined;
 
-    constructor(data?: IEditLichHocCommand) {
+    constructor(data?: IEditlLichHocDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -2121,8 +4091,8 @@ export class EditLichHocCommand implements IEditLichHocCommand {
             this.tenLop = _data["tenLop"];
             this.gioBatDau = _data["gioBatDau"];
             this.gioKetThuc = _data["gioKetThuc"];
-            this.ngayBatDau = _data["ngayBatDau"] ? new Date(_data["ngayBatDau"].toString()) : <any>undefined;
-            this.ngayKetThuc = _data["ngayKetThuc"] ? new Date(_data["ngayKetThuc"].toString()) : <any>undefined;
+            this.ngayBatDau = _data["ngayBatDau"];
+            this.ngayKetThuc = _data["ngayKetThuc"];
             this.hocPhi = _data["hocPhi"];
             this.trangThai = _data["trangThai"];
             this.giaoVienCode = _data["giaoVienCode"];
@@ -2130,9 +4100,9 @@ export class EditLichHocCommand implements IEditLichHocCommand {
         }
     }
 
-    static fromJS(data: any): EditLichHocCommand {
+    static fromJS(data: any): EditlLichHocDto {
         data = typeof data === 'object' ? data : {};
-        let result = new EditLichHocCommand();
+        let result = new EditlLichHocDto();
         result.init(data);
         return result;
     }
@@ -2145,8 +4115,8 @@ export class EditLichHocCommand implements IEditLichHocCommand {
         data["tenLop"] = this.tenLop;
         data["gioBatDau"] = this.gioBatDau;
         data["gioKetThuc"] = this.gioKetThuc;
-        data["ngayBatDau"] = this.ngayBatDau ? formatDate(this.ngayBatDau) : <any>undefined;
-        data["ngayKetThuc"] = this.ngayKetThuc ? formatDate(this.ngayKetThuc) : <any>undefined;
+        data["ngayBatDau"] = this.ngayBatDau;
+        data["ngayKetThuc"] = this.ngayKetThuc;
         data["hocPhi"] = this.hocPhi;
         data["trangThai"] = this.trangThai;
         data["giaoVienCode"] = this.giaoVienCode;
@@ -2155,15 +4125,15 @@ export class EditLichHocCommand implements IEditLichHocCommand {
     }
 }
 
-export interface IEditLichHocCommand {
+export interface IEditlLichHocDto {
     id?: string;
     thu?: number | undefined;
     phongId?: number | undefined;
     tenLop?: string | undefined;
     gioBatDau?: string | undefined;
     gioKetThuc?: string | undefined;
-    ngayBatDau?: Date;
-    ngayKetThuc?: Date;
+    ngayBatDau?: string | undefined;
+    ngayKetThuc?: string | undefined;
     hocPhi?: number | undefined;
     trangThai?: string | undefined;
     giaoVienCode?: string | undefined;
@@ -2175,9 +4145,9 @@ export class CreateNhanVienCommand implements ICreateNhanVienCommand {
     ten?: string;
     gioiTinh?: string;
     diaChi?: string;
-    ngaySinh?: Date;
-    email?: string | undefined;
-    soDienThoai?: string | undefined;
+    ngaySinh?: string;
+    email?: string;
+    soDienThoai?: string;
     coSoId?: string;
     role?: string;
 
@@ -2196,7 +4166,7 @@ export class CreateNhanVienCommand implements ICreateNhanVienCommand {
             this.ten = _data["ten"];
             this.gioiTinh = _data["gioiTinh"];
             this.diaChi = _data["diaChi"];
-            this.ngaySinh = _data["ngaySinh"] ? new Date(_data["ngaySinh"].toString()) : <any>undefined;
+            this.ngaySinh = _data["ngaySinh"];
             this.email = _data["email"];
             this.soDienThoai = _data["soDienThoai"];
             this.coSoId = _data["coSoId"];
@@ -2217,7 +4187,7 @@ export class CreateNhanVienCommand implements ICreateNhanVienCommand {
         data["ten"] = this.ten;
         data["gioiTinh"] = this.gioiTinh;
         data["diaChi"] = this.diaChi;
-        data["ngaySinh"] = this.ngaySinh ? formatDate(this.ngaySinh) : <any>undefined;
+        data["ngaySinh"] = this.ngaySinh;
         data["email"] = this.email;
         data["soDienThoai"] = this.soDienThoai;
         data["coSoId"] = this.coSoId;
@@ -2231,9 +4201,9 @@ export interface ICreateNhanVienCommand {
     ten?: string;
     gioiTinh?: string;
     diaChi?: string;
-    ngaySinh?: Date;
-    email?: string | undefined;
-    soDienThoai?: string | undefined;
+    ngaySinh?: string;
+    email?: string;
+    soDienThoai?: string;
     coSoId?: string;
     role?: string;
 }
@@ -2245,6 +4215,7 @@ export class GetNhanViensWithPaginationQuery implements IGetNhanViensWithPaginat
     filterTenCoSo?: string | undefined;
     filterTenVaiTro?: string | undefined;
     sortBy?: string | undefined;
+    isActive?: boolean | undefined;
 
     constructor(data?: IGetNhanViensWithPaginationQuery) {
         if (data) {
@@ -2263,6 +4234,7 @@ export class GetNhanViensWithPaginationQuery implements IGetNhanViensWithPaginat
             this.filterTenCoSo = _data["filterTenCoSo"];
             this.filterTenVaiTro = _data["filterTenVaiTro"];
             this.sortBy = _data["sortBy"];
+            this.isActive = _data["isActive"];
         }
     }
 
@@ -2281,6 +4253,7 @@ export class GetNhanViensWithPaginationQuery implements IGetNhanViensWithPaginat
         data["filterTenCoSo"] = this.filterTenCoSo;
         data["filterTenVaiTro"] = this.filterTenVaiTro;
         data["sortBy"] = this.sortBy;
+        data["isActive"] = this.isActive;
         return data;
     }
 }
@@ -2292,6 +4265,7 @@ export interface IGetNhanViensWithPaginationQuery {
     filterTenCoSo?: string | undefined;
     filterTenVaiTro?: string | undefined;
     sortBy?: string | undefined;
+    isActive?: boolean | undefined;
 }
 
 export class EditNhanVienCommand implements IEditNhanVienCommand {
@@ -2299,12 +4273,12 @@ export class EditNhanVienCommand implements IEditNhanVienCommand {
     ten?: string;
     gioiTinh?: string;
     diaChi?: string;
-    ngaySinh?: Date;
-    email?: string | undefined;
-    soDienThoai?: string | undefined;
+    ngaySinh?: string;
+    email?: string;
+    soDienThoai?: string;
     coSoId?: string;
-    userId?: string;
     role?: string;
+    status?: string;
 
     constructor(data?: IEditNhanVienCommand) {
         if (data) {
@@ -2321,12 +4295,12 @@ export class EditNhanVienCommand implements IEditNhanVienCommand {
             this.ten = _data["ten"];
             this.gioiTinh = _data["gioiTinh"];
             this.diaChi = _data["diaChi"];
-            this.ngaySinh = _data["ngaySinh"] ? new Date(_data["ngaySinh"].toString()) : <any>undefined;
+            this.ngaySinh = _data["ngaySinh"];
             this.email = _data["email"];
             this.soDienThoai = _data["soDienThoai"];
             this.coSoId = _data["coSoId"];
-            this.userId = _data["userId"];
             this.role = _data["role"];
+            this.status = _data["status"];
         }
     }
 
@@ -2343,12 +4317,12 @@ export class EditNhanVienCommand implements IEditNhanVienCommand {
         data["ten"] = this.ten;
         data["gioiTinh"] = this.gioiTinh;
         data["diaChi"] = this.diaChi;
-        data["ngaySinh"] = this.ngaySinh ? formatDate(this.ngaySinh) : <any>undefined;
+        data["ngaySinh"] = this.ngaySinh;
         data["email"] = this.email;
         data["soDienThoai"] = this.soDienThoai;
         data["coSoId"] = this.coSoId;
-        data["userId"] = this.userId;
         data["role"] = this.role;
+        data["status"] = this.status;
         return data;
     }
 }
@@ -2358,17 +4332,16 @@ export interface IEditNhanVienCommand {
     ten?: string;
     gioiTinh?: string;
     diaChi?: string;
-    ngaySinh?: Date;
-    email?: string | undefined;
-    soDienThoai?: string | undefined;
+    ngaySinh?: string;
+    email?: string;
+    soDienThoai?: string;
     coSoId?: string;
-    userId?: string;
     role?: string;
+    status?: string;
 }
 
 export class CreatePhongCommand implements ICreatePhongCommand {
     ten?: string;
-    coSoId?: string;
 
     constructor(data?: ICreatePhongCommand) {
         if (data) {
@@ -2382,7 +4355,6 @@ export class CreatePhongCommand implements ICreatePhongCommand {
     init(_data?: any) {
         if (_data) {
             this.ten = _data["ten"];
-            this.coSoId = _data["coSoId"];
         }
     }
 
@@ -2396,23 +4368,17 @@ export class CreatePhongCommand implements ICreatePhongCommand {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["ten"] = this.ten;
-        data["coSoId"] = this.coSoId;
         return data;
     }
 }
 
 export interface ICreatePhongCommand {
     ten?: string;
-    coSoId?: string;
 }
 
-export class GetPhongsWithPaginationQuery implements IGetPhongsWithPaginationQuery {
-    pageNumber?: number;
-    pageSize?: number;
-    currentRole?: string | undefined;
-    currentCoSoId?: string | undefined;
+export class GetPhongsQuery implements IGetPhongsQuery {
 
-    constructor(data?: IGetPhongsWithPaginationQuery) {
+    constructor(data?: IGetPhongsQuery) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -2422,43 +4388,28 @@ export class GetPhongsWithPaginationQuery implements IGetPhongsWithPaginationQue
     }
 
     init(_data?: any) {
-        if (_data) {
-            this.pageNumber = _data["pageNumber"];
-            this.pageSize = _data["pageSize"];
-            this.currentRole = _data["currentRole"];
-            this.currentCoSoId = _data["currentCoSoId"];
-        }
     }
 
-    static fromJS(data: any): GetPhongsWithPaginationQuery {
+    static fromJS(data: any): GetPhongsQuery {
         data = typeof data === 'object' ? data : {};
-        let result = new GetPhongsWithPaginationQuery();
+        let result = new GetPhongsQuery();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["pageNumber"] = this.pageNumber;
-        data["pageSize"] = this.pageSize;
-        data["currentRole"] = this.currentRole;
-        data["currentCoSoId"] = this.currentCoSoId;
         return data;
     }
 }
 
-export interface IGetPhongsWithPaginationQuery {
-    pageNumber?: number;
-    pageSize?: number;
-    currentRole?: string | undefined;
-    currentCoSoId?: string | undefined;
+export interface IGetPhongsQuery {
 }
 
 export class EditPhongCommand implements IEditPhongCommand {
     id?: number;
     ten?: string;
     trangThai?: string;
-    coSoId?: string;
 
     constructor(data?: IEditPhongCommand) {
         if (data) {
@@ -2474,7 +4425,6 @@ export class EditPhongCommand implements IEditPhongCommand {
             this.id = _data["id"];
             this.ten = _data["ten"];
             this.trangThai = _data["trangThai"];
-            this.coSoId = _data["coSoId"];
         }
     }
 
@@ -2490,7 +4440,6 @@ export class EditPhongCommand implements IEditPhongCommand {
         data["id"] = this.id;
         data["ten"] = this.ten;
         data["trangThai"] = this.trangThai;
-        data["coSoId"] = this.coSoId;
         return data;
     }
 }
@@ -2499,7 +4448,6 @@ export interface IEditPhongCommand {
     id?: number;
     ten?: string;
     trangThai?: string;
-    coSoId?: string;
 }
 
 export class PaginatedListOfTodoItemBriefDto implements IPaginatedListOfTodoItemBriefDto {
