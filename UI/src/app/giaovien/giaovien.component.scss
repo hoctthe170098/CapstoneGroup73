@@ -90,7 +90,15 @@ body {
   .add-student-btn:hover {
     opacity: 0.9;
   }
+  .active-status {
+    color: green;
+    font-weight: bold;
+  }
   
+  .inactive-status {
+    color: gray;
+    font-weight: bold;
+  }
   /* Bảng danh sách */
   .student-table {
     width: 100%;

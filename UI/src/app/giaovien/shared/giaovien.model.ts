@@ -15,6 +15,6 @@ export class Giaovien {
  
   lopHocs: string[] = [];
   
-  province?: string;  // Mã hoặc tên tỉnh/thành
-  district?: string;  // Mã hoặc tên quận/huyện
+  province?: string;  
+  district?: string; 
 }

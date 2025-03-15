@@ -2,16 +2,16 @@
   <!-- Tiêu đề -->
   <h2 class="page-title">DANH SÁCH GIÁO VIÊN</h2>
   <div class="filter-row">
-    <select class="form-control dropdown-filter" [(ngModel)]="trangThai">
-      <option value="">Trạng thái</option>
+    <select class="form-control dropdown-filter" [(ngModel)]="trangThai" (change)="filterByStatus()">
+      <option value="">Tất cả trạng thái</option>
       <option value="Hoạt động">Hoạt động</option>
-      <option value="Tạm ngừng">Tạm ngừng</option>
+      <option value="Tạm ngừng">Không Hoạt Động</option>
     </select>
 
 
 
     <input type="text" class="form-control search-input" placeholder="Tìm tên/code giáo viên..."
-      [(ngModel)]="searchTerm" />
+    [(ngModel)]="searchTerm" (keyup.enter)="searchGiaoVien()" />
 
 
     <div class="btn-group-right">
@@ -22,11 +22,11 @@
       <button class="btn export-file-btn" (click)="onExportFile()">Xuất Tệp</button>
 
 
-      <button class="btn add-student-btn" (click)="openAddStudentModal()">+ Thêm Học Viên</button>
+      <button class="btn add-student-btn" (click)="openAddStudentModal()">+ Thêm Giáo Viên</button>
     </div>
   </div>
 
-  <!-- Pop-up Thêm Học Viên -->
+  <!-- Pop-up Thêm giáo viên -->
   <div class="modal-container" *ngIf="isModalOpen">
     <!-- Lớp overlay -->
     <div class="modal-overlay" (click)="closeModal()"></div>
@@ -34,7 +34,7 @@
     <!-- Khung trắng pop-up -->
     <div class="modal-content">
       <div class="modal-header">
-        <h2>THÊM HỌC VIÊN MỚI</h2>
+        <h2>THÊM GIÁO VIÊN MỚI</h2>
         <button class="close-btn" (click)="closeModal()">✕</button>
       </div>
 
@@ -86,15 +86,7 @@
               <label>Trường</label>
               <input type="text" class="form-control" placeholder="Nhập trường" />
             </div>
-            <div class="form-group">
-              <label>Cơ sở</label>
-              <select class="form-control" [(ngModel)]="editStudent.coSoId" name="edit_coSoId">
-                <option value="">-- Chọn Cơ Sở --</option>
-                <option *ngFor="let cs of cosoList" [value]="cs.id">
-                  {{ cs.ten }}
-                </option>
-              </select>
-            </div>
+            
           </div>
 
           <div class="form-row">
@@ -188,15 +180,7 @@
               <label>Trường</label>
               <input type="text" class="form-control" [(ngModel)]="editStudent.truongDangDay" name="edit_truongDangDay">
             </div>
-            <div class="form-group">
-              <label>Cơ sở</label>
-              <select class="form-control" [(ngModel)]="editStudent.coSoId" name="edit_coSoId">
-                <option value="">-- Chọn Cơ Sở --</option>
-                <option *ngFor="let cs of cosoList" [value]="cs.id">
-                  {{ cs.ten }}
-                </option>
-              </select>
-            </div>
+            
           </div>
 
 
@@ -253,26 +237,31 @@
         </tr>
       </thead>
       <tbody>
-        <ng-container *ngFor="let hs of students; let i = index">
+        <tr *ngIf="students.length === 0">
+          <td colspan="12" style="text-align: center; color: red;">Không có giáo viên nào</td>
+        </tr>
+  
+        <ng-container *ngFor="let gv of students; let i = index">
           <!-- Hàng tóm tắt -->
           <tr>
-            <td>{{ hs.code }}</td>
-            <td>{{ hs.ten }}</td>
-            <td>{{ hs.gioiTinh }}</td>
-            <td>{{ hs.ngaySinh | date:'dd-MM-yyyy' }}</td>
-            <td>{{ hs.email }}</td>
-            <td>{{ hs.soDienThoai }}</td>
+            <td>{{ gv.code }}</td>
+            <td>{{ gv.ten }}</td>
+            <td>{{ gv.gioiTinh }}</td>
+            <td>{{ gv.ngaySinh | date:'dd-MM-yyyy' }}</td>
+            <td>{{ gv.email }}</td>
+            <td>{{ gv.soDienThoai }}</td>
+            
             <td>
-              <span class="active-status">Hoạt động</span>
-              <i class="check-icon"></i>
+              <span [ngClass]="{ 'active-status': gv.isActive, 'inactive-status': !gv.isActive }">
+                {{ gv.isActive ? 'Hoạt Động' : 'Không Hoạt Động' }}
+              </span>
             </td>
             <!-- Nút dropdown -->
             <td class="dropdown-col">
               <button class="btn dropdown-btn" (click)="toggleDetails(i)">
-                <i *ngIf="!hs.showDetails" class="fas fa-caret-down"></i>
-                <i *ngIf="hs.showDetails" class="fas fa-caret-up"></i>
+                <i *ngIf="!gv.showDetails" class="fas fa-caret-down"></i>
+                <i *ngIf="gv.showDetails" class="fas fa-caret-up"></i>
               </button>
-
             </td>
             <!-- Nút sửa (bên phải) -->
             <td class="edit-col">
@@ -281,67 +270,66 @@
               </button>
             </td>
           </tr>
-
+  
           <!-- Hàng chi tiết (hiển thị ngay dưới item đó) -->
-          <tr *ngIf="hs.showDetails">
-            <td colspan="9" class="detail-cell">
-              <!-- Bố cục chia làm 4 hàng, theo ảnh mẫu -->
+          <tr *ngIf="gv.showDetails">
+            <td colspan="12" class="detail-cell">
+              <!-- Bố cục chia làm 4 hàng -->
               <div class="container-fluid">
                 <!-- Row 1: Code, Họ và Tên, Giới Tính, Ngày Sinh -->
                 <div class="row">
                   <div class="col-md-3 detail-item">
                     <label>Code</label>
-                    <div class="detail-box">{{ hs.code }}</div>
+                    <div class="detail-box">{{ gv.code }}</div>
                   </div>
                   <div class="col-md-3 detail-item">
                     <label>Họ và Tên</label>
-                    <div class="detail-box">{{ hs.ten }}</div>
+                    <div class="detail-box">{{ gv.ten }}</div>
                   </div>
                   <div class="col-md-3 detail-item">
                     <label>Giới Tính</label>
-                    <div class="detail-box">{{ hs.gioiTinh }}</div>
+                    <div class="detail-box">{{ gv.gioiTinh }}</div>
                   </div>
                   <div class="col-md-3 detail-item">
                     <label>Ngày Sinh</label>
-                    <div class="detail-box">{{ hs.ngaySinh | date:'dd-MM-yyyy' }}</div>
+                    <div class="detail-box">{{ gv.ngaySinh | date:'dd-MM-yyyy' }}</div>
                   </div>
                 </div>
-
+  
                 <!-- Row 2: Số Điện Thoại, Email, Địa Chỉ -->
                 <div class="row mt-3">
                   <div class="col-md-4 detail-item">
                     <label>Số Điện Thoại</label>
-                    <div class="detail-box">{{ hs.soDienThoai }}</div>
+                    <div class="detail-box">{{ gv.soDienThoai }}</div>
                   </div>
                   <div class="col-md-4 detail-item">
                     <label>Email</label>
-                    <div class="detail-box">{{ hs.email }}</div>
+                    <div class="detail-box">{{ gv.email }}</div>
                   </div>
                   <div class="col-md-4 detail-item">
                     <label>Địa Chỉ</label>
-                    <div class="detail-box">{{ hs.diaChi }}</div>
+                    <div class="detail-box">{{ gv.diaChi }}</div>
                   </div>
                 </div>
-
-                <!-- Row 3: Trường Đang Học, Cơ Sở, Chính Sách Học Phí -->
+  
+                <!-- Row 3: Trường Đang Dạy, Cơ Sở -->
                 <div class="row mt-3">
                   <div class="col-md-4 detail-item">
                     <label>Trường Đang Dạy</label>
-                    <div class="detail-box">{{ hs.truongDangDay }}</div>
+                    <div class="detail-box">{{ gv.truongDangDay }}</div>
                   </div>
                   <div class="col-md-4 detail-item">
                     <label>Cơ Sở</label>
-                    <div class="detail-box">{{ hs.coso.ten }}</div>
+                    <div class="detail-box">{{ gv.tenCoSo }}</div>
                   </div>
-
                 </div>
-
-                <!-- Row 4: Danh Sách Lớp Đang Học -->
+  
+                <!-- Row 4: Danh Sách Lớp Đang Dạy -->
                 <div class="row mt-3">
                   <div class="col-12 detail-item">
                     <label>Danh Sách Lớp Đang Dạy</label>
                     <div class="detail-box">
-                      {{ hs.lopHocs.join(', ') }}
+                      {{ gv.lopHocs.length ? gv.lopHocs.join(', ') : 'Không có lớp nào' }}
                     </div>
                   </div>
                 </div>
