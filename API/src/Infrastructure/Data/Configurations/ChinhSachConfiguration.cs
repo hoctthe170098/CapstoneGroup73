@@ -17,7 +17,7 @@ public class ChinhSachConfiguration : IEntityTypeConfiguration<ChinhSach>
         builder.Property(x => x.Ten)
             .HasMaxLength(30);
         builder.Property(x => x.Mota)
-            .HasMaxLength(20);
+            .HasMaxLength(200);
         builder.HasAnnotation($"CheckConstraint:CK_ChinhSach_PhanTramGiam", "[PhanTramGiam] > 0.8 AND [PhanTramGiam] < 1");
     }
 }

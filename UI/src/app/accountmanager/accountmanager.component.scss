@@ -1,0 +1,405 @@
+
+body {
+    background-color: #f6f7fb;
+  }
+  
+  /* Khung chính */
+  .hoc-sinh-wrapper {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px auto;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
+    max-width: 1200px;
+  }
+  
+  /* Tiêu đề */
+  .page-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  
+  /* Thanh filter */
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  
+ 
+  .btn-group-right {
+    margin-left: auto; 
+    display: flex;
+    gap: 8px;          
+  }
+  
+  /* Dropdown filter */
+  .dropdown-filter {
+    width: 140px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    color: #333;
+  }
+  
+  .search-input {
+    width: 300px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+  }
+  
+  .choose-file-btn {
+    background-color: #00ffff; 
+    color: #333;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .choose-file-btn:hover {
+    opacity: 0.9;
+  }
+  
+  
+  .export-file-btn {
+    background-color: #bd3a2b; 
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .export-file-btn:hover {
+    opacity: 0.9;
+  }
+  
+  /* Nút + Thêm Học Viên (xanh lá) */
+  .add-student-btn {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .add-student-btn:hover {
+    opacity: 0.9;
+  }
+  
+  /* Bảng danh sách */
+  .student-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .student-table thead tr {
+    background-color: #f8f8f8;
+  }
+  .student-table th,
+  .student-table td {
+    vertical-align: middle;
+    border-bottom: 1px solid #e2e2e2;
+    padding: 12px;
+    color: #333;
+    font-size: 14px;
+  }
+  
+  /* Dropdown + Sửa */
+  .dropdown-col {
+    width: 50px;
+    text-align: center;
+  }
+  .edit-col {
+    width: 50px;
+    text-align: center;
+  }
+  .dropdown-btn,
+  .edit-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    color: #333;
+  }
+  
+  /* Trạng thái + icon check */
+  .active-status {
+    color: #28a745;
+    font-weight: 500;
+    margin-right: 4px;
+  }
+  .check-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-image: url("data:image/svg+xml,%3Csvg fill='%2328a745' viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M13.485.515a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2v-11a2 2 0 0 1 2-2h11zm-7.07 9.616l5.362-5.363-.707-.707-4.655 4.656-1.989-1.989-.707.707 2.696 2.696z'/%3E%3C/svg%3E");
+    background-size: cover;
+    background-repeat: no-repeat;
+    vertical-align: middle;
+  }
+  
+  /* Hàng chi tiết */
+  .detail-cell {
+    background-color: #f9f9f9;
+    padding: 16px !important;
+  }
+  .detail-item {
+    margin-bottom: 12px;
+  }
+  .detail-item label {
+    display: block;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 4px;
+  }
+  .detail-box {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 8px;
+    color: #333;
+  }
+  
+  /* Phân trang */
+  .pagination-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+  .pagination {
+    margin: 0;
+  }
+  .page-item {
+    list-style: none;
+  }
+  .page-item a {
+    color: #333;
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    margin: 0 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .page-item.active a {
+    background-color: #6f52ed;
+    color: #fff;
+    border-color: #6f52ed;
+  }
+  
+  /* Toàn bộ popup được bao bọc bởi .modal-container và .modal-overlay */
+
+.modal-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999; /* trên cùng */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Nền mờ phía sau popup */
+  .modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+  }
+  
+  /* Khung trắng popup */
+  .modal-content {
+    position: relative;
+    z-index: 10000; /* trên overlay */
+    background-color: #fff;
+    border-radius: 8px;
+    width: 600px; /* Hoặc tùy chỉnh */
+    max-width: 90%; /* Co giãn trên màn hình nhỏ */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Header của popup */
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: none; /* Bỏ gạch ngang, nếu muốn */
+  }
+  .modal-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+  }
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  
+  /* Body của popup */
+  .modal-body {
+    padding: 16px;
+  }
+  
+  /* Footer của popup */
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px;
+    border-top: none; /* Bỏ gạch ngang, nếu muốn */
+  }
+  
+  /* Ví dụ nút THÊM màu xanh nhạt */
+  .them-btn {
+    background-color: #a3decf; 
+    border: none;
+    color: #333;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  .them-btn:hover {
+    opacity: 0.9;
+  }
+  
+  /* Form layout trong popup (tùy chỉnh thêm/bớt) */
+  .form-group {
+    margin-bottom: 16px;
+  }
+  .form-group label {
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: block;
+  }
+  .form-row {
+    display: flex;
+    gap: 16px; 
+    margin-bottom: 16px;
+  }
+  .form-row .form-group {
+    flex: 1; /* Mỗi cột chia đều, bạn có thể thay đổi theo ý */
+  }
+  
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end; /* dồn nút về phía cuối bên phải */
+    padding: 16px;
+    border-top: none; /* Bỏ gạch ngang nếu muốn */
+  }
+  
+  .save-btn {
+    background-color: #a3decf; /* xanh lá nhạt */
+    border: none;
+    color: #333;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  .save-btn:hover {
+    opacity: 0.9;
+  }
+
+  .cancel-btn {
+    background-color: #D4D4D4;
+    border: none;
+    color: #333;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  .cancel-btn:hover {
+    opacity: 0.9;
+  }
+
+  .lop-select-container {
+    position: relative;
+    width: 140px; /* tương tự dropdown-filter cũ */
+    margin-right: 8px; /* nếu muốn khoảng cách */
+    display: inline-block;
+  }
+  
+  /* Vùng hiển thị “Lớp” hoặc “Lớp 1” */
+  .lop-select-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 6px 8px;
+    cursor: pointer;
+    min-height: 38px; /* ngang bằng form-control */
+  }
+  
+  .lop-select-display span {
+    color: #999; /* placeholder color */
+  }
+  
+  .caret-icon {
+    margin-left: 8px;
+  }
+  
+  /* Dropdown content */
+  .lop-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+    margin-top: 2px;
+  }
+  
+  .search-box {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .search-box input {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 6px 8px;
+  }
+  
+  .select-options {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 200px; /* scrollbar if many items */
+    overflow-y: auto;
+  }
+  
+  .select-options li {
+    padding: 8px;
+    cursor: pointer;
+  }
+  
+  .select-options li:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .no-result {
+    color: #999;
+    text-align: center;
+    padding: 8px;
+  }

@@ -51,7 +51,7 @@ export class LoginPageComponent {
         if (res.isError == false && res.message.includes('Đăng nhập thành công')) {   
           localStorage.setItem('token', res.data);
           this.toastr.success('Đăng nhập thành công!', 'Thành công');
-          this.router.navigate(['/dashboard/dashboard1']);
+          this.router.navigate(['/coso']);
         } else {
           this.isLoginFailed = true;
           this.toastr.error(res.message, 'Lỗi');
