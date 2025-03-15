@@ -18,7 +18,8 @@ public record GetNhanViensWithPaginationQuery : IRequest<Output>
     public string? SearchTen { get; init; } 
     public string? FilterTenCoSo { get; init; } 
     public string? FilterTenVaiTro { get; init; } 
-    public string? SortBy { get; init; } 
+    public string? SortBy { get; init; }
+    public bool? IsActive { get; init; }
 }
 
 public class GetNhanViensWithPaginationQueryHandler
@@ -54,6 +55,51 @@ public class GetNhanViensWithPaginationQueryHandler
                 query = query.Where(nv => nv.Coso.Ten == request.FilterTenCoSo);
             }
 
+            // Filter by Status
+            if (request.IsActive.HasValue)
+            {
+                var userIds = await _context.NhanViens
+                    .Where(nv => nv.UserId != null)
+                    .Select(nv => nv.UserId!)
+                    .Distinct()
+                    .ToListAsync();
+
+                var filteredUserIds = new List<string>();
+
+                foreach (var userId in userIds)
+                {
+                    var isActive = await _identityService.IsUserActiveAsync(userId);
+                    if (isActive == request.IsActive.Value)
+                    {
+                        filteredUserIds.Add(userId);
+                    }
+                }
+                query = query.Where(nv => nv.UserId != null && filteredUserIds.Contains(nv.UserId!));
+            }
+
+            // Filter by "TenVaiTro"
+            if (!string.IsNullOrWhiteSpace(request.FilterTenVaiTro))
+            {
+                var userIdsWithRole = new List<string>();
+
+                var userIds = await _context.NhanViens
+                    .Where(nv => nv.UserId != null)
+                    .Select(nv => nv.UserId!)
+                    .Distinct()
+                    .ToListAsync();
+
+                foreach (var userId in userIds)
+                {
+                    var roles = await _identityService.GetRolesByUserId(userId);
+                    if (roles.Contains(request.FilterTenVaiTro))
+                    {
+                        userIdsWithRole.Add(userId);
+                    }
+                }
+
+                query = query.Where(nv => nv.UserId != null && userIdsWithRole.Contains(nv.UserId!));
+            }
+
             // Sorting
             query = request.SortBy switch
             {
@@ -65,6 +111,7 @@ public class GetNhanViensWithPaginationQueryHandler
             var list = await query
                .ProjectTo<NhanVienDto>(_mapper.ConfigurationProvider)
                .PaginatedListAsync(request.PageNumber, request.PageSize);
+
             // Fetch Role Names Using IIdentityService
             foreach (var dto in list.Items) 
             {

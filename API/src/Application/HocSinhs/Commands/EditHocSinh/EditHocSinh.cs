@@ -29,11 +29,13 @@ public class EditHocSinhCommandHandler : IRequestHandler<EditHocSinhCommand, Out
 {
     private readonly IApplicationDbContext _context;
     private readonly IIdentityService _identityService;
+
     public EditHocSinhCommandHandler(IApplicationDbContext context, IIdentityService identityService)
     {
         _context = context;
         _identityService = identityService;
     }
+
     public async Task<Output> Handle(EditHocSinhCommand request, CancellationToken cancellationToken)
     {
         // Validate required fields
