@@ -27,29 +27,35 @@ export class EditchuongtrinhComponent implements OnInit {
     this.programId = Number(this.route.snapshot.paramMap.get('id'));
   
     if (this.programId !== null && !isNaN(this.programId)) {
-      this.chuongtrinhService.getPrograms(this.programId).subscribe({
-        next: (loadedProgram) => {
-          if (loadedProgram) {
-            
-            this.program = {
-              ...loadedProgram,
-              noiDungBaiHocs: loadedProgram.noiDungBaiHocs?.map((lesson: any, index: number) => ({
-                ...lesson,
-                soThuTu: lesson.soThuTu ?? index + 1,
-                taiLieuHocTaps: lesson.taiLieuHocTaps ?? [],
-                expanded: lesson.expanded ?? false
-              })) ?? []
-            };
-          } else {
-            console.error("Không tìm thấy chương trình học với ID:", this.programId);
+      this.chuongtrinhService.getAllPrograms().subscribe({
+        next: (response) => {
+          if (response && response.data) {
+            const programList = response.data;
+            const loadedProgram = programList.find((p: any) => p.id === this.programId);
+  
+            if (loadedProgram) {
+              this.program = {
+                ...loadedProgram,
+                noiDungBaiHocs: loadedProgram.noiDungBaiHocs?.map((lesson: any, index: number) => ({
+                  ...lesson,
+                  soThuTu: lesson.soThuTu ?? index + 1,
+                  taiLieuHocTaps: lesson.taiLieuHocTaps ?? [],
+                  expanded: false
+                })) ?? []
+              };
+            } else {
+              console.error("❌ Không tìm thấy chương trình học với ID:", this.programId);
+            }
           }
         },
         error: (err) => {
-          console.error("Lỗi khi tải chương trình học:", err);
+          console.error("❌ Lỗi khi tải chương trình học:", err);
         }
       });
     }
   }
+  
+  
 
   addLesson() {
     this.program.noiDungBaiHocs.push({

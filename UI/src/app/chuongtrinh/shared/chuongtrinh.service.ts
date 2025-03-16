@@ -39,6 +39,18 @@ export class ChuongtrinhService {
       })
     );
   }
+  getAllPrograms(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/getallchuongtrinhs`, {
+      headers: this.getHeaders()
+    }).pipe(
+      tap(response => console.log(`📌 API trả về danh sách chương trình:`, response)),
+      catchError(error => {
+        console.error(`❌ Lỗi khi lấy danh sách chương trình:`, error);
+        return throwError(() => error);
+      })
+    );
+  }
+  
   uploadFile(file: File) {
     const formData = new FormData();
     formData.append('file', file);
@@ -71,6 +83,7 @@ export class ChuongtrinhService {
 
   /** 🔥 Cập nhật chương trình */
   updateProgram(payload: any) {
+    const chuongTrinhDto = encodeURIComponent(JSON.stringify(payload.chuongTrinhDto));
     return this.http.put(`${this.apiUrl}/updatechuongtrinh`, payload);
   }
 

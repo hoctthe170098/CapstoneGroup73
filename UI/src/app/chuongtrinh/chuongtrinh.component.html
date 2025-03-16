@@ -22,7 +22,7 @@
                       {{ program.expanded ? 'Ẩn' : 'Hiển thị' }}
                   </a>
                   <span class="text-muted"> | </span>
-                  <a [routerLink]="['/chuongtrinh/editchuongtrinh', program.id]" class="text-primary me-3">Sửa</a>
+                  <a [routerLink]="['edit/', program.id]" class="text-primary me-3">Sửa</a>
                   <span class="text-muted"> | </span>
                   <a href="#" class="text-danger" (click)="onDeleteProgram(program.id, $event)">Xóa</a>
 
