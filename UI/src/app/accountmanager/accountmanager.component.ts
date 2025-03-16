@@ -85,8 +85,8 @@ export class AccountmanagerComponent implements OnInit {
           this.students = response.data.items.map((student: any) => ({
             ...student,
             showDetails: false,
-            isActive: student.isActive, // sử dụng isActive từ API (boolean)
-            displayStatus: student.isActive ? 'Hoạt động' : 'Tạm ngừng'
+            isActive: student.trangThai, // sử dụng isActive từ API (boolean)
+            displayStatus: student.trangThai ? 'Hoạt động' : 'Tạm ngừng'
           }));
   
           this.totalItems = response.data.totalCount || 0;
@@ -344,8 +344,7 @@ onEditStudentClick(index: number) {
     ...hs, 
     ngaySinh: this.formatDate(hs.ngaySinh),
     status: hs.isActive ? "true" : "false"
-   
-   
+
 };
 console.log("📌 Trạng thái trước khi sửa:", this.editStudent.status);
 console.log("📌 Vai trò của nhân viên trước khi sửa:", this.editStudent)
@@ -394,15 +393,7 @@ const validRoles = ["CampusManager", "LearningManager"];
   }
   this.isEditModalOpen = true;
 }
-
-
-
-
-
-
-
   closeEditModal() { this.isEditModalOpen = false; }
-
   submitEditStudent() {
     this.forceNVPrefixEdit(); // Đảm bảo Code đúng định dạng khi chỉnh sửa
 
@@ -439,10 +430,9 @@ const validRoles = ["CampusManager", "LearningManager"];
         soDienThoai: this.editStudent.soDienThoai,
         coSoId: this.editStudent.coSoId || null, 
         role: this.editStudent.tenVaiTro,
-        trangThai: this.editStudent.status 
+        status: this.editStudent.status 
     };
-
-    console.log("📌 Dữ liệu cập nhật gửi API:", updatedHs);
+    console.log("📌 Dữ liệu gửi lên API khi sửa:", updatedHs);
 
     this.accountmanagerService.updateNhanVien(updatedHs).subscribe(
         response => {
@@ -460,19 +450,14 @@ const validRoles = ["CampusManager", "LearningManager"];
         }
     );
 }
-
 searchNhanVien() {
   this.currentPage = 1;
   this.loadDanhSachNhanVien();
 }
-
-
 filterByStatus() {
   this.currentPage = 1;
   this.loadDanhSachNhanVien();
 }
-
-
 onProvinceChangeForEdit(provinceCode: string) {
   this.selectedProvince = this.provinces.find(p => String(p.code) === String(provinceCode));
 
@@ -483,8 +468,6 @@ onProvinceChangeForEdit(provinceCode: string) {
       this.editDistricts = [];
   }
 }
-
-
 onDistrictChangeForEdit(districtCode: string) {
   if (!this.editDistricts || this.editDistricts.length === 0) {
     console.error("⚠️ Không có danh sách quận/huyện để tìm kiếm!");
@@ -511,16 +494,6 @@ onDistrictChangeForEdit(districtCode: string) {
     this.editStudent.district = '';  // Reset giá trị nếu không tìm thấy
   }
 }
-
-
-
-
-
-
-
-
-
-
   formatDate(date: any) {
     if (!date) return '';
     const d = new Date(date);

@@ -46,7 +46,8 @@ public class GetNhanViensWithPaginationQueryHandler
             // Search by "Ten"
             if (!string.IsNullOrWhiteSpace(request.SearchTen))
             {
-                query = query.Where(nv => nv.Ten.Contains(request.SearchTen));
+                query = query.Where(nv => nv.Ten.Contains(request.SearchTen)
+                ||nv.Code.Contains(request.SearchTen));
             }
 
             // Filter by "TenCoSo"

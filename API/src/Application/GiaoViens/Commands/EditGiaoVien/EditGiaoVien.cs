@@ -121,9 +121,10 @@ public class EditGiaoVienCommandHandler : IRequestHandler<EditGiaoVienCommand, O
             giaoVien.SoDienThoai = request.SoDienThoai;
             giaoVien.CoSoId = coSoId;
         }
-        if (giaoVien.UserId != null && request.Status.ToLower() == "false")
+        if (giaoVien.UserId != null )
         {
-            await _identityService.disableUser(giaoVien.UserId);
+            await _identityService
+                .UpdateStatusUser(giaoVien.UserId, Boolean.Parse(request.Status));
         }
         await _context.SaveChangesAsync(cancellationToken);
         return new Output

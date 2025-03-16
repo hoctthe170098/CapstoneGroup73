@@ -555,12 +555,12 @@ public class IdentityService : IIdentityService
         else return Guid.Empty;
     }
 
-    public async Task<Result> disableUser(string userId)
+    public async Task<Result> UpdateStatusUser(string userId,bool status)
     {
         var user = _userManager.Users.SingleOrDefault(u => u.Id == userId);
         if (user != null)
         {
-            user.IsActive = false;
+            user.IsActive = status;
             var result = await _userManager.UpdateAsync(user);
             return result.Succeeded ? Result.Success() : Result.Failure(result.Errors.Select(e => e.Description));
         }

@@ -1,4 +1,4 @@
-﻿using System;
+﻿    using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -116,9 +116,10 @@ public class EditNhanVienCommandHandler : IRequestHandler<EditNhanVienCommand, O
         {
             await _identityService.changeEmail(nhanVien.UserId,request.Email);
         }
-        if (nhanVien.UserId != null && request.Status.ToLower() == "false")
+        if (nhanVien.UserId != null )
         {
-            await _identityService.disableUser(nhanVien.UserId);
+            await _identityService
+                .UpdateStatusUser(nhanVien.UserId,Boolean.Parse(request.Status));
         }
         await _context.SaveChangesAsync(cancellationToken);
 
