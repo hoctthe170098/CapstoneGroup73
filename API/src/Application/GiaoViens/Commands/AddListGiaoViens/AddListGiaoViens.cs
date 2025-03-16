@@ -22,7 +22,8 @@ public class AddListGiaoViensCommandHandler : IRequestHandler<AddListGiaoViensCo
     private readonly IApplicationDbContext _context;
     private readonly IIdentityService _identityService;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    public AddListGiaoViensCommandHandler(IApplicationDbContext context, IIdentityService identityService, IHttpContextAccessor httpContextAccessor)
+    public AddListGiaoViensCommandHandler(IApplicationDbContext context
+        , IIdentityService identityService, IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
         _identityService = identityService;
@@ -39,9 +40,7 @@ public class AddListGiaoViensCommandHandler : IRequestHandler<AddListGiaoViensCo
         {
             throw new WrongInputException("Danh sách giáo viên không được rỗng.");
         }
-
         var codes = request.GiaoViens.Select(gv => gv.Code).ToList();
-
         // Validate existing code
         var existingCodes = await _context.GiaoViens.Where(gv => codes.Contains(gv.Code)).Select(gv => gv.Code).ToListAsync(cancellationToken);
 
@@ -49,10 +48,8 @@ public class AddListGiaoViensCommandHandler : IRequestHandler<AddListGiaoViensCo
         {
             throw new WrongInputException($"Mã giáo viên đã tồn tại: {string.Join(", ", existingCodes)}");
         }
-
         var giaoViensToAdd = new List<GiaoVien>();
         var errors = new List<string>(); // Danh sách lỗi
-
         foreach (var req in request.GiaoViens)
         {
             try
@@ -63,7 +60,10 @@ public class AddListGiaoViensCommandHandler : IRequestHandler<AddListGiaoViensCo
                     string.IsNullOrWhiteSpace(req.GioiTinh) ||
                     string.IsNullOrWhiteSpace(req.DiaChi) ||
                     string.IsNullOrWhiteSpace(req.SoDienThoai) ||
-                    string.IsNullOrWhiteSpace(req.TruongDangDay))
+                    string.IsNullOrWhiteSpace(req.TruongDangDay)||
+                    string.IsNullOrWhiteSpace(req.SoDienThoai) ||
+                    string.IsNullOrWhiteSpace(req.Email) ||
+                    string.IsNullOrWhiteSpace(req.NgaySinh))
                 {
                     throw new NotFoundDataException($"Dữ liệu không hợp lệ cho giáo viên có mã {req.Code}");
                 }
