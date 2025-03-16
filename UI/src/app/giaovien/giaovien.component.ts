@@ -13,9 +13,13 @@ export class GiaovienComponent implements OnInit {
   trangThai: string = ''; 
   searchTerm: string = ''; 
   students: any[] = [];
-  currentPage: number = 1;
-  totalPages: number = 1;
-  pageSize: number = 8;
+
+   // **Phân trang**
+   currentPage: number = 1;
+   totalPages: number = 1;
+   pageSize: number = 8;
+   totalItems: number = 0;
+
   provinces: any[] = [];
   districts: any[] = [];
   editDistricts: any[] = [];
@@ -140,8 +144,9 @@ onProvinceChangeForEdit(provinceCode: string) {
 
     this.giaovienService.getDanhSachGiaoVien(this.currentPage, this.pageSize, this.searchTerm, '', isActiveFilter)
       .subscribe(response => {
+        console.log("📌 API Response:", response);
         if (!response.isError && response.data) {
-          this.students = response.data.map((gv: any) => ({
+          this.students = response.data.map((gv: any) => ({ 
             code: gv.code || '',
             ten: gv.ten || '',
             gioiTinh: gv.gioiTinh || '',
@@ -156,7 +161,15 @@ onProvinceChangeForEdit(provinceCode: string) {
             showDetails: false
           }));
 
-          this.totalPages = Math.ceil(response.data.length / this.pageSize);
+          this.totalItems = response.data.totalCount || this.students.length;
+        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
+
+        console.log("🔹 Tổng số giáo viên:", this.totalItems);
+        console.log("🔹 Tổng số trang:", this.totalPages);
+        }else {
+          this.students = [];
+          this.totalItems = 0;
+          this.totalPages = 0;
         }
         this.cdr.detectChanges();
       });
@@ -165,10 +178,13 @@ onProvinceChangeForEdit(provinceCode: string) {
   
 
   /** Chuyển trang */
-  goToPage(page: number) {
-    this.currentPage = page;
-    this.loadDanhSachGiaoVien();
+  changePage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.loadDanhSachGiaoVien();
+    }
   }
+  
 
   /** Tìm kiếm giáo viên */
   searchGiaoVien() {

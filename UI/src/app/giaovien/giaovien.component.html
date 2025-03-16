@@ -586,15 +586,26 @@
     </table>
   </div>
 
-  <!-- Phân trang -->
-  <div class="pagination-container">
-    <ul class="pagination">
-      <li class="page-item" [class.active]="currentPage === 1">
-        <a class="page-link" (click)="goToPage(1)">1</a>
-      </li>
-      <li class="page-item" [class.active]="currentPage === 2">
-        <a class="page-link" (click)="goToPage(2)">2</a>
-      </li>
-    </ul>
-  </div>
+<!-- Phân trang -->
+<div class="pagination-container" *ngIf="totalPages > 1">
+  <ul class="pagination">
+    <!-- Nút về trang trước -->
+    <li class="page-item" [class.disabled]="currentPage === 1">
+      <a class="page-link" (click)="changePage(currentPage - 1)">«</a>
+    </li>
+
+    <!-- Tạo danh sách số trang -->
+    <li *ngFor="let page of [].constructor(totalPages); let i = index" 
+        class="page-item" [class.active]="currentPage === (i + 1)">
+      <a class="page-link" (click)="changePage(i + 1)">{{ i + 1 }}</a>
+    </li>
+
+    <!-- Nút về trang sau -->
+    <li class="page-item" [class.disabled]="currentPage === totalPages">
+      <a class="page-link" (click)="changePage(currentPage + 1)">»</a>
+    </li>
+  </ul>
+</div>
+  
+
 </div>
