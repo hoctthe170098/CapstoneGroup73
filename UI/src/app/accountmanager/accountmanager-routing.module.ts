@@ -7,11 +7,11 @@ const routes: Routes = [
     path: '',
      component: AccountmanagerComponent,
     data: {
-      title: 'Tài Khoản'
+      title: 'Nhân viên'
     }
   },
   {
-    path: 'danh-sach-tai-khoan',
+    path: 'danh-sach-nhan-vien',
     component: AccountmanagerComponent
   },
   

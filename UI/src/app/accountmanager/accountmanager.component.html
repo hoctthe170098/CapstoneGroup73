@@ -2,13 +2,13 @@
   <!-- Tiêu đề -->
   <h2 class="page-title">DANH SÁCH NHÂN VIÊN</h2>
   <div class="filter-row">
-    <select class="form-control dropdown-filter" [(ngModel)]="trangThai">
-      <option value="">Trạng thái</option>
+    <select class="form-control dropdown-filter" [(ngModel)]="trangThai" (change)="filterByStatus()">
+      <option value="">Tất cả trạng thái</option>
       <option value="Hoạt động">Hoạt động</option>
-      <option value="Tạm ngừng">Tạm ngừng</option>
+      <option value="Tạm ngừng">Không Hoạt Động</option>
     </select>
-    <input type="text" class="form-control search-input" placeholder="Tìm tên/code giáo viên..."
-      [(ngModel)]="searchTerm" />
+    <input type="text" class="form-control search-input" placeholder="Tìm tên/code nhân viên..."
+    [(ngModel)]="searchTerm" (keyup.enter)="searchNhanVien()" />
 
 
     <div class="btn-group-right">
@@ -32,22 +32,54 @@
         <form>
           <div class="form-group">
             <label>Code</label>
-            <input type="text" class="form-control" [(ngModel)]="newStudent.code" name="code" required
-              (input)="forceNVPrefix()" autocomplete="off" />
+            <input 
+              type="text" 
+              class="form-control" 
+              [(ngModel)]="newStudent.code" 
+              name="code" 
+              required
+              #codeInput="ngModel"
+              pattern="^NV.{1,16}$"
+              [ngClass]="{'is-invalid': codeInput.invalid && (codeInput.dirty || codeInput.touched)}"
+              (input)="forceNVPrefix()"
+              autocomplete="off" />
+            
+            <!-- Hiển thị lỗi nếu Code không hợp lệ -->
+            <small *ngIf="codeInput.invalid && (codeInput.dirty || codeInput.touched)" class="text-danger">
+              <i class="ft-alert-circle align-middle"></i>
+              <span *ngIf="codeInput.errors?.required">Vui lòng nhập Code!</span>
+              <span *ngIf="codeInput.errors?.pattern">Code phải bắt đầu bằng 'NV', có ít nhất 1 ký tự sau đó và tối đa 18 ký tự!</span>
+            </small>
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label>Họ và Tên</label>
-              <input type="text" class="form-control" [(ngModel)]="newStudent.ten" name="ten" required />
+              <input 
+                type="text" 
+                class="form-control" 
+                [(ngModel)]="newStudent.ten" 
+                name="ten" 
+                required 
+                maxlength="30"
+                #nameInput="ngModel"
+                [ngClass]="{'is-invalid': nameInput.invalid && (nameInput.dirty || nameInput.touched)}" />
+              
+              <!-- Hiển thị lỗi nếu Họ và Tên bị bỏ trống hoặc quá 30 ký tự -->
+              <small *ngIf="nameInput.invalid && (nameInput.dirty || nameInput.touched)" class="text-danger">
+                <i class="ft-alert-circle align-middle"></i>
+                <span *ngIf="nameInput.errors?.required">Vui lòng nhập Họ và Tên!</span>
+                <span *ngIf="nameInput.errors?.maxlength">Họ và Tên không được vượt quá 30 ký tự!</span>
+              </small>
             </div>
             <div class="form-group">
               <label>Giới Tính</label>
-              <select class="form-control">
-                <option>Nam</option>
-                <option>Nữ</option>
+              <select class="form-control" [(ngModel)]="newStudent.gioiTinh" name="gioiTinh" required>
+                <option value="Nam">Nam</option>
+                <option value="Nu">Nữ</option>
               </select>
             </div>
+            
             <div class="form-group">
               <label>Ngày Sinh</label>
               <div class="input-group">
@@ -70,54 +102,64 @@
           </div>
 
           <div class="form-row">
-            <div class="form-group">
+            <div class="form-group col-md-6">
               <label>Email</label>
               <input type="email" class="form-control" [(ngModel)]="newStudent.email" name="email" required
-                #emailInput="ngModel" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                #emailInput="ngModel"
+                pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
                 [ngClass]="{'is-invalid': emailInput.invalid && (emailInput.dirty || emailInput.touched)}" />
-
-              <!-- Hiển thị lỗi nếu email không hợp lệ -->
+          
               <small *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)" class="text-danger">
                 <i class="ft-alert-circle align-middle"></i>
                 <span *ngIf="emailInput.errors?.required">Vui lòng nhập email!</span>
                 <span *ngIf="emailInput.errors?.pattern">Email không hợp lệ</span>
               </small>
             </div>
-            <div class="form-group">
+          
+            <div class="form-group col-md-6">
               <label>Số Điện Thoại</label>
-              <input type="tel" class="form-control" [(ngModel)]="newStudent.soDienThoai" name="soDienThoai" required
-                #phoneInput="ngModel" pattern="0[0-9]{9}"
+              <input type="tel" class="form-control" [(ngModel)]="newStudent.soDienThoai" name="soDienThoai"
+                required pattern="^0[0-9]{9,10}$" #phoneInput="ngModel"
                 [ngClass]="{'is-invalid': phoneInput.invalid && (phoneInput.dirty || phoneInput.touched)}" />
-
-              <!-- Hiển thị lỗi nếu số điện thoại không hợp lệ -->
+          
               <small *ngIf="phoneInput.invalid && (phoneInput.dirty || phoneInput.touched)" class="text-danger">
                 <i class="ft-alert-circle align-middle"></i>
-                <span *ngIf="phoneInput.errors?.required">Vui lòng nhập số điện thoại!</span>
-                <span *ngIf="phoneInput.errors?.pattern">Số điện thoại không hợp lệ! Định dạng: 0xxxxxxxxx (10
-                  số)</span>
+                <span *ngIf="phoneInput.errors?.required">Vui lòng nhập Số Điện Thoại!</span>
+                <span *ngIf="phoneInput.errors?.pattern">Số Điện Thoại không hợp lệ! Phải có từ 10 đến 11 số và bắt đầu bằng số 0.</span>
               </small>
             </div>
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label>Cơ sở</label>
-              <select class="form-control" [(ngModel)]="newStudent.coSoId" name="coSoId">
-                <option value="">-- Chọn Cơ Sở --</option>
-                <option *ngFor="let cs of cosoList" [value]="cs.id">
-                  {{ cs.ten }}
-                </option>
-              </select>
+
+            <!-- Row 4: Trường, Cơ Sở -->
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label>Cơ sở</label>
+                <select class="form-control" [(ngModel)]="newStudent.coSoId" name="coSoId" required (blur)="validateCoSo()">
+                  <option value="">-- Chọn Cơ Sở --</option>
+                  <option *ngFor="let cs of cosoList" [value]="cs.id">
+                    {{ cs.ten }}
+                  </option>
+                </select>
+            
+                <small *ngIf="isCoSoInvalid" class="text-danger">
+                  <i class="ft-alert-circle align-middle"></i> Vui lòng chọn cơ sở!
+                </small>
+              </div>
+            
+              <div class="form-group col-md-6">
+                <label>Vai trò</label>
+                <select class="form-control" [(ngModel)]="newStudent.role" name="role" required (blur)="validateRole()">
+                  <option value="">-- Chọn Vai Trò --</option>
+                  <option value="CampusManager">Quản lý cơ sở</option>
+                  <option value="LearningManager">Quản lý tài liệu học tập</option>
+                </select>
+            
+                <small *ngIf="isRoleInvalid" class="text-danger">
+                  <i class="ft-alert-circle align-middle"></i> Vui lòng chọn vai trò!
+                </small>
+              </div>
             </div>
-            <div class="form-group">
-              <label>Vai trò</label>
-              <select class="form-control" [(ngModel)]="newStudent.role" name="role">
-                <option value="">-- Chọn Vai Trò --</option>
-                <option value="CampusManager">Quản lý cơ sở</option>
-                <option value="LearningManager">Quản lý tài liệu học tập</option>
-              </select>
-            </div>
-          </div>
 
           <div class="form-row">
             <div class="form-group">
@@ -170,41 +212,104 @@
           <!-- Row 1: CODE (disabled) -->
           <div class="form-group">
             <label>CODE</label>
-            <input type="text" class="form-control" [(ngModel)]="editStudent.code" name="edit_code" disabled>
+            <input 
+              type="text" 
+              class="form-control" 
+              [(ngModel)]="editStudent.code" 
+              name="edit_code" 
+              disabled />
           </div>
+          
+          
           <!-- Row 2: Họ và Tên, Giới Tính, Ngày Sinh -->
           <div class="form-row">
             <div class="form-group">
               <label>Họ và Tên</label>
-              <input type="text" class="form-control" [(ngModel)]="editStudent.ten" name="edit_ten">
+              <input 
+                type="text" 
+                class="form-control" 
+                [(ngModel)]="editStudent.ten" 
+                name="edit_ten" 
+                required 
+                #editNameInput="ngModel"
+                [ngClass]="{'is-invalid': editNameInput.invalid && (editNameInput.dirty || editNameInput.touched)}" />
+              
+              <!-- Hiển thị lỗi nếu Họ và Tên bị bỏ trống -->
+              <small *ngIf="editNameInput.invalid && (editNameInput.dirty || editNameInput.touched)" class="text-danger">
+                <i class="ft-alert-circle align-middle"></i>
+                Vui lòng nhập họ và tên!
+              </small>
             </div>
             <div class="form-group">
               <label>Giới Tính</label>
-              <select class="form-control" [(ngModel)]="editStudent.gioiTinh" name="edit_gioiTinh">
-                <option>Nam</option>
-                <option>Nữ</option>
+              <select class="form-control" [(ngModel)]="editStudent.gioiTinh" name="gioiTinh" required>
+                <option value="Nam">Nam</option>
+                <option value="Nu">Nữ</option>
               </select>
             </div>
+            
             <div class="form-group">
               <label>Ngày Sinh</label>
               <div class="input-group">
-                <input type="date" class="form-control" [(ngModel)]="editStudent.ngaySinh" name="edit_ngaySinh">
+                <input type="date" class="form-control" [(ngModel)]="editStudent.ngaySinh" name="edit_ngaySinh" required
+                  (change)="checkAge(editStudent.ngaySinh)" #editDobInput="ngModel"
+                  [ngClass]="{'is-invalid': (isUnderage || editDobInput.invalid) && (editDobInput.dirty || editDobInput.touched)}" />
                 <div class="input-group-append">
-                  <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                  <span class="input-group-text">
+                    <i class="fa fa-calendar"></i>
+                  </span>
                 </div>
               </div>
+            
+              <!-- Hiển thị lỗi nếu chưa đủ 18 tuổi -->
+              <small *ngIf="isUnderage && (editDobInput.dirty || editDobInput.touched)" class="text-danger">
+                <i class="ft-alert-circle align-middle"></i>
+                Nhân viên phải đủ ít nhất 18 tuổi.
+              </small>
             </div>
           </div>
           <!-- Row 3: Email, Số Điện Thoại -->
           <div class="form-row">
             <div class="form-group">
               <label>Email</label>
-              <input type="email" class="form-control" [(ngModel)]="editStudent.email" name="edit_email">
+              <input 
+                type="email" 
+                class="form-control" 
+                [(ngModel)]="editStudent.email" 
+                name="edit_email"
+                required
+                pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                #editEmailInput="ngModel"
+                [ngClass]="{'is-invalid': editEmailInput.invalid && (editEmailInput.dirty || editEmailInput.touched)}" />
+            
+              <!-- Hiển thị lỗi nếu Email không hợp lệ -->
+              <small *ngIf="editEmailInput.invalid && (editEmailInput.dirty || editEmailInput.touched)" class="text-danger">
+                <i class="ft-alert-circle align-middle"></i>
+                <span *ngIf="editEmailInput.errors?.required">Vui lòng nhập Email!</span>
+                <span *ngIf="editEmailInput.errors?.pattern">Email không hợp lệ! Định dạng đúng: example@domain.com</span>
+              </small>
             </div>
             <div class="form-group">
               <label>Số Điện Thoại</label>
-              <input type="tel" class="form-control" [(ngModel)]="editStudent.soDienThoai" name="edit_soDienThoai">
+              <input 
+                type="tel" 
+                class="form-control" 
+                [(ngModel)]="editStudent.soDienThoai" 
+                name="edit_soDienThoai"
+                required
+                pattern="^0[0-9]{9,10}$"
+                #editPhoneInput="ngModel"
+                [ngClass]="{'is-invalid': editPhoneInput.invalid && (editPhoneInput.dirty || editPhoneInput.touched)}" />
+            
+              <!-- Hiển thị lỗi nếu Số Điện Thoại không hợp lệ -->
+              <small *ngIf="editPhoneInput.invalid && (editPhoneInput.dirty || editPhoneInput.touched)" class="text-danger">
+                <i class="ft-alert-circle align-middle"></i>
+                <span *ngIf="editPhoneInput.errors?.required">Vui lòng nhập Số Điện Thoại!</span>
+                <span *ngIf="editPhoneInput.errors?.pattern">Số Điện Thoại không hợp lệ! Phải có từ 10 đến 11 số và bắt đầu bằng số 0.</span>
+              </small>
             </div>
+            
+            
           </div>
           <!-- Row 4: Trường, Cơ Sở -->
           <div class="form-row">
@@ -216,13 +321,27 @@
                   {{ cs.ten }}
                 </option>
               </select>
+              <small *ngIf="!editStudent.coSoId" class="text-danger">
+                <i class="ft-alert-circle align-middle"></i> Vui lòng chọn cơ sở!
+              </small>
             </div>
             <div class="form-group">
               <label>Vai trò</label>
-              <select class="form-control" [(ngModel)]="editStudent.tenVaiTro" name="role">
+              <select class="form-control" [(ngModel)]="editStudent.tenVaiTro" name="edit_role" required>
                 <option value="">-- Chọn Vai Trò --</option>
                 <option value="CampusManager">Quản lý cơ sở</option>
                 <option value="LearningManager">Quản lý tài liệu học tập</option>
+              </select>
+            
+              <small *ngIf="!editStudent.tenVaiTro" class="text-danger">
+                <i class="ft-alert-circle align-middle"></i> Vui lòng chọn vai trò!
+              </small>
+            </div>
+            <div class="form-group">
+              <label>Trạng thái</label>
+              <select class="form-control" [(ngModel)]="editStudent.status" name="edit_status">
+                <option value="true">Hoạt động</option>
+                <option value="false">Không Hoạt Động</option>
               </select>
             </div>
           </div>
@@ -291,8 +410,9 @@
             <td>{{ hs.email }}</td>
             <td>{{ hs.soDienThoai }}</td>
             <td>
-              <span class="active-status">Hoạt động</span>
-              <i class="check-icon"></i>
+              <span [ngClass]="{ 'active-status': hs.isActive, 'inactive-status': !hs.isActive }">
+                {{ hs.isActive ? 'Hoạt động' : 'Không Hoạt Động' }}
+              </span>
             </td>
             <!-- Nút dropdown -->
             <td class="dropdown-col">
@@ -365,13 +485,18 @@
   </div>
 
   <!-- Phân trang -->
-  <!-- <div class="pagination-container">
-      <ul class="pagination">
-        <li class="page-item" [class.active]="currentPage === 1">
-          <a class="page-link" (click)="goToPage(1)">1</a>
-        </li>
-        <li class="page-item" [class.active]="currentPage === 2">
-          <a class="page-link" (click)="goToPage(2)">2</a>
-        </li>
-      </ul>
-    </div> -->
+  <div class="pagination-container" *ngIf="totalPages > 1">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <a class="page-link" (click)="changePage(currentPage - 1)">«</a>
+      </li>
+      <li *ngFor="let page of [].constructor(totalPages); let i = index" 
+          class="page-item" [class.active]="currentPage === (i + 1)">
+        <a class="page-link" (click)="changePage(i + 1)">{{ i + 1 }}</a>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <a class="page-link" (click)="changePage(currentPage + 1)">»</a>
+      </li>
+    </ul>
+  </div>
+</div>
