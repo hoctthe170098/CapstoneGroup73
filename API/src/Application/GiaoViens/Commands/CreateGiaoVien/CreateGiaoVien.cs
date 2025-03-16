@@ -76,7 +76,8 @@ public class CreateGiaoVienCommandHandler : IRequestHandler<CreateGiaoVienComman
             throw new FormatException("CoSo không hợp lệ");
         }
         // Validate length constraints
-        if (request.Code.Length > 20 || request.Ten.Length > 50 || request.DiaChi.Length > 100)
+        if (request.Code.Length > 20 || request.Ten.Length > 50 || request.DiaChi.Length > 100
+            ||request.TruongDangDay.Length>100)
         {
             throw new WrongInputException("Độ dài dữ liệu không hợp lệ!");
         }

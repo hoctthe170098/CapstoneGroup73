@@ -24,7 +24,7 @@ public class ChinhSachs : EndpointGroupBase
             .MapDelete(DeleteChinhSach, "deletechinhsach/{id}");
     }
 
-    //[Authorize(Roles = Roles.Administrator)]
+    [Authorize(Roles = Roles.Administrator)]
     public async Task<Output> CreateChinhSach(ISender sender, [FromBody] CreateChinhSachCommand command)
     {
         return await sender.Send(command);
@@ -42,12 +42,11 @@ public class ChinhSachs : EndpointGroupBase
         return await sender.Send(query);
     }
 
-    //[Authorize(Roles = Roles.Administrator)]
+    [Authorize(Roles = Roles.Administrator+","+Roles.CampusManager)]
     public async Task<Output> GetAllChinhSachs(ISender sender, [AsParameters] GetAllChinhSachsQuery query)
     {
         return await sender.Send(query);
     }
-
     [Authorize(Roles = Roles.Administrator)]
     public async Task<Output> DeleteChinhSach(ISender sender, string id)
     {

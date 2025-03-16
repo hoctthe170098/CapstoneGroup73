@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using StudyFlow.Application.ChuongTrinhs.Commands.CreateChuongTrinh;
 using StudyFlow.Application.ChuongTrinhs.Commands.UpdateChuongTrinh;
 using StudyFlow.Application.ChuongTrinhs.Queries.GetAllChuongTrinhs;
+using StudyFlow.Application.ChuongTrinhs.Queries.GetChuongTrinhById;
 using StudyFlow.Application.ChuongTrinhs.Queries.GetChuongTrinhsWithPagination;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Application.Cosos.Queries.GetAllCoSo;
@@ -20,6 +21,7 @@ public class ChuongTrinhs : EndpointGroupBase
             .MapPut(UpdateChuongTrinh,"updatechuongtrinh")
             .MapPost(GetChuongTrinhsWithPagination, "getchuongtrinhs")
             .MapGet(GetAllChuongTrinhs, "getallchuongtrinhs")
+            .MapGet(GetChuongTrinhById, "getchuongtrinhbyid/{chuongTrinhId}")
             .MapDelete(DeleteChuongTrinh,"deletechuongtrinh/{id}");
     }
     [Authorize(Roles = Roles.LearningManager)]
@@ -34,6 +36,11 @@ public class ChuongTrinhs : EndpointGroupBase
     }
     [Authorize(Roles = Roles.LearningManager)]
     public async Task<Output> GetChuongTrinhsWithPagination(ISender sender, GetChuongTrinhsWithPaginationQuery query)
+    {
+        return await sender.Send(query);
+    }
+    [Authorize(Roles = Roles.LearningManager)]
+    public async Task<Output> GetChuongTrinhById(ISender sender,[AsParameters] GetChuongTrinhByIdQuery query)
     {
         return await sender.Send(query);
     }

@@ -43,21 +43,21 @@ public class GetHocSinhsWithPaginationQueryHandler
             if (request.PageNumber < 1 || request.PageSize < 1) throw new WrongInputException();
 
             // Lấy token từ request header
-            var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            if (string.IsNullOrEmpty(token))
-                throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
-            var coSoId = _identityService.GetCampusId(token);
+            //var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            //if (string.IsNullOrEmpty(token))
+            //    throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+            //var coSoId = _identityService.GetCampusId(token);
 
             var query = _context.HocSinhs
                 .Include(hs => hs.Coso)
                 .Include(hs => hs.ChinhSach)
-                .Where(hs => hs.CoSoId == coSoId)
+               // .Where(hs => hs.CoSoId == coSoId)
                 .AsQueryable();
 
             // Search name
             if (!string.IsNullOrWhiteSpace(request.SearchTen))
             {
-                query = query.Where(hs => hs.Ten.ToLower().Contains(request.SearchTen.ToLower()));
+                query = query.Where(hs => hs.Ten.ToLower().Contains(request.SearchTen.ToLower()) || hs.Code.Contains(request.SearchTen));
             }
 
             // Sort by name
@@ -105,7 +105,7 @@ public class GetHocSinhsWithPaginationQueryHandler
             return new Output
             {
                 isError = false,
-                data = list,
+                data = paginatedList,
                 code = 200
             };
 
