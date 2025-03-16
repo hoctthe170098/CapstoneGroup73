@@ -1,52 +1,78 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 
 <div class="container-fluid mt-4">
-  <!-- Đưa heading vào bên trong container -->
   <h3 class="fw-bold">DANH SÁCH CHƯƠNG TRÌNH HỌC</h3>
 
   <div class="card p-3 mt-3">
       <div class="d-flex justify-content-between">
-          <input type="text" class="form-control w-75" placeholder="Tìm chương trình học...">
-          <button class="btn btn-success" [routerLink]="['/chuongtrinh','add']">
-              Thêm
-          </button>
+          <!-- Ô tìm kiếm -->
+          <input type="text" class="form-control w-50" [(ngModel)]="searchQuery" placeholder="Tìm chương trình học...">
+          <button class="btn btn-primary" (click)="onSearch()">Tìm kiếm</button>
+          <button class="btn btn-success" [routerLink]="['/chuongtrinh','add']">Thêm</button>
       </div>
 
       <!-- Danh sách chương trình -->
-      <div class="card mt-4" *ngFor="let program of programs">
-          <div class="card-body">
-              <h5 class="card-title fw-bold">{{ program.tieuDe || 'Chưa có tiêu đề' }}</h5>
-              <p class="card-text">{{ program.moTa || 'Chưa có mô tả' }}</p>
+      <div *ngIf="programs.length > 0; else noData">
+          <div class="card mt-4" *ngFor="let program of programs">
+              <div class="card-body">
+                  <h5 class="card-title fw-bold">{{ program.tieuDe || 'Chưa có tiêu đề' }}</h5>
+                  <p class="card-text">{{ program.moTa || 'Chưa có mô tả' }}</p>
 
-              <a href="#" class="text-primary" (click)="toggleContent(program.id, $event)">
-                  {{ program.expanded ? 'Ẩn' : 'Hiển thị' }}
-              </a>
-              <span class="text-muted"> | </span>
-              <a [routerLink]="['/chuongtrinh/edit', program.id]" class="text-primary me-3">Sửa</a>
-              <span class="text-muted"> | </span>
-              <a href="#" class="text-danger" (click)="deleteProgram(program.id)">Xóa</a>
+                  <a href="#" class="text-primary" (click)="toggleContent(program.id, $event)">
+                      {{ program.expanded ? 'Ẩn' : 'Hiển thị' }}
+                  </a>
+                  <span class="text-muted"> | </span>
+                  <a [routerLink]="['/chuongtrinh/editchuongtrinh', program.id]" class="text-primary me-3">Sửa</a>
+                  <span class="text-muted"> | </span>
+                  <a href="#" class="text-danger" (click)="onDeleteProgram(program.id, $event)">Xóa</a>
 
-              <div *ngIf="program.expanded" class="lesson-content mt-3">
-                  <div class="card mt-3" *ngFor="let lesson of program.noiDungBaiHocs">
-                      <div class="card-body">
-                          <h6 class="fw-bold">{{ lesson.tieuDe || 'Chưa có tiêu đề bài học' }}</h6>
-                          <p class="fw-bold">{{ lesson.mota || 'Chưa có mô tả' }}</p>
-                          <ul class="list-group mt-2" *ngIf="lesson.taiLieuHocTaps && lesson.taiLieuHocTaps.length > 0">
-                              <li *ngFor="let file of lesson.taiLieuHocTaps" class="list-group-item">
-                                <a *ngIf="file.fileUrl" href="{{ file.fileUrl }}" target="_blank" (click)="$event.preventDefault(); downloadFile(file.fileUrl)">
-                                  {{ file.urlType }}
-                                </a>
-                                <span *ngIf="!file.fileUrl" class="text-muted">Không có file</span>
-                              </li>
-                          </ul>
-                      </div>
-                  </div>
 
-                  <div *ngIf="!program.noiDungBaiHocs || program.noiDungBaiHocs.length === 0" class="text-muted">
-                      Không có bài học nào.
-                  </div>
+                  <!-- Hiển thị nội dung bài học nếu expanded = true -->
+                  <div *ngIf="program.expanded" class="lesson-content mt-3">
+                    <div *ngIf="program.noiDungBaiHocs && program.noiDungBaiHocs.length > 0; else noLessons">
+                        <div class="card mt-3" *ngFor="let lesson of program.noiDungBaiHocs">
+                            <div class="card-body">
+                                <h6 class="fw-bold">{{ lesson.tieuDe || 'Chưa có tiêu đề bài học' }}</h6>
+                                <p>{{ lesson.mota || 'Chưa có mô tả' }}</p>
+                                
+                                <!-- Hiển thị tài liệu học tập -->
+                                <ul class="list-group mt-2" *ngIf="lesson.taiLieuHocTaps && lesson.taiLieuHocTaps.length > 0">
+                                    <li *ngFor="let file of lesson.taiLieuHocTaps" class="list-group-item d-flex justify-content-between align-items-center">
+                                        <!-- Bấm vào tên file để tải -->
+                                        <a [href]="'file:///D:/SEP/CapstoneGroup73/API/src/Web/uploads/' + file.ten">
+                                            Mở file
+                                        </a>
+                                    </li>
+                                </ul>
+                                
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <ng-template #noLessons>
+                        <div class="text-muted">Không có bài học nào.</div>
+                    </ng-template>
+                </div>
               </div>
           </div>
+      </div>
+
+      <!-- Hiển thị nếu không có dữ liệu -->
+      <ng-template #noData>
+          <div class="text-center text-muted mt-4">
+              Không có chương trình học nào.
+          </div>
+      </ng-template>
+
+      <!-- Phân trang -->
+      <div class="d-flex justify-content-between mt-3">
+          <button class="btn btn-secondary" (click)="changePage(false)" [disabled]="currentPage === 1">
+              Trước
+          </button>
+          <span>Trang {{ currentPage }} / {{ totalPages }}</span>
+          <button class="btn btn-secondary" (click)="changePage(true)" [disabled]="currentPage === totalPages">
+              Tiếp
+          </button>
       </div>
   </div>
 </div>

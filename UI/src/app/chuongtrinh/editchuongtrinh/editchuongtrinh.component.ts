@@ -1,6 +1,6 @@
-// import { Component, OnInit } from '@angular/core';
-// import { ActivatedRoute, Router } from '@angular/router';
-// import { ChuongtrinhService } from '../shared/chuongtrinh.service';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ChuongtrinhService } from '../shared/chuongtrinh.service';
 
 // @Component({
 //   selector: 'app-editchuongtrinh',

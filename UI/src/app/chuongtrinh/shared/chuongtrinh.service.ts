@@ -9,7 +9,7 @@ import { CreateChuongTrinh, CreateNoiDungBaiHoc } from './chuongtrinh.model';
   providedIn: 'root'
 })
 export class ChuongtrinhService {
-  private apiUrl = `${environment.apiURL}/ChuongTrinhs`;
+  private apiUrl = `${environment.apiURL}/Chuongtrinhs`;
   private programsSource = new BehaviorSubject<CreateChuongTrinh[]>([]);
   programs$ = this.programsSource.asObservable(); // Observable để component có thể subscribe
 
@@ -22,23 +22,22 @@ export class ChuongtrinhService {
   }
 
   /** 🔥 Lấy danh sách chương trình từ API */
-  getPrograms(): void {
-    this.http.get<any>(`${this.apiUrl}/getchuongtrinhs?PageNumber=1&PageSize=10`, {
+  getPrograms(page: number = 1, search: string = "", pageSize: number = 8): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/getchuongtrinhs`, {
+      search: search, // ✅ Thêm từ khóa tìm kiếm
+      pageNumber: page,
+      pageSize: pageSize
+    }, {
       headers: this.getHeaders()
-    }).subscribe({
-      next: (response) => {
-        console.log("📌 API Response:", response); // Kiểm tra dữ liệu từ API
-        if (response && response.items) {  // ✅ Sửa lỗi lấy dữ liệu
-          console.log("✅ Danh sách chương trình học:", response.items);
-          this.programsSource.next(response.items); // Cập nhật danh sách
-        } else {
-          console.warn("⚠️ API không trả về dữ liệu hợp lệ", response);
-        }
-      },
-      error: (error) => {
+    }).pipe(
+      tap(response => {
+        console.log(`📌 API Response (Trang ${page}, Tìm kiếm: "${search}")`, response);
+      }),
+      catchError(error => {
         console.error("❌ Lỗi khi gọi API:", error);
-      }
-    });
+        return throwError(() => error);
+      })
+    );
   }
   
   /** 🔥 Lấy danh sách bài học của một chương trình */
