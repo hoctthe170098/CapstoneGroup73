@@ -8,7 +8,7 @@
       <option value="Tạm ngừng">Không Hoạt Động</option>
     </select>
     <input type="text" class="form-control search-input" placeholder="Tìm tên/code nhân viên..."
-    [(ngModel)]="searchTerm" (keyup.enter)="searchNhanVien()" />
+    [(ngModel)]="searchTerm" (ngModelChange)="searchNhanVien()" />
 
 
     <div class="btn-group-right">
@@ -242,9 +242,9 @@
             </div>
             <div class="form-group">
               <label>Giới Tính</label>
-              <select class="form-control" [(ngModel)]="editStudent.gioiTinh" name="gioiTinh" required>
-                <option value="Nam">Nam</option>
-                <option value="Nu">Nữ</option>
+              <select class="form-control" [(ngModel)]="editStudent.gioiTinh" name="edit_gioiTinh">
+                <option value="nam">Nam</option>
+                <option value="nu">Nữ</option>
               </select>
             </div>
             
@@ -405,7 +405,7 @@
           <tr>
             <td>{{ hs.code }}</td>
             <td>{{ hs.ten }}</td>
-            <td>{{ hs.gioiTinh }}</td>
+            <td>{{ hs.gioiTinh === 'nam' ? 'Nam' : 'Nữ' }}</td>
             <td>{{ hs.ngaySinh | date:'dd-MM-yyyy' }}</td>
             <td>{{ hs.email }}</td>
             <td>{{ hs.soDienThoai }}</td>
@@ -447,7 +447,7 @@
                   </div>
                   <div class="col-md-3 detail-item">
                     <label>Giới Tính</label>
-                    <div class="detail-box">{{ hs.gioiTinh }}</div>
+                    <div class="detail-box">{{ hs.gioiTinh === 'nam' ? 'Nam' : 'Nữ' }}</div>
                   </div>
                   <div class="col-md-3 detail-item">
                     <label>Ngày Sinh</label>

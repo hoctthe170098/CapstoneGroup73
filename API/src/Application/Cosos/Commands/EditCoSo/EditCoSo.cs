@@ -48,6 +48,9 @@ public class EditCoSoComandHandler : IRequestHandler<EditCoSoComand, Output>
         if (coso == null) throw new NotFoundIDException();
         else
         {
+            var check = await _context.CoSos.AnyAsync(c => 
+            c.Id!=g_id && c.Ten.Equals(request.Ten));
+            if (check) throw new Exception("Tên cơ sở đã tồn tại");
             coso.Ten = request.Ten;
             coso.DiaChi = request.DiaChi;
             coso.SoDienThoai = request.SoDienThoai;

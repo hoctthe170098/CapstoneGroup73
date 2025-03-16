@@ -13,6 +13,7 @@ export const ROUTES: RouteInfo[] = [
     ]
   },
   {path: '/phong', title: 'Phòng Học', icon: 'ft-briefcase', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
+  {path: '/accountmanager', title: 'Quản lý', icon: 'ft-briefcase', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
   {path: '/giaovien', title: 'Giáo Viên', icon: 'ft-briefcase', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
   {path: '/hocsinh', title: 'Học Sinh', icon: 'ft-map-pin', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
   { path: '/sanpham/danh-sach-san-pham', title: 'Sản phẩm', icon: 'ft-clipboard', class: 'dropdown-item', isExternalLink: false, submenu: [] },
