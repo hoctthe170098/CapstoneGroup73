@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Application.GiaoViens.Commands.AddListGiaoViens;
 using StudyFlow.Application.GiaoViens.Commands.CreateGiaoVien;
 using StudyFlow.Application.GiaoViens.Commands.EditGiaoVien;
+using StudyFlow.Application.GiaoViens.Commands.ExportGiaoViensToExcel;
 using StudyFlow.Application.GiaoViens.Queries.GetGiaoViensWithPagination;
 using StudyFlow.Domain.Constants;
 
@@ -16,14 +18,15 @@ public class GiaoViens : EndpointGroupBase
             .MapPost(CreateGiaoVien, "creategiaovien")
             .MapPost(GetGiaoViensWithPagination, "getgiaovienswithpagination")
             .MapPut(EditGiaoVien, "editgiaovien")
-            .MapPost(AddListGiaoViens, "addlistgiaoviens");
+            .MapPost(AddListGiaoViens, "addlistgiaoviens")
+            .MapPost(ExportGiaoViensToExcel, "exportgiaovienstoexcel");
     }
     [Authorize(Roles = Roles.CampusManager)]
     public async Task<Output> CreateGiaoVien(ISender sender, CreateGiaoVienCommand comand)
     {
         return await sender.Send(comand);
     }
-    [Authorize(Roles = Roles.CampusManager)]
+    //[Authorize(Roles = Roles.CampusManager)]
     public async Task<Output> GetGiaoViensWithPagination(ISender sender, GetGiaoViensWithPaginationQuery query)
     {
         return await sender.Send(query);
@@ -35,6 +38,11 @@ public class GiaoViens : EndpointGroupBase
     }
     [Authorize(Roles = Roles.CampusManager)]
     public async Task<Output> AddListGiaoViens(ISender sender, AddListGiaoViensCommand comand)
+    {
+        return await sender.Send(comand);
+    }
+    //[Authorize(Roles = Roles.CampusManager)]
+    public async Task<FileContentResult> ExportGiaoViensToExcel(ISender sender, ExportGiaoViensToExcelCommand comand)
     {
         return await sender.Send(comand);
     }
