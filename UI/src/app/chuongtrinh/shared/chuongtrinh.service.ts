@@ -39,7 +39,15 @@ export class ChuongtrinhService {
       })
     );
   }
+  uploadFile(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
   
+    return this.http.post<{ fileUrl: string }>(
+      'https://localhost:5001/api/ChuongTrinhs/uploadfile', 
+      formData
+    );
+  }
   /** 🔥 Lấy danh sách bài học của một chương trình */
   getProgramLessons(id: number): Observable<CreateNoiDungBaiHoc[]> {
     return this.http.get<CreateChuongTrinh>(`${this.apiUrl}/${id}`, {
@@ -62,21 +70,8 @@ export class ChuongtrinhService {
   }
 
   /** 🔥 Cập nhật chương trình */
-  updateProgram(id: number, updatedProgram: CreateChuongTrinh): Observable<CreateChuongTrinh> {
-    return this.http.put<CreateChuongTrinh>(`${this.apiUrl}/updatechuongtrinh/${id}`, updatedProgram, {
-      headers: this.getHeaders()
-    }).pipe(
-      tap(() => {
-        const programs = this.programsSource.value.map(program =>
-          program.id === id ? updatedProgram : program
-        );
-        this.programsSource.next(programs);
-      }),
-      catchError(error => {
-        console.error(`❌ Lỗi khi cập nhật chương trình ID ${id}:`, error);
-        return throwError(() => error);
-      })
-    );
+  updateProgram(payload: any) {
+    return this.http.put(`${this.apiUrl}/updatechuongtrinh`, payload);
   }
 
   /** 🔥 Xóa chương trình */

@@ -39,8 +39,8 @@
                                 <ul class="list-group mt-2" *ngIf="lesson.taiLieuHocTaps && lesson.taiLieuHocTaps.length > 0">
                                     <li *ngFor="let file of lesson.taiLieuHocTaps" class="list-group-item d-flex justify-content-between align-items-center">
                                         <!-- Bấm vào tên file để tải -->
-                                        <a [href]="'file:///D:/SEP/CapstoneGroup73/API/src/Web/uploads/' + file.ten">
-                                            Mở file
+                                        <a *ngIf="file.urlFile" [href]="file.urlFile" download class="text-primary text-decoration-none">
+                                            {{ file.ten }}
                                         </a>
                                     </li>
                                 </ul>
