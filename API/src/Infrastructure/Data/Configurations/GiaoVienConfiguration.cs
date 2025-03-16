@@ -25,7 +25,7 @@ public class GiaoVienConfiguration : IEntityTypeConfiguration<GiaoVien>
         builder.Property(x => x.DiaChi)
             .HasMaxLength(200);
         builder.Property(x => x.TruongDangDay)
-            .HasMaxLength(50);
+            .HasMaxLength(100);
         builder.Property(x => x.SoDienThoai)
             .HasMaxLength(11);
         builder.Property(x => x.Email)
