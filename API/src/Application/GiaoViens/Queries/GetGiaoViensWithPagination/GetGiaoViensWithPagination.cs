@@ -61,7 +61,7 @@ public class GetGiaoViensWithPaginationQueryHandler
                 string nameLower = request.SearchTen.ToLower();
 
                 query = query.Where(nv => nv.Ten.Contains(nameLower) || nv.Code.Contains(request.SearchTen));
-
+            }
             // Filter by Status
             if(request.IsActive.HasValue)
             {
