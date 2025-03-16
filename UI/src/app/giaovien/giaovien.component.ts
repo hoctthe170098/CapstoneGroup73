@@ -23,33 +23,34 @@ export class GiaovienComponent implements OnInit {
   editTeacherForm: FormGroup;
   selectedTeacher: any;
 
-  constructor(private giaovienService: GiaovienService, private router: Router, private cdr: ChangeDetectorRef,private toastr: ToastrService,  private fb: FormBuilder) {
+  constructor(private giaovienService: GiaovienService, private router: Router, private cdr: ChangeDetectorRef, private toastr: ToastrService, private fb: FormBuilder) {
     this.addTeacherForm = this.fb.group({
-      code: ['', Validators.required],
-      ten: ['', [Validators.required, Validators.maxLength(30)]],
+      code: ['', [Validators.required, Validators.maxLength(18)]], // Code < 18 ký tự
+      ten: ['', [Validators.required, Validators.maxLength(20)]], // Tên tối đa 20 ký tự
       gioiTinh: ['Nam', Validators.required],
-      ngaySinh: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      soDienThoai: ['', [Validators.required, Validators.pattern(/^0\d{9,10}$/)]],
-      truongDangDay: ['', Validators.required],
+      ngaySinh: ['', [Validators.required, this.validateAge]], // Phải trên 18 tuổi
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(50)]], // Email hợp lệ, tối đa 50 ký tự
+      soDienThoai: ['', [Validators.required, Validators.pattern(/^0\d{9,10}$/)]], // 10 hoặc 11 số
+      truongDangDay: ['', [Validators.required, Validators.maxLength(50)]], // Không quá 50 ký tự
       province: ['', Validators.required],
       district: ['', Validators.required],
-      diaChiCuThe: ['', [Validators.required, Validators.maxLength(100)]]
-    });
-    this.editTeacherForm = this.fb.group({
-      code: [{ value: '', disabled: true }], // Code không được chỉnh sửa
-      ten: ['', [Validators.required, Validators.maxLength(30)]],
-      gioiTinh: ['Nam', Validators.required],
-      ngaySinh: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      soDienThoai: ['', [Validators.required, Validators.pattern(/^0\d{9,10}$/)]],
-      truongDangDay: ['', Validators.required],
-      province: ['', Validators.required],
-      district: ['', Validators.required],
-      diaChiCuThe: ['', [Validators.required, Validators.maxLength(100)]],
+      diaChiCuThe: ['', [Validators.required, Validators.maxLength(150)]], // Tối đa 150 ký tự
       status: [true]
     });
-    this.selectedTeacher = null;
+  
+    this.editTeacherForm = this.fb.group({
+      code: [{ value: '', disabled: true }], // Code không chỉnh sửa
+      ten: ['', [Validators.required, Validators.maxLength(20)]],
+      gioiTinh: ['Nam', Validators.required],
+      ngaySinh: ['', [Validators.required, this.validateAge]],
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(50)]],
+      soDienThoai: ['', [Validators.required, Validators.pattern(/^0\d{9,10}$/)]],
+      truongDangDay: ['', [Validators.required, Validators.maxLength(50)]],
+      province: ['', Validators.required],
+      district: ['', Validators.required],
+      diaChiCuThe: ['', [Validators.required, Validators.maxLength(150)]],
+      status: [true]
+    });
   }
 
   ngOnInit(): void {
@@ -88,6 +89,31 @@ onProvinceChange(provinceCode: string) {
     
 }
 
+checkEmailExists(email: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    this.giaovienService.getDanhSachGiaoVien().subscribe((response) => {
+      if (!response.isError && response.data) {
+        const existingEmail = response.data.some((gv: any) => gv.email === email);
+        resolve(existingEmail);
+      } else {
+        resolve(false);
+      }
+    });
+  });
+}
+
+checkPhoneExists(phone: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    this.giaovienService.getDanhSachGiaoVien().subscribe((response) => {
+      if (!response.isError && response.data) {
+        const existingPhone = response.data.some((gv: any) => gv.soDienThoai === phone);
+        resolve(existingPhone);
+      } else {
+        resolve(false);
+      }
+    });
+  });
+}
 
 
 // Khi chọn tỉnh/thành phố trong modal chỉnh sửa -> cập nhật quận/huyện
@@ -108,7 +134,7 @@ onProvinceChangeForEdit(provinceCode: string) {
    
 }
   
-   /** 🏫 Load danh sách giáo viên từ API */
+   /** Load danh sách giáo viên từ API */
    loadDanhSachGiaoVien() {
     let isActiveFilter: boolean | null = this.trangThai === 'Hoạt động' ? true : this.trangThai === 'Tạm ngừng' ? false : null;
 
@@ -161,7 +187,7 @@ onProvinceChangeForEdit(provinceCode: string) {
     this.selectedTeacher = { ...teacher };
   
     if (!teacher.code || teacher.code.trim() === "") {
-      console.error("❌ Lỗi: Giáo viên không có mã!");
+      console.error(" Lỗi: Giáo viên không có mã!");
       this.toastr.error("Giáo viên không có mã, không thể chỉnh sửa!", "Lỗi");
       return;
     }
@@ -177,21 +203,13 @@ onProvinceChangeForEdit(provinceCode: string) {
       province: teacher.province,
       district: teacher.district,
       diaChiCuThe: teacher.diaChiCuThe,
-      status: teacher.isActive ? true : false // 🆕 Gán trạng thái khi mở form
+      status: teacher.isActive ? true : false 
     });
   
-    console.log("✅ Dữ liệu sau khi gán vào form:", this.editTeacherForm.value);
+    console.log(" Dữ liệu sau khi gán vào form:", this.editTeacherForm.value);
   
     this.isEditModalOpen = true;
   }
-  
-  
-  
-  
-  
-
-  
-
 
   /** Thêm giáo viên */
   isModalOpen: boolean = false;
@@ -218,16 +236,29 @@ onProvinceChangeForEdit(provinceCode: string) {
     this.isModalOpen = false;
   }
 
-  /** 📩 Gửi API để thêm giáo viên */
-  submitNewTeacher() {
+  /**  Gửi API để thêm giáo viên */
+ async submitNewTeacher() {
     if (this.addTeacherForm.invalid) {
       this.addTeacherForm.markAllAsTouched();
       return;
     }
   
     const formData = this.addTeacherForm.value;
+    //  Kiểm tra email trùng
+  const emailExists = await this.checkEmailExists(formData.email);
+  if (emailExists) {
+    this.toastr.error("Email đã tồn tại!", "Lỗi");
+    return;
+  }
+
+  //  Kiểm tra số điện thoại trùng
+  const phoneExists = await this.checkPhoneExists(formData.soDienThoai);
+  if (phoneExists) {
+    this.toastr.error("Số điện thoại đã tồn tại!", "Lỗi");
+    return;
+  }
   
-    console.log("🔍 Kiểm tra dữ liệu form:", formData);
+    console.log(" Kiểm tra dữ liệu form:", formData);
   
     // 🔹 Kiểm tra province và district
     const provinceObj = this.provinces.find(p => p.code == formData.province);
@@ -236,10 +267,10 @@ onProvinceChangeForEdit(provinceCode: string) {
     const districtObj = this.districts.find(d => d.code == formData.district);
     const districtName = districtObj ? districtObj.name : '';
   
-    console.log("✅ Province Name:", provinceName);
-    console.log("✅ District Name:", districtName);
+    console.log(" Province Name:", provinceName);
+    console.log(" District Name:", districtName);
   
-    // 🔹 Nếu không có giá trị thì gán là chuỗi rỗng để tránh lỗi `undefined`
+    //  Nếu không có giá trị thì gán là chuỗi rỗng để tránh lỗi `undefined`
     const diaChiFormatted = `${provinceName || ''}, ${districtName || ''}, ${formData.diaChiCuThe || ''}`.trim();
   
     const newTeacher = {
@@ -299,7 +330,7 @@ getDistrictName(districtCode: string): string {
       district: '',
       diaChi: ''
     };
-    this.districts = []; // Reset danh sách quận/huyện
+    this.districts = []; 
   }
   
   
@@ -332,29 +363,28 @@ getDistrictName(districtCode: string): string {
 
     console.log("🔍 Giáo viên được chọn:", this.selectedTeacher);
 
-    // 🏢 Tách địa chỉ thành phần riêng (Tỉnh, Quận/Huyện, Địa chỉ cụ thể)
+    //  Tách địa chỉ thành phần riêng (Tỉnh, Quận/Huyện, Địa chỉ cụ thể)
     const addressParts = teacher.diaChi ? teacher.diaChi.split(',').map(part => part.trim()) : ['', '', ''];
     const provinceName = addressParts[0] || ''; // Thành phố
     const districtName = addressParts[1] || ''; // Quận/Huyện
     const detailAddress = addressParts[2] || ''; // Địa chỉ cụ thể
 
-    // 🔹 Lấy `provinceCode` từ `provinceName`
+    // Lấy `provinceCode` từ `provinceName`
     const provinceObj = this.provinces.find(p => p.name === provinceName);
     const provinceCode = provinceObj ? provinceObj.code : '';
 
-    // 🔹 Gọi danh sách quận/huyện theo tỉnh đã chọn
+    // Gọi danh sách quận/huyện theo tỉnh đã chọn
     this.onProvinceChangeForEdit(provinceCode);
 
-    // 🔹 Lấy `districtCode` từ `districtName`
+    //  Lấy `districtCode` từ `districtName`
     const districtObj = provinceObj?.districts.find(d => d.name === districtName);
     const districtCode = districtObj ? districtObj.code : '';
 
-    // 🗓️ Chuyển đổi ngày sinh về `yyyy-MM-dd`
     const ngaySinhFormatted = teacher.ngaySinh ? new Date(teacher.ngaySinh).toISOString().split('T')[0] : '';
 
-    // 🔹 Cập nhật form với dữ liệu chỉnh sửa
+    //  Cập nhật form với dữ liệu chỉnh sửa
     this.editTeacherForm.patchValue({
-        code: teacher.code, // ✅ Đảm bảo code được gán đúng
+        code: teacher.code, 
         ten: teacher.ten,
         gioiTinh: teacher.gioiTinh,
         ngaySinh: ngaySinhFormatted,
@@ -389,32 +419,39 @@ getDistrictName(districtCode: string): string {
     this.isEditModalOpen = false;
   }
 
-  submitEditStudent() {
+  async submitEditStudent() {
   console.log("🔍 Giáo viên đang chỉnh sửa:", this.selectedTeacher);
   console.log("🔍 Dữ liệu từ Form:", this.editTeacherForm.value);
 
   let formData = { ...this.editTeacherForm.value };
 
-  // 🔥 Kiểm tra nếu `code` bị undefined thì lấy từ `selectedTeacher`
   if (!formData.code || formData.code.trim() === "") {
     if (this.selectedTeacher && this.selectedTeacher.code) {
       formData.code = this.selectedTeacher.code;
     } else {
       this.toastr.error("Không tìm thấy mã giáo viên!", "Lỗi");
-      console.error("❌ Lỗi: Mã giáo viên không tồn tại!");
+      console.error("Lỗi: Mã giáo viên không tồn tại!");
       return;
     }
   }
 
-  console.log("✅ Mã giáo viên sau khi gán:", formData.code);
+  console.log(" Mã giáo viên sau khi gán:", formData.code);
+  const emailExists = await this.checkEmailExists(formData.email);
+  if (emailExists && formData.email !== this.selectedTeacher.email) {
+    this.toastr.error("Email đã tồn tại!", "Lỗi");
+    return;
+  }
 
-  // 🔹 Chuyển đổi ngày sinh sang định dạng `YYYY-MM-DD`
+  const phoneExists = await this.checkPhoneExists(formData.soDienThoai);
+  if (phoneExists && formData.soDienThoai !== this.selectedTeacher.soDienThoai) {
+    this.toastr.error("Số điện thoại đã tồn tại!", "Lỗi");
+    return;
+  }
   if (formData.ngaySinh) {
     const date = new Date(formData.ngaySinh);
     formData.ngaySinh = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   }
 
-  // 🔹 Định dạng lại `diaChi`
   const provinceObj = this.provinces.find(p => p.code == formData.province);
   const provinceName = provinceObj ? provinceObj.name : '';
 
@@ -423,15 +460,13 @@ getDistrictName(districtCode: string): string {
 
   formData.diaChi = `${provinceName}, ${districtName}, ${formData.diaChiCuThe || ''}`.trim();
 
-  // 🔹 Chuyển đổi status thành string "true" hoặc "false"
   formData.status = formData.status ? "true" : "false";
 
   console.log("📤 Gửi API cập nhật giáo viên với dữ liệu:", JSON.stringify(formData));
 
-  // 🛠 Gửi API cập nhật
   this.giaovienService.updateGiaoVien(formData).subscribe({
     next: (res) => {
-      console.log("✅ Phản hồi từ API:", res);
+      console.log(" Phản hồi từ API:", res);
       if (!res.isError) {
         this.toastr.success("Cập nhật giáo viên thành công!", "Thành công");
         this.closeEditModal();
@@ -441,20 +476,29 @@ getDistrictName(districtCode: string): string {
       }
     },
     error: (error) => {
-      console.error("❌ Lỗi kết nối API:", error);
+      console.error(" Lỗi kết nối API:", error);
       this.toastr.error("Có lỗi xảy ra, vui lòng thử lại!", "Lỗi");
     }
   });
 }
 
-  
+validateAge(control: any) {
+  if (!control.value) return null;
+  const birthDate = new Date(control.value);
+  const today = new Date();
+  const age = today.getFullYear() - birthDate.getFullYear();
+  if (age < 18) {
+    return { invalidAge: true };
+  }
+  return null;
+}
+
   
 
   filterByStatus() {
     this.currentPage = 1;
     this.loadDanhSachGiaoVien();
   }
-  /** Hàm format ngày => yyyy-MM-dd */
   formatDate(date: Date) {
     const d = new Date(date);
     const year = d.getFullYear();

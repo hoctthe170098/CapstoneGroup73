@@ -15,7 +15,7 @@
     <input
       type="text"
       class="form-control search-input"
-      placeholder="Tìm tên/code giáo viên..."
+      placeholder="Tìm tên giáo viên..."
       [(ngModel)]="searchTerm"
       (keyup.enter)="searchGiaoVien()"
     />
@@ -35,6 +35,7 @@
     </div>
   </div>
 
+  <!-- Add teacher -->
   <div class="modal-container" *ngIf="isModalOpen">
     <div class="modal-overlay" (click)="closeModal()"></div>
     <div class="modal-content">
@@ -42,18 +43,44 @@
         <h2>THÊM GIÁO VIÊN MỚI</h2>
         <button class="close-btn" (click)="closeModal()">✕</button>
       </div>
-  
+
       <div class="modal-body">
         <form [formGroup]="addTeacherForm" (ngSubmit)="submitNewTeacher()">
           <div class="form-group">
             <label>Code</label>
-            <input formControlName="code" type="text" class="form-control" placeholder="Code" />
+            <div class="input-group">
+              <span class="input-group-text">GV</span>
+              <input formControlName="code" type="text" class="form-control" placeholder="Nhập mã giáo viên" />
+            </div>
+            <small
+              class="error-message"
+              *ngIf="
+                addTeacherForm.controls['code'].invalid &&
+                addTeacherForm.controls['code'].touched
+              "
+            >
+              Mã giáo viên không được quá 18 ký tự.
+            </small>
           </div>
-  
+
           <div class="form-row">
             <div class="form-group">
               <label>Họ và Tên</label>
-              <input formControlName="ten" type="text" class="form-control" placeholder="Nhập tên" />
+              <input
+                formControlName="ten"
+                type="text"
+                class="form-control"
+                placeholder="Nhập họ và tên"
+              />
+              <small
+                class="error-message"
+                *ngIf="
+                  addTeacherForm.controls['ten'].invalid &&
+                  addTeacherForm.controls['ten'].touched
+                "
+              >
+                Tên không được quá 20 ký tự.
+              </small>
             </div>
             <div class="form-group">
               <label>Giới Tính</label>
@@ -64,32 +91,100 @@
             </div>
             <div class="form-group">
               <label>Ngày Sinh</label>
-              <input formControlName="ngaySinh" type="date" class="form-control" />
+              <input
+                formControlName="ngaySinh"
+                type="date"
+                class="form-control"
+              />
+              <small
+                class="error-message"
+                *ngIf="
+                  addTeacherForm.controls['ngaySinh'].errors?.invalidAge &&
+                  addTeacherForm.controls['ngaySinh'].touched
+                "
+              >
+                Giáo viên phải trên 18 tuổi.
+              </small>
             </div>
           </div>
-  
+
           <div class="form-row">
             <div class="form-group">
               <label>Email</label>
-              <input formControlName="email" type="email" class="form-control" placeholder="Nhập email" />
+              <input
+                formControlName="email"
+                type="email"
+                class="form-control"
+                placeholder="Nhập email"
+              />
+              <small
+                class="error-message"
+                *ngIf="
+                  addTeacherForm.controls['email'].invalid &&
+                  addTeacherForm.controls['email'].touched
+                "
+              >
+                Email không hợp lệ hoặc quá 50 ký tự.
+              </small>
+              <small class="error-message" *ngIf="emailError">
+                {{ emailError }}
+              </small>
             </div>
             <div class="form-group">
               <label>Số Điện Thoại</label>
-              <input formControlName="soDienThoai" type="tel" class="form-control" placeholder="Nhập số điện thoại" />
+              <input
+                formControlName="soDienThoai"
+                type="tel"
+                class="form-control"
+                placeholder="Nhập số điện thoại"
+              />
+              <small
+                class="error-message"
+                *ngIf="
+                  addTeacherForm.controls['soDienThoai'].invalid &&
+                  addTeacherForm.controls['soDienThoai'].touched
+                "
+              >
+                Số điện thoại phải có 10 hoặc 11 số.
+              </small>
+              <small class="error-message" *ngIf="phoneError">
+                {{ phoneError }}
+              </small>
             </div>
           </div>
-  
+
           <div class="form-group">
-            <label>Trường</label>
-            <input formControlName="truongDangDay" type="text" class="form-control" placeholder="Nhập trường" />
+            <label>Trường Đang Dạy</label>
+            <input
+              formControlName="truongDangDay"
+              type="text"
+              class="form-control"
+              placeholder="Nhập trường đang dạy"
+            />
+            <small
+              class="error-message"
+              *ngIf="
+                addTeacherForm.controls['truongDangDay'].invalid &&
+                addTeacherForm.controls['truongDangDay'].touched
+              "
+            >
+              Tên trường không được quá 50 ký tự.
+            </small>
           </div>
-  
+
           <div class="form-row">
             <div class="form-group">
               <label>Thành phố</label>
-              <select formControlName="province" class="form-control" (change)="onProvinceChange($event.target.value)">
+              <select
+                formControlName="province"
+                class="form-control"
+                (change)="onProvinceChange($event.target.value)"
+              >
                 <option value="">-- Chọn Thành phố --</option>
-                <option *ngFor="let province of provinces" [value]="province.code">
+                <option
+                  *ngFor="let province of provinces"
+                  [value]="province.code"
+                >
                   {{ province.name }}
                 </option>
               </select>
@@ -98,131 +193,266 @@
               <label>Quận/Huyện</label>
               <select formControlName="district" class="form-control">
                 <option value="">-- Chọn Quận/Huyện --</option>
-                <option *ngFor="let district of districts" [value]="district.code">
+                <option
+                  *ngFor="let district of districts"
+                  [value]="district.code"
+                >
                   {{ district.name }}
                 </option>
               </select>
             </div>
             <div class="form-group">
               <label>Địa chỉ cụ thể</label>
-              <input formControlName="diaChiCuThe" type="text" class="form-control" placeholder="Nhập địa chỉ cụ thể" />
+              <input
+                formControlName="diaChiCuThe"
+                type="text"
+                class="form-control"
+                placeholder="Nhập địa chỉ cụ thể"
+              />
+              <small
+                class="error-message"
+                *ngIf="
+                  addTeacherForm.controls['diaChiCuThe'].invalid &&
+                  addTeacherForm.controls['diaChiCuThe'].touched
+                "
+              >
+                Địa chỉ không được quá 150 ký tự.
+              </small>
             </div>
           </div>
-  
+
           <div class="modal-footer">
-            <button type="button" class="btn cancel-btn" (click)="closeModal()">Hủy</button>
+            <button type="button" class="btn cancel-btn" (click)="closeModal()">
+              Hủy
+            </button>
             <button type="submit" class="btn save-btn">Thêm</button>
           </div>
         </form>
       </div>
     </div>
   </div>
-  
-  
 
+  <!-- POP-UP CHỈNH SỬA GIÁO VIÊN -->
+  <div class="modal-container" *ngIf="isEditModalOpen">
+    <div class="modal-overlay" (click)="closeEditModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>CHỈNH SỬA GIÁO VIÊN</h2>
+        <button class="close-btn" (click)="closeEditModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="editTeacherForm" (ngSubmit)="submitEditStudent()">
+          <!-- CODE -->
 
-  
-<!-- POP-UP CHỈNH SỬA GIÁO VIÊN -->
-<div class="modal-container" *ngIf="isEditModalOpen">
-  <div class="modal-overlay" (click)="closeEditModal()"></div>
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2>CHỈNH SỬA GIÁO VIÊN</h2>
-      <button class="close-btn" (click)="closeEditModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <form [formGroup]="editTeacherForm" (ngSubmit)="submitEditStudent()">
-        <!-- CODE -->
-        
-        <div class="form-group">
-          <label>CODE</label>
-          <input type="text" class="form-control" formControlName="code" readonly />
-        </div>
-
-        <!-- Họ và tên, giới tính, ngày sinh -->
-        <div class="form-row">
           <div class="form-group">
-            <label>Họ và Tên</label>
-            <input type="text" class="form-control" formControlName="ten" placeholder="Nhập họ và tên" />
+            <label>CODE</label>
+            <input
+              formControlName="code"
+              type="text"
+              class="form-control"
+              placeholder="Nhập mã giáo viên"
+            />
+            <small
+              class="error-message"
+              *ngIf="
+                addTeacherForm.controls['code'].invalid &&
+                addTeacherForm.controls['code'].touched
+              "
+            >
+              Mã giáo viên không được quá 18 ký tự.
+            </small>
           </div>
-          <div class="form-group">
-            <label>Giới Tính</label>
-            <select class="form-control" formControlName="gioiTinh">
-              <option>Nam</option>
-              <option>Nữ</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Ngày Sinh</label>
-            <input type="date" class="form-control" formControlName="ngaySinh" />
-          </div>
-        </div>
 
-        <!-- Email, số điện thoại -->
-        <div class="form-row">
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" class="form-control" formControlName="email" placeholder="Nhập email" />
+          <!-- Họ và tên, giới tính, ngày sinh -->
+          <div class="form-row">
+            <div class="form-group">
+              <label>Họ và Tên</label>
+              <input
+                formControlName="ten"
+                type="text"
+                class="form-control"
+                placeholder="Nhập họ và tên"
+              />
+              <small
+                class="error-message"
+                *ngIf="
+                  addTeacherForm.controls['ten'].invalid &&
+                  addTeacherForm.controls['ten'].touched
+                "
+              >
+                Tên không được quá 20 ký tự.
+              </small>
+            </div>
+            <div class="form-group">
+              <label>Giới Tính</label>
+              <select class="form-control" formControlName="gioiTinh">
+                <option>Nam</option>
+                <option>Nữ</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Ngày Sinh</label>
+              <input
+                formControlName="ngaySinh"
+                type="date"
+                class="form-control"
+              />
+              <small
+                class="error-message"
+                *ngIf="
+                  addTeacherForm.controls['ngaySinh'].errors?.invalidAge &&
+                  addTeacherForm.controls['ngaySinh'].touched
+                "
+              >
+                Giáo viên phải trên 18 tuổi.
+              </small>
+            </div>
           </div>
-          <div class="form-group">
-            <label>Số Điện Thoại</label>
-            <input type="tel" class="form-control" formControlName="soDienThoai" placeholder="Nhập số điện thoại" />
+
+          <!-- Email, số điện thoại -->
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email</label>
+              <input
+                formControlName="email"
+                type="email"
+                class="form-control"
+                placeholder="Nhập email"
+              />
+              <small
+                class="error-message"
+                *ngIf="
+                  addTeacherForm.controls['email'].invalid &&
+                  addTeacherForm.controls['email'].touched
+                "
+              >
+                Email không hợp lệ hoặc quá 50 ký tự.
+              </small>
+              <small class="error-message" *ngIf="emailError">
+                {{ emailError }}
+              </small>
+            </div>
+            <div class="form-group">
+              <label>Số Điện Thoại</label>
+              <input
+                formControlName="soDienThoai"
+                type="tel"
+                class="form-control"
+                placeholder="Nhập số điện thoại"
+              />
+              <small
+                class="error-message"
+                *ngIf="
+                  addTeacherForm.controls['soDienThoai'].invalid &&
+                  addTeacherForm.controls['soDienThoai'].touched
+                "
+              >
+                Số điện thoại phải có 10 hoặc 11 số.
+              </small>
+              <small class="error-message" *ngIf="phoneError">
+                {{ phoneError }}
+              </small>
+            </div>
           </div>
-        </div>
 
-        <!-- Trường -->
-        <div class="form-group">
-          <label>Trường</label>
-          <input type="text" class="form-control" formControlName="truongDangDay" placeholder="Nhập trường" />
-        </div>
-
-        <!-- Thành phố, Quận/Huyện, Địa chỉ cụ thể -->
-        <div class="form-row">
+          <!-- Trường -->
           <div class="form-group">
-            <label>Thành phố</label>
-            <select class="form-control" formControlName="province" (change)="onProvinceChangeForEdit($event.target.value)">
-              <option value="">-- Chọn Thành phố --</option>
-              <option *ngFor="let province of provinces" [value]="province.code">
-                {{ province.name }}
-              </option>
-            </select>
+            <label>Trường</label>
+            <input
+              formControlName="truongDangDay"
+              type="text"
+              class="form-control"
+              placeholder="Nhập trường đang dạy"
+            />
+            <small
+              class="error-message"
+              *ngIf="
+                addTeacherForm.controls['truongDangDay'].invalid &&
+                addTeacherForm.controls['truongDangDay'].touched
+              "
+            >
+              Tên trường không được quá 50 ký tự.
+            </small>
           </div>
-          <div class="form-group">
-            <label>Quận/Huyện</label>
-            <select class="form-control" formControlName="district">
-              <option value="">-- Chọn Quận/Huyện --</option>
-              <option *ngFor="let district of editDistricts" [value]="district.code">
-                {{ district.name }}
-              </option>
-            </select>
+
+          <!-- Thành phố, Quận/Huyện, Địa chỉ cụ thể -->
+          <div class="form-row">
+            <div class="form-group">
+              <label>Thành phố</label>
+              <select
+                class="form-control"
+                formControlName="province"
+                (change)="onProvinceChangeForEdit($event.target.value)"
+              >
+                <option value="">-- Chọn Thành phố --</option>
+                <option
+                  *ngFor="let province of provinces"
+                  [value]="province.code"
+                >
+                  {{ province.name }}
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Quận/Huyện</label>
+              <select class="form-control" formControlName="district">
+                <option value="">-- Chọn Quận/Huyện --</option>
+                <option
+                  *ngFor="let district of editDistricts"
+                  [value]="district.code"
+                >
+                  {{ district.name }}
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Địa chỉ cụ thể</label>
+              <input
+                formControlName="diaChiCuThe"
+                type="text"
+                class="form-control"
+                placeholder="Nhập địa chỉ cụ thể"
+              />
+              <small
+                class="error-message"
+                *ngIf="
+                  addTeacherForm.controls['diaChiCuThe'].invalid &&
+                  addTeacherForm.controls['diaChiCuThe'].touched
+                "
+              >
+                Địa chỉ không được quá 150 ký tự.
+              </small>
+            </div>
           </div>
-          <div class="form-group">
-            <label>Địa chỉ cụ thể</label>
-            <input type="text" class="form-control" formControlName="diaChiCuThe" placeholder="Nhập địa chỉ cụ thể" />
+
+          <div class="form-group toggle-container">
+            <label for="statusToggle">Kích Hoạt</label>
+            <label class="switch">
+              <input
+                type="checkbox"
+                formControlName="status"
+                id="statusToggle"
+              />
+              <span class="slider round"></span>
+            </label>
           </div>
-        </div>
 
-        <div class="form-group toggle-container">
-          <label for="statusToggle">Kích Hoạt</label>
-          <label class="switch">
-            <input type="checkbox" formControlName="status" id="statusToggle">
-            <span class="slider round"></span>
-          </label>
-        </div>
-
-
-        <!-- Nút xác nhận -->
-        <div class="modal-footer">
-          <button type="button" class="btn cancel-btn" (click)="closeEditModal()">Hủy</button>
-          <button type="submit" class="btn save-btn">ÁP DỤNG</button>
-        </div>
-      </form>
+          <!-- Nút xác nhận -->
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn cancel-btn"
+              (click)="closeEditModal()"
+            >
+              Hủy
+            </button>
+            <button type="submit" class="btn save-btn">ÁP DỤNG</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</div>
-
-
-
+<!-- danh sach -->
   <div class="table-responsive">
     <table class="table student-table">
       <thead>
