@@ -243,8 +243,8 @@
             <div class="form-group">
               <label>Giới Tính</label>
               <select class="form-control" [(ngModel)]="editStudent.gioiTinh" name="edit_gioiTinh">
-                <option value="nam">Nam</option>
-                <option value="nu">Nữ</option>
+                <option value="Nam">Nam</option>
+                <option value="Nữ">Nữ</option>
               </select>
             </div>
             
@@ -286,7 +286,7 @@
               <small *ngIf="editEmailInput.invalid && (editEmailInput.dirty || editEmailInput.touched)" class="text-danger">
                 <i class="ft-alert-circle align-middle"></i>
                 <span *ngIf="editEmailInput.errors?.required">Vui lòng nhập Email!</span>
-                <span *ngIf="editEmailInput.errors?.pattern">Email không hợp lệ! Định dạng đúng: example@domain.com</span>
+                <span *ngIf="editEmailInput.errors?.pattern">Email không hợp lệ!</span>
               </small>
             </div>
             <div class="form-group">
@@ -405,7 +405,7 @@
           <tr>
             <td>{{ hs.code }}</td>
             <td>{{ hs.ten }}</td>
-            <td>{{ hs.gioiTinh === 'nam' ? 'Nam' : 'Nữ' }}</td>
+            <td>{{ hs.gioiTinh === 'Nam' ? 'Nam' : 'Nữ' }}</td>
             <td>{{ hs.ngaySinh | date:'dd-MM-yyyy' }}</td>
             <td>{{ hs.email }}</td>
             <td>{{ hs.soDienThoai }}</td>
@@ -447,7 +447,7 @@
                   </div>
                   <div class="col-md-3 detail-item">
                     <label>Giới Tính</label>
-                    <div class="detail-box">{{ hs.gioiTinh === 'nam' ? 'Nam' : 'Nữ' }}</div>
+                    <div class="detail-box">{{ hs.gioiTinh === 'Nam' ? 'Nam' : 'Nữ' }}</div>
                   </div>
                   <div class="col-md-3 detail-item">
                     <label>Ngày Sinh</label>

@@ -33,8 +33,9 @@ public class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TReque
                 if (failures[0].ErrorCode == "STT") 
                     throw new WrongInputException("Số thứ tự nội dung bài" +
                         " học phải bắt đầu từ 1 và tăng dần, không được trùng lặp.");
-                if (failures[0].ErrorCode == "Format")
+                else if (failures[0].ErrorCode == "Format")
                     throw new WrongInputException("Dữ liệu nhập sai format, vui lòng nhập lại");
+                else throw new WrongInputException();
             }
                
         }

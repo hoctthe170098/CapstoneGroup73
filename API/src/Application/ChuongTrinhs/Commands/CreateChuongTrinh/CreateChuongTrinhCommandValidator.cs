@@ -11,12 +11,12 @@ public class CreateChuongTrinhCommandValidator : AbstractValidator<CreateChuongT
     public CreateChuongTrinhCommandValidator()
     {
         RuleFor(v => v.ChuongTrinhDto.TieuDe)
-            .MaximumLength(30)
-            .NotEmpty();
+            .NotEmpty()
+            .MaximumLength(30);
 
         RuleFor(v => v.ChuongTrinhDto.MoTa)
-            .MaximumLength(100)
-            .NotEmpty();
+            .NotEmpty()
+            .MaximumLength(100);
 
         When(v => v.ChuongTrinhDto.NoiDungBaiHocs != null && v.ChuongTrinhDto.NoiDungBaiHocs.Any(), () =>
         {
@@ -49,6 +49,7 @@ public class CreateChuongTrinhCommandValidator : AbstractValidator<CreateChuongT
                 });
         });
     }
+
     private bool BeSequentialAndUnique(List<CreateNoiDungBaiHocDto>? noiDungBaiHocs)
     {
         if (noiDungBaiHocs == null || !noiDungBaiHocs.Any()) return true;

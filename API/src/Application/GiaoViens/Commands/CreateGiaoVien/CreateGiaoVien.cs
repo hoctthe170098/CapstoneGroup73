@@ -115,7 +115,8 @@ public class CreateGiaoVienCommandHandler : IRequestHandler<CreateGiaoVienComman
             throw new WrongInputException($"Mã giáo viên '{request.Code}' đã tồn tại!");
         }
         // Create identity user     
-        var (result, userId) = await _identityService.GenerateUser(request.Ten, request.Code, request.Email);
+        var (result, userId) = await _identityService
+            .GenerateUser(request.Ten, "GV" + request.Code, request.Email);
 
         if (!result.Succeeded)
         {

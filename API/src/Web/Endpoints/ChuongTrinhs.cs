@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StudyFlow.Application.ChuongTrinhs.Commands.CreateChuongTrinh;
+using StudyFlow.Application.ChuongTrinhs.Commands.DowntaiLieuHocTap;
 using StudyFlow.Application.ChuongTrinhs.Commands.UpdateChuongTrinh;
 using StudyFlow.Application.ChuongTrinhs.Queries.GetAllChuongTrinhs;
 using StudyFlow.Application.ChuongTrinhs.Queries.GetChuongTrinhById;
@@ -22,7 +23,8 @@ public class ChuongTrinhs : EndpointGroupBase
             .MapPost(GetChuongTrinhsWithPagination, "getchuongtrinhs")
             .MapGet(GetAllChuongTrinhs, "getallchuongtrinhs")
             .MapGet(GetChuongTrinhById, "getchuongtrinhbyid/{chuongTrinhId}")
-            .MapDelete(DeleteChuongTrinh,"deletechuongtrinh/{id}");
+            .MapDelete(DeleteChuongTrinh,"deletechuongtrinh/{id}")
+            .MapPost(DownloadTaiLieuHocTap, "downloadtailieuhoctap"); ;
     }
     [Authorize(Roles = Roles.LearningManager)]
     public async Task<Output> CreateChuongTrinh(ISender sender, [FromForm] CreateChuongTrinhCommand command)
@@ -33,6 +35,28 @@ public class ChuongTrinhs : EndpointGroupBase
     public async Task<Output> UpdateChuongTrinh(ISender sender, [FromForm] UpdateChuongTrinhCommand command)
     {
         return await sender.Send(command);
+    }
+    [Authorize]
+    public async Task<IResult> DownloadTaiLieuHocTap(ISender sender, [FromBody] DowntaiLieuHocTapCommand command)
+    {
+        var result = await sender.Send(command);
+
+        if (result.isError == true)
+        {
+            return Results.BadRequest(result.message);
+        }
+
+        if (result.data == null)
+        {
+            return Results.BadRequest("File not found or error occurred.");
+        }
+
+        if (!(result.data is FileContentResult fileContentResult))
+        {
+            return Results.BadRequest("Invalid file content.");
+        }
+
+        return Results.File(fileContentResult.FileContents, fileContentResult.ContentType, fileContentResult.FileDownloadName);
     }
     [Authorize(Roles = Roles.LearningManager)]
     public async Task<Output> GetChuongTrinhsWithPagination(ISender sender, GetChuongTrinhsWithPaginationQuery query)

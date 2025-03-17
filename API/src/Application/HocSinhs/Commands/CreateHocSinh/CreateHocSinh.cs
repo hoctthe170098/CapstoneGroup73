@@ -126,7 +126,8 @@ public class CreateHocSinhCommandHandler : IRequestHandler<CreateHocSinhCommand,
             throw new WrongInputException($"Mã học viên '{request.Code}' đã tồn tại!");
         }
         // Create identity user     
-        var (result, userId) = await _identityService.GenerateUser(request.Ten, request.Code, request.Email);
+        var (result, userId) = await _identityService
+            .GenerateUser(request.Ten, "HS" + request.Code, request.Email);
         if (!result.Succeeded)
         {
             throw new Exception("Tạo tài khoản thất bại: " + string.Join(", ", result.Errors));

@@ -62,6 +62,7 @@ public class GetGiaoViensWithPaginationQueryHandler
 
                 query = query.Where(nv => nv.Ten.Contains(nameLower) || nv.Code.Contains(request.SearchTen));
             }
+
             // Filter by Status
             if(request.IsActive.HasValue)
             {
@@ -110,14 +111,14 @@ public class GetGiaoViensWithPaginationQueryHandler
             }
 
             var paginatedList = list
-              .Skip((request.PageNumber - 1) * request.PageSize)
-              .Take(request.PageSize)
-              .ToList();
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
 
             return new Output
             {
                 isError = false,
-                data = paginatedList,
+                data = list,
                 code = 200
             };
         }
