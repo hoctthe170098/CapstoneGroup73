@@ -41,6 +41,7 @@ export class EditchuongtrinhComponent implements OnInit {
           console.error("❌ API không trả về dữ liệu!");
           return;
         }
+        // Gán dữ liệu vào program
         this.program = {
           id: response.id || 0,
           tieuDe: response.tieuDe || "Chưa có tiêu đề",
@@ -54,8 +55,10 @@ export class EditchuongtrinhComponent implements OnInit {
             expanded: false
           })) ?? []
         };
-
-        console.log("📌 Dữ liệu sau khi gán vào `program`:", this.program);
+        // Sắp xếp lại noiDungBaiHocs theo soThuTu
+        if (this.program.noiDungBaiHocs) {
+          this.program.noiDungBaiHocs.sort((a, b) => a.soThuTu - b.soThuTu);
+        }
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -131,6 +134,7 @@ export class EditchuongtrinhComponent implements OnInit {
   }
   /** ✅ Gửi chương trình đã chỉnh sửa lên API */
   saveProgram() {
+    console.log(this.program)
     if (!this.program.tieuDe || !this.program.moTa) {
       alert("⚠️ Vui lòng nhập đầy đủ thông tin!");
       return;

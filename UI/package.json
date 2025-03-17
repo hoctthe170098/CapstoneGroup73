@@ -52,6 +52,7 @@
     "d3": "6.3.0",
     "datatables.net": "1.10.22",
     "date-fns": "2.16.1",
+    "file-saver": "^2.0.5",
     "firebase": "8.1.2",
     "gulp": "4.0.2",
     "hopscotch": "0.3.1",
