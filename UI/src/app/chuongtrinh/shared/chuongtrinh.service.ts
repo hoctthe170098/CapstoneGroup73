@@ -68,7 +68,13 @@ export class ChuongtrinhService {
       headers: this.getHeaders(), // Không đặt 'Content-Type'
     });
   }
-
+  downloadFile(urlFile: string): Observable<any> {
+    const headers = this.getHeaders().set('Content-Type', 'application/json'); // Sử dụng getHeaders() và thêm Content-Type
+    return this.http.post(`${this.apiUrl}/downloadtailieuhoctap`, { filePath: urlFile }, {
+      headers: headers,
+      responseType: 'blob' // Yêu cầu response là Blob
+    });
+  }
   /** 🔥 Cập nhật chương trình */
   updateProgram(payload: any) {
     return this.http.put(`${this.apiUrl}/updatechuongtrinh`, payload);
