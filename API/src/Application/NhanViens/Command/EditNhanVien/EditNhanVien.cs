@@ -96,7 +96,13 @@ public class EditNhanVienCommandHandler : IRequestHandler<EditNhanVienCommand, O
         {
             throw new NotFoundDataException("Cơ sở không tồn tại");
         }
-
+        // Check If phone or email exist
+        var phoneExists = await _context.NhanViens.AnyAsync(nv => nv.SoDienThoai == request.SoDienThoai, cancellationToken);
+        var emailExists = await _context.NhanViens.AnyAsync(nv => nv.Email == request.Email, cancellationToken);
+        if (phoneExists || emailExists)
+        {
+            throw new WrongInputException($"Số điện thoại hoặc email đã tồn tại");
+        }
         var nhanVien = await _context.NhanViens.FindAsync(new object[] { request.Code }, cancellationToken);
 
         if (nhanVien == null) throw new NotFoundIDException();

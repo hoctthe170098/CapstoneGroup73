@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.FileProviders;
 using StudyFlow.Infrastructure.Data;
 using StudyFlow.Web.Endpoints;
 
@@ -59,5 +60,10 @@ app.UseCors(
 app.MapEndpoints();
 app.UseExceptionHandler();
 app.Run();
-
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.ContentRootPath, "uploads")),
+    RequestPath = "/uploads"
+});
 public partial class Program { }

@@ -13,9 +13,12 @@ export class GiaovienComponent implements OnInit {
   trangThai: string = ''; 
   searchTerm: string = ''; 
   students: any[] = [];
-  currentPage: number = 1;
-  totalPages: number = 1;
-  pageSize: number = 8;
+
+   currentPage: number = 1;
+   totalPages: number = 1;
+   pageSize: number = 8;
+   totalItems: number = 0;
+
   provinces: any[] = [];
   districts: any[] = [];
   editDistricts: any[] = [];
@@ -116,7 +119,6 @@ checkPhoneExists(phone: string): Promise<boolean> {
 }
 
 
-// Khi chọn tỉnh/thành phố trong modal chỉnh sửa -> cập nhật quận/huyện
 onProvinceChangeForEdit(provinceCode: string) {
     console.log("Giá trị tỉnh/thành phố được chọn trong Edit:", provinceCode);
 
@@ -134,14 +136,13 @@ onProvinceChangeForEdit(provinceCode: string) {
    
 }
   
-   /** Load danh sách giáo viên từ API */
    loadDanhSachGiaoVien() {
     let isActiveFilter: boolean | null = this.trangThai === 'Hoạt động' ? true : this.trangThai === 'Tạm ngừng' ? false : null;
 
-    this.giaovienService.getDanhSachGiaoVien(this.currentPage, this.pageSize, this.searchTerm, '', isActiveFilter)
+    this.giaovienService.getDanhSachGiaoVien(1, 9999, this.searchTerm, '', isActiveFilter)
       .subscribe(response => {
         if (!response.isError && response.data) {
-          this.students = response.data.map((gv: any) => ({
+          this.students = response.data.map((gv: any) => ({ 
             code: gv.code || '',
             ten: gv.ten || '',
             gioiTinh: gv.gioiTinh || '',
@@ -156,19 +157,31 @@ onProvinceChangeForEdit(provinceCode: string) {
             showDetails: false
           }));
 
-          this.totalPages = Math.ceil(response.data.length / this.pageSize);
+          this.totalItems = response.data.totalCount || this.students.length;
+                this.totalPages = Math.ceil(this.totalItems / this.pageSize);
+
+        console.log("🔹 Tổng số giáo viên:", this.totalItems);
+        console.log("🔹 Tổng số trang:", this.totalPages);
         }
         this.cdr.detectChanges();
       });
   }
 
   
-
-  /** Chuyển trang */
-  goToPage(page: number) {
-    this.currentPage = page;
-    this.loadDanhSachGiaoVien();
+  get paginatedStudents() {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    return this.students.slice(startIndex, endIndex);
   }
+  
+  /** Chuyển trang */
+  changePage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+        this.currentPage = page;
+        console.log("🔄 Chuyển đến trang:", this.currentPage);
+    }
+}
+  
 
   /** Tìm kiếm giáo viên */
   searchGiaoVien() {

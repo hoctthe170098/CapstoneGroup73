@@ -15,7 +15,7 @@
     <input
       type="text"
       class="form-control search-input"
-      placeholder="Tìm tên giáo viên..."
+      placeholder="Tìm tên/code giáo viên..."
       [(ngModel)]="searchTerm"
       (keyup.enter)="searchGiaoVien()"
     />
@@ -469,13 +469,13 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngIf="students.length === 0">
+        <tr *ngIf="paginatedStudents.length === 0">
           <td colspan="12" style="text-align: center; color: red">
             Không có giáo viên nào
           </td>
         </tr>
 
-        <ng-container *ngFor="let gv of students; let i = index">
+        <ng-container *ngFor="let gv of paginatedStudents; let i = index">
           <!-- Hàng tóm tắt -->
           <tr>
             <td>{{ gv.code }}</td>
@@ -586,15 +586,21 @@
     </table>
   </div>
 
-  <!-- Phân trang -->
-  <div class="pagination-container">
-    <ul class="pagination">
-      <li class="page-item" [class.active]="currentPage === 1">
-        <a class="page-link" (click)="goToPage(1)">1</a>
-      </li>
-      <li class="page-item" [class.active]="currentPage === 2">
-        <a class="page-link" (click)="goToPage(2)">2</a>
-      </li>
-    </ul>
-  </div>
+<!-- Phân trang -->
+<div class="pagination-container" *ngIf="totalPages > 1">
+  <ul class="pagination">
+    <li class="page-item" [class.disabled]="currentPage === 1">
+      <a class="page-link" (click)="changePage(currentPage - 1)">«</a>
+    </li>
+    <li *ngFor="let page of [].constructor(totalPages); let i = index" 
+        class="page-item" [class.active]="currentPage === (i + 1)">
+      <a class="page-link" (click)="changePage(i + 1)">{{ i + 1 }}</a>
+    </li>
+    <li class="page-item" [class.disabled]="currentPage === totalPages">
+      <a class="page-link" (click)="changePage(currentPage + 1)">»</a>
+    </li>
+  </ul>
+</div>
+
+
 </div>
