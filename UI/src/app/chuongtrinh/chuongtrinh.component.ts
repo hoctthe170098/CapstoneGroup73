@@ -35,7 +35,13 @@ export class ChuongtrinhComponent implements OnInit {
         this.programs = response.data.items
           .filter(program => program.tieuDe.toLowerCase().includes(search.toLowerCase()))
           .map(program => ({ ...program, expanded: false }));
-
+        // Sắp xếp noiDungBaiHocs trong từng program
+        this.programs.forEach(program => {
+          if (program.noiDungBaiHocs) {
+            program.noiDungBaiHocs.sort((a, b) => a.soThuTu - b.soThuTu);
+          }
+        });
+        console.log(this.programs)
         this.currentPage = response.data.pageNumber;
         this.totalPages = response.data.totalPages;
         this.cdr.detectChanges();

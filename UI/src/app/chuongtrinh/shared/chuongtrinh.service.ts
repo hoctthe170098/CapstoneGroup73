@@ -22,7 +22,7 @@ export class ChuongtrinhService {
   }
 
   /** 🔥 Lấy danh sách chương trình từ API */
-  getPrograms(page: number = 1, search: string = "", pageSize: number = 8): Observable<any> {
+  getPrograms(page: number = 1, search: string = "", pageSize: number = 2): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/getchuongtrinhs`, {
       search: search, // ✅ Thêm từ khóa tìm kiếm
       pageNumber: page,
