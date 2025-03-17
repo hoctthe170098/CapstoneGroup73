@@ -3,15 +3,14 @@
     <h2 class="page-title">DANH SÁCH HỌC VIÊN</h2>
   
     <div class="filter-row">
-        <select class="form-control dropdown-filter" [(ngModel)]="trangThai">
-          <option value="">Trạng thái</option>
-          <option value="Hoạt động">Hoạt động</option>
-          <option value="Tạm ngừng">Tạm ngừng</option>
-        </select>
+      <select class="form-control dropdown-filter" [(ngModel)]="trangThai" (change)="loadDanhSachHocSinh()">
+        <option value="">Tất cả trạng thái</option>
+        <option value="Hoạt động">Hoạt động</option>
+        <option value="Tạm ngừng">Tạm ngừng</option>
+      </select>
     
         <div class="lop-select-container">
           <div class="lop-select-display" (click)="toggleLopDropdown()">
-            <!-- Nếu chưa chọn => hiển thị placeholder "Lớp", nếu chọn => hiển thị lop -->
             <span *ngIf="!lop">Lớp</span>
             <span *ngIf="lop">{{ lop }}</span>
             <i class="fa fa-caret-down caret-icon"></i>
@@ -293,8 +292,9 @@
               <td>{{ hs.email }}</td>
               <td>{{ hs.soDienThoai }}</td>
               <td>
-                <span class="active-status">Hoạt động</span>
-                <i class="check-icon"></i>
+                <span [ngClass]="{'active-status': hs.isActive, 'inactive-status': !hs.isActive}">
+                  {{ hs.isActive ? "Hoạt Động" : "Không Hoạt Động" }}
+                </span>
               </td>
               <!-- Nút dropdown -->
               <td class="dropdown-col">
@@ -335,7 +335,9 @@
                       <label>Ngày Sinh</label>
                       <div class="detail-box">{{ hs.ngaySinh | date:'dd-MM-yyyy' }}</div>
                     </div>
+                    
                   </div>
+                  
   
                   <!-- Row 2: Số Điện Thoại, Email, Địa Chỉ -->
                   <div class="row mt-3">
@@ -360,8 +362,8 @@
                       <div class="detail-box">{{ hs.truongDangHoc }}</div>
                     </div>
                     <div class="col-md-4 detail-item">
-                      <label>Cơ Sở</label>
-                      <div class="detail-box">{{ hs.coso.ten }}</div>
+                      <label>Lớp</label>
+                      <div class="detail-box">{{ hs.lop }}</div>
                     </div>
                     <div class="col-md-4 detail-item">
                       <label>Chính Sách Học Phí</label>
@@ -371,10 +373,10 @@
   
                   <!-- Row 4: Danh Sách Lớp Đang Học -->
                   <div class="row mt-3">
-                    <div class="col-12 detail-item">
+                    <div class="col-md-12 detail-item">
                       <label>Danh Sách Lớp Đang Học</label>
                       <div class="detail-box">
-                        {{ hs.lopHocs.join(', ') }}
+                        {{ hs.lopHocs.length > 0 ? hs.lopHocs.join(', ') : "Chưa học lớp nào" }}
                       </div>
                     </div>
                   </div>

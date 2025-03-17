@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, ChangeDetectorRef } from '@angular/core';
 import { HocSinh } from './shared/hocsinh.model';
 import { HocSinhService } from './shared/hocsinh.service';
 import { Router } from '@angular/router';
@@ -21,20 +21,32 @@ export class HocsinhComponent implements OnInit {
     { code: 'Lớp 4', name: 'Lớp 4' },
     { code: 'Lớp 5 Anh', name: 'Lớp 5 Anh' },
   ];
-   // Mảng lọc khi tìm kiếm
    filteredClassOptions = this.classOptions.slice();
 
-   // Từ khoá gõ trong ô tìm kiếm
    lopSearchTerm: string = '';
  
-   // Trạng thái mở/đóng dropdown lớp
    lopDropdownOpen: boolean = false;
+
+   students: (HocSinh & { showDetails: boolean })[] = [];
+  provinces: any[] = [];
+  districts: any[] = [];
+  editDistricts: any[] = [];
+ // Phân trang
+ currentPage: number = 1;
+ totalPages: number = 1;
+ pageSize: number = 8;
+ totalItems: number = 0;
+
+ // Biến xử lý modal
+ isModalOpen: boolean = false;
+ isEditModalOpen: boolean = false;
+ newStudent: any = {};
+ editStudent: any = {};
+
  
-   // Khi bấm vào vùng hiển thị "Lớp"
    toggleLopDropdown() {
      this.lopDropdownOpen = !this.lopDropdownOpen;
      if (this.lopDropdownOpen) {
-       // Reset tìm kiếm mỗi lần mở dropdown
        this.lopSearchTerm = '';
        this.filteredClassOptions = this.classOptions.slice();
      }
@@ -49,12 +61,7 @@ export class HocsinhComponent implements OnInit {
      );
    }
  
-   // Khi chọn 1 lớp
-   selectLop(option: { code: string; name: string }) {
-     // Ở đây ta gán lop = code hoặc name, tuỳ bạn muốn hiển thị
-     this.lop = option.name; // hoặc `${option.code} - ${option.name}`
-     this.lopDropdownOpen = false;
-   }
+   
  
    // Lắng nghe click ngoài dropdown => đóng dropdown
    @HostListener('document:click', ['$event'])
@@ -71,54 +78,7 @@ export class HocsinhComponent implements OnInit {
 
    
 
-  students: (HocSinh & { showDetails: boolean })[] = [
-    {
-      code: 'HE171450',
-      ten: 'Bùi Ngọc Dũng',
-      gioiTinh: 'Nam',
-      diaChi: '245 Phạm Ngọc Thạch, Đống Đa, TP Hà Nội',
-      lop: 'Lớp 1',
-      truongDangHoc: 'Trường Đại học FPT',
-      ngaySinh: new Date(2003, 6, 23),  // 6 = July
-      email: 'dungbnhe17457@fpt.edu.vn',
-      soDienThoai: '0123-456-789',
-      coSoId: 'cs1',
-      coso: {
-        id: 'cs1',
-        ten: 'Hoàng Văn Thái',
-        diaChi: '',
-        soDienThoai: '',
-        trangThai: '',
-        default: false
-      },
-      chinhSach: 'Cơ bản',
-      lopHocs: ['Toán 1', 'Tiếng Anh 1', 'Tiếng Việt 1'],
-      showDetails: false
-    },
-    {
-      code: 'HE171466',
-      ten: 'Ngô Minh Kiên',
-      gioiTinh: 'Nam',
-      diaChi: 'Long Biên, Hà Nội',
-      lop: 'Lớp 1',
-      truongDangHoc: 'Trường Đại học FPT',
-      ngaySinh: new Date(2003, 4, 10),  // 4 = May (hiển thị June)
-      email: 'kiennmhe17146@fpt.edu.vn',
-      soDienThoai: '0987-654-321',
-      coSoId: 'cs2',
-      coso: {
-        id: 'cs2',
-        ten: 'Phạm Văn Đồng',
-        diaChi: '',
-        soDienThoai: '',
-        trangThai: '',
-        default: false
-      },
-      chinhSach: 'Nâng cao',
-      lopHocs: ['Lớp Toán 2', 'Lớp Anh 2'],
-      showDetails: false
-    }
-  ];
+  
 
   toggleDetails(index: number) {
     this.students[index].showDetails = !this.students[index].showDetails;
@@ -134,29 +94,13 @@ export class HocsinhComponent implements OnInit {
     alert('Xuất Tệp');
   }
 
-  currentPage: number = 1;
-  totalPages: number = 2;
+
 
   goToPage(page: number) {
     this.currentPage = page;
   }
 
-  // --- Pop-up "Thêm Học Viên Mới" (các biến mới) ---
-  isModalOpen: boolean = false;
-
-  newStudent: any = {
-    code: '',
-    ten: '',
-    gioiTinh: 'Nam',
-    ngaySinh: '',
-    email: '',
-    soDienThoai: '',
-    truongDangHoc: '',
-    chinhSach: '',
-    province: '',
-    district: '',
-    diaChi: ''
-  };
+  
 
   openAddStudentModal() {
     this.isModalOpen = true;
@@ -202,20 +146,13 @@ export class HocsinhComponent implements OnInit {
   }
 
   
-  provinces: any[] = [];
-  districts: any[] = [];
 
-  constructor(private hocSinhService: HocSinhService,private router: Router) {}
+
+  constructor(private hocSinhService: HocSinhService,private router: Router,private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    this.hocSinhService.getProvinces().subscribe(
-      data => {
-        this.provinces = data;
-      },
-      error => {
-        console.error('Error fetching provinces:', error);
-      }
-    );
+    this.loadDanhSachHocSinh();
+    this.loadProvinces();
   }
 
   onProvinceChange(provinceCode: string) {
@@ -226,23 +163,68 @@ export class HocsinhComponent implements OnInit {
       this.districts = [];
     }
   }
+  loadDanhSachHocSinh() {
+    let isActiveFilter: boolean | null = this.trangThai === 'Hoạt động' ? true : this.trangThai === 'Tạm ngừng' ? false : null;
 
+    this.hocSinhService.getDanhSachHocSinh(this.currentPage, this.pageSize, this.searchTerm, '', isActiveFilter, this.lop)
+      .subscribe(response => {
+        console.log("📌 API Response:", response);
+        if (!response.isError && response.data) {
+          this.students = response.data.map((hs: any) => ({
+            code: hs.code || '',
+            ten: hs.ten || '',
+            gioiTinh: hs.gioiTinh || '',
+            diaChi: hs.diaChi || '',
+            lop: hs.lop || '',
+            truongDangHoc: hs.truongDangHoc || '',
+            ngaySinh: hs.ngaySinh ? new Date(hs.ngaySinh) : null,
+            email: hs.email || '',
+            soDienThoai: hs.soDienThoai || '',
+            isActive: hs.isActive !== undefined ? hs.isActive : false,
+            tenCoSo: hs.tenCoSo || '',
+            chinhSach: hs.tenChinhSach || '',
+            lopHocs: hs.tenLops ? hs.tenLops : [],
+            showDetails: false
+          }));
+
+          this.totalItems = response.data.totalCount || this.students.length;
+          this.totalPages = Math.ceil(this.totalItems / this.pageSize);
+        } else {
+          this.students = [];
+          this.totalItems = 0;
+          this.totalPages = 0;
+        }
+        this.cdr.detectChanges();
+      });
+  }
+  /** 🔄 Chuyển trang */
+  changePage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.loadDanhSachHocSinh();
+    }
+  }
+
+  /** 🔍 Tìm kiếm theo lớp */
+  selectLop(option: { code: string; name: string }) {
+    this.lop = option.name;
+    this.lopDropdownOpen = false;
+    this.loadDanhSachHocSinh();
+  }
+
+  /** 🗺️ Lấy danh sách tỉnh/thành phố */
+  loadProvinces() {
+    this.hocSinhService.getProvinces().subscribe(
+      data => {
+        this.provinces = data;
+      },
+      error => {
+        console.error('Lỗi tải tỉnh/thành phố:', error);
+      }
+    );
+  }
  
-  isEditModalOpen: boolean = false;
-  editStudent: any = {
-    code: '',
-    ten: '',
-    gioiTinh: 'Nam',
-    ngaySinh: '',
-    email: '',
-    soDienThoai: '',
-    truongDangHoc: '',
-    chinhSach: '',
-    province: '',
-    district: '',
-    diaChi: ''
-  };
-  editDistricts: any[] = [];
+  
 
   // Khi bấm nút “Sửa” ở bảng
   onEditStudentClick(index: number) {
