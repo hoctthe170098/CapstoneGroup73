@@ -11,7 +11,6 @@ public class UpdateChuongTrinhDto
     public required int Id { get; init; }
     public required string TieuDe { get; init; }
     public required string MoTa { get; init; }
-    public required string TrangThai {  get; init; }
     public List<UpdateNoiDungBaiHocDto>? NoiDungBaiHocs { get; init; } = new List<UpdateNoiDungBaiHocDto>();
 }
 public class UpdateNoiDungBaiHocDto

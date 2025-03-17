@@ -23,7 +23,7 @@ export class EditchuongtrinhComponent implements OnInit {
     private router: Router,
     private chuongtrinhService: ChuongtrinhService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.programId = Number(this.route.snapshot.paramMap.get('id'));
@@ -37,12 +37,10 @@ export class EditchuongtrinhComponent implements OnInit {
     this.chuongtrinhService.getProgramById(this.programId).subscribe({
       next: (response) => {
         console.log("📌 Dữ liệu API trả về:", response);
-
         if (!response) {
           console.error("❌ API không trả về dữ liệu!");
           return;
         }
-
         this.program = {
           id: response.id || 0,
           tieuDe: response.tieuDe || "Chưa có tiêu đề",
@@ -68,16 +66,14 @@ export class EditchuongtrinhComponent implements OnInit {
 
   /** ✅ Thêm bài học mới */
   addLesson() {
-    const newLesson = {
-      id: "0",
+    this.program.noiDungBaiHocs.push({
+      id: null,
       tieuDe: '',
       mota: '',
       soThuTu: this.program.noiDungBaiHocs.length + 1, // Mặc định số thứ tự mới
       taiLieuHocTaps: [],
       expanded: false
-    };
-
-    this.program.noiDungBaiHocs.push(newLesson);
+    });
   }
 
   /** ✅ Toggle mở rộng bài học */
@@ -107,23 +103,32 @@ export class EditchuongtrinhComponent implements OnInit {
   /** ✅ Xử lý khi thả bài học */
   onDropLesson(event: DragEvent, targetIndex: number) {
     event.preventDefault();
-
     if (this.draggedLessonIndex === null || this.draggedLessonIndex === targetIndex) return;
 
     // Hoán đổi vị trí giữa bài học được kéo và bài học mục tiêu
     const movedLesson = this.program.noiDungBaiHocs[this.draggedLessonIndex];
     this.program.noiDungBaiHocs.splice(this.draggedLessonIndex, 1);
     this.program.noiDungBaiHocs.splice(targetIndex, 0, movedLesson);
-
     // Cập nhật số thứ tự cho tất cả bài học
     this.program.noiDungBaiHocs.forEach((lesson, i) => {
       lesson.soThuTu = i + 1;
     });
-
     // Reset chỉ số bài học đang kéo
     this.draggedLessonIndex = null;
   }
-
+  /** ✅ Upload file vào danh sách */
+  uploadFile(file: File, lessonIndex: number) {
+    const allowedTypes = ['application/pdf', 'application/msword', 'video/mp4'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Chỉ chấp nhận file PDF, Word, MP4!');
+      return;
+    }
+    this.program.noiDungBaiHocs[lessonIndex].taiLieuHocTaps.push({
+      urlType: file.type.includes('video') ? 'video' : 'pdf',
+      file,
+      ten: file.name
+    });
+  }
   /** ✅ Gửi chương trình đã chỉnh sửa lên API */
   saveProgram() {
     if (!this.program.tieuDe || !this.program.moTa) {
@@ -132,26 +137,29 @@ export class EditchuongtrinhComponent implements OnInit {
     }
 
     const formData = new FormData();
-    formData.append('id', this.program.id.toString());
-    formData.append('tieuDe', this.program.tieuDe);
-    formData.append('moTa', this.program.moTa);
-    formData.append('trangThai', this.program.trangThai ?? "Đang cập nhật");
-
+    formData.append('chuongTrinhDto.id', this.program.id);
+    formData.append('chuongTrinhDto.tieuDe', this.program.tieuDe);
+    formData.append('chuongTrinhDto.moTa', this.program.moTa);
+    // Lặp qua danh sách bài học và thêm vào FormData
     this.program.noiDungBaiHocs.forEach((lesson, index) => {
-      formData.append(`noiDungBaiHocs[${index}][id]`, lesson.id ?? "0");
-      formData.append(`noiDungBaiHocs[${index}][tieuDe]`, lesson.tieuDe);
-      formData.append(`noiDungBaiHocs[${index}][mota]`, lesson.mota);
-      formData.append(`noiDungBaiHocs[${index}][soThuTu]`, lesson.soThuTu.toString());
-
+      if (lesson.id !== null && lesson.id !== undefined) {
+        formData.append(`chuongTrinhDto.noiDungBaiHocs[${index}].id`, lesson.id.toString());
+      }
+      formData.append(`chuongTrinhDto.noiDungBaiHocs[${index}].tieuDe`, lesson.tieuDe);
+      formData.append(`chuongTrinhDto.noiDungBaiHocs[${index}].moTa`, lesson.mota);
+      formData.append(`chuongTrinhDto.noiDungBaiHocs[${index}].soThuTu`, lesson.soThuTu);
+      // Lặp qua danh sách tài liệu của từng bài học
       lesson.taiLieuHocTaps.forEach((file, fileIndex) => {
-        formData.append(`noiDungBaiHocs[${index}][taiLieuHocTaps][${fileIndex}][id]`, file.id ?? "0");
-        formData.append(`noiDungBaiHocs[${index}][taiLieuHocTaps][${fileIndex}][urlType]`, file.urlType);
-        if (file.file instanceof File) {
-          formData.append(`noiDungBaiHocs[${index}][taiLieuHocTaps][${fileIndex}][file]`, file.file);
+        if (file.id !== null && file.id !== undefined) {
+          formData.append(`chuongTrinhDto.noiDungBaiHocs[${index}].taiLieuHocTaps[${fileIndex}].id`, file.id.toString());
         }
+        formData.append(`chuongTrinhDto.noiDungBaiHocs[${index}].taiLieuHocTaps[${fileIndex}].urlType`, file.urlType);
+        formData.append(`chuongTrinhDto.noiDungBaiHocs[${index}].taiLieuHocTaps[${fileIndex}].file`, file.file);
       });
     });
+    console.log("📌 Dữ liệu gửi lên API (FormData):", this.program);
 
+    // Gọi API cập nhật chương trình
     this.chuongtrinhService.updateProgram(formData).subscribe({
       next: (response) => {
         if (response.isError) {

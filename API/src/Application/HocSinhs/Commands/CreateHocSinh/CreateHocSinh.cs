@@ -135,7 +135,7 @@ public class CreateHocSinhCommandHandler : IRequestHandler<CreateHocSinhCommand,
         // Create new NhanVien entity
         var hocSinh = new HocSinh
         {
-            Code = request.Code,
+            Code = "HS"+request.Code,
             Ten = request.Ten,
             GioiTinh = request.GioiTinh,
             DiaChi = request.DiaChi,

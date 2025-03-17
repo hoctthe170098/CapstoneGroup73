@@ -47,9 +47,8 @@
       <!-- Danh sách tài liệu học tập -->
       <ul class="list-group mt-2">
         <li *ngFor="let file of lesson.taiLieuHocTaps" class="list-group-item d-flex justify-content-between align-items-center">
-          <span>{{ file.urlType }}</span>
+          <span>{{ file.ten }}</span>
           <button class="btn btn-sm btn-danger" (click)="removeFile(i, j)">&times;</button>
-
         </li>
       </ul>
 
