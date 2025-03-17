@@ -19,7 +19,7 @@
                     <h5 class="card-title fw-bold">{{ program.tieuDe || 'Chưa có tiêu đề' }}</h5>
                     <p class="card-text">{{ program.moTa || 'Chưa có mô tả' }}</p>
 
-<<<<<<< HEAD
+
                   <a href="#" class="text-primary" (click)="toggleContent(program.id, $event)">
                       {{ program.expanded ? 'Ẩn' : 'Hiển thị' }}
                   </a>
@@ -27,15 +27,7 @@
                   <a [routerLink]="['edit/', program.id]" class="text-primary me-3">Sửa</a>
                   <span class="text-muted"> | </span>
                   <a href="#" class="text-danger" (click)="onDeleteProgram(program.id, $event)">Xóa</a>
-=======
-                    <a href="#" class="text-primary" (click)="toggleContent(program.id, $event)">
-                        {{ program.expanded ? 'Ẩn' : 'Hiển thị' }}
-                    </a>
-                    <span class="text-muted"> | </span>
-                    <a [routerLink]="['/chuongtrinh/editchuongtrinh', program.id]" class="text-primary me-3">Sửa</a>
-                    <span class="text-muted"> | </span>
-                    <a href="#" class="text-danger" (click)="onDeleteProgram(program.id, $event)">Xóa</a>
->>>>>>> main
+
 
 
                     <!-- Hiển thị nội dung bài học nếu expanded = true -->
