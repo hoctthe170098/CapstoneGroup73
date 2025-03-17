@@ -68,6 +68,28 @@ public class GetHocSinhsWithPaginationQueryHandler
                 _ => query.OrderBy(hs => hs.Code)
             };
 
+            // Filter status
+            if (request.FilterIsActive.HasValue)
+            {
+                var userIds = await _context.HocSinhs
+                    .Where(gv => gv.UserId != null)
+                    .Select(gv => gv.UserId!)
+                    .Distinct()
+                    .ToListAsync();
+
+                var filteredUserIds = new List<string>();
+
+                foreach (var userId in userIds)
+                {
+                    var isActive = await _identityService.IsUserActiveAsync(userId);
+                    if (isActive == request.FilterIsActive.Value)
+                    {
+                        filteredUserIds.Add(userId);
+                    }
+                }
+                query = query.Where(gv => gv.UserId != null && filteredUserIds.Contains(gv.UserId!));
+            }
+
             var list = await query
                .ProjectTo<HocSinhDto>(_mapper.ConfigurationProvider)
                .ToListAsync();
