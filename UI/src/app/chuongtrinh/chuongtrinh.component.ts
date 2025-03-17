@@ -99,19 +99,25 @@ export class ChuongtrinhComponent implements OnInit {
 
   downloadFile(fileUrl: string, fileName: string): void {
     this.chuongtrinhService.downloadFile(fileUrl).subscribe(
-      (res: any) => { // Thay đổi kiểu dữ liệu thành any
-        if (!res.isError) {
-          const blob = new Blob([res.data], { type: 'application/octet-stream' }); // Tạo Blob từ res.data
-          saveAs(blob, fileName);
-          this.toastr.success('Tải file thành công.');
-        } else {
+      (res: any) => {
+        if (res instanceof Blob) {
+          // Trường hợp thành công (nhận Blob)
+          saveAs(res, fileName);
+        } else if (res && res.isError) {
+          // Trường hợp lỗi (nhận res JSON)
           this.toastr.error(res.message);
         }
       },
-      (error) => {
+      (error: any) => {
+        // Trường hợp lỗi HTTP
         console.error('Lỗi khi tải file:', error);
         this.toastr.error('Đã có lỗi xảy ra.');
       }
     );
   }
+  // downloadFile(fileUrl: string,fileName:string): void {
+  //   this.chuongtrinhService.downloadFile(fileUrl).subscribe((blob: Blob) => {
+  //     saveAs(blob, fileName);
+  //   });
+  // }
 }
