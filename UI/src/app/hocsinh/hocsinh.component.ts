@@ -33,8 +33,8 @@ export class HocsinhComponent implements OnInit {
   editDistricts: any[] = [];
  // Phân trang
  currentPage: number = 1;
- totalPages: number = 1;
  pageSize: number = 8;
+ totalPages: number = 1;
  totalItems: number = 0;
 
  // Biến xử lý modal
@@ -80,6 +80,12 @@ export class HocsinhComponent implements OnInit {
 
   
 
+   searchHocSinh() {
+    this.currentPage = 1;
+    this.loadDanhSachHocSinh();
+  }
+
+  /** Mở rộng chi tiết */
   toggleDetails(index: number) {
     this.students[index].showDetails = !this.students[index].showDetails;
   }
@@ -166,7 +172,7 @@ export class HocsinhComponent implements OnInit {
   loadDanhSachHocSinh() {
     let isActiveFilter: boolean | null = this.trangThai === 'Hoạt động' ? true : this.trangThai === 'Tạm ngừng' ? false : null;
 
-    this.hocSinhService.getDanhSachHocSinh(this.currentPage, this.pageSize, this.searchTerm, '', isActiveFilter, this.lop)
+    this.hocSinhService.getDanhSachHocSinh(1, 9999, this.searchTerm, '', isActiveFilter, '')
       .subscribe(response => {
         console.log("📌 API Response:", response);
         if (!response.isError && response.data) {
@@ -181,14 +187,18 @@ export class HocsinhComponent implements OnInit {
             email: hs.email || '',
             soDienThoai: hs.soDienThoai || '',
             isActive: hs.isActive !== undefined ? hs.isActive : false,
-            tenCoSo: hs.tenCoSo || '',
+           
             chinhSach: hs.tenChinhSach || '',
             lopHocs: hs.tenLops ? hs.tenLops : [],
             showDetails: false
           }));
 
-          this.totalItems = response.data.totalCount || this.students.length;
+          this.totalItems = response.totalRecords ?? response.totalCount ?? this.students.length;
           this.totalPages = Math.ceil(this.totalItems / this.pageSize);
+          console.log("📌 API Response:", response);
+console.log("📌 Total Records:", response.totalRecords);
+console.log("📌 Students Length:", this.students.length);
+
         } else {
           this.students = [];
           this.totalItems = 0;
@@ -204,6 +214,16 @@ export class HocsinhComponent implements OnInit {
       this.loadDanhSachHocSinh();
     }
   }
+  get paginatedStudents() {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    return this.students.slice(startIndex, endIndex);
+  }
+  filterByStatus() {
+    this.currentPage = 1; // Reset về trang đầu tiên khi lọc
+    this.loadDanhSachHocSinh();
+  }
+
 
   /** 🔍 Tìm kiếm theo lớp */
   selectLop(option: { code: string; name: string }) {

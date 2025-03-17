@@ -3,11 +3,11 @@
     <h2 class="page-title">DANH SÁCH HỌC VIÊN</h2>
   
     <div class="filter-row">
-      <select class="form-control dropdown-filter" [(ngModel)]="trangThai" (change)="loadDanhSachHocSinh()">
-        <option value="">Tất cả trạng thái</option>
-        <option value="Hoạt động">Hoạt động</option>
-        <option value="Tạm ngừng">Tạm ngừng</option>
-      </select>
+<select class="form-control dropdown-filter" [(ngModel)]="trangThai" (change)="filterByStatus()">
+    <option value="">Tất cả trạng thái</option>
+    <option value="Hoạt động">Hoạt động</option>
+    <option value="Tạm ngừng">Không Hoạt Động</option>
+  </select>
     
         <div class="lop-select-container">
           <div class="lop-select-display" (click)="toggleLopDropdown()">
@@ -42,12 +42,13 @@
           </div>
         </div>
     
-        <input
-          type="text"
-          class="form-control search-input"
-          placeholder="Tìm tên/code học viên..."
-          [(ngModel)]="searchTerm"
-        />
+        <input 
+    type="text" 
+    class="form-control search-input" 
+    placeholder="Tìm tên/code học sinh..." 
+    [(ngModel)]="searchTerm" 
+    (keyup.enter)="searchHocSinh()"
+  />
     
        
         <div class="btn-group-right">
@@ -282,7 +283,10 @@
           </tr>
         </thead>
         <tbody>
-          <ng-container *ngFor="let hs of students; let i = index">
+          <tr *ngIf="paginatedStudents.length === 0">
+            <td colspan="8" style="text-align: center; color: red">Không có học sinh nào</td>
+          </tr>
+          <ng-container *ngFor="let hs of paginatedStudents; let i = index">
             <!-- Hàng tóm tắt -->
             <tr>
               <td>{{ hs.code }}</td>
@@ -388,16 +392,19 @@
       </table>
     </div>
   
-    <!-- Phân trang -->
-    <div class="pagination-container">
-      <ul class="pagination">
-        <li class="page-item" [class.active]="currentPage === 1">
-          <a class="page-link" (click)="goToPage(1)">1</a>
-        </li>
-        <li class="page-item" [class.active]="currentPage === 2">
-          <a class="page-link" (click)="goToPage(2)">2</a>
-        </li>
-      </ul>
-    </div>
+   <!-- Phân trang -->
+   <div class="pagination-container" *ngIf="totalPages > 1">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <a class="page-link" (click)="changePage(currentPage - 1)">«</a>
+      </li>
+      <li *ngFor="let page of [].constructor(totalPages); let i = index" class="page-item" [class.active]="currentPage === (i + 1)">
+        <a class="page-link" (click)="changePage(i + 1)">{{ i + 1 }}</a>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <a class="page-link" (click)="changePage(currentPage + 1)">»</a>
+      </li>
+    </ul>
+  </div>
   </div>
   
