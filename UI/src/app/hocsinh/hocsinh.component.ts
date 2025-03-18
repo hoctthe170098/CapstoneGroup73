@@ -262,7 +262,6 @@ export class HocsinhComponent implements OnInit {
             showDetails: false
           }));
 
-          // 🟢 Cập nhật số trang từ API
           this.totalItems = response.data.totalCount || 0;
           this.totalPages = Math.ceil(this.totalItems / this.pageSize);
 
@@ -279,20 +278,18 @@ export class HocsinhComponent implements OnInit {
 }
 
 
-
-  /** 🔄 Chuyển trang */
   changePage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
         this.currentPage = page;
         console.log("📌 Chuyển trang:", this.currentPage);
-        this.loadDanhSachHocSinh();  // 🔄 Gọi API lấy dữ liệu trang mới
+        this.loadDanhSachHocSinh();  
     }
 }
 
   
   
   filterByStatus() {
-    this.currentPage = 1; // Reset về trang đầu tiên khi lọc
+    this.currentPage = 1; 
     this.loadDanhSachHocSinh();
   }
 

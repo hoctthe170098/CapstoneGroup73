@@ -19,7 +19,7 @@ export class HocSinhService {
     return this.http.get<any>(this.provinceApiUrl);
   }
   getDanhSachHocSinh(pageNumber: number, pageSize: number, searchTen: string, sortBy: string, filterIsActive: boolean | null, filterByClass: string): Observable<any> {
-    const token = localStorage.getItem('token'); // 🔑 Lấy token từ localStorage (hoặc sessionStorage)
+    const token = localStorage.getItem('token'); //  Lấy token từ localStorage (hoặc sessionStorage)
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
     const body = {
@@ -33,16 +33,23 @@ export class HocSinhService {
     return this.http.post<any>(`${this.baseUrl}/gethocsinhswithpagination`, body, { headers });
   }
 
-  /** 🟢 Lấy danh sách chính sách (Có Bearer Token) */
   getDanhSachChinhSach(): Observable<any> {
-    const token = localStorage.getItem('token'); // 🔑 Lấy token
+    const token = localStorage.getItem('token'); //  Lấy token
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
     return this.http.get<any>(`${this.CHINH_SACH_URL}/getallchinhsachs`, { headers });
   }
   createHocSinh(hocSinhData: any): Observable<any> {
-    const token = localStorage.getItem('token'); // 🔑 Lấy token
+    const token = localStorage.getItem('token'); //  Lấy token
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.post(`${this.baseUrl}/createhocsinh`, hocSinhData, { headers });
   }
+  updateHocSinh(hocSinhData: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders()
+        .set('Authorization', `Bearer ${token}`)
+        .set('Content-Type', 'application/json');
+
+    return this.http.put<any>(`${this.baseUrl}/edithocsinh`, JSON.stringify(hocSinhData), { headers });
+}
 }

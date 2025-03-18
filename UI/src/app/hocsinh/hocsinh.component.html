@@ -351,6 +351,16 @@
               />
             </div>
           </div>
+          <!-- Row 6: Kích Hoạt / Không Hoạt Động -->
+
+<div class="form-group ">
+  <label for="statusToggle">Kích Hoạt</label>
+  <label class="switch">
+    <input type="checkbox" id="toggleActive" [(ngModel)]="editStudent.isActive" name="edit_isActive"/>
+    <span class="slider round"></span>
+  </label>
+</div>
+
         </form>
       </div>
       <div class="modal-footer">
@@ -503,7 +513,6 @@
     </table>
   </div>
 
-  <!-- Phân trang -->
   <!-- Phân trang -->
 <div class="pagination-container" *ngIf="totalPages > 1">
   <ul class="pagination">
