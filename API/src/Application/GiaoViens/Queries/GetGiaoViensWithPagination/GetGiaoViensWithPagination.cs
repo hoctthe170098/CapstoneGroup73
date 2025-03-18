@@ -95,9 +95,9 @@ public class GetGiaoViensWithPaginationQueryHandler
 
             var list = await query
                .ProjectTo<GiaoVienDto>(_mapper.ConfigurationProvider)
-               .ToListAsync();
+               .PaginatedListAsync(request.PageNumber, request.PageSize);
 
-            foreach (var giaoVienDto in list)
+            foreach (var giaoVienDto in list.Items)
             {
                 if (!string.IsNullOrEmpty(giaoVienDto.Code))
                 {
@@ -109,11 +109,6 @@ public class GetGiaoViensWithPaginationQueryHandler
                     giaoVienDto.IsActive = user != null && await _identityService.IsUserActiveAsync(user);
                 }
             }
-
-            var paginatedList = list
-                .Skip((request.PageNumber - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToList();
 
             return new Output
             {
