@@ -43,21 +43,21 @@ public class GetHocSinhsWithPaginationQueryHandler
             if (request.PageNumber < 1 || request.PageSize < 1) throw new WrongInputException();
 
             // Lấy token từ request header
-            var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            if (string.IsNullOrEmpty(token))
-                throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
-            var coSoId = _identityService.GetCampusId(token);
+            //var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            //if (string.IsNullOrEmpty(token))
+            //    throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+            //var coSoId = _identityService.GetCampusId(token);
 
             var query = _context.HocSinhs
                 .Include(hs => hs.Coso)
                 .Include(hs => hs.ChinhSach)
-                .Where(hs => hs.CoSoId == coSoId)
+               // .Where(hs => hs.CoSoId == coSoId)
                 .AsQueryable();
 
             // Search name
             if (!string.IsNullOrWhiteSpace(request.SearchTen))
             {
-                query = query.Where(hs => hs.Ten.ToLower().Contains(request.SearchTen.ToLower()));
+                query = query.Where(hs => hs.Ten.ToLower().Contains(request.SearchTen.ToLower()) || hs.Code.Contains(request.SearchTen));
             }
 
             // Sort by name
@@ -67,6 +67,28 @@ public class GetHocSinhsWithPaginationQueryHandler
                 "Ten" => query.OrderBy(hs => hs.Ten),
                 _ => query.OrderBy(hs => hs.Code)
             };
+
+            // Filter status
+            if (request.FilterIsActive.HasValue)
+            {
+                var userIds = await _context.HocSinhs
+                    .Where(gv => gv.UserId != null)
+                    .Select(gv => gv.UserId!)
+                    .Distinct()
+                    .ToListAsync();
+
+                var filteredUserIds = new List<string>();
+
+                foreach (var userId in userIds)
+                {
+                    var isActive = await _identityService.IsUserActiveAsync(userId);
+                    if (isActive == request.FilterIsActive.Value)
+                    {
+                        filteredUserIds.Add(userId);
+                    }
+                }
+                query = query.Where(gv => gv.UserId != null && filteredUserIds.Contains(gv.UserId!));
+            }
 
             var list = await query
                .ProjectTo<HocSinhDto>(_mapper.ConfigurationProvider)
@@ -105,7 +127,7 @@ public class GetHocSinhsWithPaginationQueryHandler
             return new Output
             {
                 isError = false,
-                data = list,
+                data = paginatedList,
                 code = 200
             };
 

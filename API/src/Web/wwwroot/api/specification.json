@@ -102,6 +102,153 @@
         }
       }
     },
+    "/api/ChinhSachs/createchinhsach": {
+      "post": {
+        "tags": [
+          "ChinhSachs"
+        ],
+        "operationId": "CreateChinhSach",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateChinhSachCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ChinhSachs/updatechinhsach": {
+      "put": {
+        "tags": [
+          "ChinhSachs"
+        ],
+        "operationId": "UpdateChinhSach",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateChinhSachCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ChinhSachs/getchinhsachs": {
+      "post": {
+        "tags": [
+          "ChinhSachs"
+        ],
+        "operationId": "GetChinhSachsWithPagination",
+        "requestBody": {
+          "x-name": "query",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetChinhSachsWithPaginationQuery"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ChinhSachs/getallchinhsachs": {
+      "get": {
+        "tags": [
+          "ChinhSachs"
+        ],
+        "operationId": "GetAllChinhSachs",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ChinhSachs/deletechinhsach/{id}": {
+      "delete": {
+        "tags": [
+          "ChinhSachs"
+        ],
+        "operationId": "DeleteChinhSach",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/ChuongTrinhs/createchuongtrinh": {
       "post": {
         "tags": [
@@ -165,29 +312,72 @@
       }
     },
     "/api/ChuongTrinhs/getchuongtrinhs": {
-      "get": {
+      "post": {
         "tags": [
           "ChuongTrinhs"
         ],
         "operationId": "GetChuongTrinhsWithPagination",
+        "requestBody": {
+          "x-name": "query",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetChuongTrinhsWithPaginationQuery"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ChuongTrinhs/getallchuongtrinhs": {
+      "get": {
+        "tags": [
+          "ChuongTrinhs"
+        ],
+        "operationId": "GetAllChuongTrinhs",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ChuongTrinhs/deletechuongtrinh/{id}": {
+      "delete": {
+        "tags": [
+          "ChuongTrinhs"
+        ],
+        "operationId": "DeleteChuongTrinh",
         "parameters": [
           {
-            "name": "PageNumber",
-            "in": "query",
+            "name": "id",
+            "in": "path",
+            "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
             },
             "x-position": 1
-          },
-          {
-            "name": "PageSize",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 2
           }
         ],
         "responses": {
@@ -196,7 +386,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedListOfChuongTrinhDto"
+                  "$ref": "#/components/schemas/Output"
                 }
               }
             }
@@ -268,6 +458,26 @@
         }
       }
     },
+    "/api/CoSos/getallcosos": {
+      "get": {
+        "tags": [
+          "CoSos"
+        ],
+        "operationId": "GetAllCoSos",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/CoSos/editcoso": {
       "put": {
         "tags": [
@@ -280,6 +490,262 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/EditCoSoComand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/GiaoViens/creategiaovien": {
+      "post": {
+        "tags": [
+          "GiaoViens"
+        ],
+        "operationId": "CreateGiaoVien",
+        "requestBody": {
+          "x-name": "comand",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGiaoVienCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/GiaoViens/getgiaovienswithpagination": {
+      "post": {
+        "tags": [
+          "GiaoViens"
+        ],
+        "operationId": "GetGiaoViensWithPagination",
+        "requestBody": {
+          "x-name": "query",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetGiaoViensWithPaginationQuery"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/GiaoViens/editgiaovien": {
+      "put": {
+        "tags": [
+          "GiaoViens"
+        ],
+        "operationId": "EditGiaoVien",
+        "requestBody": {
+          "x-name": "comand",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditGiaoVienCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/GiaoViens/addlistgiaoviens": {
+      "post": {
+        "tags": [
+          "GiaoViens"
+        ],
+        "operationId": "AddListGiaoViens",
+        "requestBody": {
+          "x-name": "comand",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddListGiaoViensCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/HocSinhs/createhocsinh": {
+      "post": {
+        "tags": [
+          "HocSinhs"
+        ],
+        "operationId": "CreateHocSinh",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateHocSinhCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/HocSinhs/gethocsinhswithpagination": {
+      "post": {
+        "tags": [
+          "HocSinhs"
+        ],
+        "operationId": "GetHocSinhsWithPagination",
+        "requestBody": {
+          "x-name": "query",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetHocSinhsWithPaginationQuery"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/HocSinhs/edithocsinh": {
+      "put": {
+        "tags": [
+          "HocSinhs"
+        ],
+        "operationId": "EditHocSinh",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditHocSinhCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/HocSinhs/addlisthocsinhs": {
+      "post": {
+        "tags": [
+          "HocSinhs"
+        ],
+        "operationId": "AddListHocSinhs",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddListHocSinhsCommand"
               }
             }
           },
@@ -503,7 +969,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/GetPhongsWithPaginationQuery"
+                "$ref": "#/components/schemas/GetPhongsQuery"
               }
             }
           },
@@ -945,6 +1411,77 @@
           }
         }
       },
+      "CreateChinhSachCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "createChinhSachDto": {
+            "$ref": "#/components/schemas/CreateChinhSachDto"
+          }
+        }
+      },
+      "CreateChinhSachDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "ten": {
+            "type": "string"
+          },
+          "mota": {
+            "type": "string"
+          },
+          "phanTramGiam": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "UpdateChinhSachCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "updateChinhSachDto": {
+            "$ref": "#/components/schemas/UpdateChinhSachDto"
+          }
+        }
+      },
+      "UpdateChinhSachDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ten": {
+            "type": "string",
+            "nullable": true
+          },
+          "mota": {
+            "type": "string",
+            "nullable": true
+          },
+          "phanTramGiam": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          }
+        }
+      },
+      "GetChinhSachsWithPaginationQuery": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "CreateChuongTrinhCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -1033,6 +1570,9 @@
           "moTa": {
             "type": "string"
           },
+          "trangThai": {
+            "type": "string"
+          },
           "noiDungBaiHocs": {
             "type": "array",
             "nullable": true,
@@ -1087,49 +1627,21 @@
           }
         }
       },
-      "PaginatedListOfChuongTrinhDto": {
+      "GetChuongTrinhsWithPaginationQuery": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ChuongTrinhDto"
-            }
+          "search": {
+            "type": "string",
+            "nullable": true
           },
           "pageNumber": {
             "type": "integer",
             "format": "int32"
           },
-          "totalPages": {
+          "pageSize": {
             "type": "integer",
             "format": "int32"
-          },
-          "totalCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "hasPreviousPage": {
-            "type": "boolean"
-          },
-          "hasNextPage": {
-            "type": "boolean"
-          }
-        }
-      },
-      "ChuongTrinhDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "tieuDe": {
-            "type": "string"
-          },
-          "moTa": {
-            "type": "string"
           }
         }
       },
@@ -1191,7 +1703,245 @@
           }
         }
       },
+      "CreateGiaoVienCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "ten": {
+            "type": "string"
+          },
+          "gioiTinh": {
+            "type": "string"
+          },
+          "diaChi": {
+            "type": "string"
+          },
+          "truongDangDay": {
+            "type": "string"
+          },
+          "ngaySinh": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "soDienThoai": {
+            "type": "string"
+          }
+        }
+      },
+      "GetGiaoViensWithPaginationQuery": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "searchTen": {
+            "type": "string",
+            "nullable": true
+          },
+          "sortBy": {
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean",
+            "nullable": true
+          }
+        }
+      },
+      "EditGiaoVienCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "ten": {
+            "type": "string"
+          },
+          "gioiTinh": {
+            "type": "string"
+          },
+          "diaChi": {
+            "type": "string"
+          },
+          "truongDangDay": {
+            "type": "string"
+          },
+          "ngaySinh": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "soDienThoai": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "AddListGiaoViensCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "giaoViens": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateGiaoVienCommand"
+            }
+          }
+        }
+      },
+      "CreateHocSinhCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "ten": {
+            "type": "string"
+          },
+          "gioiTinh": {
+            "type": "string"
+          },
+          "diaChi": {
+            "type": "string"
+          },
+          "lop": {
+            "type": "string"
+          },
+          "truongDangHoc": {
+            "type": "string"
+          },
+          "ngaySinh": {
+            "type": "string",
+            "format": "date"
+          },
+          "email": {
+            "type": "string"
+          },
+          "soDienThoai": {
+            "type": "string"
+          },
+          "chinhSachId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "coSoId": {
+            "type": "string",
+            "format": "guid"
+          }
+        }
+      },
+      "GetHocSinhsWithPaginationQuery": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "searchTen": {
+            "type": "string",
+            "nullable": true
+          },
+          "sortBy": {
+            "type": "string",
+            "nullable": true
+          },
+          "filterIsActive": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "filterByClass": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "EditHocSinhCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "ten": {
+            "type": "string"
+          },
+          "gioiTinh": {
+            "type": "string"
+          },
+          "diaChi": {
+            "type": "string"
+          },
+          "lop": {
+            "type": "string"
+          },
+          "truongDangHoc": {
+            "type": "string"
+          },
+          "ngaySinh": {
+            "type": "string",
+            "format": "date"
+          },
+          "email": {
+            "type": "string"
+          },
+          "soDienThoai": {
+            "type": "string"
+          },
+          "chinhSachId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "coSoId": {
+            "type": "string",
+            "format": "guid"
+          }
+        }
+      },
+      "AddListHocSinhsCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "hocSinhs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateHocSinhCommand"
+            }
+          }
+        }
+      },
       "CreateLichHocCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "lichHocDto": {
+            "$ref": "#/components/schemas/CreateLichHocDto"
+          }
+        }
+      },
+      "CreateLichHocDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -1213,12 +1963,10 @@
             "type": "string"
           },
           "ngayBatDau": {
-            "type": "string",
-            "format": "date"
+            "type": "string"
           },
           "ngayKetThuc": {
-            "type": "string",
-            "format": "date"
+            "type": "string"
           },
           "hocPhi": {
             "type": "integer",
@@ -1237,6 +1985,15 @@
         }
       },
       "EditLichHocCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "lichHocDto": {
+            "$ref": "#/components/schemas/EditlLichHocDto"
+          }
+        }
+      },
+      "EditlLichHocDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -1268,11 +2025,11 @@
           },
           "ngayBatDau": {
             "type": "string",
-            "format": "date"
+            "nullable": true
           },
           "ngayKetThuc": {
             "type": "string",
-            "format": "date"
+            "nullable": true
           },
           "hocPhi": {
             "type": "integer",
@@ -1311,8 +2068,7 @@
             "type": "string"
           },
           "ngaySinh": {
-            "type": "string",
-            "format": "date"
+            "type": "string"
           },
           "email": {
             "type": "string"
@@ -1321,8 +2077,7 @@
             "type": "string"
           },
           "coSoId": {
-            "type": "string",
-            "format": "guid"
+            "type": "string"
           },
           "role": {
             "type": "string"
@@ -1356,6 +2111,10 @@
           "sortBy": {
             "type": "string",
             "nullable": true
+          },
+          "isActive": {
+            "type": "boolean",
+            "nullable": true
           }
         }
       },
@@ -1376,8 +2135,7 @@
             "type": "string"
           },
           "ngaySinh": {
-            "type": "string",
-            "format": "date"
+            "type": "string"
           },
           "email": {
             "type": "string"
@@ -1388,10 +2146,10 @@
           "coSoId": {
             "type": "string"
           },
-          "userId": {
+          "role": {
             "type": "string"
           },
-          "role": {
+          "status": {
             "type": "string"
           }
         }
@@ -1402,35 +2160,12 @@
         "properties": {
           "ten": {
             "type": "string"
-          },
-          "coSoId": {
-            "type": "string",
-            "format": "guid"
           }
         }
       },
-      "GetPhongsWithPaginationQuery": {
+      "GetPhongsQuery": {
         "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "pageNumber": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "pageSize": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "currentRole": {
-            "type": "string",
-            "nullable": true
-          },
-          "currentCoSoId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true
-          }
-        }
+        "additionalProperties": false
       },
       "EditPhongCommand": {
         "type": "object",
@@ -1445,10 +2180,6 @@
           },
           "trangThai": {
             "type": "string"
-          },
-          "coSoId": {
-            "type": "string",
-            "format": "guid"
           }
         }
       },

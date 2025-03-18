@@ -15,7 +15,7 @@ public class TaiLieuHocTapConfiguration : IEntityTypeConfiguration<TaiLieuHocTap
         builder.ToTable(nameof(TaiLieuHocTap));
         builder.HasKey(t => t.Id);
         builder.Property(x => x.Ten)
-            .HasMaxLength(50);
+            .HasMaxLength(200);
         builder.Property(x => x.urlType)
             .HasMaxLength(20);
         builder.Property(x => x.urlFile)

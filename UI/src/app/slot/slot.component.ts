@@ -9,18 +9,17 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./slot.component.scss']
 })
 export class SlotComponent implements OnInit {
-  // Danh sách phòng
+  
   rooms: Slot[] = [];
-  // Form thêm
+
   roomName: string = '';
 
-  // Popup edit
+  
   isEditModalOpen: boolean = false;
   editRoomId: number | null = null;
   editRoomName: string = '';
-  editRoomStatus: string = 'Mở'; // UI: "Mở" hoặc "Đóng"
+  editRoomStatus: string = 'Mở'; 
 
-  // Biến cờ để kiểm soát hiển thị lỗi sau khi bấm nút
   isSubmittedAdd: boolean = false;
   isSubmittedEdit: boolean = false;
 
@@ -34,12 +33,12 @@ export class SlotComponent implements OnInit {
     this.loadRooms();
   }
 
-  // Lấy danh sách phòng
+ 
   loadRooms(): void {
     this.slotService.getDanhSachPhong().subscribe({
       next: (res) => {
         if (!res.isError && res.data) {
-          // Chuyển "use"/"nonuse" -> "Mở"/"Đóng"
+          
           this.rooms = res.data.map((r: any) => ({
             ...r,
             trangThai: this.translateStatus(r.trangThai)
@@ -56,20 +55,20 @@ export class SlotComponent implements OnInit {
     });
   }
 
-  // "use" -> "Mở", "nonuse" -> "Đóng"
+  
   translateStatus(status: string): string {
     if (status === 'use') return 'Mở';
     if (status === 'nonuse') return 'Đóng';
     return status;
   }
 
-  // Kiểm tra trùng tên (cho form thêm)
+  
   isDuplicateRoomName(name: string): boolean {
     const trimmed = name.trim().toLowerCase();
     return this.rooms.some(r => r.ten.toLowerCase() === trimmed);
   }
 
-  // Kiểm tra trùng tên (cho form edit) - bỏ qua phòng đang edit
+  
   isDuplicateEditRoomName(name: string): boolean {
     const trimmed = name.trim().toLowerCase();
     return this.rooms.some(r =>
@@ -77,35 +76,35 @@ export class SlotComponent implements OnInit {
     );
   }
 
-  // Thêm phòng
+  
   addRoom(): void {
     this.isSubmittedAdd = true; // người dùng đã bấm nút => cho phép hiển thị lỗi
     const nameTrim = this.roomName.trim();
 
-    // Validate
+    
     if (!nameTrim) {
-      return; // Tên rỗng => dừng
+      return; 
     }
     if (nameTrim.length > 20) {
-      return; // Quá 20 ký tự => dừng
+      return; 
     }
     if (this.isDuplicateRoomName(nameTrim)) {
-      return; // Tên đã tồn tại => dừng
+      return; 
     }
 
-    // Gọi API
+    
     const body = { ten: nameTrim };
     this.slotService.createPhong(body).subscribe({
       next: (res) => {
         if (!res.isError && res.data) {
-          // Thêm phòng vào rooms
+          
           const newRoom = {
             ...res.data,
             trangThai: this.translateStatus(res.data.trangThai)
           };
           this.rooms.push(newRoom);
 
-          // Reset form
+          
           this.roomName = '';
           this.isSubmittedAdd = false;
           this.loadRooms();
@@ -121,33 +120,33 @@ export class SlotComponent implements OnInit {
     });
   }
 
-  // Mở pop-up Edit
+ 
   openEditRoomModal(roomId: number): void {
     const room = this.rooms.find(r => r.id === roomId);
     if (room) {
       this.editRoomId = room.id;
       this.editRoomName = room.ten;
-      this.editRoomStatus = room.trangThai; // "Mở" hoặc "Đóng"
+      this.editRoomStatus = room.trangThai; 
       this.isEditModalOpen = true;
-      this.isSubmittedEdit = false; // reset cờ
+      this.isSubmittedEdit = false; 
       this.cd.detectChanges();
     }
   }
 
-  // Áp dụng Edit
+  // Edit
   applyEditRoom(): void {
-    this.isSubmittedEdit = true; // user đã bấm => hiển thị lỗi
+    this.isSubmittedEdit = true; 
     const nameTrim = this.editRoomName.trim();
 
     // Validate
     if (!nameTrim) {
-      return; // Tên rỗng => dừng
+      return; 
     }
     if (nameTrim.length > 20) {
-      return; // Quá 20 ký tự => dừng
+      return; 
     }
     if (this.isDuplicateEditRoomName(nameTrim)) {
-      return; // Tên đã tồn tại => dừng
+      return; 
     }
 
     const confirmResult = window.confirm('Bạn có chắc muốn thay đổi thông tin phòng này?');
@@ -156,7 +155,6 @@ export class SlotComponent implements OnInit {
       return;
     }else this.isEditModalOpen = false;
 
-    // Chuyển UI -> API: "Mở" -> "use", "Đóng" -> "nonuse"
     const apiStatus = (this.editRoomStatus === 'Mở') ? 'use' : 'nonuse';
     const data: Slot = {
       id: this.editRoomId!,
@@ -167,7 +165,7 @@ export class SlotComponent implements OnInit {
     this.slotService.updatePhong(data).subscribe({
       next: (res) => {
         if (!res.isError && res.data) {
-          // Cập nhật rooms
+         
           const idx = this.rooms.findIndex(r => r.id === this.editRoomId);
           if (idx !== -1) {
             this.rooms[idx].ten = nameTrim;
@@ -185,7 +183,7 @@ export class SlotComponent implements OnInit {
       }
     });
   }
-  // Bấm nút "Sửa" trong bảng
+
   editRoom(roomId: number): void {
     this.openEditRoomModal(roomId);
   }

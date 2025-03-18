@@ -25,7 +25,9 @@ public class HocSinhConfiguration : IEntityTypeConfiguration<HocSinh>
         builder.Property(x => x.DiaChi)
             .HasMaxLength(200);
         builder.Property(x => x.TruongDangHoc)
-            .HasMaxLength(50);
+            .HasMaxLength(100);
+        builder.Property(x => x.Lop)
+            .HasMaxLength(20);
         builder.Property(x => x.SoDienThoai)
             .HasMaxLength(11);
         builder.Property(x => x.Email)

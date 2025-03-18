@@ -76,7 +76,8 @@ public class CreateGiaoVienCommandHandler : IRequestHandler<CreateGiaoVienComman
             throw new FormatException("CoSo không hợp lệ");
         }
         // Validate length constraints
-        if (request.Code.Length > 20 || request.Ten.Length > 50 || request.DiaChi.Length > 100)
+        if (request.Code.Length > 20 || request.Ten.Length > 50 || request.DiaChi.Length > 100
+            ||request.TruongDangDay.Length>100)
         {
             throw new WrongInputException("Độ dài dữ liệu không hợp lệ!");
         }
@@ -114,7 +115,8 @@ public class CreateGiaoVienCommandHandler : IRequestHandler<CreateGiaoVienComman
             throw new WrongInputException($"Mã giáo viên '{request.Code}' đã tồn tại!");
         }
         // Create identity user     
-        var (result, userId) = await _identityService.GenerateUser(request.Ten, request.Code, request.Email);
+        var (result, userId) = await _identityService
+            .GenerateUser(request.Ten, "GV" + request.Code, request.Email);
 
         if (!result.Succeeded)
         {

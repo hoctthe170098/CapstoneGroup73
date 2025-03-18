@@ -73,7 +73,8 @@ public class EditGiaoVienCommandHandler : IRequestHandler<EditGiaoVienCommand, O
             throw new WrongInputException("Giáo viên phải đủ 18 tuổi trở lên");
         }
         // Validate length constraints
-        if (request.Code.Length > 20 || request.Ten.Length > 50 || request.DiaChi.Length > 100)
+        if (request.Code.Length > 20 || request.Ten.Length > 50 || request.DiaChi.Length > 100
+            ||request.TruongDangDay.Length>100)
         {
             throw new WrongInputException("Độ dài dữ liệu không hợp lệ!");
         }
@@ -119,11 +120,11 @@ public class EditGiaoVienCommandHandler : IRequestHandler<EditGiaoVienCommand, O
             giaoVien.NgaySinh = ngaySinh;
             giaoVien.Email = request.Email;
             giaoVien.SoDienThoai = request.SoDienThoai;
-            giaoVien.CoSoId = coSoId;
         }
-        if (giaoVien.UserId != null && request.Status.ToLower() == "false")
+        if (giaoVien.UserId != null )
         {
-            await _identityService.disableUser(giaoVien.UserId);
+            await _identityService
+                .UpdateStatusUser(giaoVien.UserId, Boolean.Parse(request.Status));
         }
         await _context.SaveChangesAsync(cancellationToken);
         return new Output

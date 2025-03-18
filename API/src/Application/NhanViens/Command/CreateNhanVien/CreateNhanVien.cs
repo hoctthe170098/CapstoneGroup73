@@ -112,7 +112,8 @@ public class CreateNhanVienCommandHandler : IRequestHandler<CreateNhanVienComman
             throw new Exception($"Mã nhân viên '{request.Code}' đã tồn tại!");
         }
         // Create identity user
-        var (result, userId) = await _identityService.GenerateUser(request.Ten, request.Code, request.Email);
+        var (result, userId) = await _identityService
+            .GenerateUser(request.Ten, "NV" + request.Code, request.Email);
 
         if (!result.Succeeded)
         {

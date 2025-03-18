@@ -1,4 +1,4 @@
-﻿using System;
+﻿    using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -96,7 +96,13 @@ public class EditNhanVienCommandHandler : IRequestHandler<EditNhanVienCommand, O
         {
             throw new NotFoundDataException("Cơ sở không tồn tại");
         }
-
+        // Check If phone or email exist
+        var phoneExists = await _context.NhanViens.AnyAsync(nv => nv.SoDienThoai == request.SoDienThoai, cancellationToken);
+        var emailExists = await _context.NhanViens.AnyAsync(nv => nv.Email == request.Email, cancellationToken);
+        if (phoneExists || emailExists)
+        {
+            throw new WrongInputException($"Số điện thoại hoặc email đã tồn tại");
+        }
         var nhanVien = await _context.NhanViens.FindAsync(new object[] { request.Code }, cancellationToken);
 
         if (nhanVien == null) throw new NotFoundIDException();
@@ -116,9 +122,10 @@ public class EditNhanVienCommandHandler : IRequestHandler<EditNhanVienCommand, O
         {
             await _identityService.changeEmail(nhanVien.UserId,request.Email);
         }
-        if (nhanVien.UserId != null && request.Status.ToLower() == "false")
+        if (nhanVien.UserId != null )
         {
-            await _identityService.disableUser(nhanVien.UserId);
+            await _identityService
+                .UpdateStatusUser(nhanVien.UserId,Boolean.Parse(request.Status));
         }
         await _context.SaveChangesAsync(cancellationToken);
 
