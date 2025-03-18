@@ -16,6 +16,6 @@ public class CreateChinhSachValidator : AbstractValidator<CreateChinhSachCommand
 
         RuleFor(x => x.CreateChinhSachDto.PhanTramGiam)
             .GreaterThan(0f).WithMessage("Phần trăm giảm phải lớn hơn 0.")
-            .LessThan(0.1f).WithMessage("Phần trăm giảm phải nhỏ hơn 0.1.");
+            .LessThanOrEqualTo(0.1f).WithMessage("Phần trăm giảm phải nhỏ hơn 0.1.");
     }
 }
