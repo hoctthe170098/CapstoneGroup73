@@ -469,13 +469,13 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngIf="paginatedStudents.length === 0">
+        <tr *ngIf="students.length === 0">
           <td colspan="12" style="text-align: center; color: red">
             Không có giáo viên nào
           </td>
         </tr>
 
-        <ng-container *ngFor="let gv of paginatedStudents; let i = index">
+        <ng-container *ngFor="let gv of students; let i = index">
           <!-- Hàng tóm tắt -->
           <tr>
             <td>{{ gv.code }}</td>

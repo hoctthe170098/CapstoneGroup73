@@ -157,7 +157,7 @@ export class HocsinhComponent implements OnInit {
       truongDangHoc: formData.truongDangHoc,
       lop: formData.lop,
       diaChi: diaChiFormatted,
-      ...(selectedPolicy !== null && { chinhSachId: selectedPolicy }) // 🔹 Chỉ thêm nếu không phải null
+      ...(selectedPolicy !== null && { chinhSachId: selectedPolicy }) 
     };
   
     console.log("📤 Gửi API thêm học sinh:", newStudent);
@@ -229,14 +229,24 @@ export class HocsinhComponent implements OnInit {
     const selectedProvince = this.provinces.find(p => p.code == provinceCode);
     this.districts = selectedProvince ? selectedProvince.districts : [];
   }
+
+  extractAddressParts(diaChi: string): { province: string, district: string, detail: string } {
+    const parts = diaChi.split(',').map(part => part.trim());
+    return {
+      province: parts[0] || '',
+      district: parts[1] || '',
+      detail: parts.slice(2).join(', ') || ''
+    };
+  }
   loadDanhSachHocSinh() {
     let isActiveFilter: boolean | null = this.trangThai === 'Hoạt động' ? true : this.trangThai === 'Tạm ngừng' ? false : null;
 
-    this.hocSinhService.getDanhSachHocSinh(1, 9999, this.searchTerm, '', isActiveFilter, '')
+    this.hocSinhService.getDanhSachHocSinh(this.currentPage, this.pageSize, this.searchTerm, '', isActiveFilter, '')
       .subscribe(response => {
         console.log("📌 API Response:", response);
-        if (!response.isError && response.data) {
-          this.students = response.data.map((hs: any) => ({
+
+        if (!response.isError && response.data && response.data.items) {
+          this.students = response.data.items.map((hs: any) => ({
             code: hs.code || '',
             ten: hs.ten || '',
             gioiTinh: hs.gioiTinh || '',
@@ -247,38 +257,40 @@ export class HocsinhComponent implements OnInit {
             email: hs.email || '',
             soDienThoai: hs.soDienThoai || '',
             isActive: hs.isActive !== undefined ? hs.isActive : false,
-           
-            chinhSach: hs.tenChinhSach && hs.tenChinhSach.trim() !== '' ? hs.tenChinhSach : 'Cơ bản', 
+            chinhSach: hs.tenChinhSach && hs.tenChinhSach.trim() !== '' ? hs.tenChinhSach : 'Cơ bản',
             lopHocs: hs.tenLops ? hs.tenLops : [],
             showDetails: false
           }));
 
-          this.totalItems = response.totalRecords ?? response.totalCount ?? this.students.length;
+          // 🟢 Cập nhật số trang từ API
+          this.totalItems = response.data.totalCount || 0;
           this.totalPages = Math.ceil(this.totalItems / this.pageSize);
-          console.log("📌 API Response:", response);
-console.log("📌 Total Records:", response.totalRecords);
-console.log("📌 Students Length:", this.students.length);
 
+          console.log("📌 Tổng số học sinh:", this.totalItems);
+          console.log("📌 Tổng số trang:", this.totalPages);
+
+          this.cdr.detectChanges();
         } else {
           this.students = [];
           this.totalItems = 0;
-          this.totalPages = 0;
+          this.totalPages = 1;
         }
-        this.cdr.detectChanges();
       });
-  }
+}
+
+
+
   /** 🔄 Chuyển trang */
   changePage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.loadDanhSachHocSinh();
+        this.currentPage = page;
+        console.log("📌 Chuyển trang:", this.currentPage);
+        this.loadDanhSachHocSinh();  // 🔄 Gọi API lấy dữ liệu trang mới
     }
-  }
-  get paginatedStudents() {
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    return this.students.slice(startIndex, endIndex);
-  }
+}
+
+  
+  
   filterByStatus() {
     this.currentPage = 1; // Reset về trang đầu tiên khi lọc
     this.loadDanhSachHocSinh();
@@ -306,28 +318,48 @@ console.log("📌 Students Length:", this.students.length);
  
   
 
-  // Khi bấm nút “Sửa” ở bảng
   onEditStudentClick(index: number) {
     const hs = this.students[index];
-    // Copy data sang editStudent
+    console.log("📝 Học sinh được chọn để chỉnh sửa:", hs);
+
+    const addressParts = hs.diaChi ? hs.diaChi.split(',').map(part => part.trim()) : ['', '', ''];
+    const provinceName = addressParts[0] || ''; 
+    const districtName = addressParts[1] || '';
+    const detailAddress = addressParts[2] || ''; 
+
+
+    const provinceObj = this.provinces.find(p => p.name === provinceName);
+    const provinceCode = provinceObj ? provinceObj.code : '';
+
+    this.onProvinceChangeForEdit(provinceCode);
+
+    const districtObj = provinceObj?.districts.find(d => d.name === districtName);
+    const districtCode = districtObj ? districtObj.code : '';
+
+    const ngaySinhFormatted = hs.ngaySinh ? new Date(hs.ngaySinh).toISOString().split('T')[0] : '';
+
+    let policyId = this.policies.find(p => p.ten === hs.chinhSach)?.id || '';
+
     this.editStudent = {
-      code: hs.code,
-      ten: hs.ten,
-      gioiTinh: hs.gioiTinh,
-      ngaySinh: hs.ngaySinh ? this.formatDate(hs.ngaySinh) : '',
-      email: hs.email,
-      soDienThoai: hs.soDienThoai,
-      truongDangHoc: hs.truongDangHoc,
-      chinhSach: hs.chinhSach,
-      province: hs.province || '',
-      district: hs.district || '',
-      diaChi: hs.diaChi
+        code: hs.code,
+        ten: hs.ten,
+        gioiTinh: hs.gioiTinh,
+        ngaySinh: ngaySinhFormatted,
+        email: hs.email,
+        soDienThoai: hs.soDienThoai,
+        truongDangHoc: hs.truongDangHoc,
+        lop: hs.lop,
+        chinhSachId: policyId, 
+        province: provinceCode,
+        district: districtCode,
+        diaChiCuThe: detailAddress 
     };
-    // Cập nhật quận/huyện khi province thay đổi
-    this.onProvinceChangeForEdit(this.editStudent.province);
+
+    console.log("✅ Dữ liệu sau khi tách địa chỉ:", this.editStudent);
 
     this.isEditModalOpen = true;
-  }
+}
+
   closeEditModal() {
     this.isEditModalOpen = false;
   }
@@ -350,9 +382,18 @@ console.log("📌 Students Length:", this.students.length);
     this.isEditModalOpen = false;
   }
   onProvinceChangeForEdit(provinceCode: string) {
-    const selectedProvince = this.provinces.find(p => p.code === provinceCode);
-    this.editDistricts = selectedProvince ? selectedProvince.districts : [];
-  }
+    const selectedProvince = this.provinces.find(p => String(p.code) === String(provinceCode));
+
+    if (selectedProvince) {
+        this.editDistricts = selectedProvince.districts;
+    } else {
+        
+        this.editDistricts = [];
+    }
+
+    this.editStudent.district = '';
+}
+
 
   // Hàm format date => yyyy-MM-dd
   formatDate(date: Date) {
