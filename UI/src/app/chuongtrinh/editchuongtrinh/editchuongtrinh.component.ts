@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChuongtrinhService } from '../shared/chuongtrinh.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-editchuongtrinh',
@@ -16,13 +17,20 @@ export class EditchuongtrinhComponent implements OnInit {
     noiDungBaiHocs: []
   };
 
+  errors: any = {
+    tieuDe: '',
+    moTa: '',
+    noiDungBaiHocs: []
+  };
+
   draggedLessonIndex: number | null = null; // Lưu vị trí bài học đang kéo
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private chuongtrinhService: ChuongtrinhService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toastr: ToastrService
   ) { }
 
   ngOnInit(): void {
@@ -65,6 +73,57 @@ export class EditchuongtrinhComponent implements OnInit {
        
       }
     });
+  }
+ validateField(field: string) {
+    if (!this.program[field]?.trim()) {
+      this.errors[field] = 'Trường này không được để trống!';
+    } else if (field === 'tieuDe' && this.program.tieuDe.length > 200) {
+      this.errors.tieuDe = 'Tiêu đề không được vượt quá 200 ký tự!';
+    } else if (field === 'moTa' && this.program.moTa.length > 300) {
+      this.errors.moTa = 'Mô tả không được vượt quá 300 ký tự!';
+    } else {
+      this.errors[field] = '';
+    }
+  }
+
+  /** ✅ Kiểm tra nội dung bài học */
+  validateLesson(index: number, field: string) {
+    if (!this.errors.noiDungBaiHocs[index]) {
+      this.errors.noiDungBaiHocs[index] = {};
+    }
+    
+    const value = this.program.noiDungBaiHocs[index][field]?.trim();
+    
+    if (!value) {
+      this.errors.noiDungBaiHocs[index][field] = 'Trường này không được để trống!';
+    } else if (field === 'tieuDe' && value.length > 200) {
+      this.errors.noiDungBaiHocs[index][field] = 'Tiêu đề không được vượt quá 200 ký tự!';
+    } else if (field === 'mota' && value.length > 300) {
+      this.errors.noiDungBaiHocs[index][field] = 'Mô tả không được vượt quá 300 ký tự!';
+    } else {
+      this.errors.noiDungBaiHocs[index][field] = '';
+    }
+  }
+
+  /** ✅ Kiểm tra toàn bộ dữ liệu trước khi gửi */
+  isFormValid() {
+    let valid = true;
+
+    ['tieuDe', 'moTa'].forEach(field => {
+      this.validateField(field);
+      if (this.errors[field]) valid = false;
+    });
+
+    this.errors.noiDungBaiHocs = [];
+    this.program.noiDungBaiHocs.forEach((lesson, index) => {
+      this.errors.noiDungBaiHocs[index] = {};
+      ['tieuDe', 'mota'].forEach(field => {
+        this.validateLesson(index, field);
+        if (this.errors.noiDungBaiHocs[index][field]) valid = false;
+      });
+    });
+
+    return valid;
   }
 
   /** ✅ Thêm bài học mới */
@@ -155,6 +214,10 @@ export class EditchuongtrinhComponent implements OnInit {
   /** ✅ Gửi chương trình đã chỉnh sửa lên API */
   saveProgram() {
    
+    if (!this.isFormValid()) {
+      this.toastr.warning('Vui lòng điền đầy đủ thông tin!');
+      return;
+    }
 
     const formData = new FormData();
     formData.append('chuongTrinhDto.id', this.program.id);
@@ -183,9 +246,9 @@ export class EditchuongtrinhComponent implements OnInit {
     this.chuongtrinhService.updateProgram(formData).subscribe({
       next: (response) => {
         if (response.isError) {
-          alert(`❌ Lỗi: ${response.message || "Có lỗi xảy ra!"}`);
+          this.toastr.warning(`❌ Lỗi: ${response.message || "Có lỗi xảy ra!"}`);
         } else {
-          alert("✅ Cập nhật chương trình thành công!");
+          this.toastr.success("Cập nhật chương trình thành công!");
           this.router.navigate(['/chuongtrinh']);
         }
       },
