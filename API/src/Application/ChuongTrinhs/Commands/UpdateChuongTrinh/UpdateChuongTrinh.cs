@@ -52,7 +52,7 @@ public class UpdateChuongTrinhCommandHandler : IRequestHandler<UpdateChuongTrinh
                 if (!string.IsNullOrEmpty(noiDungDto.Id))
                 {
                     var noiDung = await _context.NoiDungBaiHocs
-                        .FindAsync(new object[] { noiDungDto.Id }, cancellationToken);
+                        .FindAsync(new object[] { Guid.Parse(noiDungDto.Id) }, cancellationToken);
                     if (noiDung == null || noiDung.ChuongTrinhId != chuongTrinhDto.Id)
                     {
                         throw new NotFoundIDException();
@@ -65,7 +65,7 @@ public class UpdateChuongTrinhCommandHandler : IRequestHandler<UpdateChuongTrinh
                             if (!string.IsNullOrEmpty(taiLieuDto.Id))
                             {
                                 var taiLieu = await _context.TaiLieuHocTaps
-                                    .FindAsync(new object[] { taiLieuDto.Id }, cancellationToken);
+                                    .FindAsync(new object[] { Guid.Parse(taiLieuDto.Id) }, cancellationToken);
                                 if (taiLieu == null 
                                     || taiLieu.NoiDungBaiHocId != Guid.Parse(noiDungDto.Id))
                                 {
@@ -196,7 +196,6 @@ public class UpdateChuongTrinhCommandHandler : IRequestHandler<UpdateChuongTrinh
         // Cập nhật thông tin ChuongTrinh
         chuongTrinh.TieuDe = chuongTrinhDto.TieuDe;
         chuongTrinh.MoTa = chuongTrinhDto.MoTa;
-        chuongTrinh.TrangThai = chuongTrinhDto.TrangThai;
         _context.ChuongTrinhs.Update(chuongTrinh);
         await _context.SaveChangesAsync(cancellationToken);
         return new Output
@@ -217,7 +216,8 @@ public class UpdateChuongTrinhCommandHandler : IRequestHandler<UpdateChuongTrinh
             try
             {
                 taiLieu.Ten = Path.GetFileNameWithoutExtension(taiLieuDto.File.FileName);
-                if (taiLieu.Ten.Length > 50) throw new FormatException();
+                if (taiLieu.Ten.Length > 200) 
+                    throw new FormatException("Tên của tài liệu không được vượt quá 200 ký tự");
                 var fileName = Guid.NewGuid().ToString() + Path.GetExtension(taiLieuDto.File.FileName);
                 var filePath = Path.Combine(_uploadFolderPath, fileName);
                 using (var stream = new FileStream(filePath, FileMode.Create))

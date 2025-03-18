@@ -78,7 +78,8 @@ public class CreateChuongTrinhCommandHandler : IRequestHandler<CreateChuongTrinh
                                 try
                                 {
                                     taiLieu.Ten = Path.GetFileNameWithoutExtension(taiLieuDto.File.FileName);
-                                    if (taiLieu.Ten.Length > 50) throw new FormatException();
+                                    if (taiLieu.Ten.Length > 200) 
+                                        throw new FormatException("Tên của tài liệu không được vượt quá 200 ký tự");
                                     var fileName = Guid.NewGuid().ToString() + Path.GetExtension(taiLieuDto.File.FileName);
                                     var filePath = Path.Combine(_uploadFolderPath, fileName);
                                     using (var stream = new FileStream(filePath, FileMode.Create))

@@ -113,7 +113,6 @@ export class AddchuongtrinhComponent {
         formData.append(`chuongTrinhDto.noiDungBaiHocs[${i}].taiLieuHocTaps[${j}].file`, file.file);
       });
     });
-
     this.chuongtrinhService.addProgram(formData).subscribe({
       next: (response) => {
         console.log('✅ Thêm chương trình thành công:', response);
