@@ -1,7 +1,9 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, ChangeDetectorRef } from '@angular/core';
 import { HocSinh } from './shared/hocsinh.model';
 import { HocSinhService } from './shared/hocsinh.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-hocsinh',
   templateUrl: './hocsinh.component.html',
@@ -21,20 +23,34 @@ export class HocsinhComponent implements OnInit {
     { code: 'Lớp 4', name: 'Lớp 4' },
     { code: 'Lớp 5 Anh', name: 'Lớp 5 Anh' },
   ];
-   // Mảng lọc khi tìm kiếm
    filteredClassOptions = this.classOptions.slice();
 
-   // Từ khoá gõ trong ô tìm kiếm
    lopSearchTerm: string = '';
  
-   // Trạng thái mở/đóng dropdown lớp
    lopDropdownOpen: boolean = false;
+
+   students: (HocSinh & { showDetails: boolean })[] = [];
+  provinces: any[] = [];
+  districts: any[] = [];
+  editDistricts: any[] = [];
+ // Phân trang
+ currentPage: number = 1;
+ pageSize: number = 8;
+ totalPages: number = 1;
+ totalItems: number = 0;
+
+ // Biến xử lý modal
+ addStudentForm: FormGroup;
+ isModalOpen: boolean = false;
+ isEditModalOpen: boolean = false;
+ newStudent: any = {};
+ editStudent: any = {};
+ policies: any[] = []; 
+
  
-   // Khi bấm vào vùng hiển thị "Lớp"
    toggleLopDropdown() {
      this.lopDropdownOpen = !this.lopDropdownOpen;
      if (this.lopDropdownOpen) {
-       // Reset tìm kiếm mỗi lần mở dropdown
        this.lopSearchTerm = '';
        this.filteredClassOptions = this.classOptions.slice();
      }
@@ -49,12 +65,7 @@ export class HocsinhComponent implements OnInit {
      );
    }
  
-   // Khi chọn 1 lớp
-   selectLop(option: { code: string; name: string }) {
-     // Ở đây ta gán lop = code hoặc name, tuỳ bạn muốn hiển thị
-     this.lop = option.name; // hoặc `${option.code} - ${option.name}`
-     this.lopDropdownOpen = false;
-   }
+   
  
    // Lắng nghe click ngoài dropdown => đóng dropdown
    @HostListener('document:click', ['$event'])
@@ -71,55 +82,14 @@ export class HocsinhComponent implements OnInit {
 
    
 
-  students: (HocSinh & { showDetails: boolean })[] = [
-    {
-      code: 'HE171450',
-      ten: 'Bùi Ngọc Dũng',
-      gioiTinh: 'Nam',
-      diaChi: '245 Phạm Ngọc Thạch, Đống Đa, TP Hà Nội',
-      lop: 'Lớp 1',
-      truongDangHoc: 'Trường Đại học FPT',
-      ngaySinh: new Date(2003, 6, 23),  // 6 = July
-      email: 'dungbnhe17457@fpt.edu.vn',
-      soDienThoai: '0123-456-789',
-      coSoId: 'cs1',
-      coso: {
-        id: 'cs1',
-        ten: 'Hoàng Văn Thái',
-        diaChi: '',
-        soDienThoai: '',
-        trangThai: '',
-        default: false
-      },
-      chinhSach: 'Cơ bản',
-      lopHocs: ['Toán 1', 'Tiếng Anh 1', 'Tiếng Việt 1'],
-      showDetails: false
-    },
-    {
-      code: 'HE171466',
-      ten: 'Ngô Minh Kiên',
-      gioiTinh: 'Nam',
-      diaChi: 'Long Biên, Hà Nội',
-      lop: 'Lớp 1',
-      truongDangHoc: 'Trường Đại học FPT',
-      ngaySinh: new Date(2003, 4, 10),  // 4 = May (hiển thị June)
-      email: 'kiennmhe17146@fpt.edu.vn',
-      soDienThoai: '0987-654-321',
-      coSoId: 'cs2',
-      coso: {
-        id: 'cs2',
-        ten: 'Phạm Văn Đồng',
-        diaChi: '',
-        soDienThoai: '',
-        trangThai: '',
-        default: false
-      },
-      chinhSach: 'Nâng cao',
-      lopHocs: ['Lớp Toán 2', 'Lớp Anh 2'],
-      showDetails: false
-    }
-  ];
+  
 
+   searchHocSinh() {
+    this.currentPage = 1;
+    this.loadDanhSachHocSinh();
+  }
+
+  /** Mở rộng chi tiết */
   toggleDetails(index: number) {
     this.students[index].showDetails = !this.students[index].showDetails;
   }
@@ -134,31 +104,16 @@ export class HocsinhComponent implements OnInit {
     alert('Xuất Tệp');
   }
 
-  currentPage: number = 1;
-  totalPages: number = 2;
+
 
   goToPage(page: number) {
     this.currentPage = page;
   }
 
-  // --- Pop-up "Thêm Học Viên Mới" (các biến mới) ---
-  isModalOpen: boolean = false;
-
-  newStudent: any = {
-    code: '',
-    ten: '',
-    gioiTinh: 'Nam',
-    ngaySinh: '',
-    email: '',
-    soDienThoai: '',
-    truongDangHoc: '',
-    chinhSach: '',
-    province: '',
-    district: '',
-    diaChi: ''
-  };
+  
 
   openAddStudentModal() {
+    this.addStudentForm.reset();
     this.isModalOpen = true;
   }
 
@@ -167,105 +122,241 @@ export class HocsinhComponent implements OnInit {
   }
 
   submitNewStudent() {
-    console.log('Thêm học viên mới:', this.newStudent);
-    const newHs: HocSinh & { showDetails: boolean } = {
-      code: this.newStudent.code,
-      ten: this.newStudent.ten,
-      gioiTinh: this.newStudent.gioiTinh,
-      ngaySinh: this.newStudent.ngaySinh ? new Date(this.newStudent.ngaySinh) : new Date(),
-      email: this.newStudent.email,
-      soDienThoai: this.newStudent.soDienThoai,
-      diaChi: this.newStudent.diaChi,
-      lop: '',
-      truongDangHoc: this.newStudent.truongDangHoc,
-      coSoId: '',
-      coso: { id: '', ten: '', diaChi: '', soDienThoai: '', trangThai: '', default: false },
-      chinhSach: this.newStudent.chinhSach,
-      lopHocs: [],
-      showDetails: false
-    };
-    this.students.push(newHs);
-    this.newStudent = {
-      code: '',
-      ten: '',
-      gioiTinh: 'Nam',
-      ngaySinh: '',
-      email: '',
-      soDienThoai: '',
-      truongDangHoc: '',
-      chinhSach: '',
-      province: '',
-      district: '',
-      diaChi: ''
-    };
-    this.isModalOpen = false;
-  }
-
+    console.log("🚀 Hàm submitNewStudent() được gọi!");
   
-  provinces: any[] = [];
-  districts: any[] = [];
+    if (this.addStudentForm.invalid) {
+      console.log("❌ Form không hợp lệ", this.addStudentForm.errors);
+      this.addStudentForm.markAllAsTouched();
+      return;
+    }
+  
+    const formData = this.addStudentForm.value;
+  
+    // ✅ Xử lý địa chỉ đầy đủ
+    const provinceObj = this.provinces.find(p => p.code == formData.province);
+    const provinceName = provinceObj ? provinceObj.name : '';
+  
+    const districtObj = this.districts.find(d => d.code == formData.district);
+    const districtName = districtObj ? districtObj.name : '';
+  
+    const diaChiFormatted = `${provinceName}, ${districtName}, ${formData.diaChiCuThe}`;
+  
+    // ✅ Xử lý chính sách học phí, nếu "Không chọn" thì đặt là `null` hoặc loại bỏ hoàn toàn
+    let selectedPolicy = formData.chinhSachId;
+    if (!selectedPolicy || selectedPolicy === "" || selectedPolicy === "-- Không chọn --") {
+      selectedPolicy = null; // Có thể thử null hoặc không gửi key này đi
+    }
+  
+    const newStudent = {
+      code: formData.code,
+      ten: formData.ten,
+      gioiTinh: formData.gioiTinh,
+      ngaySinh: formData.ngaySinh,
+      email: formData.email,
+      soDienThoai: formData.soDienThoai,
+      truongDangHoc: formData.truongDangHoc,
+      lop: formData.lop,
+      diaChi: diaChiFormatted,
+      ...(selectedPolicy !== null && { chinhSachId: selectedPolicy }) 
+    };
+  
+    console.log("📤 Gửi API thêm học sinh:", newStudent);
+  
+    this.hocSinhService.createHocSinh(newStudent).subscribe({
+      next: (res) => {
+        console.log("📌 Phản hồi từ API:", res);
+        if (!res.isError) {
+          this.toastr.success("Thêm học sinh thành công!", "Thành công");
+          this.closeModal();
+          this.loadDanhSachHocSinh();
+        } else {
+          this.toastr.error(res.message, "Lỗi");
+        }
+      },
+      error: (err) => {
+        console.error("❌ Lỗi khi gọi API:", err);
+        this.toastr.error("Có lỗi xảy ra, vui lòng thử lại!", "Lỗi");
+      }
+    });
+  }
+  
 
-  constructor(private hocSinhService: HocSinhService,private router: Router) {}
+
+  constructor(private hocSinhService: HocSinhService,private router: Router,private cdr: ChangeDetectorRef, 
+    private toastr: ToastrService,
+    private fb: FormBuilder) {
+      // Form thêm học sinh
+    this.addStudentForm = this.fb.group({
+      code: ['', [Validators.required, Validators.maxLength(18)]],
+      ten: ['', [Validators.required, Validators.maxLength(50)]],
+      gioiTinh: ['Nam', Validators.required],
+      ngaySinh: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      soDienThoai: ['', [Validators.required, Validators.pattern(/^0\d{9,10}$/)]],
+      truongDangHoc: ['', Validators.required],
+      lop: ['', Validators.required], 
+      province: ['', Validators.required],  // Thành phố
+      district: ['', Validators.required],  // Quận/Huyện
+      diaChiCuThe: ['', Validators.required], // Địa chỉ cụ thể
+      chinhSachId: ['']
+    });
+    }
 
   ngOnInit(): void {
-    this.hocSinhService.getProvinces().subscribe(
-      data => {
-        this.provinces = data;
+    this.loadDanhSachHocSinh();
+    this.loadProvinces();
+    this.loadDanhSachChinhSach();
+  }
+
+  loadDanhSachChinhSach() {
+    this.hocSinhService.getDanhSachChinhSach().subscribe(
+      response => {
+        if (!response.isError && response.data) {
+          this.policies = response.data; // Gán dữ liệu vào biến policies
+          console.log("📌 Danh sách chính sách:", this.policies);
+        } else {
+          this.policies = [];
+          console.error("Lỗi tải danh sách chính sách!");
+        }
       },
       error => {
-        console.error('Error fetching provinces:', error);
+        console.error("❌ Lỗi khi gọi API danh sách chính sách:", error);
       }
     );
   }
 
   onProvinceChange(provinceCode: string) {
     const selectedProvince = this.provinces.find(p => p.code == provinceCode);
-    if (selectedProvince) {
-      this.districts = selectedProvince.districts;
-    } else {
-      this.districts = [];
-    }
+    this.districts = selectedProvince ? selectedProvince.districts : [];
   }
 
- 
-  isEditModalOpen: boolean = false;
-  editStudent: any = {
-    code: '',
-    ten: '',
-    gioiTinh: 'Nam',
-    ngaySinh: '',
-    email: '',
-    soDienThoai: '',
-    truongDangHoc: '',
-    chinhSach: '',
-    province: '',
-    district: '',
-    diaChi: ''
-  };
-  editDistricts: any[] = [];
+  extractAddressParts(diaChi: string): { province: string, district: string, detail: string } {
+    const parts = diaChi.split(',').map(part => part.trim());
+    return {
+      province: parts[0] || '',
+      district: parts[1] || '',
+      detail: parts.slice(2).join(', ') || ''
+    };
+  }
+  loadDanhSachHocSinh() {
+    let isActiveFilter: boolean | null = this.trangThai === 'Hoạt động' ? true : this.trangThai === 'Tạm ngừng' ? false : null;
 
-  // Khi bấm nút “Sửa” ở bảng
+    this.hocSinhService.getDanhSachHocSinh(this.currentPage, this.pageSize, this.searchTerm, '', isActiveFilter, '')
+      .subscribe(response => {
+        console.log("📌 API Response:", response);
+
+        if (!response.isError && response.data && response.data.items) {
+          this.students = response.data.items.map((hs: any) => ({
+            code: hs.code || '',
+            ten: hs.ten || '',
+            gioiTinh: hs.gioiTinh || '',
+            diaChi: hs.diaChi || '',
+            lop: hs.lop || '',
+            truongDangHoc: hs.truongDangHoc || '',
+            ngaySinh: hs.ngaySinh ? new Date(hs.ngaySinh) : null,
+            email: hs.email || '',
+            soDienThoai: hs.soDienThoai || '',
+            isActive: hs.isActive !== undefined ? hs.isActive : false,
+            chinhSach: hs.tenChinhSach && hs.tenChinhSach.trim() !== '' ? hs.tenChinhSach : 'Cơ bản',
+            lopHocs: hs.tenLops ? hs.tenLops : [],
+            showDetails: false
+          }));
+
+          this.totalItems = response.data.totalCount || 0;
+          this.totalPages = Math.ceil(this.totalItems / this.pageSize);
+
+          console.log("📌 Tổng số học sinh:", this.totalItems);
+          console.log("📌 Tổng số trang:", this.totalPages);
+
+          this.cdr.detectChanges();
+        } else {
+          this.students = [];
+          this.totalItems = 0;
+          this.totalPages = 1;
+        }
+      });
+}
+
+
+  changePage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+        this.currentPage = page;
+        console.log("📌 Chuyển trang:", this.currentPage);
+        this.loadDanhSachHocSinh();  
+    }
+}
+
+  
+  
+  filterByStatus() {
+    this.currentPage = 1; 
+    this.loadDanhSachHocSinh();
+  }
+
+
+  /** 🔍 Tìm kiếm theo lớp */
+  selectLop(option: { code: string; name: string }) {
+    this.lop = option.name;
+    this.lopDropdownOpen = false;
+    this.loadDanhSachHocSinh();
+  }
+
+  /** 🗺️ Lấy danh sách tỉnh/thành phố */
+  loadProvinces() {
+    this.hocSinhService.getProvinces().subscribe(
+      data => {
+        this.provinces = data;
+      },
+      error => {
+        console.error('Lỗi tải danh sách tỉnh/thành phố:', error);
+      }
+    );
+  }
+ 
+  
+
   onEditStudentClick(index: number) {
     const hs = this.students[index];
-    // Copy data sang editStudent
+    console.log("📝 Học sinh được chọn để chỉnh sửa:", hs);
+
+    const addressParts = hs.diaChi ? hs.diaChi.split(',').map(part => part.trim()) : ['', '', ''];
+    const provinceName = addressParts[0] || ''; 
+    const districtName = addressParts[1] || '';
+    const detailAddress = addressParts[2] || ''; 
+
+
+    const provinceObj = this.provinces.find(p => p.name === provinceName);
+    const provinceCode = provinceObj ? provinceObj.code : '';
+
+    this.onProvinceChangeForEdit(provinceCode);
+
+    const districtObj = provinceObj?.districts.find(d => d.name === districtName);
+    const districtCode = districtObj ? districtObj.code : '';
+
+    const ngaySinhFormatted = hs.ngaySinh ? new Date(hs.ngaySinh).toISOString().split('T')[0] : '';
+
+    let policyId = this.policies.find(p => p.ten === hs.chinhSach)?.id || '';
+
     this.editStudent = {
-      code: hs.code,
-      ten: hs.ten,
-      gioiTinh: hs.gioiTinh,
-      ngaySinh: hs.ngaySinh ? this.formatDate(hs.ngaySinh) : '',
-      email: hs.email,
-      soDienThoai: hs.soDienThoai,
-      truongDangHoc: hs.truongDangHoc,
-      chinhSach: hs.chinhSach,
-      province: hs.province || '',
-      district: hs.district || '',
-      diaChi: hs.diaChi
+        code: hs.code,
+        ten: hs.ten,
+        gioiTinh: hs.gioiTinh,
+        ngaySinh: ngaySinhFormatted,
+        email: hs.email,
+        soDienThoai: hs.soDienThoai,
+        truongDangHoc: hs.truongDangHoc,
+        lop: hs.lop,
+        chinhSachId: policyId, 
+        province: provinceCode,
+        district: districtCode,
+        diaChiCuThe: detailAddress 
     };
-    // Cập nhật quận/huyện khi province thay đổi
-    this.onProvinceChangeForEdit(this.editStudent.province);
+
+    console.log("✅ Dữ liệu sau khi tách địa chỉ:", this.editStudent);
 
     this.isEditModalOpen = true;
-  }
+}
+
   closeEditModal() {
     this.isEditModalOpen = false;
   }
@@ -288,9 +379,18 @@ export class HocsinhComponent implements OnInit {
     this.isEditModalOpen = false;
   }
   onProvinceChangeForEdit(provinceCode: string) {
-    const selectedProvince = this.provinces.find(p => p.code === provinceCode);
-    this.editDistricts = selectedProvince ? selectedProvince.districts : [];
-  }
+    const selectedProvince = this.provinces.find(p => String(p.code) === String(provinceCode));
+
+    if (selectedProvince) {
+        this.editDistricts = selectedProvince.districts;
+    } else {
+        
+        this.editDistricts = [];
+    }
+
+    this.editStudent.district = '';
+}
+
 
   // Hàm format date => yyyy-MM-dd
   formatDate(date: Date) {
