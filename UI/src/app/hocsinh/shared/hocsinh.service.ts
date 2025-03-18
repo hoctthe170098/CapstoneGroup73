@@ -40,4 +40,9 @@ export class HocSinhService {
 
     return this.http.get<any>(`${this.CHINH_SACH_URL}/getallchinhsachs`, { headers });
   }
+  createHocSinh(hocSinhData: any): Observable<any> {
+    const token = localStorage.getItem('token'); // 🔑 Lấy token
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post(`${this.baseUrl}/createhocsinh`, hocSinhData, { headers });
+  }
 }
