@@ -22,7 +22,7 @@ export class ChuongtrinhService {
   }
 
   /** 🔥 Lấy danh sách chương trình từ API */
-  getPrograms(page: number = 1, search: string = "", pageSize: number = 2): Observable<any> {
+  getPrograms(page: number = 1, search: string = "", pageSize: number = 4 ): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/getchuongtrinhs`, {
       search: search, // ✅ Thêm từ khóa tìm kiếm
       pageNumber: page,
@@ -97,21 +97,21 @@ export class ChuongtrinhService {
   }
 
   /** 🔥 Upload file tài liệu học tập */
-  uploadFile(file: File): Observable<string> {
-    const formData = new FormData();
-    formData.append('file', file);
+  // uploadFile(file: File): Observable<string> {
+  //   const formData = new FormData();
+  //   formData.append('file', file);
 
-    return this.http.post<{ fileUrl: string }>(
-      `${this.apiUrl}/uploadfile`, 
-      formData
-    ).pipe(
-      map(response => response.fileUrl),
-      catchError(error => {
-        console.error('❌ Lỗi khi tải lên file:', error);
-        return throwError(() => error);
-      })
-    );
-  }
+  //   return this.http.post<{ fileUrl: string }>(
+  //     `${this.apiUrl}/uploadfile`, 
+  //     formData
+  //   ).pipe(
+  //     map(response => response.fileUrl),
+  //     catchError(error => {
+  //       console.error('❌ Lỗi khi tải lên file:', error);
+  //       return throwError(() => error);
+  //     })
+  //   );
+  // }
 
   /** 🔥 Tải xuống tài liệu học tập */
   downloadFile(filePath: string): Observable<Blob> {

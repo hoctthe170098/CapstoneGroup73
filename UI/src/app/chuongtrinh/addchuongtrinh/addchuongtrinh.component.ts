@@ -53,12 +53,12 @@ export class AddchuongtrinhComponent {
     this.program.noiDungBaiHocs[index].expanded = !this.program.noiDungBaiHocs[index].expanded;
   }
 
-  /** ✅ Xử lý tải file lên */
+  /** ✅ Xử lý tải file lên (chỉ lưu tạm, không upload ngay) */
   onFileChange(event: Event, lessonIndex: number) {
     const files = (event.target as HTMLInputElement).files;
     if (files) {
       for (let i = 0; i < files.length; i++) {
-        this.uploadFile(files[i], lessonIndex);
+        this.addFileToLesson(files[i], lessonIndex);
       }
     }
   }
@@ -72,13 +72,13 @@ export class AddchuongtrinhComponent {
     event.preventDefault();
     if (event.dataTransfer?.files.length) {
       for (let i = 0; i < event.dataTransfer.files.length; i++) {
-        this.uploadFile(event.dataTransfer.files[i], lessonIndex);
+        this.addFileToLesson(event.dataTransfer.files[i], lessonIndex);
       }
     }
   }
 
-  /** ✅ Upload file vào danh sách */
-  uploadFile(file: File, lessonIndex: number) {
+  /** ✅ Lưu file vào danh sách bài học (Không upload ngay) */
+  addFileToLesson(file: File, lessonIndex: number) {
     const allowedTypes = ['application/pdf', 'video/mp4', 'application/msword'];
     if (!allowedTypes.includes(file.type)) {
       alert('Chỉ chấp nhận file .pdf, .mp4, .doc!');
@@ -96,10 +96,10 @@ export class AddchuongtrinhComponent {
     this.program.noiDungBaiHocs[lessonIndex].taiLieuHocTaps.splice(fileIndex, 1);
   }
 
-  /** ✅ Gửi chương trình lên API */
+  /** ✅ Gửi chương trình lên API (bao gồm cả file) */
   saveProgram() {
     const formData = new FormData();
-    
+
     formData.append('chuongTrinhDto.tieuDe', this.program.tieuDe);
     formData.append('chuongTrinhDto.moTa', this.program.moTa);
 
@@ -113,6 +113,7 @@ export class AddchuongtrinhComponent {
         formData.append(`chuongTrinhDto.noiDungBaiHocs[${i}].taiLieuHocTaps[${j}].file`, file.file);
       });
     });
+
     this.chuongtrinhService.addProgram(formData).subscribe({
       next: (response) => {
         console.log('✅ Thêm chương trình thành công:', response);
@@ -131,4 +132,3 @@ export class AddchuongtrinhComponent {
     this.router.navigate(['/chuongtrinh']);
   }
 }
-  
