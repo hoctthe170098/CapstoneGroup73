@@ -1,0 +1,193 @@
+  <!-- Phần container bọc toàn bộ nội dung -->
+  <div class="container-fluid">
+      <!-- Tiêu đề -->
+      <h2 class="mb-3">THÊM LỚP HỌC</h2>
+    
+      <!-- Khung trắng (card) bao quanh form -->
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <form [formGroup]="themLopForm" (ngSubmit)="onSubmit()">
+            <!-- Hàng đầu: Tên lớp, Chương trình học, Phòng -->
+            <div class="row">
+              <!-- Tên lớp -->
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="tenLop">Tên lớp</label>
+                  <input
+                    id="tenLop"
+                    type="text"
+                    class="form-control"
+                    formControlName="tenLop"
+                    placeholder="Nhập tên lớp"
+                  />
+                  <small class="text-danger" *ngIf="themLopForm.get('tenLop').touched && themLopForm.get('tenLop').hasError('required')">
+                    Tên lớp không được để trống!
+                  </small>
+                  
+                </div>
+              </div>
+    
+              <!-- Chương trình học -->
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="chuongTrinh">Chương trình học</label>
+                  <select id="chuongTrinh" class="form-control" formControlName="chuongTrinh">
+                    <option [ngValue]="null" disabled>Chọn chương trình học</option>
+                    <option *ngFor="let ct of chuongTrinhList" [ngValue]="ct">
+                      {{ ct.tenChuongTrinh }}
+                    </option>
+                  </select>
+                  <small class="text-danger" *ngIf="themLopForm.get('chuongTrinh').touched && themLopForm.get('chuongTrinh').hasError('required')">
+                    Vui lòng chọn chương trình học!
+                  </small>
+                </div>
+              </div>
+    </div>
+    
+            <!-- Học phí, Giáo viên, Ngày bắt đầu, Ngày kết thúc -->
+            <div class="row">
+              <!-- Học phí -->
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="hocPhi">Học phí</label>
+                  <input id="hocPhi" type="number" class="form-control" formControlName="hocPhi" placeholder="Nhập học phí" />
+                  <small class="text-danger" *ngIf="themLopForm.get('hocPhi').touched && themLopForm.get('hocPhi').hasError('required')">
+                    Học phí không được để trống!
+                  </small>
+                  <small class="text-danger" *ngIf="themLopForm.get('hocPhi').touched && themLopForm.get('hocPhi').hasError('min')">
+                    Học phí phải lớn hơn hoặc bằng 400.000!
+                  </small>
+                </div>
+              </div>
+    
+              <!-- Giáo viên -->
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="giaoVien">Giáo viên</label>
+                  <select id="giaoVien" class="form-control" formControlName="giaoVien">
+                    <option [ngValue]="null" disabled>Chọn giáo viên</option>
+                    <option *ngFor="let gv of giaoVienList" [ngValue]="gv">
+                      {{ gv.tenGiaoVien }}
+                    </option>
+                  </select>
+                  <small class="text-danger" *ngIf="themLopForm.get('giaoVien').touched && themLopForm.get('giaoVien').hasError('required')">
+                    Vui lòng chọn giáo viên!
+                  </small>
+                </div>
+              </div>
+    
+              <!-- Ngày bắt đầu -->
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="ngayBatDau">Ngày bắt đầu</label>
+                  <input id="ngayBatDau" type="date" class="form-control" formControlName="ngayBatDau" />
+                  <small class="text-danger" *ngIf="themLopForm.get('ngayBatDau').touched && themLopForm.get('ngayBatDau').hasError('required')">
+                    Vui lòng chọn ngày bắt đầu!
+                  </small>
+                  <small class="text-danger" *ngIf="themLopForm.get('ngayBatDau').touched && themLopForm.get('ngayBatDau').hasError('invalidStartDate')">
+                    Ngày bắt đầu phải từ hôm nay trở đi!
+                  </small>
+                </div>
+              </div>
+    
+              <!-- Ngày kết thúc -->
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="ngayKetThuc">Ngày kết thúc</label>
+                  <input id="ngayKetThuc" type="date" class="form-control" formControlName="ngayKetThuc" />
+                  <small class="text-danger" *ngIf="themLopForm.get('ngayKetThuc').touched && themLopForm.get('ngayKetThuc').hasError('required')">
+                    Vui lòng chọn ngày kết thúc!
+                  </small>
+                  <small class="text-danger" *ngIf="themLopForm.get('ngayKetThuc').touched && themLopForm.get('ngayKetThuc').hasError('invalidEndDate')">
+                    Ngày kết thúc phải sau ít nhất 2 tháng kể từ ngày bắt đầu!
+                  </small>
+                </div>
+              </div>
+            </div>
+    
+            <!-- Lịch học trong tuần -->
+            <div class="mt-3">
+              <label class="form-label fw-bold">Lịch Học Trong Tuần</label>
+            </div>
+    
+            <div formArrayName="lichHoc">
+              <div class="form-group row align-items-center" *ngFor="let schedule of lichHoc.controls; let i = index" [formGroupName]="i">
+                <div class="col-md-3 mb-2">
+                  <label for="Chonthutrongtuan">Thứ trong tuần</label>
+                  <select class="form-control" formControlName="thu">
+                    
+                    <option value="" selected>Chọn thứ trong tuần</option>
+                    <option value="2">Thứ hai</option>
+                    <option value="3">Thứ ba</option>
+                    <option value="4">Thứ tư</option>
+                    <option value="5">Thứ năm</option>
+                    <option value="6">Thứ sáu</option>
+                    <option value="7">Thứ bảy</option>
+                    <option value="8">Chủ nhật</option>
+                  </select>
+                  <small class="text-danger" *ngIf="schedule.get('thu').touched && schedule.get('thu').hasError('required')">
+                      Vui lòng chọn thứ trong tuần!
+                    </small>
+                    <small class="text-danger" *ngIf="lichHoc.hasError('duplicateDays')">
+                      Không được chọn trùng thứ trong tuần!
+                    </small>
+                </div>
+    
+                <div class="col-md-2 mb-2">
+                  <label for="gioBatDau">Giờ bắt đầu</label>
+                  <input type="time" class="form-control" formControlName="gioBatDau" placeholder="Giờ bắt đầu" />
+                  <small class="text-danger" *ngIf="schedule.get('gioBatDau').touched && schedule.get('gioBatDau').hasError('required')">
+                      Vui lòng chọn giờ bắt đầu!
+                    </small>
+                    <small class="text-danger" *ngIf="schedule.get('gioBatDau').hasError('invalidStartTime')">
+                      Giờ bắt đầu phải từ 08:00 sáng trở đi!
+                    </small>
+                </div>
+    
+                <div class="col-md-2 mb-2">
+                  <label for="gioKetThuc">Giờ kết thúc</label>
+                  <input type="time" class="form-control" formControlName="gioKetThuc" placeholder="Giờ kết thúc" />
+                  <small class="text-danger" *ngIf="schedule.get('gioKetThuc').touched && schedule.get('gioKetThuc').hasError('required')">
+                      Vui lòng chọn giờ kết thúc!
+                    </small>
+                    <small class="text-danger" *ngIf="schedule.get('gioKetThuc').hasError('invalidEndTime')">
+                      Giờ kết thúc không được sau 10:00 tối!
+                    </small>
+                </div>
+                <!-- Phòng -->
+              <div class="col-md-2 mb-2">
+                
+                  <label for="phong">Phòng</label>
+                  <select id="phong" class="form-control" formControlName="phong">
+                    <option [ngValue]="null">Chọn phòng</option>
+                    <option *ngFor="let p of phongList" [ngValue]="p">
+                      {{ p.tenPhong }}
+                    </option>>
+                  </select>
+                  <small class="text-danger" *ngIf="schedule.get('phong').touched && schedule.get('phong').hasError('required')">
+                    Vui lòng chọn phòng học!
+                  </small>
+                  
+                
+              </div>
+                
+    
+              <div class="col-md-2 mb-2 d-flex flex-column align-items-center justify-content-center">
+                <span class="mb-1" style="visibility: hidden;">Xóa</span> 
+                <button type="button" class="btn btn-danger" (click)="removeSchedule(i)">-</button>
+              </div>  
+            </div>
+    
+              <button type="button" class="btn btn-primary mt-2" (click)="addSchedule()">+</button>
+            </div>
+    
+            <!-- Nút Hủy & Thêm -->
+            <div class="d-flex justify-content-end mt-4">
+              <button class="btn btn-danger ms-2" (click)="onCancel()">Hủy</button>
+              <button class="btn btn-success" type="submit">Thêm</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    
