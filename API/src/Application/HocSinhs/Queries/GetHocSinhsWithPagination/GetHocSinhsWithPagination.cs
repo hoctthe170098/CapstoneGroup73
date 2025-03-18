@@ -43,15 +43,15 @@ public class GetHocSinhsWithPaginationQueryHandler
             if (request.PageNumber < 1 || request.PageSize < 1) throw new WrongInputException();
 
             // Lấy token từ request header
-            //var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            //if (string.IsNullOrEmpty(token))
-            //    throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
-            //var coSoId = _identityService.GetCampusId(token);
+            var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            if (string.IsNullOrEmpty(token))
+                throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+            var coSoId = _identityService.GetCampusId(token);
 
             var query = _context.HocSinhs
                 .Include(hs => hs.Coso)
                 .Include(hs => hs.ChinhSach)
-               // .Where(hs => hs.CoSoId == coSoId)
+                .Where(hs => hs.CoSoId == coSoId)
                 .AsQueryable();
 
             // Search name
@@ -92,17 +92,17 @@ public class GetHocSinhsWithPaginationQueryHandler
 
             var list = await query
                .ProjectTo<HocSinhDto>(_mapper.ConfigurationProvider)
-               .ToListAsync();
+               .PaginatedListAsync(request.PageNumber, request.PageSize);
 
             // Fetch class enrolled list of student
-            var hocSinhCodes = list.Select(hs => hs.Code).ToList();
+            var hocSinhCodes = list.Items.Select(hs => hs.Code).ToList();
             var thamGiaLopHocs = await _context.ThamGiaLopHocs
                 .Where(tg => hocSinhCodes.Contains(tg.HocSinhCode))
                 .Include(tg => tg.LichHoc)
                 .ToListAsync();
 
             // Assign student active status and class enrolled
-            foreach (var hocSinhDto in list)
+            foreach (var hocSinhDto in list.Items)
             {
                 var tenLops = thamGiaLopHocs
                     .Where(tg => tg.HocSinhCode == hocSinhDto.Code)
@@ -118,16 +118,10 @@ public class GetHocSinhsWithPaginationQueryHandler
                 }
             }
 
-            // Pagination
-            var paginatedList = list
-                .Skip((request.PageNumber - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToList();
-
             return new Output
             {
                 isError = false,
-                data = paginatedList,
+                data = list,
                 code = 200
             };
 
