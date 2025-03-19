@@ -7,6 +7,7 @@ using StudyFlow.Application.GiaoViens.Commands.CreateGiaoVien;
 using StudyFlow.Application.GiaoViens.Commands.EditGiaoVien;
 using StudyFlow.Application.GiaoViens.Commands.ExportGiaoViensToExcel;
 using StudyFlow.Application.GiaoViens.Commands.ImportGiaoViensFromExcel;
+using StudyFlow.Application.GiaoViens.Queries.GetGiaoViensByNameOrCode;
 using StudyFlow.Application.GiaoViens.Queries.GetGiaoViensWithPagination;
 using StudyFlow.Domain.Constants;
 
@@ -20,6 +21,7 @@ public class GiaoViens : EndpointGroupBase
             .DisableAntiforgery()
             .MapPost(CreateGiaoVien, "creategiaovien")
             .MapPost(GetGiaoViensWithPagination, "getgiaovienswithpagination")
+            .MapPost(GetGiaoViensByNameOrCode,"getgiaovienbycodeorname")
             .MapPut(EditGiaoVien, "editgiaovien")
             .MapPost(AddListGiaoViens, "addlistgiaoviens")
             .MapPost(ImportGiaoViensFromEXcel, "importgiaoviensfromexcel")
@@ -32,6 +34,11 @@ public class GiaoViens : EndpointGroupBase
     }
     [Authorize(Roles = Roles.CampusManager)]
     public async Task<Output> GetGiaoViensWithPagination(ISender sender, GetGiaoViensWithPaginationQuery query)
+    {
+        return await sender.Send(query);
+    }
+    [Authorize(Roles = Roles.CampusManager)]
+    public async Task<Output> GetGiaoViensByNameOrCode(ISender sender, GetGiaoViensByNameOrCodeQuery query)
     {
         return await sender.Send(query);
     }

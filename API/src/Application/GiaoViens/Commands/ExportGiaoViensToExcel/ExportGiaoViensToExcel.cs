@@ -33,9 +33,9 @@ public class ExportGiaoVienCommandHandler : IRequestHandler<ExportGiaoViensToExc
     public async Task<Output> Handle(ExportGiaoViensToExcelCommand request, CancellationToken cancellationToken)
     {
         var giaoViens = await _context.GiaoViens
-        .Include(gv => gv.Coso)
-        .Include(gv => gv.LicHocs)
-        .ToListAsync(cancellationToken);
+            .Include(gv => gv.Coso)
+            .Include(gv => gv.LichHocs)
+            .ToListAsync(cancellationToken);
 
         if (!giaoViens.Any())
         {
@@ -49,8 +49,19 @@ public class ExportGiaoVienCommandHandler : IRequestHandler<ExportGiaoViensToExc
             var headers = new[] { "Mã GV", "Tên", "Giới Tính", "Ngày Sinh", "Email", "Số Điện Thoại", "Địa Chỉ", "Trường Đang Dạy", "Tên Cơ Sở", "Danh Sách Lớp", "Trạng Thái" };
             for (int i = 0; i < headers.Length; i++)
             {
-                worksheet.Cells[1, i + 1].Value = headers[i];
-            }
+                Code = gv.Code,
+                Ten = gv.Ten,
+                GioiTinh = gv.GioiTinh,
+                NgaySinh = gv.NgaySinh,
+                Email = gv.Email,
+                SoDienThoai = gv.SoDienThoai,
+                DiaChi = gv.DiaChi,
+                TruongDangDay = gv.TruongDangDay,
+                TenCoSo = gv.Coso.Ten,
+                TenLops = gv.LichHocs.Select(lh => lh.TenLop).Distinct().ToList(),
+                IsActive = isActive
+            });
+        }
 
             for (int i = 0; i < giaoViens.Count; i++)
             {
