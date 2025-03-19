@@ -51,7 +51,7 @@ public class GetGiaoViensWithPaginationQueryHandler
 
             var query = _context.GiaoViens
                 .Include(nv => nv.Coso)
-                .Include(nv => nv.LicHocs)
+                .Include(nv => nv.LichHocs)
                 .Where(gv => gv.CoSoId == coSoId)
                 .AsQueryable();
 

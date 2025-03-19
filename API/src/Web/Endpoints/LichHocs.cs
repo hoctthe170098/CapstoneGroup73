@@ -17,7 +17,7 @@ public class LichHocs : EndpointGroupBase
             .MapGet(GetLichHocById, "getlichhocbyid");
     }
 
-    public async Task<Output> CreateLichHoc(ISender sender, [FromBody] CreateLichHocCommand command)
+    public async Task<Output> CreateLichHoc(ISender sender, CreateLichHocCommand command)
     {
         return await sender.Send(command);
     }

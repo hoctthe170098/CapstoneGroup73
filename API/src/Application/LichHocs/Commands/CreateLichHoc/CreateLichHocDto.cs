@@ -7,15 +7,11 @@ using System.Threading.Tasks;
 namespace StudyFlow.Application.LichHocs.Commands.CreateLichHoc;
 public class CreateLichHocDto
 {
-    public int Thu { get; set; }
-    public int PhongId { get; set; }
-    public string TenLop { get; set; } = string.Empty;
-    public string GioBatDau { get; set; } = string.Empty;
-    public string GioKetThuc { get; set; } = string.Empty;
-    public string NgayBatDau { get; set; } = string.Empty;
-    public string NgayKetThuc { get; set; } = string.Empty;
+    public required string TenLop { get; init; }
+    public required DateOnly NgayBatDau { get; init; } 
+    public required DateOnly NgayKetThuc { get; init; } 
     public int HocPhi { get; set; }
-    public string TrangThai { get; set; } = "NotYet";
-    public string GiaoVienCode { get; set; } = string.Empty;
+    public required string GiaoVienCode { get; init; } 
     public int ChuongTrinhId { get; set; }
+    public required List<LichHocDto> LichHocs { get; init; }
 }
