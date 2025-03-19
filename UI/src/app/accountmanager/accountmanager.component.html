@@ -2,10 +2,21 @@
   <!-- Tiêu đề -->
   <h2 class="page-title">DANH SÁCH NHÂN VIÊN</h2>
   <div class="filter-row">
+    <select class="form-control dropdown-filter" [(ngModel)]="cosoId" (change)="filterByCoSo()">
+      <option value="">Tất cả Cơ Sở</option>
+      <option *ngFor="let coso of cosoList" [value]="coso.id">
+        {{ coso.ten }}
+      </option>
+    </select>
     <select class="form-control dropdown-filter" [(ngModel)]="trangThai" (change)="filterByStatus()">
       <option value="">Tất cả trạng thái</option>
       <option value="Hoạt động">Hoạt động</option>
       <option value="Tạm ngừng">Không Hoạt Động</option>
+    </select>
+    <select class="form-control dropdown-filter" [(ngModel)]="roleName"  (change)="filterByRole()">
+      <option value="">Chọn Vai Trò</option>
+      <option value="CampusManager">Quản lý cơ sở</option>
+      <option value="LearningManager">Quản lý tài liệu học tập</option>
     </select>
     <input type="text" class="form-control search-input" placeholder="Tìm tên/code nhân viên..."
     [(ngModel)]="searchTerm" (ngModelChange)="searchNhanVien()" />
@@ -474,6 +485,10 @@
                   <div class="col-md-4 detail-item">
                     <label>Cơ Sở</label>
                     <div class="detail-box">{{ hs.tenCoSo }}</div>
+                  </div>
+                  <div class="col-md-4 detail-item">
+                    <label>Vai trò</label>
+                    <div class="detail-box">{{ tenVaiTro(hs.tenVaiTro) }}</div>
                   </div>
                 </div>
               </div>
