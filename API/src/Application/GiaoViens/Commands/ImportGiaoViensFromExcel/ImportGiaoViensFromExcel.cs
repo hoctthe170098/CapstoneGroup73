@@ -13,7 +13,7 @@ using StudyFlow.Application.GiaoViens.Queries.GetGiaoViensWithPagination.GetGiao
 using StudyFlow.Domain.Entities;
 
 namespace StudyFlow.Application.GiaoViens.Commands.ImportGiaoViensFromExcel;
-public record ImportGiaoViensFromExcelCommand() : IRequest<Output>
+public record ImportGiaoViensFromExcelCommand : IRequest<Output>
 {
     public required IFormFile File { get; init; }
 }

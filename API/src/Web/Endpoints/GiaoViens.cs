@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StudyFlow.Application.ChuongTrinhs.Commands.DowntaiLieuHocTap;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Application.GiaoViens.Commands.AddListGiaoViens;
 using StudyFlow.Application.GiaoViens.Commands.CreateGiaoVien;
@@ -16,6 +17,7 @@ public class GiaoViens : EndpointGroupBase
     public override void Map(WebApplication app)
     {
         app.MapGroup(this)
+            .DisableAntiforgery()
             .MapPost(CreateGiaoVien, "creategiaovien")
             .MapPost(GetGiaoViensWithPagination, "getgiaovienswithpagination")
             .MapPut(EditGiaoVien, "editgiaovien")
@@ -43,15 +45,31 @@ public class GiaoViens : EndpointGroupBase
     {
         return await sender.Send(comand);
     }
-    //[Authorize(Roles = Roles.CampusManager)]
-    [Consumes("multipart/form-data")]
+    [Authorize(Roles = Roles.CampusManager)]
     public async Task<Output> ImportGiaoViensFromEXcel(ISender sender, [FromForm] ImportGiaoViensFromExcelCommand command)
     {
         return await sender.Send(command);
     }
-    //[Authorize(Roles = Roles.CampusManager)]
-    public async Task<FileContentResult> ExportGiaoViensToExcel(ISender sender, ExportGiaoViensToExcelCommand comand)
+    [Authorize(Roles = Roles.CampusManager)]
+    public async Task<IResult> ExportGiaoViensToExcel(ISender sender, [FromBody] ExportGiaoViensToExcelCommand command)
     {
-        return await sender.Send(comand);
+        var result = await sender.Send(command);
+
+        if (result.isError == true)
+        {
+            return Results.BadRequest(result.message);
+        }
+
+        if (result.data == null)
+        {
+            return Results.BadRequest("File not found or error occurred.");
+        }
+
+        if (!(result.data is FileContentResult fileContentResult))
+        {
+            return Results.BadRequest("Invalid file content.");
+        }
+
+        return Results.File(fileContentResult.FileContents, fileContentResult.ContentType, fileContentResult.FileDownloadName);
     }
 }
