@@ -251,7 +251,7 @@ body {
   
   /* Body của popup */
   .modal-body {
-    padding: 16px;
+    padding: 8px;
   }
   
   /* Footer của popup */
@@ -278,7 +278,7 @@ body {
   
   /* Form layout trong popup (tùy chỉnh thêm/bớt) */
   .form-group {
-    margin-bottom: 16px;
+    margin-bottom: 6px;
   }
   .form-group label {
     font-weight: 600;
@@ -288,7 +288,7 @@ body {
   .form-row {
     display: flex;
     gap: 16px; 
-    margin-bottom: 16px;
+    margin-bottom: 8px;
   }
   .form-row .form-group {
     flex: 1; /* Mỗi cột chia đều, bạn có thể thay đổi theo ý */
@@ -462,4 +462,32 @@ body {
   
   input:checked + .slider:before {
     transform: translateX(18px);
+  }
+  .error-message {
+    color: red;
+    font-size: 13px;
+    margin-top: 3px;
+    display: block;
+  }
+  .code-group {
+    display: flex;
+    flex-direction: column;
+  
+    .input-group {
+      display: flex;
+      align-items: center;
+  
+      .input-group-text {
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        padding: 8px 12px;
+        font-weight: bold;
+        border-radius: 4px 0 0 4px;
+      }
+  
+      .form-control {
+        border-radius: 0 4px 4px 0;
+        border-left: none;
+      }
+    }
   }

@@ -42,7 +42,7 @@ export class GiaovienComponent implements OnInit {
     });
   
     this.editTeacherForm = this.fb.group({
-      code: [{ value: '', disabled: true }], // Code không chỉnh sửa
+      code: [''],
       ten: ['', [Validators.required, Validators.maxLength(20)]],
       gioiTinh: ['Nam', Validators.required],
       ngaySinh: ['', [Validators.required, this.validateAge]],
@@ -160,7 +160,6 @@ loadDanhSachGiaoVien() {
           showDetails: false
         }));
 
-        // 🟢 Cập nhật số trang từ API
         this.totalItems = response.data.totalCount || 0;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
 

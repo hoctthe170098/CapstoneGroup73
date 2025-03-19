@@ -42,11 +42,13 @@ export class HocsinhComponent implements OnInit {
  // Biến xử lý modal
  addStudentForm: FormGroup;
  isModalOpen: boolean = false;
- isEditModalOpen: boolean = false;
  newStudent: any = {};
  editStudent: any = {};
  policies: any[] = []; 
 
+editStudentForm: FormGroup;
+selectedStudent: any;
+isEditModalOpen: boolean = false;
  
    toggleLopDropdown() {
      this.lopDropdownOpen = !this.lopDropdownOpen;
@@ -195,11 +197,26 @@ export class HocsinhComponent implements OnInit {
       soDienThoai: ['', [Validators.required, Validators.pattern(/^0\d{9,10}$/)]],
       truongDangHoc: ['', Validators.required],
       lop: ['', Validators.required], 
-      province: ['', Validators.required],  // Thành phố
-      district: ['', Validators.required],  // Quận/Huyện
-      diaChiCuThe: ['', Validators.required], // Địa chỉ cụ thể
+      province: ['', Validators.required], 
+      district: ['', Validators.required],  
+      diaChiCuThe: ['', Validators.required], 
       chinhSachId: ['']
     });
+    this.editStudentForm = this.fb.group({
+      code: [''], 
+      ten: ['', [Validators.required, Validators.maxLength(18)]],
+      gioiTinh: ['Nam', Validators.required],
+      ngaySinh: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(50)]],
+      soDienThoai: ['', [Validators.required, Validators.pattern(/^0\d{9,10}$/)]],
+      truongDangHoc: ['', [Validators.required, Validators.maxLength(50)]],
+      lop: ['', Validators.required],
+      province: ['', Validators.required],
+      district: ['', Validators.required],
+      diaChiCuThe: ['', [Validators.required, Validators.maxLength(150)]],
+      chinhSachId: [''],
+      status: [true] 
+  });
     }
 
   ngOnInit(): void {
@@ -277,6 +294,65 @@ export class HocsinhComponent implements OnInit {
       });
 }
 
+openEditStudentModal(student: any) {
+  console.log("🔍 Học sinh được chọn để chỉnh sửa:", student);
+
+  if (!student || !student.code) {
+    this.toastr.error("Không tìm thấy mã học sinh!", "Lỗi");
+    console.error("❌ Lỗi: Học sinh không có mã!", student);
+    return;
+  }
+
+  this.selectedStudent = { ...student };
+
+  const addressParts = student.diaChi ? student.diaChi.split(',').map(part => part.trim()) : ['', '', ''];
+  const provinceName = addressParts[0] || '';
+  const districtName = addressParts[1] || '';
+  const detailAddress = addressParts[2] || '';
+
+  // 🔥 Kiểm tra lại tỉnh/thành phố
+  const provinceObj = this.provinces.find(p => p.name === provinceName);
+  const provinceCode = provinceObj ? provinceObj.code : '';
+
+  if (!provinceObj) {
+    console.warn("⚠️ Không tìm thấy tỉnh/thành phố trong danh sách Edit!", provinceName);
+  }
+
+  this.onProvinceChangeForEdit(provinceCode);
+
+  const districtObj = provinceObj?.districts.find(d => d.name === districtName);
+  const districtCode = districtObj ? districtObj.code : '';
+
+  const ngaySinhFormatted = student.ngaySinh ? new Date(student.ngaySinh).toISOString().split('T')[0] : '';
+
+  let policyId = this.policies.find(p => p.ten === student.chinhSach)?.id || '';
+
+  // 🔥 Gán dữ liệu vào FormGroup
+  this.editStudentForm.patchValue({
+      code: student.code || '',  
+      ten: student.ten,
+      gioiTinh: student.gioiTinh,
+      ngaySinh: ngaySinhFormatted,
+      email: student.email,
+      soDienThoai: student.soDienThoai,
+      truongDangHoc: student.truongDangHoc,
+      lop: student.lop,
+      chinhSachId: policyId,
+      province: provinceCode,
+      district: districtCode,
+      diaChiCuThe: detailAddress,
+      status: [true]
+  });
+
+  console.log("✅ Dữ liệu sau khi patch vào form:", this.editStudentForm.value);
+  console.log("📌 Giá trị `code` trong Form sau khi patch:", this.editStudentForm.get('code')?.value);
+  
+  this.isEditModalOpen = true;
+}
+
+
+
+
 
   changePage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
@@ -315,81 +391,155 @@ export class HocsinhComponent implements OnInit {
  
   
 
-  onEditStudentClick(index: number) {
+  onEditStudentClick(index: number) { 
     const hs = this.students[index];
-    console.log("📝 Học sinh được chọn để chỉnh sửa:", hs);
-
-    const addressParts = hs.diaChi ? hs.diaChi.split(',').map(part => part.trim()) : ['', '', ''];
-    const provinceName = addressParts[0] || ''; 
-    const districtName = addressParts[1] || '';
-    const detailAddress = addressParts[2] || ''; 
-
-
+  
+    console.log("🔍 Học sinh được chọn để chỉnh sửa:", hs);
+  
+    if (!hs || !hs.code) {
+      this.toastr.error("Không tìm thấy mã học sinh!", "Lỗi");
+      console.error("❌ Lỗi: Học sinh không có mã!", hs);
+      return;
+    }
+  
+    const addressParts = hs.diaChi ? hs.diaChi.split(',').map(p => p.trim()) : ['', '', ''];
+    const [provinceName, districtName, detailAddress] = addressParts;
+  
     const provinceObj = this.provinces.find(p => p.name === provinceName);
     const provinceCode = provinceObj ? provinceObj.code : '';
-
     this.onProvinceChangeForEdit(provinceCode);
-
+  
     const districtObj = provinceObj?.districts.find(d => d.name === districtName);
     const districtCode = districtObj ? districtObj.code : '';
-
-    const ngaySinhFormatted = hs.ngaySinh ? new Date(hs.ngaySinh).toISOString().split('T')[0] : '';
-
-    let policyId = this.policies.find(p => p.ten === hs.chinhSach)?.id || '';
-
-    this.editStudent = {
-        code: hs.code,
-        ten: hs.ten,
-        gioiTinh: hs.gioiTinh,
-        ngaySinh: ngaySinhFormatted,
-        email: hs.email,
-        soDienThoai: hs.soDienThoai,
-        truongDangHoc: hs.truongDangHoc,
-        lop: hs.lop,
-        chinhSachId: policyId, 
-        province: provinceCode,
-        district: districtCode,
-        diaChiCuThe: detailAddress 
-    };
-
-    console.log("✅ Dữ liệu sau khi tách địa chỉ:", this.editStudent);
-
+  
+    const policyObj = this.policies.find(p => p.ten === hs.chinhSach);
+    const policyId = policyObj ? policyObj.id : '';
+  
+    console.log("📌 Dữ liệu trước khi patch vào form:", hs);
+  
+    this.editStudentForm.patchValue({
+      code: hs.code || '', 
+      ten: hs.ten,
+      gioiTinh: hs.gioiTinh,
+      ngaySinh: hs.ngaySinh ? new Date(hs.ngaySinh).toISOString().split('T')[0] : '',
+      email: hs.email,
+      soDienThoai: hs.soDienThoai,
+      truongDangHoc: hs.truongDangHoc,
+      lop: hs.lop,
+      chinhSachId: policyId,
+      province: provinceCode,
+      district: districtCode,
+      diaChiCuThe: detailAddress,
+      
+    });
+  
+    console.log("✅ Dữ liệu sau khi patch vào form:", this.editStudentForm.value);
+  
     this.isEditModalOpen = true;
-}
+  }
+  
+
 
   closeEditModal() {
     this.isEditModalOpen = false;
   }
   submitEditStudent() {
-    // Cập nhật data vào mảng students
-    const idx = this.students.findIndex(h => h.code === this.editStudent.code);
-    if (idx !== -1) {
-      const updatedHs = this.students[idx];
-      updatedHs.ten = this.editStudent.ten;
-      updatedHs.gioiTinh = this.editStudent.gioiTinh;
-      updatedHs.ngaySinh = this.editStudent.ngaySinh ? new Date(this.editStudent.ngaySinh) : null;
-      updatedHs.email = this.editStudent.email;
-      updatedHs.soDienThoai = this.editStudent.soDienThoai;
-      updatedHs.truongDangHoc = this.editStudent.truongDangHoc;
-      updatedHs.chinhSach = this.editStudent.chinhSach;
-      updatedHs.province = this.editStudent.province;
-      updatedHs.district = this.editStudent.district;
-      updatedHs.diaChi = this.editStudent.diaChi;
-    }
-    this.isEditModalOpen = false;
-  }
-  onProvinceChangeForEdit(provinceCode: string) {
-    const selectedProvince = this.provinces.find(p => String(p.code) === String(provinceCode));
-
-    if (selectedProvince) {
-        this.editDistricts = selectedProvince.districts;
-    } else {
-        
-        this.editDistricts = [];
+    if (this.editStudentForm.invalid) {
+        console.log("⚠️ Form bị lỗi:", this.editStudentForm.errors);
+        this.toastr.error("Vui lòng nhập đầy đủ thông tin!", "Lỗi");
+        return;
     }
 
-    this.editStudent.district = '';
+    let formData = { ...this.editStudentForm.value };
+
+    console.log("📌 Kiểm tra giá trị `code` trước khi gửi API:", formData.code);
+
+    if (!formData.code || formData.code.trim() === "") {
+        this.toastr.error("Không tìm thấy mã học sinh!", "Lỗi");
+        console.error("❌ Lỗi: Mã học sinh không tồn tại trong form!", formData);
+        return;
+    }
+
+    // 🔄 Format ngày sinh về định dạng YYYY-MM-DD
+    if (formData.ngaySinh) {
+        const date = new Date(formData.ngaySinh);
+        formData.ngaySinh = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    }
+
+    // 🏙️ Gộp địa chỉ đầy đủ
+    const provinceObj = this.provinces.find(p => p.code == formData.province);
+    const provinceName = provinceObj ? provinceObj.name : '';
+
+    const districtObj = this.editDistricts.find(d => d.code == formData.district);
+    const districtName = districtObj ? districtObj.name : '';
+
+    formData.diaChi = `${provinceName}, ${districtName}, ${formData.diaChiCuThe || ''}`.trim();
+
+    // ✅ Chuyển đổi `status` sang string ("true"/"false") nếu API yêu cầu string
+    formData.status = formData.status ? "true" : "false";
+
+    // ✅ Chuyển đổi `chinhSachId` sang string nếu API yêu cầu
+    if (formData.chinhSachId) {
+        formData.chinhSachId = String(formData.chinhSachId);
+    }
+
+    // 🛠 Chỉ lấy các trường cần thiết theo API yêu cầu
+    const filteredData = {
+        code: formData.code,
+        ten: formData.ten,
+        gioiTinh: formData.gioiTinh,
+        diaChi: formData.diaChi, // ✅ Địa chỉ gộp
+        lop: formData.lop,
+        truongDangHoc: formData.truongDangHoc,
+        ngaySinh: formData.ngaySinh,
+        email: formData.email,
+        soDienThoai: formData.soDienThoai,
+        chinhSachId: formData.chinhSachId,
+        status: formData.status
+    };
+
+    console.log("📤 Gửi API cập nhật học sinh với dữ liệu:", JSON.stringify(filteredData));
+
+    this.hocSinhService.updateHocSinh(filteredData).subscribe({
+        next: (res) => {
+            console.log("📌 Phản hồi từ API:", res);
+            if (!res.isError) {
+                this.toastr.success("Cập nhật học sinh thành công!", "Thành công");
+                this.closeEditModal();
+                this.loadDanhSachHocSinh();
+            } else {
+                this.toastr.error(res.message, "Lỗi");
+            }
+        },
+        error: (error) => {
+            console.error("❌ Lỗi kết nối API:", error);
+            this.toastr.error("Có lỗi xảy ra, vui lòng thử lại!", "Lỗi");
+        }
+    });
 }
+
+
+  
+  
+
+
+onProvinceChangeForEdit(provinceCode: string) {
+  console.log("Giá trị tỉnh/thành phố được chọn trong Edit:", provinceCode);
+
+  const selectedProvince = this.provinces.find(p => String(p.code) === String(provinceCode));
+
+  if (selectedProvince) {
+      console.log("Tỉnh đã chọn trong Edit:", selectedProvince);
+      console.log("Danh sách quận/huyện trong Edit:", selectedProvince.districts);
+      this.editDistricts = selectedProvince.districts;
+  } else {
+      console.warn("Không tìm thấy tỉnh/thành phố trong danh sách Edit!");
+      this.editDistricts = [];
+  }
+
+ 
+}
+
 
 
   // Hàm format date => yyyy-MM-dd
