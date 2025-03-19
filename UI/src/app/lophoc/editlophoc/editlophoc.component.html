@@ -14,6 +14,10 @@
             <small class="text-danger" *ngIf="editLopForm.get('tenLop').touched && editLopForm.get('tenLop').hasError('required')">
               Tên lớp không được để trống!
             </small>
+            <small class="text-danger"
+                *ngIf="editLopForm.get('tenLop').touched && editLopForm.get('tenLop').hasError('maxlength')">
+                Tên lớp không được quá 20 ký tự!
+              </small>
             
           </div>
 
@@ -53,7 +57,7 @@
                 Học phí không được để trống!
               </small>
               <small class="text-danger" *ngIf="editLopForm.get('hocPhi').touched && editLopForm.get('hocPhi').hasError('min')">
-                Học phí phải lớn hơn hoặc bằng 400.000!
+                Học phí phải lớn hơn hoặc bằng 50.000!
               </small>
             </div>
           </div>

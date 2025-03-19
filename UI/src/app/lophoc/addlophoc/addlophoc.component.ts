@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
-
+import { PhongService } from '../shared/lophoc.service';
 @Component({
   selector: 'app-addlophoc',
   templateUrl: './addlophoc.component.html',
@@ -8,29 +8,26 @@ import { FormArray, FormBuilder, FormGroup, Validators, AbstractControl } from '
 })
 export class AddlophocComponent implements OnInit {
   themLopForm: FormGroup;
-
+  phongList: any[] = [];
   // Dữ liệu mẫu, có thể thay bằng dữ liệu từ API
   chuongTrinhList = [
     { id: 1, tenChuongTrinh: 'Chương trình A' },
     { id: 2, tenChuongTrinh: 'Chương trình B' },
   ];
-  phongList = [
-    { id: 1, tenPhong: 'Phòng 101' },
-    { id: 2, tenPhong: 'Phòng 202' },
-  ];
-  giaoVienList = [
-    { id: 1, tenGiaoVien: 'Nguyễn Văn A' },
-    { id: 2, tenGiaoVien: 'Trần Thị B' },
-  ];
+  
+  giaoVienList: any[] = [];
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder,private phongService: PhongService) {}
 
   ngOnInit(): void {
-    console.log('Danh sách phòng:', this.phongList);
+    this.fetchPhongs(); // Gọi API lấy danh sách phòng
+    this.fetchGiaoViens(); // Gọi API lấy danh sách giáo viên
+     console.log('Danh sách phòng:', this.phongList);
+   
     this.themLopForm = this.fb.group({
-      tenLop: ['', Validators.required],
+      tenLop: ['', [Validators.required, Validators.maxLength(20)]], // Giới hạn 20 ký tự
       chuongTrinh: [null, Validators.required],
-      hocPhi: [null, [Validators.required, Validators.min(400000)]], // Học phí phải >= 400.000
+      hocPhi: [null, [Validators.required, Validators.min(50000)]], // Học phí phải >= 400.000 
       giaoVien: [null, Validators.required],
       ngayBatDau: ['', [Validators.required, this.validateStartDate]], // Ngày bắt đầu từ hôm nay trở đi
       ngayKetThuc: ['', [Validators.required, this.validateEndDate.bind(this)]], // Ngày kết thúc sau 2 tháng
@@ -40,6 +37,41 @@ export class AddlophocComponent implements OnInit {
     // Thêm 1 dòng lịch mặc định
     this.addSchedule();
   }
+  fetchPhongs(): void {
+    this.phongService.getPhongs().subscribe(
+      (response) => {
+        if (!response.isError) {
+          this.phongList = response.data;
+          console.log('Danh sách phòng:', this.phongList); 
+        } else {
+          
+        }
+      },
+      (error) => {
+        console.error('Lỗi API:', error);
+      }
+    );
+  }
+  fetchGiaoViens(searchTen: string = ''): void {
+    const requestPayload = {
+      searchTen: searchTen // Có thể truyền giá trị tìm kiếm, nếu không mặc định rỗng
+    };
+  
+    this.phongService.getGiaoViens(requestPayload).subscribe(
+      (response) => {
+        if (!response.isError) {
+          this.giaoVienList = response.data; // Giả sử API trả về danh sách trực tiếp trong response.data
+          console.log('Danh sách giáo viên:', this.giaoVienList);
+        } else {
+          console.error('Lỗi lấy danh sách giáo viên:', response.message);
+        }
+      },
+      (error) => {
+        console.error('Lỗi API:', error);
+      }
+    );
+  }
+  
 
   // Tạo getter để truy cập FormArray lichHoc
   get lichHoc(): FormArray {
@@ -58,17 +90,22 @@ export class AddlophocComponent implements OnInit {
 
   // Thêm 1 dòng lịch học
   addSchedule(): void {
-    const newSchedule = this.createSchedule();
+  const newSchedule = this.createSchedule();
+  
+  // Lấy giá trị của các lịch học đã có
+  const existingDays = this.lichHoc.controls
+    .map(control => control.get('thu')?.value)
+    .filter(value => value); // Loại bỏ giá trị null hoặc ""
 
-    // Kiểm tra nếu thứ đã tồn tại thì không cho thêm
-    const newThu = newSchedule.get('thu')?.value;
-    if (this.lichHoc.controls.some(control => control.get('thu')?.value === newThu)) {
-      alert('Thứ này đã tồn tại trong lịch học!');
-      return;
-    }
-
-    this.lichHoc.push(newSchedule);
+  // Nếu giá trị mới không phải null hoặc rỗng thì mới kiểm tra trùng lặp
+  if (newSchedule.get('thu')?.value && existingDays.includes(newSchedule.get('thu')?.value)) {
+    alert('Thứ này đã tồn tại trong lịch học!');
+    return;
   }
+
+  this.lichHoc.push(newSchedule);
+}
+
 
   // Xóa 1 dòng lịch học theo index
   removeSchedule(index: number): void {

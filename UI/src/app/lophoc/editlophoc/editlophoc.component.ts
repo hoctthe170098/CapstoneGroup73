@@ -42,7 +42,7 @@ export class EditLopHocComponent implements OnInit {
 
   ngOnInit(): void {
     this.editLopForm = this.fb.group({
-      tenLop: ['', Validators.required],
+      tenLop: ['', [Validators.required, Validators.maxLength(20)]], // Giới hạn 20 ký tự
       chuongTrinh: [null, Validators.required],
       hocPhi: [null, [Validators.required, Validators.min(400000)]], // Học phí phải >= 400.000
       giaoVien: [null, Validators.required],
