@@ -4,6 +4,7 @@ using StudyFlow.Application.Phongs.Queries.GetPhongsWithPagination;
 using StudyFlow.Application.Phongs.Commands.CreatePhong;
 using StudyFlow.Application.Phongs.Commands.EditPhong;
 using StudyFlow.Domain.Constants;
+using StudyFlow.Application.Phongs.Queries.GetAllPhongSuDungs;
 
 namespace StudyFlow.Web.Endpoints;
 
@@ -14,6 +15,7 @@ public class Phongs : EndpointGroupBase
         app.MapGroup(this)
             .MapPost(CreatePhong, "createphong")
             .MapPost(GetPhongsWithPagination, "getphongswithpagination")
+            .MapGet(GetAllPhongsSuDungDuoc,"getallphongsudungduoc")
             .MapPut(EditPhong, "editphong");
     }
 
@@ -28,7 +30,11 @@ public class Phongs : EndpointGroupBase
     {
         return await sender.Send(query);    
     }
-
+    [Authorize(Roles = Roles.CampusManager)]
+    public async Task<Output> GetAllPhongsSuDungDuoc(ISender sender, [AsParameters]GetAllPhongSuDungsQuery query)
+    {
+        return await sender.Send(query);
+    }
     [Authorize(Roles = Roles.CampusManager)]
     public async Task<Output> EditPhong(ISender sender, EditPhongCommand command)
     {
