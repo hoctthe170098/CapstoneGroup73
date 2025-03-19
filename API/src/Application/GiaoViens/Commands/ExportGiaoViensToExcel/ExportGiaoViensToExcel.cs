@@ -15,11 +15,11 @@ using StudyFlow.Application.Common.Interfaces;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Application.GiaoViens.Queries.GetGiaoViensWithPagination.GetGiaoViensWithPagination;
 
-public record ExportGiaoViensToExcelCommand : IRequest<Output>
+public record ExportGiaoViensToExcelCommand : IRequest<FileContentResult>
 {
 }
 
-public class ExportGiaoVienCommandHandler : IRequestHandler<ExportGiaoViensToExcelCommand, Output>
+public class ExportGiaoVienCommandHandler : IRequestHandler<ExportGiaoViensToExcelCommand, FileContentResult>
 {
     private readonly IApplicationDbContext _context;
     private readonly IIdentityService _identityService;
@@ -30,11 +30,11 @@ public class ExportGiaoVienCommandHandler : IRequestHandler<ExportGiaoViensToExc
         _identityService = identityService;
     }
 
-    public async Task<Output> Handle(ExportGiaoViensToExcelCommand request, CancellationToken cancellationToken)
+    public async Task<FileContentResult> Handle(ExportGiaoViensToExcelCommand request, CancellationToken cancellationToken)
     {
         var giaoViens = await _context.GiaoViens
             .Include(gv => gv.Coso)
-            .Include(gv => gv.LichHocs)
+            .Include(gv => gv.LichHocs) // Ensure correct property name
             .ToListAsync(cancellationToken);
 
         if (!giaoViens.Any())
@@ -49,23 +49,14 @@ public class ExportGiaoVienCommandHandler : IRequestHandler<ExportGiaoViensToExc
             var headers = new[] { "Mã GV", "Tên", "Giới Tính", "Ngày Sinh", "Email", "Số Điện Thoại", "Địa Chỉ", "Trường Đang Dạy", "Tên Cơ Sở", "Danh Sách Lớp", "Trạng Thái" };
             for (int i = 0; i < headers.Length; i++)
             {
-                Code = gv.Code,
-                Ten = gv.Ten,
-                GioiTinh = gv.GioiTinh,
-                NgaySinh = gv.NgaySinh,
-                Email = gv.Email,
-                SoDienThoai = gv.SoDienThoai,
-                DiaChi = gv.DiaChi,
-                TruongDangDay = gv.TruongDangDay,
-                TenCoSo = gv.Coso.Ten,
-                TenLops = gv.LichHocs.Select(lh => lh.TenLop).Distinct().ToList(),
-                IsActive = isActive
-            });
-        }
+                worksheet.Cells[1, i + 1].Value = headers[i];
+            }
 
             for (int i = 0; i < giaoViens.Count; i++)
             {
                 var gv = giaoViens[i];
+                bool isActive = gv.UserId != null && await _identityService.IsUserActiveAsync(gv.UserId);
+
                 worksheet.Cells[i + 2, 1].Value = gv.Code;
                 worksheet.Cells[i + 2, 2].Value = gv.Ten;
                 worksheet.Cells[i + 2, 3].Value = gv.GioiTinh;
@@ -75,25 +66,20 @@ public class ExportGiaoVienCommandHandler : IRequestHandler<ExportGiaoViensToExc
                 worksheet.Cells[i + 2, 7].Value = gv.DiaChi;
                 worksheet.Cells[i + 2, 8].Value = gv.TruongDangDay;
                 worksheet.Cells[i + 2, 9].Value = gv.Coso?.Ten;
-                worksheet.Cells[i + 2, 10].Value = string.Join(", ", gv.LicHocs.Select(lh => lh.TenLop).Distinct());
-                worksheet.Cells[i + 2, 11].Value = gv.UserId != null ? "Hoạt động" : "Chưa hoạt động";
+                worksheet.Cells[i + 2, 10].Value = string.Join(", ", gv.LichHocs.Select(lh => lh.TenLop).Distinct());
+                worksheet.Cells[i + 2, 11].Value = isActive ? "Hoạt động" : "Chưa hoạt động";
             }
 
             worksheet.Cells.AutoFitColumns();
 
             string fileName = "DanhSachGiaoVien.xlsx";
 
-            return new Output
+            return new FileContentResult(package.GetAsByteArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             {
-                isError = false,
-                data = new FileContentResult(package.GetAsByteArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-                {
-                    FileDownloadName = fileName
-                },
-                message = "File downloaded successfully."
+                FileDownloadName = fileName
             };
-        };
-        
+        }
     }
 }
+
 
