@@ -29,7 +29,7 @@ public class HocSinhs : EndpointGroupBase
         return await sender.Send(command);
     }
 
-    //[Authorize(Roles = Roles.CampusManager)]
+    [Authorize(Roles = Roles.CampusManager)]
     public async Task<Output> GetHocSinhsWithPagination(ISender sender, GetHocSinhsWithPaginationQuery query)
     {
         return await sender.Send(query);

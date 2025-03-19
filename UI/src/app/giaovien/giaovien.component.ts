@@ -95,8 +95,8 @@ onProvinceChange(provinceCode: string) {
 checkEmailExists(email: string): Promise<boolean> {
   return new Promise((resolve) => {
     this.giaovienService.getDanhSachGiaoVien().subscribe((response) => {
-      if (!response.isError && response.data) {
-        const existingEmail = response.data.some((gv: any) => gv.email === email);
+      if (!response.isError && response.data && response.data.items) {
+        const existingEmail = response.data.items.some((gv: any) => gv.email === email);
         resolve(existingEmail);
       } else {
         resolve(false);
@@ -108,8 +108,8 @@ checkEmailExists(email: string): Promise<boolean> {
 checkPhoneExists(phone: string): Promise<boolean> {
   return new Promise((resolve) => {
     this.giaovienService.getDanhSachGiaoVien().subscribe((response) => {
-      if (!response.isError && response.data) {
-        const existingPhone = response.data.some((gv: any) => gv.soDienThoai === phone);
+      if (!response.isError && response.data && response.data.items) {
+        const existingPhone = response.data.items.some((gv: any) => gv.soDienThoai === phone);
         resolve(existingPhone);
       } else {
         resolve(false);
@@ -117,6 +117,7 @@ checkPhoneExists(phone: string): Promise<boolean> {
     });
   });
 }
+
 
 
 onProvinceChangeForEdit(provinceCode: string) {
@@ -136,51 +137,54 @@ onProvinceChangeForEdit(provinceCode: string) {
    
 }
   
-   loadDanhSachGiaoVien() {
-    let isActiveFilter: boolean | null = this.trangThai === 'Hoạt động' ? true : this.trangThai === 'Tạm ngừng' ? false : null;
+loadDanhSachGiaoVien() {
+  let isActiveFilter: boolean | null = this.trangThai === 'Hoạt động' ? true : this.trangThai === 'Tạm ngừng' ? false : null;
 
-    this.giaovienService.getDanhSachGiaoVien(1, 9999, this.searchTerm, '', isActiveFilter)
-      .subscribe(response => {
-        if (!response.isError && response.data) {
-          this.students = response.data.map((gv: any) => ({ 
-            code: gv.code || '',
-            ten: gv.ten || '',
-            gioiTinh: gv.gioiTinh || '',
-            diaChi: gv.diaChi || '',
-            truongDangDay: gv.truongDangDay || '',
-            ngaySinh: gv.ngaySinh ? new Date(gv.ngaySinh) : null,
-            email: gv.email || '',
-            soDienThoai: gv.soDienThoai || '',
-            isActive: gv.isActive !== undefined ? gv.isActive : false,
-            tenCoSo: gv.tenCoSo || '',
-            lopHocs: gv.tenLops ? gv.tenLops : [],
-            showDetails: false
-          }));
+  this.giaovienService.getDanhSachGiaoVien(this.currentPage, this.pageSize, this.searchTerm, '', isActiveFilter)
+    .subscribe(response => {
+      console.log("📌 API Response (Giáo Viên):", response);
 
-          this.totalItems = response.data.totalCount || this.students.length;
-                this.totalPages = Math.ceil(this.totalItems / this.pageSize);
+      if (!response.isError && response.data && response.data.items) {
+        this.students = response.data.items.map((gv: any) => ({
+          code: gv.code || '',
+          ten: gv.ten || '',
+          gioiTinh: gv.gioiTinh || '',
+          diaChi: gv.diaChi || '',
+          truongDangDay: gv.truongDangDay || '',
+          ngaySinh: gv.ngaySinh ? new Date(gv.ngaySinh) : null,
+          email: gv.email || '',
+          soDienThoai: gv.soDienThoai || '',
+          isActive: gv.isActive !== undefined ? gv.isActive : false,
+          tenCoSo: gv.tenCoSo || '',
+          lopHocs: gv.tenLops ? gv.tenLops : [],
+          showDetails: false
+        }));
 
-        console.log("🔹 Tổng số giáo viên:", this.totalItems);
-        console.log("🔹 Tổng số trang:", this.totalPages);
-        }
+        // 🟢 Cập nhật số trang từ API
+        this.totalItems = response.data.totalCount || 0;
+        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
+
+        console.log("📌 Tổng số giáo viên:", this.totalItems);
+        console.log("📌 Tổng số trang:", this.totalPages);
+
         this.cdr.detectChanges();
-      });
-  }
-
-  
-  get paginatedStudents() {
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    return this.students.slice(startIndex, endIndex);
-  }
-  
-  /** Chuyển trang */
-  changePage(page: number) {
-    if (page >= 1 && page <= this.totalPages) {
-        this.currentPage = page;
-        console.log("🔄 Chuyển đến trang:", this.currentPage);
-    }
+      } else {
+        this.students = [];
+        this.totalItems = 0;
+        this.totalPages = 1;
+      }
+    });
 }
+
+/** 🔄 Chuyển trang */
+changePage(page: number) {
+  if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      console.log("📌 Chuyển trang:", this.currentPage);
+      this.loadDanhSachGiaoVien(); // 🔄 Gọi API lấy dữ liệu trang mới
+  }
+}
+
   
 
   /** Tìm kiếm giáo viên */
@@ -200,11 +204,11 @@ onProvinceChangeForEdit(provinceCode: string) {
     this.selectedTeacher = { ...teacher };
   
     if (!teacher.code || teacher.code.trim() === "") {
-      console.error(" Lỗi: Giáo viên không có mã!");
       this.toastr.error("Giáo viên không có mã, không thể chỉnh sửa!", "Lỗi");
       return;
     }
   
+    // Cập nhật form với dữ liệu chính xác từ API
     this.editTeacherForm.patchValue({
       code: teacher.code,
       ten: teacher.ten,
@@ -216,13 +220,15 @@ onProvinceChangeForEdit(provinceCode: string) {
       province: teacher.province,
       district: teacher.district,
       diaChiCuThe: teacher.diaChiCuThe,
-      status: teacher.isActive ? true : false 
+      status: teacher.isActive // 🔥 Đảm bảo trạng thái `isActive` được gán vào `status`
     });
   
-    console.log(" Dữ liệu sau khi gán vào form:", this.editTeacherForm.value);
+    console.log("✅ Dữ liệu sau khi gán vào form:", this.editTeacherForm.value);
   
     this.isEditModalOpen = true;
   }
+  
+  
 
   /** Thêm giáo viên */
   isModalOpen: boolean = false;

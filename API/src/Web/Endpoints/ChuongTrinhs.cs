@@ -68,7 +68,7 @@ public class ChuongTrinhs : EndpointGroupBase
     {
         return await sender.Send(query);
     }
-    [Authorize(Roles = Roles.LearningManager)]
+    [Authorize(Roles = Roles.LearningManager+","+Roles.CampusManager)]
     public async Task<Output> GetAllChuongTrinhs(ISender sender, [AsParameters] GetAllChuongTrinhsQuery query)
     {
         return await sender.Send(query);

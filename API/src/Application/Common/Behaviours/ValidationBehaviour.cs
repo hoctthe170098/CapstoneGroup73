@@ -35,7 +35,7 @@ public class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TReque
                         " học phải bắt đầu từ 1 và tăng dần, không được trùng lặp.");
                 else if (failures[0].ErrorCode == "Format")
                     throw new WrongInputException("Dữ liệu nhập sai format, vui lòng nhập lại");
-                else throw new WrongInputException();
+                else throw new Exception(failures[0].ErrorMessage);
             }
                
         }

@@ -52,7 +52,7 @@ public class ExportGiaoVienCommandHandler : IRequestHandler<ExportGiaoViensToExc
         // Lấy danh sách giáo viên
         var giaoViens = await _context.GiaoViens
             .Include(gv => gv.Coso)
-            .Include(gv => gv.LicHocs)
+            .Include(gv => gv.LichHocs)
             .ToListAsync(cancellationToken);
 
         if (!giaoViens.Any())
@@ -77,7 +77,7 @@ public class ExportGiaoVienCommandHandler : IRequestHandler<ExportGiaoViensToExc
                 DiaChi = gv.DiaChi,
                 TruongDangDay = gv.TruongDangDay,
                 TenCoSo = gv.Coso.Ten,
-                TenLops = gv.LicHocs.Select(lh => lh.TenLop).Distinct().ToList(),
+                TenLops = gv.LichHocs.Select(lh => lh.TenLop).Distinct().ToList(),
                 IsActive = isActive
             });
         }

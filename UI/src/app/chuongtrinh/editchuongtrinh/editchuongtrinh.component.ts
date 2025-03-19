@@ -195,7 +195,8 @@ export class EditchuongtrinhComponent implements OnInit {
 
     this.program.noiDungBaiHocs[lessonIndex].taiLieuHocTaps.push({
       urlType: file.type.includes('video') ? 'video' : 'pdf',
-      file
+      file,
+      ten:file.name
     });
   }
   /** ✅ Upload file vào danh sách */
