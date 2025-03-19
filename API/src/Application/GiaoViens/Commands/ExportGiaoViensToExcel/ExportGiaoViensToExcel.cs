@@ -15,11 +15,11 @@ using StudyFlow.Application.Common.Interfaces;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Application.GiaoViens.Queries.GetGiaoViensWithPagination.GetGiaoViensWithPagination;
 
-public record ExportGiaoViensToExcelCommand : IRequest<FileContentResult>
+public record ExportGiaoViensToExcelCommand : IRequest<Output>
 {
 }
 
-public class ExportGiaoVienCommandHandler : IRequestHandler<ExportGiaoViensToExcelCommand, FileContentResult>
+public class ExportGiaoVienCommandHandler : IRequestHandler<ExportGiaoViensToExcelCommand, Output>
 {
     private readonly IApplicationDbContext _context;
     private readonly IIdentityService _identityService;
@@ -30,7 +30,7 @@ public class ExportGiaoVienCommandHandler : IRequestHandler<ExportGiaoViensToExc
         _identityService = identityService;
     }
 
-    public async Task<FileContentResult> Handle(ExportGiaoViensToExcelCommand request, CancellationToken cancellationToken)
+    public async Task<Output> Handle(ExportGiaoViensToExcelCommand request, CancellationToken cancellationToken)
     {
         var giaoViens = await _context.GiaoViens
             .Include(gv => gv.Coso)
@@ -74,9 +74,14 @@ public class ExportGiaoVienCommandHandler : IRequestHandler<ExportGiaoViensToExc
 
             string fileName = "DanhSachGiaoVien.xlsx";
 
-            return new FileContentResult(package.GetAsByteArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            return new Output
             {
-                FileDownloadName = fileName
+                isError = false,
+                data = new FileContentResult(package.GetAsByteArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                {
+                    FileDownloadName = fileName
+                },
+                message = "File downloaded successfully."
             };
         }
     }
