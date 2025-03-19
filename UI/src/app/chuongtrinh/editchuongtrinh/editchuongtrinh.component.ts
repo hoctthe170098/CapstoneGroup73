@@ -187,9 +187,10 @@ export class EditchuongtrinhComponent implements OnInit {
     }
   }
   addFileToLesson(file: File, lessonIndex: number) {
-    const allowedTypes = ['application/pdf', 'video/mp4', 'application/msword'];
+    const allowedTypes = ['application/pdf', 'video/mp4', 'application/msword'
+    ,'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
     if (!allowedTypes.includes(file.type)) {
-      alert('Chỉ chấp nhận file .pdf, .mp4, .doc!');
+      alert('Chỉ chấp nhận file .pdf, .mp4, .doc, .docx !');
       return;
     }
 

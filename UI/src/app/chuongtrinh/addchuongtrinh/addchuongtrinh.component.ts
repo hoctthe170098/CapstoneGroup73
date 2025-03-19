@@ -152,12 +152,12 @@ export class AddchuongtrinhComponent {
 
   /** ✅ Lưu file vào danh sách bài học (Không upload ngay) */
   addFileToLesson(file: File, lessonIndex: number) {
-    const allowedTypes = ['application/pdf', 'video/mp4', 'application/msword'];
+    const allowedTypes = ['application/pdf', 'video/mp4', 'application/msword'
+    ,'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
     if (!allowedTypes.includes(file.type)) {
-      this.toastr.warning('Chỉ chấp nhận file .pdf, .mp4, .doc!');
+      alert('Chỉ chấp nhận file .pdf, .mp4, .doc, .docx !');
       return;
     }
-
     this.program.noiDungBaiHocs[lessonIndex].taiLieuHocTaps.push({
       urlType: file.type.includes('video') ? 'video' : 'pdf',
       file
