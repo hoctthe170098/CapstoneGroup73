@@ -23,5 +23,5 @@ public class GiaoVien
     public CoSo Coso { get; set; } = null!;
     public string? UserId { get; set; }
     [JsonIgnore]
-    public IList<LichHoc> LicHocs { get; private set; } = new List<LichHoc>();
+    public IList<LichHoc> LichHocs { get; private set; } = new List<LichHoc>();
 }

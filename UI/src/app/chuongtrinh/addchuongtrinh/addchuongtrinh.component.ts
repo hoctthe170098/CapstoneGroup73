@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ChuongtrinhService } from '../shared/chuongtrinh.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-addchuongtrinh',
@@ -22,10 +23,71 @@ export class AddchuongtrinhComponent {
     ]
   };
 
+  errors: any = {
+    tieuDe: '',
+    moTa: '',
+    noiDungBaiHocs: []
+  };
+
+  draggedLessonIndex: number | null = null;
+
   constructor(
     private router: Router,
-    private chuongtrinhService: ChuongtrinhService
+    private chuongtrinhService: ChuongtrinhService,
+    private toastr: ToastrService
   ) {}
+
+  validateField(field: string) {
+    const maxLength = field === 'tieuDe' ? 200 : 300;
+
+    if (!this.program[field]?.trim()) {
+      this.errors[field] = 'Trường này không được để trống!';
+    } else if (this.program[field].length > maxLength) {
+      this.errors[field] = ` Quá số ký tự cho phép, vui lòng nhập lại! Giới hạn: ${maxLength} ký tự.`;
+    } else {
+      this.errors[field] = '';
+    }
+  }
+
+  /** ✅ Kiểm tra nội dung bài học */
+  validateLesson(index: number, field: string) {
+    if (!this.errors.noiDungBaiHocs[index]) {
+      this.errors.noiDungBaiHocs[index] = {};
+    }
+
+    const maxLength = field === 'tieuDe' ? 200 : 300;
+    const value = this.program.noiDungBaiHocs[index][field]?.trim();
+
+    if (!value) {
+      this.errors.noiDungBaiHocs[index][field] = 'Trường này không được để trống!';
+    } else if (value.length > maxLength) {
+      this.errors.noiDungBaiHocs[index][field] = `Quá số ký tự cho phép, vui lòng nhập lại! Giới hạn: ${maxLength} ký tự.`;
+    } else {
+      this.errors.noiDungBaiHocs[index][field] = '';
+    }
+  }
+
+  /** ✅ Kiểm tra toàn bộ dữ liệu trước khi gửi */
+  isFormValid() {
+    let valid = true;
+
+    ['tieuDe', 'moTa'].forEach(field => {
+      this.validateField(field);
+      if (this.errors[field]) valid = false;
+    });
+
+    this.errors.noiDungBaiHocs = [];
+    this.program.noiDungBaiHocs.forEach((lesson, index) => {
+      this.errors.noiDungBaiHocs[index] = {};
+      ['tieuDe', 'mota'].forEach(field => {
+        this.validateLesson(index, field);
+        if (this.errors.noiDungBaiHocs[index][field]) valid = false;
+      });
+    });
+
+    return valid;
+  }
+  
 
   /** ✅ Thêm bài học mới */
   addLesson() {
@@ -64,27 +126,38 @@ export class AddchuongtrinhComponent {
   }
 
   /** ✅ Xử lý kéo thả file */
+  onDragStart(event: DragEvent, index: number) {
+    this.draggedLessonIndex = index;
+    event.dataTransfer?.setData("text/plain", index.toString());
+  }
+
   onDragOver(event: DragEvent) {
     event.preventDefault();
   }
 
-  onDrop(event: DragEvent, lessonIndex: number) {
+  onDropLesson(event: DragEvent, targetIndex: number) {
     event.preventDefault();
-    if (event.dataTransfer?.files.length) {
-      for (let i = 0; i < event.dataTransfer.files.length; i++) {
-        this.addFileToLesson(event.dataTransfer.files[i], lessonIndex);
-      }
-    }
+    if (this.draggedLessonIndex === null || this.draggedLessonIndex === targetIndex) return;
+
+    const movedLesson = this.program.noiDungBaiHocs[this.draggedLessonIndex];
+    this.program.noiDungBaiHocs.splice(this.draggedLessonIndex, 1);
+    this.program.noiDungBaiHocs.splice(targetIndex, 0, movedLesson);
+
+    this.program.noiDungBaiHocs.forEach((lesson, i) => {
+      lesson.soThuTu = i + 1;
+    });
+
+    this.draggedLessonIndex = null;
   }
 
   /** ✅ Lưu file vào danh sách bài học (Không upload ngay) */
   addFileToLesson(file: File, lessonIndex: number) {
-    const allowedTypes = ['application/pdf', 'video/mp4', 'application/msword'];
+    const allowedTypes = ['application/pdf', 'video/mp4', 'application/msword'
+    ,'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
     if (!allowedTypes.includes(file.type)) {
-      alert('Chỉ chấp nhận file .pdf, .mp4, .doc!');
+      alert('Chỉ chấp nhận file .pdf, .mp4, .doc, .docx !');
       return;
     }
-
     this.program.noiDungBaiHocs[lessonIndex].taiLieuHocTaps.push({
       urlType: file.type.includes('video') ? 'video' : 'pdf',
       file
@@ -98,6 +171,10 @@ export class AddchuongtrinhComponent {
 
   /** ✅ Gửi chương trình lên API (bao gồm cả file) */
   saveProgram() {
+    if (!this.isFormValid()) {
+      this.toastr.warning('Vui lòng điền đầy đủ thông tin!');
+      return;
+    }
     const formData = new FormData();
 
     formData.append('chuongTrinhDto.tieuDe', this.program.tieuDe);
@@ -116,13 +193,13 @@ export class AddchuongtrinhComponent {
 
     this.chuongtrinhService.addProgram(formData).subscribe({
       next: (response) => {
-        console.log('✅ Thêm chương trình thành công:', response);
-        alert('Thêm chương trình thành công!');
+      
+        this.toastr.success('Thêm chương trình thành công!');
         this.router.navigate(['/chuongtrinh']);
       },
       error: (error) => {
-        console.error('❌ Lỗi khi thêm chương trình:', error);
-        alert('Lỗi khi thêm chương trình!');
+       
+        this.toastr.warning('Lỗi khi thêm chương trình!');
       }
     });
   }

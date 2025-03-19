@@ -154,7 +154,7 @@ public class AddListGiaoViensCommandHandler : IRequestHandler<AddListGiaoViensCo
             }
         }
         // Thêm giáo viên thành công (nếu có)
-        if (giaoViensToAdd.Any())
+        if (!errors.Any())
         {
             await _context.GiaoViens.AddRangeAsync(giaoViensToAdd, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);

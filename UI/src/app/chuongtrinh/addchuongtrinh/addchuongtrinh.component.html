@@ -5,27 +5,48 @@
 
   <div class="mb-3">
     <h3 class="form-label fw-bold">Tiêu Đề</h3>
-    <input type="text" class="form-control input-field" placeholder="Nhập tiêu đề" [(ngModel)]="program.tieuDe" />
-
+    <input type="text" class="form-control input-field" placeholder="Nhập tiêu đề" [(ngModel)]="program.tieuDe"
+           (input)="validateField('tieuDe')" />
+    <small class="text-danger" *ngIf="errors.tieuDe">{{ errors.tieuDe }}</small>
+    
+     
+    
+  
     <h3 class="form-label fw-bold">Mô Tả</h3>
-    <textarea class="form-control input-field" rows="3" placeholder="Viết mô tả cho chương trình học" [(ngModel)]="program.moTa"></textarea>
+    <textarea class="form-control input-field" rows="3" placeholder="Viết mô tả cho chương trình học"
+              [(ngModel)]="program.moTa" (input)="validateField('moTa')">
+    </textarea>
+    <small class="text-danger" *ngIf="errors.moTa">{{ errors.moTa }}</small>
+    
+    
   </div>
 
   <!-- Danh sách nội dung bài học -->
-  <div *ngFor="let lesson of program.noiDungBaiHocs; let i = index" class="lesson-container">
+  <div *ngFor="let lesson of program.noiDungBaiHocs; let i = index" class="lesson-container"
+  draggable="true" (dragstart)="onDragStart($event, i)" (dragover)="onDragOver($event)" (drop)="onDropLesson($event, i)">
     <div class="lesson-header d-flex justify-content-between align-items-center">
       <div class="d-flex align-items-center">
         <button class="btn btn-sm toggle-btn me-2" (click)="toggleLesson(i)">
           <i [class]="lesson.expanded ? 'bi bi-chevron-up' : 'bi bi-chevron-down'"></i>
         </button>
-        <h5 class="m-0">Nội dung bài học {{ i + 1 }}</h5>
+        <h5 class="m-0">Nội dung bài học {{ lesson.soThuTu }}</h5>
       </div>
       <button class="btn btn-sm btn-danger close-btn" (click)="removeLesson(i)">&times;</button>
     </div>
 
     <div class="lesson-body" *ngIf="lesson.expanded">
-      <input type="text" class="form-control mb-2" placeholder="Nhập tiêu đề bài học" [(ngModel)]="lesson.tieuDe" />
-      <textarea class="form-control mb-2" rows="2" placeholder="Viết mô tả bài học" [(ngModel)]="lesson.mota"></textarea>
+      <input type="text" class="form-control mb-2" placeholder="Nhập tiêu đề bài học" [(ngModel)]="lesson.tieuDe"
+           (input)="validateLesson(i, 'tieuDe')" />
+    <small class="text-danger" *ngIf="errors.noiDungBaiHocs[i]?.tieuDe">{{ errors.noiDungBaiHocs[i]?.tieuDe }}</small>
+    
+
+    <textarea class="form-control mb-2" rows="2" placeholder="Viết mô tả bài học" [(ngModel)]="lesson.mota"
+              (input)="validateLesson(i, 'mota')">
+    </textarea>
+    <small class="text-danger" *ngIf="errors.noiDungBaiHocs[i]?.mota">{{ errors.noiDungBaiHocs[i]?.mota }}</small>
+    
+
+  
 
       <!-- Kéo thả hoặc chọn file -->
       <div class="upload-container text-center p-3 border rounded"

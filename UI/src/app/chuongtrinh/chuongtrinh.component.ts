@@ -29,7 +29,7 @@ export class ChuongtrinhComponent implements OnInit {
    */
   getPrograms(page: number, search: string): void {
     this.chuongtrinhService.getPrograms(page, search).subscribe(response => {
-      console.log("📌 Dữ liệu từ API:", response);
+      
       if (!response.isError && response.code === 200) {
         // ✅ Chỉ lọc theo tiêu đề (tieuDe)
         this.programs = response.data.items
@@ -41,12 +41,12 @@ export class ChuongtrinhComponent implements OnInit {
             program.noiDungBaiHocs.sort((a, b) => a.soThuTu - b.soThuTu);
           }
         });
-        console.log(this.programs)
+       
         this.currentPage = response.data.pageNumber;
         this.totalPages = response.data.totalPages;
         this.cdr.detectChanges();
       } else {
-        console.warn("⚠️ Lỗi khi lấy danh sách chương trình:", response.message);
+        
       }
     });
   }
@@ -85,15 +85,15 @@ export class ChuongtrinhComponent implements OnInit {
   onDeleteProgram(id: number, event: Event): void {
     event.preventDefault(); // ✅ Ngăn chặn reload
 
-    if (confirm(`Bạn có chắc chắn muốn xóa chương trình ID ${id} không?`)) {
+    if (confirm(`Bạn có chắc chắn muốn xóa chương trình này không?`)) {
       this.chuongtrinhService.deleteProgram(id).subscribe({
         next: (response) => {
-          console.log(`✅ Xóa thành công chương trình ID ${id}:`, response);
+          
           this.programs = this.programs.filter(program => program.id !== id);
           this.cdr.detectChanges();
         },
         error: (error) => {
-          console.error(`❌ Lỗi khi xóa chương trình ID ${id}:`, error);
+         
 
           if (error.status === 401) {
             alert("⚠️ Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
@@ -116,7 +116,7 @@ export class ChuongtrinhComponent implements OnInit {
       },
       (error: any) => {
         // Trường hợp lỗi HTTP
-        console.error('Lỗi khi tải file:', error);
+       
         this.toastr.error('Đã có lỗi xảy ra.');
       }
     );

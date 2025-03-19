@@ -17,11 +17,11 @@ export class AccountmanagerService {
     return this.http.get<any>(this.provinceApiUrl);
   }
 
-  getDanhSachNhanVien(pageNumber: number , pageSize: number , searchTen: string = '', sortBy: string = '', isActive: boolean = null
+  getDanhSachNhanVien(pageNumber: number , pageSize: number , searchTen: string = '',filterTenCoSo:string='',filterTenVaiTro:string='', sortBy: string = '', isActive: boolean = null
   ): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    const body = { pageNumber, pageSize, searchTen, sortBy, isActive };
+    const body = { pageNumber, pageSize, searchTen,filterTenCoSo,filterTenVaiTro, sortBy, isActive };
 
     return this.http.post<any>(`${this.baseUrl}/getnhanvienswithpagination`, body, { headers });
   }

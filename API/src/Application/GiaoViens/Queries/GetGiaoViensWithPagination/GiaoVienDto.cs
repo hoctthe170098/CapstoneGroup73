@@ -26,7 +26,7 @@ public class GiaoVienDto
         {
             CreateMap<GiaoVien, GiaoVienDto>()
                 .ForMember(dest => dest.TenCoSo, opt => opt.MapFrom(src => src.Coso.Ten))
-                .ForMember(dest => dest.TenLops, opt => opt.MapFrom(src => src.LicHocs.Select(lh => lh.TenLop).Distinct().ToList()))
+                .ForMember(dest => dest.TenLops, opt => opt.MapFrom(src => src.LichHocs.Select(lh => lh.TenLop).Distinct().ToList()))
                 .ForMember(dest => dest.IsActive, opt => opt.Ignore());
         }
     }

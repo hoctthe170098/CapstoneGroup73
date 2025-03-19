@@ -53,9 +53,10 @@ public class GetNhanViensWithPaginationQueryHandler
             // Filter by "TenCoSo"
             if (!string.IsNullOrWhiteSpace(request.FilterTenCoSo))
             {
-                query = query.Where(nv => nv.Coso.Ten == request.FilterTenCoSo);
+                var checkFormatCoSo=Guid.TryParse(request.FilterTenCoSo, out var coSo_id);
+                if(checkFormatCoSo) 
+                query = query.Where(nv => nv.Coso.Id == coSo_id);
             }
-
             // Filter by Status
             if (request.IsActive.HasValue)
             {
