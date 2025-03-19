@@ -86,7 +86,7 @@
             <label>Code</label>
             <input type="text" class="form-control" placeholder="Nhập mã học viên" formControlName="code" />
             <small class="error-message" *ngIf="addStudentForm.controls['code'].invalid && addStudentForm.controls['code'].touched">
-              Mã học viên không được quá 18 ký tự.
+              Mã học viên phải điền không được quá 18 ký tự.
             </small>
           </div>
   
@@ -96,7 +96,7 @@
               <label>Họ và Tên</label>
               <input type="text" class="form-control" placeholder="Nhập họ và tên" formControlName="ten" />
               <small class="error-message" *ngIf="addStudentForm.controls['ten'].invalid && addStudentForm.controls['ten'].touched">
-                Họ và tên không được quá 50 ký tự.
+                Họ và tên phải điền và không được quá 50 ký tự.
               </small>
             </div>
   
@@ -130,7 +130,7 @@
               <label>Email</label>
               <input type="email" class="form-control" placeholder="Nhập email" formControlName="email" />
               <small class="error-message" *ngIf="addStudentForm.controls['email'].invalid && addStudentForm.controls['email'].touched">
-                Email không hợp lệ hoặc quá 100 ký tự.
+                Email phải điền hợp lệ và không quá 100 ký tự.
               </small>
             </div>
   
@@ -150,7 +150,7 @@
               <label>Trường</label>
               <input type="text" class="form-control" placeholder="Nhập trường" formControlName="truongDangHoc" />
               <small class="error-message" *ngIf="addStudentForm.controls['truongDangHoc'].invalid && addStudentForm.controls['truongDangHoc'].touched">
-                Trường không được quá 50 ký tự.
+                Trường phải có và không được quá 50 ký tự.
               </small>
             </div>
   
@@ -159,7 +159,7 @@
               <label>Lớp</label>
               <input type="text" class="form-control" placeholder="Nhập lớp" formControlName="lop" />
               <small class="error-message" *ngIf="addStudentForm.controls['lop'].invalid && addStudentForm.controls['lop'].touched">
-                Lớp không được quá 20 ký tự.
+                Lớp phải có và không được quá 20 ký tự.
               </small>
             </div>
   
@@ -209,7 +209,7 @@
               <label>Địa chỉ cụ thể</label>
               <input type="text" class="form-control" placeholder="Nhập địa chỉ cụ thể" formControlName="diaChiCuThe" />
               <small class="error-message" *ngIf="addStudentForm.controls['diaChiCuThe'].invalid && addStudentForm.controls['diaChiCuThe'].touched">
-                Địa chỉ không được quá 150 ký tự.
+                Địa chỉ cần điền và không chứa quá 150 kí tự.
               </small>
             </div>
           </div>
@@ -247,7 +247,7 @@
               <label>Họ và Tên</label>
               <input formControlName="ten" type="text" class="form-control" />
               <small class="error-message" *ngIf="editStudentForm.controls['ten'].invalid && editStudentForm.controls['ten'].touched">
-                Họ và tên không được quá 50 ký tự.
+                Họ và tên phải điền và không được quá 50 ký tự.
               </small>
             </div>
   
@@ -265,7 +265,7 @@
               <label>Ngày Sinh</label>
               <input formControlName="ngaySinh" type="date" class="form-control" />
               <small class="error-message" *ngIf="editStudentForm.controls['ngaySinh'].invalid && editStudentForm.controls['ngaySinh'].touched">
-                Vui lòng chọn ngày sinh hợp lệ.
+                <span *ngIf="editStudentForm.controls['ngaySinh'].errors?.required">Vui lòng nhập ngày sinh hợp lệ.</span>
               </small>
             </div>
           </div>
@@ -276,7 +276,7 @@
               <label>Email</label>
               <input formControlName="email" type="email" class="form-control" />
               <small class="error-message" *ngIf="editStudentForm.controls['email'].invalid && editStudentForm.controls['email'].touched">
-                Email không hợp lệ hoặc quá 100 ký tự.
+                Email phải điền hợp lệ và không quá 100 ký tự.
               </small>
             </div>
   
@@ -296,7 +296,7 @@
               <label>Trường</label>
               <input formControlName="truongDangHoc" type="text" class="form-control" />
               <small class="error-message" *ngIf="editStudentForm.controls['truongDangHoc'].invalid && editStudentForm.controls['truongDangHoc'].touched">
-                Trường không được quá 50 ký tự.
+                Trường phải có và không được quá 50 ký tự.
               </small>
             </div>
   
@@ -305,7 +305,7 @@
               <label>Lớp</label>
               <input formControlName="lop" type="text" class="form-control" />
               <small class="error-message" *ngIf="editStudentForm.controls['lop'].invalid && editStudentForm.controls['lop'].touched">
-                Lớp không được quá 20 ký tự.
+                Lớp phải có và không được quá 20 ký tự.
               </small>
             </div>
   
@@ -355,7 +355,7 @@
               <label>Địa chỉ cụ thể</label>
               <input formControlName="diaChiCuThe" type="text" class="form-control" />
               <small class="error-message" *ngIf="editStudentForm.controls['diaChiCuThe'].invalid && editStudentForm.controls['diaChiCuThe'].touched">
-                Địa chỉ không được quá 150 ký tự.
+                Địa chỉ phải điền và không được quá 150 ký tự.
               </small>
             </div>
           </div>
