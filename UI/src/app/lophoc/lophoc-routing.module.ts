@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LophocComponent } from './lophoc.component';
+import { AddlophocComponent } from './addlophoc/addlophoc.component';
+import { EditLopHocComponent } from './editlophoc/editlophoc.component';
 
 const routes: Routes = [
   {
@@ -10,6 +12,20 @@ const routes: Routes = [
         title: 'Lớp Học'
       }
     },
+    {
+        path: 'add',
+        component: AddlophocComponent,
+        data: {
+          title: 'Thêm Lớp Học'
+        }
+    },
+    {
+       path: 'edit/:id',
+       component: EditLopHocComponent,
+       data: {
+         title: 'Chỉnh Sửa Lớp Học'
+       }
+     }
 ];
 
 @NgModule({

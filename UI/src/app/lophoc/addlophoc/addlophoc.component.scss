@@ -1,0 +1,35 @@
+.bullet {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    background-color: #000;
+    border-radius: 50%;
+    margin: 0 10px;
+  }
+.delete-button {
+    background-color: #e53935;   // Màu đỏ của nút
+    width: 35px;                 // Kích thước ngang
+    height: 35px;                // Kích thước dọc
+    border: none;                // Không viền
+    border-radius: 50%;          // Bo tròn 100%
+    color: #fff;                 // Màu chữ (dấu "-") là trắng
+    display: inline-flex;         // Flex để căn giữa nội dung
+    align-items: center;         // Căn giữa theo chiều dọc
+    justify-content: center;     // Căn giữa theo chiều ngang
+    font-weight: bold;           // Chữ (dấu "-") in đậm
+    cursor: pointer;             // Con trỏ chuột dạng pointer
+  
+    &:hover {
+      background-color: #d32f2f; // Màu đỏ đậm hơn khi hover
+    }
+  }
+  .plus-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    
+    border: none;
+    background-color: #007bff;
+    color: white;
+  } 
+  

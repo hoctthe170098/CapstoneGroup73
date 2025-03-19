@@ -80,7 +80,7 @@ public class GetLopHocWithPaginationQueryValidator : AbstractValidator<CreateLic
         if (string.IsNullOrEmpty(token))
             throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
         var coSoId = _identityService.GetCampusId(token);
-        return await _context.Phongs.AnyAsync(p => p.Id == phongId&&p.CoSoId==coSoId);
+        return await _context.Phongs.AnyAsync(p => p.Id == phongId&&p.CoSoId==coSoId&&p.CoSo.TrangThai=="use");
     }
 
     private bool BeValidDateOnly(DateOnly date)
