@@ -84,7 +84,10 @@
           <!-- Code -->
           <div class="form-group">
             <label>Code</label>
-            <input type="text" class="form-control" placeholder="Nhập mã học viên" formControlName="code" />
+            <div class="input-group">
+              <span class="input-group-text">HS</span>
+              <input type="text" class="form-control" placeholder="Nhập mã học viên" formControlName="code" />
+            </div>
             <small class="error-message" *ngIf="addStudentForm.controls['code'].invalid && addStudentForm.controls['code'].touched">
               Mã học viên phải điền không được quá 18 ký tự.
             </small>
