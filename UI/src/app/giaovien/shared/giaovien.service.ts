@@ -54,5 +54,11 @@ export class GiaovienService {
 
     return this.http.put<any>(`${this.baseUrl}/editgiaovien`, JSON.stringify(giaoVienData), { headers });
 }
+exportGiaoViensToExcel(): Observable<Blob> {
+  const token = localStorage.getItem('token');
+  const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+  return this.http.post(`${this.baseUrl}/exportgiaovienstoexcel`, {}, { headers, responseType: 'blob' });
+}
 
 }

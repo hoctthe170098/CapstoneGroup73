@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GiaovienService } from './shared/giaovien.service';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { saveAs } from 'file-saver';
 @Component({
   selector: 'app-giaovien',
   templateUrl: './giaovien.component.html',
@@ -528,9 +529,17 @@ validateAge(control: any) {
       this.router.navigate(['/giaovien/import-giao-vien']);
     }
   
-    onExportFile() {
-      alert('Xuất Tệp');
+    
+    exportGiaoVien() {
+      this.giaovienService.exportGiaoViensToExcel().subscribe(
+        (response: Blob) => {
+          const fileName = 'DanhSachGiaoVien.xlsx';
+          saveAs(response, fileName);
+        },
+        (error) => {
+          console.error('❌ Lỗi khi xuất file:', error);
+        }
+      );
     }
-  
 
 }
