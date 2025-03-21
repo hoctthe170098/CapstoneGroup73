@@ -9,6 +9,6 @@ public class LichHocDto
 {
     public int Thu { get; init; }
     public int PhongId { get; init; }
-    public TimeOnly GioBatDau { get; init; } 
-    public TimeOnly GioKetThuc { get; init; } 
+    public required string GioBatDau { get; init; } 
+    public required string GioKetThuc { get; init; } 
 }

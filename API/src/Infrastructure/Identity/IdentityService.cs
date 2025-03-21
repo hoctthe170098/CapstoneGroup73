@@ -100,11 +100,17 @@ public class IdentityService : IIdentityService
         return result.ToApplicationResult();
     }
 
-    public async Task<string?> GenerateJwtToken(string username,string password)
+    public async Task<string?> GenerateJwtToken(string username, string password)
     {
-        var user = await  _userManager.FindByNameAsync(username);
-        if (user != null &&user.IsActive==true && await _userManager.CheckPasswordAsync(user, password))
+        var user = await _userManager.FindByNameAsync(username);
+        if (user != null && await _userManager.CheckPasswordAsync(user, password))
         {
+            if (user.IsActive == false) throw new Exception("Tài khoản bạn đã bị khoá");
+            var checkCoSo = await _context.CoSos
+                .AnyAsync(c => c.TrangThai == "close"
+                && (c.NhanViens.Any(nv => nv.UserId == user.Id)||c.GiaoViens.Any(gv => gv.UserId == user.Id)
+                ||c.HocSinhs.Any(hs => hs.UserId == user.Id)));
+            if (checkCoSo) throw new Exception("Cơ sở bạn đã đóng cửa");
             var roles = await _userManager.GetRolesAsync(user);
             IdentityOptions _options = new IdentityOptions();
             var secretKey = _configuration["Jwt:SecretKey"] ?? throw new ArgumentNullException(nameof(_configuration), "Jwt:SecretKey is missing in configuration.");
