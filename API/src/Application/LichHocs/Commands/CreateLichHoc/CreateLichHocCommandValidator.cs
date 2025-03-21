@@ -22,19 +22,21 @@ public class GetLopHocWithPaginationQueryValidator : AbstractValidator<CreateLic
         RuleFor(x => x.LopHocDto.TenLop)
             .NotEmpty().WithMessage("Tên lớp không được để trống")
             .MaximumLength(20).WithMessage("Tên lớp tối đa 20 ký tự")
-            .MustAsync(NotExistName)
+            .MustAsync(NotExistClassName)
             .WithMessage("Tên lớp đã tồn tại");
 
         RuleFor(x => x.LopHocDto.NgayBatDau)
             .Must(BeValidDateOnly).WithMessage("Ngày bắt đầu không đúng định dạng DateOnly")
-            .GreaterThan(DateOnly.FromDateTime(DateTime.Now)).WithMessage("Ngày bắt đầu phải lớn hơn ngày hiện tại");
+            .GreaterThan(DateOnly.FromDateTime(DateTime.Now))
+            .WithMessage("Ngày bắt đầu phải lớn hơn ngày hiện tại");
 
         RuleFor(x => x.LopHocDto.NgayKetThuc)
             .Must(BeValidDateOnly).WithMessage("Ngày kết thúc không đúng định dạng DateOnly")
-            .GreaterThan(x => x.LopHocDto.NgayBatDau.AddMonths(2)).WithMessage("Ngày kết thúc phải lớn hơn ngày bắt đầu ít nhất 2 tháng");
+            .GreaterThan(x => x.LopHocDto.NgayBatDau.AddMonths(2))
+            .WithMessage("Ngày kết thúc phải lớn hơn ngày bắt đầu ít nhất 2 tháng");
 
         RuleFor(x => x.LopHocDto.HocPhi)
-            .GreaterThan(400000).WithMessage("Học phí phải lớn hơn 400,000");
+            .GreaterThanOrEqualTo(50000).WithMessage("Học phí phải lớn hơn 50,000");
 
         RuleFor(x => x.LopHocDto.GiaoVienCode)
             .NotEmpty().WithMessage("GiaoVienCode không được để trống")
@@ -48,10 +50,11 @@ public class GetLopHocWithPaginationQueryValidator : AbstractValidator<CreateLic
 
         RuleFor(x => x.LopHocDto.LichHocs)
             .NotEmpty().WithMessage("Danh sách Lịch Học không được để trống")
-            .MustAsync(BeValidLichHocs).WithMessage("Danh sách Lịch Học đã bị trùng hoặc không hợp lệ");
+            .MustAsync(BeValidLichHocs)
+            .WithMessage("Danh sách Lịch Học đã bị trùng hoặc không hợp lệ, thời gian nghỉ giữa 2 tiết của 1 giáo viên ít nhất là 15p");
     }
 
-    private async Task<bool> NotExistName(string name, CancellationToken cToken)
+    private async Task<bool> NotExistClassName(string name, CancellationToken cToken)
     {
         var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
         if (string.IsNullOrEmpty(token))
@@ -62,7 +65,8 @@ public class GetLopHocWithPaginationQueryValidator : AbstractValidator<CreateLic
 
     private async Task<bool> ExistChuongTrinh(int chuongTrinhId, CancellationToken token)
     {
-        return await _context.ChuongTrinhs.AnyAsync(ct => ct.Id == chuongTrinhId);
+        return await _context.ChuongTrinhs
+            .AnyAsync(ct => ct.Id == chuongTrinhId && ct.TrangThai.ToLower()=="use");
     }
 
     private async Task<bool> ExistGiaoVien(string code, CancellationToken cToken)
@@ -80,7 +84,7 @@ public class GetLopHocWithPaginationQueryValidator : AbstractValidator<CreateLic
         if (string.IsNullOrEmpty(token))
             throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
         var coSoId = _identityService.GetCampusId(token);
-        return await _context.Phongs.AnyAsync(p => p.Id == phongId&&p.CoSoId==coSoId&&p.CoSo.TrangThai=="use");
+        return await _context.Phongs.AnyAsync(p => p.Id == phongId&&p.CoSoId==coSoId&&p.TrangThai=="use");
     }
 
     private bool BeValidDateOnly(DateOnly date)
@@ -99,26 +103,28 @@ public class GetLopHocWithPaginationQueryValidator : AbstractValidator<CreateLic
         {
             return true; // Danh sách rỗng hoặc null thì không cần validate
         }
-
         foreach (var lichHoc in lichHocs)
         {
-            if(lichHoc.Thu<2||lichHoc.Thu>8) return false;
+            var checktime1 = TimeOnly.TryParse(lichHoc.GioBatDau, out var gioBatDau);
+            var checktime2 = TimeOnly.TryParse(lichHoc.GioKetThuc, out var gioKetThuc);
+            if(!checktime1||!checktime2) return false;
+            if (lichHoc.Thu<2||lichHoc.Thu>8) return false;
             var check = await ExistPhong(lichHoc.PhongId, token);
             if (!check) return false;
 
             // Kiểm tra GioBatDau định dạng TimeOnly
-            if (!BeValidTimeOnly(lichHoc.GioBatDau) || lichHoc.GioBatDau < new TimeOnly(8, 0) || lichHoc.GioBatDau > new TimeOnly(20, 0))
+            if (!BeValidTimeOnly(gioBatDau) || gioBatDau < new TimeOnly(8, 0) || gioBatDau > new TimeOnly(20, 0))
             {
                 return false;
             }
 
             // Kiểm tra GioKetThuc định dạng TimeOnly
-            if (!BeValidTimeOnly(lichHoc.GioKetThuc) || lichHoc.GioKetThuc < new TimeOnly(10, 0) || lichHoc.GioKetThuc > new TimeOnly(22, 0))
+            if (!BeValidTimeOnly(gioBatDau) || gioBatDau < new TimeOnly(10, 0) || gioBatDau > new TimeOnly(22, 0))
             {
                 return false;
             }
 
-            if (lichHoc.GioKetThuc < lichHoc.GioBatDau.AddHours(2))
+            if (gioKetThuc < gioBatDau.AddHours(2))
             {
                 return false;
             }
@@ -132,33 +138,43 @@ public class GetLopHocWithPaginationQueryValidator : AbstractValidator<CreateLic
                 if (lichHocs[i].Thu==lichHocs[j].Thu)return false;
                 if (lichHocs[i].PhongId == lichHocs[j].PhongId)
                 {
-                    if (!(lichHocs[i].GioKetThuc <= lichHocs[j].GioBatDau || lichHocs[j].GioKetThuc <= lichHocs[i].GioBatDau))
+                    if (!(TimeOnly.Parse(lichHocs[i].GioKetThuc) <= TimeOnly.Parse(lichHocs[j].GioBatDau)
+                        || TimeOnly.Parse(lichHocs[j].GioKetThuc) <= TimeOnly.Parse(lichHocs[i].GioBatDau)))
                     {
                         return false;
                     }
-                    var timeSpan = (lichHocs[j].GioBatDau > lichHocs[i].GioKetThuc)
-                        ? lichHocs[j].GioBatDau - lichHocs[i].GioKetThuc
-                        : lichHocs[i].GioBatDau - lichHocs[j].GioKetThuc;
+                    var timeSpan = (TimeOnly.Parse(lichHocs[j].GioBatDau) > TimeOnly.Parse(lichHocs[i].GioKetThuc))
+                        ? TimeOnly.Parse(lichHocs[j].GioBatDau) - TimeOnly.Parse(lichHocs[i].GioKetThuc)
+                        : TimeOnly.Parse(lichHocs[i].GioBatDau) - TimeOnly.Parse(lichHocs[j].GioKetThuc);
                     if (timeSpan < TimeSpan.FromMinutes(15)) return false;
                 }
             }
         }
         var lichHocData = await _context.LichHocs
-            .Select(l => new {l.GiaoVienCode,l.PhongId,l.GioBatDau,l.GioKetThuc,l.Thu})
+            .Select(l => new {l.GiaoVienCode,l.PhongId,l.GioBatDau
+            ,l.GioKetThuc,l.Thu,l.NgayBatDau,l.NgayKetThuc})
             .ToListAsync();
         foreach (var lichHoc in lichHocs)
         {
             var checkThuAndPhong = lichHocData
-                .Any(lh=>lh.Thu==lichHoc.Thu&&lh.PhongId==lichHoc.PhongId
-                &&!(lh.GioKetThuc<=lichHoc.GioBatDau.AddMinutes(15)
-                ||lh.GioBatDau>=lichHoc.GioKetThuc.AddMinutes(15)));
-            if (!checkThuAndPhong) return false;
-            var checkGiaoVien = lichHocData
-                .Any(lh => lh.GiaoVienCode == command.LopHocDto.GiaoVienCode
-                && !(lh.GioKetThuc <= lichHoc.GioBatDau.AddMinutes(15)
-                || lh.GioBatDau >= lichHoc.GioKetThuc.AddMinutes(15)));
-            if (!checkGiaoVien) return false;
+                .Any(lh=>lh.Thu==lichHoc.Thu
+                &&(lh.PhongId==lichHoc.PhongId|| lh.GiaoVienCode == command.LopHocDto.GiaoVienCode)
+                && TinhNgayBuoiHocCuoiCung(lh.NgayKetThuc,lh.Thu)>=command.LopHocDto.NgayBatDau
+                && !(lh.GioKetThuc<= TimeOnly.Parse(lichHoc.GioBatDau).AddMinutes(-15)
+                ||lh.GioBatDau>=TimeOnly.Parse(lichHoc.GioKetThuc).AddMinutes(15)));
+            if (checkThuAndPhong) return false;
         }
         return true;
+    }
+    // Phương thức tính toán ngày buổi học cuối cùng
+    private DateOnly TinhNgayBuoiHocCuoiCung(DateOnly ngayKetThuc, int thu)
+    {
+        // Tính toán ngày buổi học cuối cùng dựa trên ngày kết thúc và thứ
+        var ngayBuoiHocCuoiCung = ngayKetThuc;
+        while (ngayBuoiHocCuoiCung.DayOfWeek != (DayOfWeek)(thu-1))
+        {
+            ngayBuoiHocCuoiCung = ngayBuoiHocCuoiCung.AddDays(-1);
+        }
+        return ngayBuoiHocCuoiCung;
     }
 }
