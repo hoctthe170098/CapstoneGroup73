@@ -55,8 +55,7 @@ public class ImportGiaoViensFromExcelCommandHandler : IRequestHandler<ImportGiao
                     string.IsNullOrWhiteSpace(worksheet.Cells[row, 5].Text) ||  
                     string.IsNullOrWhiteSpace(worksheet.Cells[row, 6].Text) ||  
                     string.IsNullOrWhiteSpace(worksheet.Cells[row, 7].Text) ||  
-                    string.IsNullOrWhiteSpace(worksheet.Cells[row, 8].Text) || 
-                    string.IsNullOrWhiteSpace(worksheet.Cells[row, 9].Text))    
+                    string.IsNullOrWhiteSpace(worksheet.Cells[row, 8].Text))  
                     {
                         throw new WrongInputException($"Import thất bại: Dòng {row} có ô bị trống. Hãy kiểm tra lại file Excel.");
                     }
@@ -77,7 +76,6 @@ public class ImportGiaoViensFromExcelCommandHandler : IRequestHandler<ImportGiao
                         SoDienThoai = worksheet.Cells[row, 6].Text.Trim(),
                         DiaChi = worksheet.Cells[row, 7].Text.Trim(),
                         TruongDangDay = worksheet.Cells[row, 8].Text.Trim(),
-                        TenCoSo = worksheet.Cells[row, 9].Text.Trim()
                     };
 
                     giaoVienList.Add(giaoVien);

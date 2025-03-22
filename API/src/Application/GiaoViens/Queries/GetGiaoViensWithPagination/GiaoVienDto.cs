@@ -17,7 +17,7 @@ public class GiaoVienDto
     public required DateOnly NgaySinh { get; set; }
     public string? Email { get; set; }
     public string? SoDienThoai { get; set; }
-    public required string TenCoSo { get; set; }
+    public string? TenCoSo { get; set; }
     public IList<string> TenLops { get; set; } = new List<string>();
     public bool IsActive { get; set; }  
     private class Mapping : Profile
