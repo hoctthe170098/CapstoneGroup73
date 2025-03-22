@@ -38,6 +38,11 @@ public class AddListHocSinhsCommandHandler : IRequestHandler<AddListHocSinhsComm
         var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
         if (string.IsNullOrEmpty(token))
             throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        Guid coSoId = _identityService.GetCampusId(token);
+        if (coSoId == Guid.Empty)
+        {
+            throw new FormatException("CoSo không hợp lệ");
+        }
         if (request.HocSinhs == null || !request.HocSinhs.Any())
         {
             throw new WrongInputException("Danh sách học viên không được rỗng.");
@@ -56,8 +61,6 @@ public class AddListHocSinhsCommandHandler : IRequestHandler<AddListHocSinhsComm
         var errors = new List<string>();
         foreach (var req in request.HocSinhs)
         {
-            try
-            {
                 if (string.IsNullOrWhiteSpace(req.Code) ||
              string.IsNullOrWhiteSpace(req.Ten) ||
              string.IsNullOrWhiteSpace(req.GioiTinh) ||
@@ -68,48 +71,43 @@ public class AddListHocSinhsCommandHandler : IRequestHandler<AddListHocSinhsComm
              string.IsNullOrWhiteSpace(req.SoDienThoai) ||
              string.IsNullOrWhiteSpace(req.NgaySinh))
                 {
-                    throw new NotFoundDataException("Dữ liệu không được để trống");
+                    throw new NotFoundDataException($"Dữ liệu học viên {req.Code} không được để trống");
                 }
                 // Validate NgaySinh (Date of Birth) format
                 if (!DateOnly.TryParseExact(req.NgaySinh, "yyyy-MM-dd", out DateOnly ngaySinh))
                 {
-                    throw new FormatException("Ngày sinh không hợp lệ. Định dạng phải là yyyy-MM-dd");
+                    throw new FormatException($"Ngày sinh học viên {req.Code} không hợp lệ. Định dạng phải là yyyy-MM-dd");
                 }
                 // Validate NgaySinh (Date of Birth) is at least 5 years old
                 var fiveYearsAgo = DateOnly.FromDateTime(DateTime.Now.AddYears(-5));
                 if (ngaySinh > fiveYearsAgo)
                 {
-                    throw new WrongInputException("Học sinh phải đủ 5 tuổi trở lên");
-                }
-                Guid coSoId = _identityService.GetCampusId(token);
-                if (coSoId == Guid.Empty)
-                {
-                    throw new FormatException("CoSo không hợp lệ");
+                    throw new WrongInputException($"Học sinh {req.Code} phải đủ 5 tuổi trở lên");
                 }
                 // Validate length constraints
                 if (req.Code.Length > 20 || req.Ten.Length > 50 || req.DiaChi.Length > 200
                     || req.Lop.Length > 20)
                 {
-                    throw new WrongInputException("Độ dài dữ liệu không hợp lệ!");
+                    throw new WrongInputException($"Độ dài dữ liệu Học sinh {req.Code} không hợp lệ!");
                 }
                 // Validate phone number 
                 if (!string.IsNullOrEmpty(req.SoDienThoai))
                 {
                     if (req.SoDienThoai.Length > 11 || !req.SoDienThoai.StartsWith("0") || !req.SoDienThoai.All(char.IsDigit))
                     {
-                        throw new FormatException("Số điện thoại không hợp lệ");
+                        throw new FormatException($"Số điện thoại Học sinh {req.Code} không hợp lệ");
                     }
                 }
                 // Validate email 
                 if (!string.IsNullOrEmpty(req.Email) && !new EmailAddressAttribute().IsValid(req.Email))
                 {
-                    throw new FormatException("Email không hợp lệ");
+                    throw new FormatException($"Email Học sinh {req.Code} không hợp lệ");
                 }
                 // Check if CoSo exists
                 var coSoExists = await _context.CoSos.AnyAsync(c => c.Id == coSoId, cancellationToken);
                 if (!coSoExists)
                 {
-                    throw new NotFoundDataException("Cơ sở không tồn tại");
+                    throw new NotFoundDataException($"Cơ sở Học sinh {req.Code} không tồn tại");
                 }
                 int chinhsach_id;
                 if (req.ChinhSachId == null || req.ChinhSachId.Trim() == "")
@@ -121,53 +119,48 @@ public class AddListHocSinhsCommandHandler : IRequestHandler<AddListHocSinhsComm
                     var check = Int32.TryParse(req.ChinhSachId, out chinhsach_id);
                     if (!check)
                     {
-                        throw new FormatException("Chính sách không hợp lệ");
+                        throw new FormatException($"Chính sách Học sinh {req.Code} không hợp lệ");
                     }
                     else
                     {
                         var checkExist = await _context.ChinhSaches
                             .AnyAsync(c => c.Id == chinhsach_id);
-                        if (!checkExist) throw new NotFoundDataException("Chính sách này không tồn tại!");
+                        if (!checkExist) throw new NotFoundDataException($"Chính sách Học sinh {req.Code} không tồn tại!");
                     }
                 }
+        }
+        try
+        {
+            foreach (var req in request.HocSinhs)
+            {
                 // Create identity user
                 var (result, userId) = await _identityService.GenerateUser(req.Ten, req.Code, req.Email);
                 if (!result.Succeeded)
                 {
                     throw new Exception($"Tạo tài khoản thất bại cho học viên có mã {req.Code}: {string.Join(", ", result.Errors)}");
                 }
-                hocSinhsToAdd.Add(new HocSinh
+                else
                 {
-                    Code = req.Code,
-                    Ten = req.Ten,
-                    GioiTinh = req.GioiTinh,
-                    DiaChi = req.DiaChi,
-                    TruongDangHoc = req.TruongDangHoc,
-                    Lop = req.Lop,
-                    NgaySinh = ngaySinh,
-                    Email = req.Email,
-                    SoDienThoai = req.SoDienThoai,
-                    CoSoId = coSoId,
-                    ChinhSachId = (chinhsach_id > 0) ? chinhsach_id : null,
-                    UserId = userId
-                });
+                    hocSinhsToAdd.Add(new HocSinh
+                    {
+                        Code = req.Code,
+                        Ten = req.Ten,
+                        GioiTinh = req.GioiTinh,
+                        DiaChi = req.DiaChi,
+                        TruongDangHoc = req.TruongDangHoc,
+                        Lop = req.Lop,
+                        NgaySinh = DateOnly.Parse(req.NgaySinh),
+                        Email = req.Email,
+                        SoDienThoai = req.SoDienThoai,
+                        CoSoId = coSoId,
+                        ChinhSachId = (req.ChinhSachId == null || req.ChinhSachId.Trim() == "") ? null : Int32.Parse(req.ChinhSachId),
+                        UserId = userId
+                    });
+                }
             }
-            catch (NotFoundDataException ex)
-            {
-                errors.Add($"Lỗi cho học sinh {req.Code}: {ex.Message}");
-            }
-            catch (FormatException ex)
-            {
-                errors.Add($"Lỗi định dạng cho học sinh {req.Code}: {ex.Message}");
-            }
-            catch (WrongInputException ex)
-            {
-                errors.Add($"Lỗi dữ liệu cho học sinh {req.Code}: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                errors.Add($"Lỗi không xác định cho học sinh {req.Code}: {ex.Message}");
-            }
+        }catch(Exception ex)
+        {
+            errors.Add(ex.Message);
         }
         if (hocSinhsToAdd.Any())
         {

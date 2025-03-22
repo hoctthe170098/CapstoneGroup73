@@ -6,6 +6,7 @@ using StudyFlow.Application.LichHocs.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using StudyFlow.Domain.Constants;
+using StudyFlow.Application.LichHocs.Queries.GetLopHocWithPagination;
 
 namespace StudyFlow.Web.Endpoints;
 
@@ -14,6 +15,7 @@ public class LichHocs : EndpointGroupBase
     public override void Map(WebApplication app)
     {
         app.MapGroup(this)
+            .MapPost(GetLopHocWithPagination, "getlophocwithpagination")
             .MapPost(CreateLichHocCoDinh, "createlichhoccodinh")
             .MapPut(EditLichHoc, "editlichhoc")
             .MapGet(GetLichHocById, "getlichhocbyid");
@@ -28,7 +30,11 @@ public class LichHocs : EndpointGroupBase
     {
         return await sender.Send(command);
     }
-
+    [Authorize(Roles = Roles.CampusManager)]
+    public async Task<Output> GetLopHocWithPagination(ISender sender, GetLopHocWithPaginationQuery query)
+    {
+        return await sender.Send(query);
+    }
     public async Task<Output> GetLichHocById(ISender sender, Guid id)
     {
         return await sender.Send(new GetLichHocByIdQuery(id));
