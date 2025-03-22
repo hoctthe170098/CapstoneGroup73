@@ -16,9 +16,9 @@ public class HocSinhDto
     public required string Lop { get; set; }
     public required string TruongDangHoc { get; set; }
     public required DateOnly NgaySinh { get; set; }
-    public string? Email { get; set; }
-    public string? SoDienThoai { get; set; }
-    public required string TenCoSo { get; set; }
+    public required string Email { get; set; }
+    public required string SoDienThoai { get; set; }
+    public string? TenCoSo { get; set; }
     public string? TenChinhSach { get; set; }
     public string? UserId { get; set; }
     public bool IsActive { get; set; }
