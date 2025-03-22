@@ -51,7 +51,8 @@ public class ExportHocSinhsToExcelCommandHandler : IRequestHandler<ExportHocSinh
                     worksheet.Cells[i + 2, 8].Value = hs.Email;
                     worksheet.Cells[i + 2, 9].Value = hs.SoDienThoai;
                     worksheet.Cells[i + 2, 10].Value = hs.TenCoSo;
-                    worksheet.Cells[i + 2, 11].Value = string.Join(", ", hs.TenLops);
+                    worksheet.Cells[i + 2, 11].Value = hs.TenCoSo;
+                    worksheet.Cells[i + 2, 12].Value = string.Join(", ", hs.TenLops);
                 }
 
                 worksheet.Cells.AutoFitColumns();
