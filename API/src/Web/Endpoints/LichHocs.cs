@@ -21,10 +21,11 @@ public class LichHocs : EndpointGroupBase
             .MapGet(GetLichHocById, "getlichhocbyid");
     }
     [Authorize(Roles =Roles.CampusManager)]
-    public async Task<Output> CreateLichHocCoDinh(ISender sender,CreateLichHocCommand command)
+    public async Task<Output> CreateLichHocCoDinh(ISender sender, [FromBody] CreateLichHocCommand command)
     {
         return await sender.Send(command);
     }
+
 
     public async Task<Output> EditLichHoc(ISender sender, [FromBody] EditLichHocCommand command)
     {

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
-import { PhongService } from '../shared/lophoc.service';
+import { LophocService } from '../shared/lophoc.service';
 @Component({
   selector: 'app-addlophoc',
   templateUrl: './addlophoc.component.html',
@@ -10,18 +10,16 @@ export class AddlophocComponent implements OnInit {
   themLopForm: FormGroup;
   phongList: any[] = [];
   // Dữ liệu mẫu, có thể thay bằng dữ liệu từ API
-  chuongTrinhList = [
-    { id: 1, tenChuongTrinh: 'Chương trình A' },
-    { id: 2, tenChuongTrinh: 'Chương trình B' },
-  ];
+  chuongTrinhList: any[] = [];
   
   giaoVienList: any[] = [];
 
-  constructor(private fb: FormBuilder,private phongService: PhongService) {}
+  constructor(private fb: FormBuilder,private lophocService: LophocService) {}
 
   ngOnInit(): void {
     this.fetchPhongs(); // Gọi API lấy danh sách phòng
     this.fetchGiaoViens(); // Gọi API lấy danh sách giáo viên
+    this.fetchChuongTrinhs();
      console.log('Danh sách phòng:', this.phongList);
    
     this.themLopForm = this.fb.group({
@@ -37,8 +35,23 @@ export class AddlophocComponent implements OnInit {
     // Thêm 1 dòng lịch mặc định
     this.addSchedule();
   }
+  fetchChuongTrinhs(): void {
+    this.lophocService.getChuongTrinhs().subscribe(
+      (res) => {
+        if (!res.isError) {
+          this.chuongTrinhList = res.data;
+          console.log('Danh sách chương trình:', this.chuongTrinhList);
+        } else {
+          console.error('Lỗi lấy chương trình:', res.message);
+        }
+      },
+      (err) => {
+        console.error('Lỗi gọi API chương trình:', err);
+      }
+    );
+  }
   fetchPhongs(): void {
-    this.phongService.getPhongs().subscribe(
+    this.lophocService.getPhongs().subscribe(
       (response) => {
         if (!response.isError) {
           this.phongList = response.data;
@@ -57,7 +70,7 @@ export class AddlophocComponent implements OnInit {
       searchTen: searchTen // Có thể truyền giá trị tìm kiếm, nếu không mặc định rỗng
     };
   
-    this.phongService.getGiaoViens(requestPayload).subscribe(
+    this.lophocService.getGiaoViens(requestPayload).subscribe(
       (response) => {
         if (!response.isError) {
           this.giaoVienList = response.data; // Giả sử API trả về danh sách trực tiếp trong response.data
@@ -116,12 +129,43 @@ export class AddlophocComponent implements OnInit {
   onSubmit(): void {
     if (this.themLopForm.valid) {
       const formValue = this.themLopForm.value;
-      console.log('Dữ liệu form:', formValue);
-      // Gọi API hoặc xử lý theo yêu cầu
+  
+      const lichHocs = formValue.lichHoc.map((lich: any) => ({
+        thu: parseInt(lich.thu),
+        phongId: lich.phong.id,
+        gioBatDau: lich.gioBatDau,
+        gioKetThuc: lich.gioKetThuc
+      }));
+  
+      const payload = {
+        lopHocDto: {
+          tenLop: formValue.tenLop,
+          ngayBatDau: formValue.ngayBatDau,
+          ngayKetThuc: formValue.ngayKetThuc,
+          hocPhi: formValue.hocPhi,
+          giaoVienCode: formValue.giaoVien.code, // đảm bảo có đúng field này
+          chuongTrinhId: formValue.chuongTrinh.id,
+          lichHocs: lichHocs
+        }
+      };
+  
+      console.log('Payload gửi đi:', JSON.stringify(payload));
+  
+      this.lophocService.createLichHocCoDinh(payload).subscribe(
+        (res) => {
+          console.log('Tạo thành công:', res);
+        },
+        (err) => {
+          console.error('Lỗi tạo lớp:', err.error);
+        }
+      );
     } else {
       this.themLopForm.markAllAsTouched();
     }
   }
+  
+  
+  
 
   // Xử lý hủy
   onCancel(): void {

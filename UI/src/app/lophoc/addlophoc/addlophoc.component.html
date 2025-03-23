@@ -33,7 +33,7 @@
               <select id="chuongTrinh" class="form-control" formControlName="chuongTrinh">
                 <option [ngValue]="null" disabled>Chọn chương trình học</option>
                 <option *ngFor="let ct of chuongTrinhList" [ngValue]="ct">
-                  {{ ct.tenChuongTrinh }}
+                  {{ ct.tieuDe }}
                 </option>
               </select>
               <small class="text-danger"
@@ -70,9 +70,10 @@
               <select id="giaoVien" class="form-control" formControlName="giaoVien">
                 <option [ngValue]="null" disabled>Chọn giáo viên</option>
                 <option *ngFor="let gv of giaoVienList" [ngValue]="gv">
-                  {{ gv.tenGiaoVien }}
+                  {{ gv.codeTen }}
                 </option>
               </select>
+              
               <small class="text-danger"
                 *ngIf="themLopForm.get('giaoVien').touched && themLopForm.get('giaoVien').hasError('required')">
                 Vui lòng chọn giáo viên!
@@ -145,7 +146,7 @@
 
             <div class="col-md-2 mb-2">
               <label for="gioBatDau">Giờ bắt đầu</label>
-              <input type="time" class="form-control" formControlName="gioBatDau" placeholder="Giờ bắt đầu" />
+              <input type="time" class="form-control" formControlName="gioBatDau" step="60" />
               <small class="text-danger"
                 *ngIf="schedule.get('gioBatDau').touched && schedule.get('gioBatDau').hasError('required')">
                 Vui lòng chọn giờ bắt đầu!
@@ -157,7 +158,7 @@
 
             <div class="col-md-2 mb-2">
               <label for="gioKetThuc">Giờ kết thúc</label>
-              <input type="time" class="form-control" formControlName="gioKetThuc" placeholder="Giờ kết thúc" />
+              <input type="time" class="form-control" formControlName="gioKetThuc" step="60" />
               <small class="text-danger"
                 *ngIf="schedule.get('gioKetThuc').touched && schedule.get('gioKetThuc').hasError('required')">
                 Vui lòng chọn giờ kết thúc!
@@ -173,7 +174,7 @@
               <select id="phong" class="form-control" formControlName="phong">
                 <option [ngValue]="null">Chọn phòng</option>
                 <option *ngFor="let p of phongList" [ngValue]="p">
-                  {{ p.tenPhong }}
+                  {{ p.ten }}
                 </option>>
               </select>
               <small class="text-danger"
