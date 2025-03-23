@@ -16,6 +16,9 @@ public class BaiTapConfiguration : IEntityTypeConfiguration<BaiTap>
         builder.HasKey(x => x.Id);
         builder.HasIndex(x => new { x.Ngay, x.LichHocId })
        .IsUnique();
+        builder.Property(kq => kq.TieuDe)
+            .IsRequired()
+            .HasMaxLength(50);
         builder.Property(kq => kq.NoiDung)
             .IsRequired()
             .HasMaxLength(750);

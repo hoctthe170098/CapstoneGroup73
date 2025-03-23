@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentValidation;
+using Microsoft.AspNetCore.Http;
 
 namespace StudyFlow.Application.ChuongTrinhs.Commands.CreateChuongTrinh;
 public class CreateChuongTrinhCommandValidator : AbstractValidator<CreateChuongTrinhCommand>
@@ -44,10 +45,34 @@ public class CreateChuongTrinhCommandValidator : AbstractValidator<CreateChuongT
                         {
                             taiLieu.RuleFor(t => t.urlType)
                                 .MaximumLength(20)
-                                .NotEmpty();
+                                .NotNull()
+                                .NotEmpty()
+                                .Must(FormatType)
+                                .WithMessage("Định dạng file không hợp lệ.");
+                            taiLieu.RuleFor(t => t.File)
+                            .NotNull()
+                            .Must(ValidLengthFile)
+                            .WithMessage("Kích thước file không được vượt quá 10MB và tên của file không được vượt quá 200 ký tự");
                         });
                 });
         });
+    }
+
+    private bool FormatType(string urlType)
+    {
+        if(urlType!="pdf"&&urlType!="word") return false;
+        return true;
+    }
+
+    private bool ValidLengthFile(IFormFile file)
+    {
+        if(file==null) return false;
+        if(file.Length==0) return false;
+        long maxSizeInBytes = 10 * 1024 * 1024; // 10MB
+        if (file.Length > maxSizeInBytes) return false;
+        var ten = Path.GetFileNameWithoutExtension(file.FileName);
+        if (ten.Length > 200) return false;
+        return true;
     }
 
     private bool BeSequentialAndUnique(List<CreateNoiDungBaiHocDto>? noiDungBaiHocs)

@@ -159,6 +159,7 @@ public class UpdateChuongTrinhCommandHandler : IRequestHandler<UpdateChuongTrinh
                            .Where(n => n.NoiDungBaiHocId == Guid.Parse(noiDungDto.Id))
                            .ToListAsync(cancellationToken);
                         // Cập nhật TaiLieuHocTap
+                        var TaiLieuCanXoas = new List<TaiLieuHocTap>();
                         if (noiDungDto.TaiLieuHocTaps != null)
                         {
                             //xoa TaiLieuHocTap
@@ -166,27 +167,40 @@ public class UpdateChuongTrinhCommandHandler : IRequestHandler<UpdateChuongTrinh
                                 .Where(n => !string.IsNullOrEmpty(n.Id))
                                 .Select(n => Guid.Parse(n.Id!))
                                 .ToList();
-                            var TaiLieuCanXoas = TaiLieuHienTai
-                                .Where(n => !TaiLieuIdsCapNhat.Contains(n.Id)).ToList();
-                            _context.TaiLieuHocTaps.RemoveRange(TaiLieuCanXoas);
-                            foreach (var taiLieuDto in noiDungDto.TaiLieuHocTaps)
+                                TaiLieuCanXoas = TaiLieuHienTai
+                                    .Where(n => !TaiLieuIdsCapNhat.Contains(n.Id)).ToList();
+                            foreach(var TaiLieuCanXoa in TaiLieuCanXoas)
                             {
-                                if (string.IsNullOrEmpty(taiLieuDto.Id))
+                                DeleteFile(TaiLieuCanXoa.urlFile);
+                                _context.TaiLieuHocTaps.Remove(TaiLieuCanXoa);
+                            }
+                                foreach (var taiLieuDto in noiDungDto.TaiLieuHocTaps)
                                 {
-                                    // Thêm mới TaiLieuHocTap
-                                    var taiLieu = new TaiLieuHocTap
+                                    if (string.IsNullOrEmpty(taiLieuDto.Id))
                                     {
-                                        Id = Guid.NewGuid(),
-                                        Ten = "",
-                                        urlType = taiLieuDto.urlType,
-                                        NgayTao = DateOnly.FromDateTime(DateTime.Now),
-                                        NoiDungBaiHocId = noiDung.Id,
-                                        urlFile = ""
-                                    };
-                                    await UploadFile(taiLieu, taiLieuDto, cancellationToken);
-                                    _context.TaiLieuHocTaps.Add(taiLieu);
-                                    await _context.SaveChangesAsync(cancellationToken);
+                                        // Thêm mới TaiLieuHocTap
+                                        var taiLieu = new TaiLieuHocTap
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            Ten = "",
+                                            urlType = taiLieuDto.urlType,
+                                            NgayTao = DateOnly.FromDateTime(DateTime.Now),
+                                            NoiDungBaiHocId = noiDung.Id,
+                                            urlFile = ""
+                                        };
+                                        await UploadFile(taiLieu, taiLieuDto, cancellationToken);
+                                        _context.TaiLieuHocTaps.Add(taiLieu);
+                                        await _context.SaveChangesAsync(cancellationToken);
+                                    }
                                 }
+                        }
+                        else
+                        {
+                            TaiLieuCanXoas = TaiLieuHienTai;
+                            foreach (var TaiLieuCanXoa in TaiLieuCanXoas)
+                            {
+                                DeleteFile(TaiLieuCanXoa.urlFile);
+                                _context.TaiLieuHocTaps.Remove(TaiLieuCanXoa);
                             }
                         }
                     }
@@ -208,16 +222,11 @@ public class UpdateChuongTrinhCommandHandler : IRequestHandler<UpdateChuongTrinh
     }
     private async Task UploadFile(TaiLieuHocTap taiLieu, UpdateTaiLieuHocTapDto taiLieuDto, CancellationToken cancellationToken)
     {
-        if ((taiLieuDto.urlType == "pdf" 
-            || taiLieuDto.urlType == "video"
-            || taiLieuDto.urlType == "mp4") 
-            && taiLieuDto.File != null && taiLieuDto.File.Length > 0)
+        if(taiLieuDto.File != null)
         {
             try
             {
                 taiLieu.Ten = Path.GetFileNameWithoutExtension(taiLieuDto.File.FileName);
-                if (taiLieu.Ten.Length > 200) 
-                    throw new FormatException("Tên của tài liệu không được vượt quá 200 ký tự");
                 var fileName = Guid.NewGuid().ToString() + Path.GetExtension(taiLieuDto.File.FileName);
                 var filePath = Path.Combine(_uploadFolderPath, fileName);
                 using (var stream = new FileStream(filePath, FileMode.Create))
@@ -232,7 +241,6 @@ public class UpdateChuongTrinhCommandHandler : IRequestHandler<UpdateChuongTrinh
                 throw new Exception($"Error uploading file {taiLieuDto.File.FileName}: {ioException.Message}");
             }
         }
-        else throw new FormatException();
     }
 
     private void DeleteFile(string filePath)
