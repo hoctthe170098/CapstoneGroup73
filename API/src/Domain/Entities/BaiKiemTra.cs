@@ -13,6 +13,7 @@ public class BaiKiemTra
     public required string UrlFile { get; set; }
     public required DateOnly NgayTao { get; set; }
     public DateOnly? NgayKiemTra { get; set; }
+    public required string TrangThai {  get; set; }
     public Guid? LichHocId { get; set; }
     [JsonIgnore]
     public LichHoc LichHoc { get; set; } = null!;

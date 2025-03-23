@@ -17,8 +17,11 @@ public class BaiKiemtraConfiguration : IEntityTypeConfiguration<BaiKiemTra>
         builder.Property(kq => kq.Ten)
             .IsRequired()
             .HasMaxLength(50);
-        builder.Property(kq => kq.Ten)
+        builder.Property(kq => kq.UrlFile)
             .IsRequired()
             .HasMaxLength(200);
+        builder.Property(kq => kq.TrangThai)
+            .IsRequired()
+            .HasMaxLength(20);
     }
 }

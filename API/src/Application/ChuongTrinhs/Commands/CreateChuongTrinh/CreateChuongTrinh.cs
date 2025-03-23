@@ -71,15 +71,9 @@ public class CreateChuongTrinhCommandHandler : IRequestHandler<CreateChuongTrinh
                                 NoiDungBaiHocId = noiDung.Id,
                                 urlFile = ""
                             };
-                            if ((taiLieuDto.urlType == "pdf" || taiLieuDto.urlType == "video"
-                                || taiLieuDto.urlType == "mp4"
-                                ) && taiLieuDto.File != null && taiLieuDto.File.Length > 0)
-                            {
                                 try
                                 {
                                     taiLieu.Ten = Path.GetFileNameWithoutExtension(taiLieuDto.File.FileName);
-                                    if (taiLieu.Ten.Length > 200) 
-                                        throw new FormatException("Tên của tài liệu không được vượt quá 200 ký tự");
                                     var fileName = Guid.NewGuid().ToString() + Path.GetExtension(taiLieuDto.File.FileName);
                                     var filePath = Path.Combine(_uploadFolderPath, fileName);
                                     using (var stream = new FileStream(filePath, FileMode.Create))
@@ -93,8 +87,6 @@ public class CreateChuongTrinhCommandHandler : IRequestHandler<CreateChuongTrinh
                                     _logger.LogError(ioException, "Error uploading file {FileName}", taiLieuDto.File.FileName);
                                     throw new Exception($"Error uploading file {taiLieuDto.File.FileName}: {ioException.Message}");
                                 }
-                            }
-                            else throw new FormatException();
                             _context.TaiLieuHocTaps.Add(taiLieu);
                             await _context.SaveChangesAsync(cancellationToken);
                         }
