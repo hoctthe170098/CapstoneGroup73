@@ -5,7 +5,7 @@ import { environment } from 'environments/environment';
 @Injectable({
   providedIn: 'root'
 })
-export class PhongService {
+export class LophocService {
   private phongUrl = `${environment.apiURL}/Phongs`;
   private giaovienUrl = `${environment.apiURL}/Giaoviens`;
   private chuongtrinhUrl = `${environment.apiURL}/ChuongTrinhs`;

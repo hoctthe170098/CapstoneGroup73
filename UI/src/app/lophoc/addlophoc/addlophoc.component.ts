@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
-import { PhongService } from '../shared/lophoc.service';
+import { LophocService } from '../shared/lophoc.service';
 @Component({
   selector: 'app-addlophoc',
   templateUrl: './addlophoc.component.html',
@@ -14,7 +14,7 @@ export class AddlophocComponent implements OnInit {
   
   giaoVienList: any[] = [];
 
-  constructor(private fb: FormBuilder,private phongService: PhongService) {}
+  constructor(private fb: FormBuilder,private lophocService: LophocService) {}
 
   ngOnInit(): void {
     this.fetchPhongs(); // Gọi API lấy danh sách phòng
@@ -36,7 +36,7 @@ export class AddlophocComponent implements OnInit {
     this.addSchedule();
   }
   fetchChuongTrinhs(): void {
-    this.phongService.getChuongTrinhs().subscribe(
+    this.lophocService.getChuongTrinhs().subscribe(
       (res) => {
         if (!res.isError) {
           this.chuongTrinhList = res.data;
@@ -51,7 +51,7 @@ export class AddlophocComponent implements OnInit {
     );
   }
   fetchPhongs(): void {
-    this.phongService.getPhongs().subscribe(
+    this.lophocService.getPhongs().subscribe(
       (response) => {
         if (!response.isError) {
           this.phongList = response.data;
@@ -70,7 +70,7 @@ export class AddlophocComponent implements OnInit {
       searchTen: searchTen // Có thể truyền giá trị tìm kiếm, nếu không mặc định rỗng
     };
   
-    this.phongService.getGiaoViens(requestPayload).subscribe(
+    this.lophocService.getGiaoViens(requestPayload).subscribe(
       (response) => {
         if (!response.isError) {
           this.giaoVienList = response.data; // Giả sử API trả về danh sách trực tiếp trong response.data
@@ -151,7 +151,7 @@ export class AddlophocComponent implements OnInit {
   
       console.log('Payload gửi đi:', JSON.stringify(payload));
   
-      this.phongService.createLichHocCoDinh(payload).subscribe(
+      this.lophocService.createLichHocCoDinh(payload).subscribe(
         (res) => {
           console.log('Tạo thành công:', res);
         },
