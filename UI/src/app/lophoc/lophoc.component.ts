@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { PhongService } from './shared/lophoc.service';
+import { LophocService } from './shared/lophoc.service';
 
 @Component({
   selector: 'app-lophoc',
@@ -33,7 +33,7 @@ export class LophocComponent implements OnInit {
   pageSize: number = 5;
 
   constructor(
-    private lophocService: PhongService,
+    private lophocService: LophocService,
     private cdr: ChangeDetectorRef
   ) {}
 
