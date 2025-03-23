@@ -8,7 +8,7 @@ import { environment } from 'environments/environment';
 export class PhongService {
   private phongUrl = `${environment.apiURL}/Phongs`;
   private giaovienUrl = `${environment.apiURL}/Giaoviens`;
-
+  private baseUrl = `${environment.apiURL}/LichHocs`;
   constructor(private http: HttpClient) {}
 
   getPhongs(): Observable<any> {
@@ -31,5 +31,14 @@ export class PhongService {
 
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.post<any>(`${this.giaovienUrl}/getgiaovienbycodeorname`, payload, { headers });
+  }
+
+  getDanhSachLopHoc(payload: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+      .set('Content-Type', 'application/json');
+
+    return this.http.post<any>(`${this.baseUrl}/getlophocwithpagination`, payload, { headers });
   }
 }

@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { PhongService } from './shared/lophoc.service';
 
 @Component({
   selector: 'app-lophoc',
@@ -7,7 +8,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LophocComponent implements OnInit {
 
-  // Biến filter
+  // Filter
   thuTrongTuan = {
     thu2: false,
     thu3: false,
@@ -23,49 +24,98 @@ export class LophocComponent implements OnInit {
   timeEnd: string = '';
   dateStart: string = '';
   dateEnd: string = '';
+  searchTerm: string = '';
 
-  // Danh sách lớp học demo
-  lophocs = [
-    {
-      tenLop: 'Lớp ôn luyện tiếng Anh cho học sinh khối 6',
-      chuongTrinh: 'Tiếng Anh nâng cao',
-      phong: 'E6-101',
-      giaoVien: 'Bùi Ngọc Dũng',
-      thoiGian: 'T2 - T6: 7h - 9h, T7: 9h - 11h',
-      ngayBatDau: '23/04/2025',
-      ngayKetThuc: '30/04/2025',
-      hocPhi: '500.000 đồng / tháng'
-    },
-    {
-      tenLop: 'Lớp ôn Toán 9',
-      chuongTrinh: 'Toán cấp 2',
-      phong: 'E6-202',
-      giaoVien: 'Trần Thị B',
-      thoiGian: 'T3 - T5: 8h - 10h',
-      ngayBatDau: '01/05/2025',
-      ngayKetThuc: '31/05/2025',
-      hocPhi: '600.000 đồng / tháng'
-    }
-  ];
+  lophocs: any[] = [];
 
-  // Phân trang demo
   currentPage: number = 1;
-  totalPages: number = 2;
+  totalPages: number = 1;
+  pageSize: number = 5;
 
-  constructor() { }
+  constructor(
+    private lophocService: PhongService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
+    this.loadLopHocs();
   }
 
-  onAddClass() {
-    alert('Thêm lớp học');
-  }
+  loadLopHocs() {
+    const thus: number[] = [];
+    if (this.thuTrongTuan.thu2) thus.push(2);
+    if (this.thuTrongTuan.thu3) thus.push(3);
+    if (this.thuTrongTuan.thu4) thus.push(4);
+    if (this.thuTrongTuan.thu5) thus.push(5);
+    if (this.thuTrongTuan.thu6) thus.push(6);
+    if (this.thuTrongTuan.thu7) thus.push(7);
+    if (this.thuTrongTuan.cn)   thus.push(8);
 
-  onEditClass(index: number) {
-    alert('Sửa lớp: ' + this.lophocs[index].tenLop);
+    const payload = {
+      pageNumber: this.currentPage,
+      pageSize: this.pageSize,
+      tenLop: this.searchTerm,
+      thus: thus,
+      giaoVienCode: 'all',
+      phongId: 0,
+      chuongTrinhId: 0,
+      trangThai: this.trangThai || 'all',
+      thoiGianBatDau: this.timeStart || '',
+      thoiGianKetThuc: this.timeEnd || '',
+      ngayBatDau: this.dateStart || '0001-01-01',
+      ngayKetThuc: this.dateEnd || '0001-01-01'
+    };
+
+    this.lophocService.getDanhSachLopHoc(payload).subscribe({
+      next: (response) => {
+        if (!response.isError && response.data) {
+          const data = response.data;
+
+          this.lophocs = data.lopHocs.map((item: any) => {
+            const lichCoDinh = item.loaiLichHocs.find((l: any) => l.trangThai === 'Cố định')?.lichHocs || [];
+            const firstLich = lichCoDinh[0];
+          
+            return {
+              tenLop: item.tenLop,
+              chuongTrinh: item.tenChuongTrinh,
+              phong: firstLich?.tenPhong || '',
+              giaoVien: item.tenGiaoVien,
+              thoiGian: lichCoDinh.map((lh: any) =>
+                `Thứ ${lh.thu}: ${lh.gioBatDau?.substring(0, 5)} - ${lh.gioKetThuc?.substring(0, 5)}`
+              ).join(', '),
+              ngayBatDau: firstLich?.ngayBatDau,
+              ngayKetThuc: firstLich?.ngayKetThuc,
+              hocPhi: item.hocPhi,
+              trangThai: item.trangThai   
+            };
+          });
+
+          this.totalPages = data.totalPages;
+          this.currentPage = data.pageNumber;
+          this.cdr.detectChanges(); 
+        } else {
+          this.lophocs = [];
+          this.totalPages = 1;
+        }
+      },
+      error: (err) => {
+        console.error(' Lỗi khi lấy danh sách lớp học:', err);
+        this.lophocs = [];
+        this.totalPages = 1;
+      }
+    });
   }
 
   goToPage(page: number) {
     this.currentPage = page;
+    this.loadLopHocs();
+  }
+
+  onAddClass() {
+    alert(' Thêm lớp học');
+  }
+
+  onEditClass(index: number) {
+    alert(' Sửa lớp: ' + this.lophocs[index].tenLop);
   }
 }
