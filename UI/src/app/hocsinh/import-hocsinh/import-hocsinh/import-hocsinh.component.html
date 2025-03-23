@@ -23,7 +23,7 @@
               <th>Ngày Sinh</th>
               <th>Email</th>
               <th>Số điện thoại</th>
-              <th>Trạng thái</th>
+              
               <th class="dropdown-col">
                 <i class="fas fa-caret-down"></i>
               </th>
@@ -39,10 +39,7 @@
                 <td>{{ s.ngaySinh | date:'dd-MM-yyyy' }}</td>
                 <td>{{ s.email }}</td>
                 <td>{{ s.soDienThoai }}</td>
-                <td>
-                  <span class="active-status">{{ s.status }}</span>
-                  <i class="check-icon"></i>
-                </td>
+                
                 <td class="dropdown-col">
                   <button class="btn dropdown-btn" (click)="toggleDetails(i)">
                     <i *ngIf="!s.showDetails" class="fas fa-caret-down"></i>

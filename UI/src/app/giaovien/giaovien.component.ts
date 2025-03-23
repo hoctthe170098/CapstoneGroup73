@@ -537,7 +537,7 @@ validateAge(control: any) {
           saveAs(response, fileName);
         },
         (error) => {
-          console.error('❌ Lỗi khi xuất file:', error);
+          console.error(' Lỗi khi xuất file:', error);
         }
       );
     }

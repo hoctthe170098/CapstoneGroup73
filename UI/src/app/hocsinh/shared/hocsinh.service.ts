@@ -52,4 +52,29 @@ export class HocSinhService {
 
     return this.http.put<any>(`${this.baseUrl}/edithocsinh`, JSON.stringify(hocSinhData), { headers });
 }
+exportHocSinhsToExcel(hocSinhs: any[]): Observable<Blob> {
+  const token = localStorage.getItem('token');
+  const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+  const body = {
+    hocSinhs: hocSinhs
+  };
+
+  return this.http.post(`${this.baseUrl}/exporthocsinhstoexcel`, body, {
+    headers,
+    responseType: 'blob'
+  });
+}
+importHocSinhsFromExcel(file: File): Observable<any> {
+  const token = localStorage.getItem('token');
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+  });
+
+  const formData = new FormData();
+  formData.append('File', file);
+
+  return this.http.post<any>(`${this.baseUrl}/importhocsinhsfromexcel?file=string`, formData, { headers });
+}
+
 }
