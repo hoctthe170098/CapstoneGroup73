@@ -171,6 +171,7 @@ public class GetLopHocWithPaginationQueryValidator : AbstractValidator<CreateLic
     {
         // Tính toán ngày buổi học cuối cùng dựa trên ngày kết thúc và thứ
         var ngayBuoiHocCuoiCung = ngayKetThuc;
+        var ThutrongTuan = (thu < 8) ? thu - 1 : thu - 8;
         while (ngayBuoiHocCuoiCung.DayOfWeek != (DayOfWeek)(thu-1))
         {
             ngayBuoiHocCuoiCung = ngayBuoiHocCuoiCung.AddDays(-1);
