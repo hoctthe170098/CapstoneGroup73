@@ -8,6 +8,7 @@ import { CustomizerService } from '../services/customizer.service';
 import { FormControl } from '@angular/forms';
 import { LISTITEMS } from '../data/template-search';
 import { Router } from '@angular/router';
+import { UserService } from 'app/pages/content-pages/shared/user.service';
 
 @Component({
   selector: "app-navbar",
@@ -42,13 +43,15 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
 
   listItems = [];
   control = new FormControl();
-
+  username:string;
+  rolename:string;
   public config: any = {};
 
   constructor(public translate: TranslateService,
     private layoutService: LayoutService,
     private router: Router,
-    private configService: ConfigService, private cdr: ChangeDetectorRef) {
+    private configService: ConfigService, private cdr: ChangeDetectorRef,
+    private authService: UserService) {
 
     const browserLang: string = translate.getBrowserLang();
     translate.use(browserLang.match(/en|es|pt|de/) ? browserLang : "en");
@@ -71,6 +74,8 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
     else {
       this.isSmallScreen = false;
     }
+    this.username = this.authService.getUserName();
+    this.rolename = this.authService.getRoleNames()[0];
   }
 
   ngAfterViewInit() {
@@ -215,9 +220,7 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   }
-
-
-
+  
   toggleNotificationSidebar() {
     this.layoutService.toggleNotificationSidebar(true);
   }

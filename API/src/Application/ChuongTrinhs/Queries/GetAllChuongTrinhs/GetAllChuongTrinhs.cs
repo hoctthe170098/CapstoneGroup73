@@ -29,6 +29,7 @@ public class GetAllChuongTrinhsQueryHandler : IRequestHandler<GetAllChuongTrinhs
             isError = false,
             code = 200,
             data = await _context.ChuongTrinhs
+            .Where(ct=>ct.TrangThai=="use")
                 .ProjectTo<ChuongTrinhDto>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken),
             message = "Lấy danh sách chương trình thành công"
