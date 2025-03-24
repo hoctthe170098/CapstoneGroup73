@@ -107,10 +107,11 @@
             <ul class="lich-hoc-list">
               <li *ngFor="let item of lop.thoiGian?.split(', ')">{{ item }}</li>
             </ul>
-            <p><strong>Ngày:</strong> {{ lop.ngayBatDau }} - {{ lop.ngayKetThuc }}</p>
-            <p><strong>Học phí:</strong> {{ lop.hocPhi | currency:'VND':'symbol-narrow' }} /buổi</p>
+            <p><strong>Ngày bắt đầu:</strong> {{ lop.ngayBatDau }} </p>
+            <p><strong>Ngày kết thúc:</strong> {{ lop.ngayKetThuc }}</p>
+            <p><strong>Học phí:</strong> {{ lop.hocPhi }} VND/buổi</p>
             <p><strong>Trạng thái:</strong> {{lop.trangThai}}</p>
-          </div>
+          </div>  
 
           <div class="lop-hoc-footer">
             <button class="btn edit-btn" (click)="onEditClass(i)">Sửa</button>
