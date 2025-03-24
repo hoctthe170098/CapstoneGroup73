@@ -152,14 +152,19 @@ export class AddchuongtrinhComponent {
 
   /** ✅ Lưu file vào danh sách bài học (Không upload ngay) */
   addFileToLesson(file: File, lessonIndex: number) {
-    const allowedTypes = ['application/pdf', 'video/mp4', 'application/msword'
+    const allowedTypes = ['application/pdf', 'application/msword'
     ,'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    const maxSizeInBytes = 10 * 1024 * 1024; // 10MB
     if (!allowedTypes.includes(file.type)) {
-      alert('Chỉ chấp nhận file .pdf, .mp4, .doc, .docx !');
+      alert('Chỉ chấp nhận file .pdf, .doc, .docx !');
+      return;
+    }
+    if (file.size > maxSizeInBytes) {
+      alert('File vượt quá 10MB. Vui lòng chọn file nhỏ hơn.');
       return;
     }
     this.program.noiDungBaiHocs[lessonIndex].taiLieuHocTaps.push({
-      urlType: file.type.includes('video') ? 'video' : 'pdf',
+      urlType: file.type.includes('pdf') ? 'pdf' : 'word',
       file
     });
   }
@@ -193,9 +198,12 @@ export class AddchuongtrinhComponent {
 
     this.chuongtrinhService.addProgram(formData).subscribe({
       next: (response) => {
-      
-        this.toastr.success('Thêm chương trình thành công!');
-        this.router.navigate(['/chuongtrinh']);
+        if(!response.isError){
+          this.toastr.success(response.message);
+          this.router.navigate(['/chuongtrinh']);
+        }else{
+          this.toastr.error(response.message);
+        }
       },
       error: (error) => {
        

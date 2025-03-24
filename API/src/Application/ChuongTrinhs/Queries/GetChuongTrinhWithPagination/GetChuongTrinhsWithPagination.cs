@@ -30,7 +30,7 @@ public class GetChuongTrinhsWithPaginationQueryHandler : IRequestHandler<GetChuo
             string noidungSearch = (string.IsNullOrWhiteSpace(request.Search)) ? "" : request.Search;
             if (request.PageNumber < 1 || request.PageSize < 1) throw new WrongInputException();
             var list = await _context.ChuongTrinhs
-                .Where(c => c.TieuDe.Contains(noidungSearch) || c.MoTa.Contains(noidungSearch))
+                .Where(c => (c.TieuDe.Contains(noidungSearch) || c.MoTa.Contains(noidungSearch))&&c.TrangThai=="use")
                    .ProjectTo<ChuongTrinhDto>(_mapper.ConfigurationProvider)
                    .PaginatedListAsync(request.PageNumber, request.PageSize);
             return new Output
@@ -43,7 +43,7 @@ public class GetChuongTrinhsWithPaginationQueryHandler : IRequestHandler<GetChuo
         }
         catch
         {
-            throw new FormatException();
+            throw ;
         }         
     }
 }

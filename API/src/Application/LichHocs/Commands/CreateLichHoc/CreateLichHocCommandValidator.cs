@@ -103,6 +103,9 @@ public class GetLopHocWithPaginationQueryValidator : AbstractValidator<CreateLic
         {
             return true; // Danh sách rỗng hoặc null thì không cần validate
         }
+        var listThu = lichHocs.Select(lh=>lh.Thu).Distinct()
+            .ToList();
+        if(listThu.Count!=lichHocs.Count) return false;
         foreach (var lichHoc in lichHocs)
         {
             var checktime1 = TimeOnly.TryParse(lichHoc.GioBatDau, out var gioBatDau);
@@ -119,7 +122,7 @@ public class GetLopHocWithPaginationQueryValidator : AbstractValidator<CreateLic
             }
 
             // Kiểm tra GioKetThuc định dạng TimeOnly
-            if (!BeValidTimeOnly(gioBatDau) || gioBatDau < new TimeOnly(10, 0) || gioBatDau > new TimeOnly(22, 0))
+            if (!BeValidTimeOnly(gioKetThuc) || gioKetThuc < new TimeOnly(10, 0) || gioKetThuc > new TimeOnly(22, 0))
             {
                 return false;
             }
@@ -127,27 +130,6 @@ public class GetLopHocWithPaginationQueryValidator : AbstractValidator<CreateLic
             if (gioKetThuc < gioBatDau.AddHours(2))
             {
                 return false;
-            }
-        }
-
-        // Kiểm tra trùng lịch học trong cùng phòng
-        for (int i = 0; i < lichHocs.Count; i++)
-        {
-            for (int j = i + 1; j < lichHocs.Count; j++)
-            {
-                if (lichHocs[i].Thu==lichHocs[j].Thu)return false;
-                if (lichHocs[i].PhongId == lichHocs[j].PhongId)
-                {
-                    if (!(TimeOnly.Parse(lichHocs[i].GioKetThuc) <= TimeOnly.Parse(lichHocs[j].GioBatDau)
-                        || TimeOnly.Parse(lichHocs[j].GioKetThuc) <= TimeOnly.Parse(lichHocs[i].GioBatDau)))
-                    {
-                        return false;
-                    }
-                    var timeSpan = (TimeOnly.Parse(lichHocs[j].GioBatDau) > TimeOnly.Parse(lichHocs[i].GioKetThuc))
-                        ? TimeOnly.Parse(lichHocs[j].GioBatDau) - TimeOnly.Parse(lichHocs[i].GioKetThuc)
-                        : TimeOnly.Parse(lichHocs[i].GioBatDau) - TimeOnly.Parse(lichHocs[j].GioKetThuc);
-                    if (timeSpan < TimeSpan.FromMinutes(15)) return false;
-                }
             }
         }
         var lichHocData = await _context.LichHocs
@@ -172,7 +154,7 @@ public class GetLopHocWithPaginationQueryValidator : AbstractValidator<CreateLic
         // Tính toán ngày buổi học cuối cùng dựa trên ngày kết thúc và thứ
         var ngayBuoiHocCuoiCung = ngayKetThuc;
         var ThutrongTuan = (thu < 8) ? thu - 1 : thu - 8;
-        while (ngayBuoiHocCuoiCung.DayOfWeek != (DayOfWeek)(thu-1))
+        while (ngayBuoiHocCuoiCung.DayOfWeek != (DayOfWeek)ThutrongTuan)
         {
             ngayBuoiHocCuoiCung = ngayBuoiHocCuoiCung.AddDays(-1);
         }
