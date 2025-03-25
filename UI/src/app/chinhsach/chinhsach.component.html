@@ -1,0 +1,76 @@
+<div class="chinhsach-wrapper">
+    <h2 class="title">CHÍNH SÁCH HỌC PHÍ</h2>
+    <div class="main-grid">
+      
+      <!-- Form Thêm Chính Sách -->
+      <div class="form-card">
+        <h3>Thêm Chính Sách Mới</h3>
+        <form>
+          <div class="form-group">
+            <label for="ten">Tên</label>
+            <input type="text" id="ten" class="form-control" placeholder="Nhập tên phòng" />
+          </div>
+  
+          <div class="form-group">
+            <label for="moTa">Mô tả</label>
+            <textarea id="moTa" class="form-control" rows="4" placeholder="Viết mô tả"></textarea>
+          </div>
+  
+          <div class="form-group">
+            <label for="giam">Phần trăm giảm</label>
+            <input type="number" id="giam" class="form-control" placeholder="Nhập phần trăm" />
+          </div>
+  
+          <div class="form-actions">
+            <button type="submit" class="btn btn-green">Thêm</button>
+            <button type="button" class="btn btn-red">Reset</button>
+          </div>
+        </form>
+      </div>
+  
+      <!-- Danh Sách Chính Sách -->
+      <div class="table-card">
+        <h3>Danh Sách Chính Sách Học Phí</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th class="wide-col">Tên</th>
+              <th class="wide-col">Phần Trăm Giảm</th>
+              <th>Mô Tả</th>
+              <th>Sửa</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of pagedChinhSach">
+                <td>{{ item.id }}</td>
+                <td class="wide-col">{{ item.ten }}</td>
+                <td class="wide-col">{{ (item.phanTramGiam * 100) | number: '1.0-0' }}%</td>
+                <td>{{ item.mota }}</td>
+                <td class="action-icons">
+                  <i class="ft-trash-2 icon-red"></i>
+                  <i class="ft-edit icon-green"></i>
+                </td>
+              </tr>
+          </tbody>
+        </table>
+  
+        <!-- Phân trang -->
+        <div class="pagination" *ngIf="totalPages > 1">
+            <button class="page-btn" (click)="prevPage()" [disabled]="currentPage === 1">&lt;</button>
+          
+            <button
+              class="page-btn"
+              *ngFor="let page of [].constructor(totalPages); let i = index"
+              [class.active]="currentPage === i + 1"
+              (click)="goToPage(i + 1)">
+              {{ i + 1 }}
+            </button>
+          
+            <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">&gt;</button>
+          </div>
+          
+      </div>
+    </div>
+  </div>
+  
