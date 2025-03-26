@@ -155,14 +155,13 @@ export class AddlophocComponent implements OnInit {
       this.lophocService.createLichHocCoDinh(payload).subscribe(
         (res: any) => {
           if (res.isError) {
-            this.toastr.error(res.message || 'Đã xảy ra lỗi không xác định', 'Lỗi');
+            this.toastr.error(res.message, 'Lỗi');
           } else {
-            this.toastr.success('Tạo lịch học cố định thành công!', 'Thành công');
+            this.toastr.success(res.message, 'Thành công');
           }
         },
         (err) => {
-          const message = err?.error?.message || 'Lỗi kết nối hoặc server không phản hồi';
-          this.toastr.error(message, 'Lỗi');
+          this.toastr.error(err?.error?.message, 'Lỗi');
         }
       );
     } else {
