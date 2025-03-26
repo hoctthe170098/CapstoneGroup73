@@ -167,30 +167,30 @@ isEditModalOpen: boolean = false;
   }
 
   submitNewStudent() {
-    console.log("🚀 Hàm submitNewStudent() được gọi!");
-  
     if (this.addStudentForm.invalid) {
-      console.log("❌ Form không hợp lệ", this.addStudentForm.errors);
       this.addStudentForm.markAllAsTouched();
       return;
     }
   
     const formData = this.addStudentForm.value;
   
-    // ✅ Xử lý địa chỉ đầy đủ
-    const provinceObj = this.provinces.find(p => p.code == formData.province);
-    const provinceName = provinceObj ? provinceObj.name : '';
+    console.log(" Form Data:", formData);
   
-    const districtObj = this.districts.find(d => d.code == formData.district);
-    const districtName = districtObj ? districtObj.name : '';
   
-    const diaChiFormatted = `${provinceName}, ${districtName}, ${formData.diaChiCuThe}`;
+    // Tìm tên tỉnh/thành
+    const provinceObj = this.provinces.find(p => String(p.code) === String(formData.province));
+    const provinceName = provinceObj?.name || '';
   
-    // ✅ Xử lý chính sách học phí, nếu "Không chọn" thì đặt là `null` hoặc loại bỏ hoàn toàn
-    let selectedPolicy = formData.chinhSachId;
-    if (!selectedPolicy || selectedPolicy === "" || selectedPolicy === "-- Không chọn --") {
-      selectedPolicy = null; // Có thể thử null hoặc không gửi key này đi
-    }
+    const districtObj = this.districts.find(d => String(d.code) === String(formData.district));
+    const districtName = districtObj?.name || '';
+  
+    const chiTiet = formData.diaChiCuThe || '';
+  
+    const diaChiFormatted = `${provinceName}, ${districtName}, ${chiTiet}`.trim();
+  
+    // Chính sách
+    let chinhSachId = formData.chinhSachId || null;
+    if (chinhSachId === '') chinhSachId = null;
   
     const newStudent = {
       code: formData.code,
@@ -202,14 +202,13 @@ isEditModalOpen: boolean = false;
       truongDangHoc: formData.truongDangHoc,
       lop: formData.lop,
       diaChi: diaChiFormatted,
-      ...(selectedPolicy !== null && { chinhSachId: selectedPolicy }) 
+      ...(chinhSachId !== null && { chinhSachId })
     };
   
-    console.log("📤 Gửi API thêm học sinh:", newStudent);
+    console.log(" Gửi API thêm học sinh:", newStudent);
   
     this.hocSinhService.createHocSinh(newStudent).subscribe({
       next: (res) => {
-        console.log("📌 Phản hồi từ API:", res);
         if (!res.isError) {
           this.toastr.success("Thêm học sinh thành công!", "Thành công");
           this.closeModal();
@@ -219,14 +218,11 @@ isEditModalOpen: boolean = false;
         }
       },
       error: (err) => {
-        console.error("❌ Lỗi khi gọi API:", err);
+        console.error(" Lỗi khi gọi API:", err);
         this.toastr.error("Có lỗi xảy ra, vui lòng thử lại!", "Lỗi");
       }
     });
   }
-  
-
-
   constructor(private hocSinhService: HocSinhService,private router: Router,private cdr: ChangeDetectorRef, 
     private toastr: ToastrService,
     private fb: FormBuilder) {
@@ -242,7 +238,7 @@ isEditModalOpen: boolean = false;
       lop: ['', Validators.required, Validators.maxLength(20)], 
       province: ['', Validators.required], 
       district: ['', Validators.required],  
-      diaChiCuThe: ['', Validators.required,Validators.maxLength(150)], 
+      diaChiCuThe: ['', Validators.required], 
       chinhSachId: ['']
     });
     this.editStudentForm = this.fb.group({
@@ -353,7 +349,6 @@ openEditStudentModal(student: any) {
   const districtName = addressParts[1] || '';
   const detailAddress = addressParts[2] || '';
 
-  // 🔥 Kiểm tra lại tỉnh/thành phố
   const provinceObj = this.provinces.find(p => p.name === provinceName);
   const provinceCode = provinceObj ? provinceObj.code : '';
 
@@ -370,7 +365,7 @@ openEditStudentModal(student: any) {
 
   let policyId = this.policies.find(p => p.ten === student.chinhSach)?.id || '';
 
-  // 🔥 Gán dữ liệu vào FormGroup
+  //  Gán dữ liệu vào FormGroup
   this.editStudentForm.patchValue({
       code: student.code || '',  
       ten: student.ten,
