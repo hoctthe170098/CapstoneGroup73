@@ -1,147 +1,135 @@
 <div class="lop-hoc-wrapper">
-    <!-- Tiêu đề + nút Thêm lớp học -->
-    <div class="top-bar">
-      <h2 class="page-title">DANH SÁCH LỚP HỌC</h2>
-      <button class="btn add-class-btn" (click)="onAddClass()">Thêm lớp học</button>
-    </div>
-  
-    <div class="content-row">
-      <!-- Cột trái: Filter -->
-<div class="left-filter">
-  <!-- Tìm kiếm -->
-  <label for="searchClass">Tìm Kiếm</label>
-  <input
-    id="searchClass"
-    type="text"
-    class="form-control"
-    placeholder="Tên lớp học..."
-   
-  />
-
-  <!-- Thứ Trong Tuần -->
-  <h4>Thứ Trong Tuần</h4>
-  <div class="checkbox-group">
-    <label><input type="checkbox" [(ngModel)]="thuTrongTuan.thu2" /> Thứ 2</label>
-    <label><input type="checkbox" [(ngModel)]="thuTrongTuan.thu3" /> Thứ 3</label>
-    <label><input type="checkbox" [(ngModel)]="thuTrongTuan.thu4" /> Thứ 4</label>
-    <label><input type="checkbox" [(ngModel)]="thuTrongTuan.thu5" /> Thứ 5</label>
-    <label><input type="checkbox" [(ngModel)]="thuTrongTuan.thu6" /> Thứ 6</label>
-    <label><input type="checkbox" [(ngModel)]="thuTrongTuan.thu7" /> Thứ 7</label>
-    <label><input type="checkbox" [(ngModel)]="thuTrongTuan.cn" /> Chủ Nhật</label>
+  <!-- Tiêu đề + nút Thêm lớp học -->
+  <div class="top-bar">
+    <h2 class="page-title">DANH SÁCH LỚP HỌC</h2>
+    <button class="btn add-class-btn" (click)="onAddClass()">Thêm lớp học</button>
   </div>
 
-  <!-- Chương Trình -->
-  <label for="chuongTrinhSelect">Chương Trình</label>
-  <select
-    id="chuongTrinhSelect"
-    class="form-control"
-    [(ngModel)]="chuongTrinh"
-  >
-    <option value="">Chọn chương trình</option>
-    <option value="Anh">Tiếng Anh</option>
-    <option value="Toan">Toán</option>
-    <!-- ... tuỳ bạn ... -->
-  </select>
+  <div class="content-row">
+    <!-- Cột trái: Filter -->
+    <div class="left-filter">
+      <!-- Tìm kiếm -->
+      <label for="searchClass">Tìm Kiếm</label>
+      <input
+        id="searchClass"
+        type="text"
+        class="form-control"
+        placeholder="Tên lớp học..."
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="loadLopHocs()"
+      />
 
-  <!-- Trạng Thái -->
-  <label for="trangThaiSelect">Trạng Thái</label>
-  <select
-    id="trangThaiSelect"
-    class="form-control"
-    [(ngModel)]="trangThai"
-  >
-    <option value="">Chọn trạng thái</option>
-    <option value="Hoạt động">Hoạt động</option>
-    <option value="Tạm ngừng">Tạm ngừng</option>
-  </select>
+      <!-- Thứ Trong Tuần -->
+      <h4>Thứ Trong Tuần</h4>
+      <div class="checkbox-group">
+        <label><input type="checkbox" [(ngModel)]="thuTrongTuan.thu2" (change)="loadLopHocs()" /> Thứ 2</label>
+        <label><input type="checkbox" [(ngModel)]="thuTrongTuan.thu3" (change)="loadLopHocs()" /> Thứ 3</label>
+        <label><input type="checkbox" [(ngModel)]="thuTrongTuan.thu4" (change)="loadLopHocs()" /> Thứ 4</label>
+        <label><input type="checkbox" [(ngModel)]="thuTrongTuan.thu5" (change)="loadLopHocs()" /> Thứ 5</label>
+        <label><input type="checkbox" [(ngModel)]="thuTrongTuan.thu6" (change)="loadLopHocs()" /> Thứ 6</label>
+        <label><input type="checkbox" [(ngModel)]="thuTrongTuan.thu7" (change)="loadLopHocs()" /> Thứ 7</label>
+        <label><input type="checkbox" [(ngModel)]="thuTrongTuan.cn" (change)="loadLopHocs()" /> Chủ Nhật</label>
+      </div>
 
-  <!-- Thời gian (Bắt đầu / Kết thúc) -->
-  <label>Thời gian</label>
-  <div class="time-range">
-    <div class="time-box">
-      <label>Bắt đầu</label>
-      <input type="time" class="form-control" [(ngModel)]="timeStart" />
-    </div>
-    <div class="time-box">
-      <label>Kết thúc</label>
-      <input type="time" class="form-control" [(ngModel)]="timeEnd" />
-    </div>
-  </div>
+      <!-- Chương Trình -->
+      <label for="chuongTrinhSelect">Chương Trình</label>
+      <select
+        id="chuongTrinhSelect"
+        class="form-control"
+        [(ngModel)]="chuongTrinh"
+        (change)="loadLopHocs()"
+      >
+        <option value="">Chọn chương trình</option>
+        <option value="Anh">Tiếng Anh</option>
+        <option value="Toan">Toán</option>
+      </select>
 
-  <!-- Ngày (Bắt đầu / Kết thúc) -->
-  <label>Ngày</label>
-  <div class="date-range">
-    <div class="date-box">
-      <label>Bắt đầu</label>
-      <input type="date" class="form-control" [(ngModel)]="dateStart" />
-    </div>
-    <div class="date-box">
-      <label>Kết thúc</label>
-      <input type="date" class="form-control" [(ngModel)]="dateEnd" />
-    </div>
-  </div>
-</div>
+      <!-- Trạng Thái -->
+      <label for="trangThaiSelect">Trạng Thái</label>
+      <select
+        id="trangThaiSelect"
+        class="form-control"
+        [(ngModel)]="trangThai"
+        (change)="loadLopHocs()"
+      >
+        <option value="">Chọn trạng thái</option>
+        <option value="Hoạt động">Hoạt động</option>
+        <option value="Tạm ngừng">Tạm ngừng</option>
+      </select>
 
-  
-      <!-- Cột phải: Danh sách lớp -->
-      <div class="right-list">
-        <div class="lop-hoc-item" *ngFor="let lop of lophocs; let i = index">
-          <!-- Thanh tiêu đề riêng -->
-          <div class="lop-hoc-title-bar">
-            {{ lop.tenLop }}
+      <!-- Thời gian -->
+      <label>Thời gian</label>
+      <div class="time-range">
+        <div class="time-box">
+          <label>Bắt đầu</label>
+          <input type="time" class="form-control" [(ngModel)]="timeStart" (change)="loadLopHocs()" />
+        </div>
+        <div class="time-box">
+          <label>Kết thúc</label>
+          <input type="time" class="form-control" [(ngModel)]="timeEnd" (change)="loadLopHocs()" />
+        </div>
+      </div>
+
+      <!-- Ngày -->
+      <label>Ngày</label>
+      <div class="date-range">
+        <div class="date-box">
+          <label>Bắt đầu</label>
+          <input type="date" class="form-control" [(ngModel)]="dateStart" (change)="loadLopHocs()" />
+        </div>
+        <div class="date-box">
+          <label>Kết thúc</label>
+          <input type="date" class="form-control" [(ngModel)]="dateEnd" (change)="loadLopHocs()" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Cột phải: Danh sách lớp -->
+    <div class="right-list">
+      <div class="lop-hoc-item" *ngFor="let lop of lophocs; let i = index">
+        <div class="lop-hoc-title-bar">
+          {{ lop.tenLop }}
+        </div>
+
+        <div class="lop-hoc-body">
+          <div class="lop-hoc-subheader">
+            <div class="lop-hoc-chuongtrinh">
+              <strong>Chương trình:</strong> {{ lop.chuongTrinh }}<br />
+              <strong>Phòng:</strong> {{ lop.phong }}
+            </div>
+            <div class="lop-hoc-giaovien">
+              <strong>Giáo viên:</strong> {{ lop.giaoVien }}
+            </div>
           </div>
-      
-          <!-- Phần nội dung lớp -->
-          <div class="lop-hoc-body">
-            <!-- Dòng thứ 2: Chương trình (bên trái), Giáo viên (bên phải) -->
-            <div class="lop-hoc-subheader">
-              <div class="lop-hoc-chuongtrinh">
-                <strong>Chương trình:</strong> {{ lop.chuongTrinh }}<br>
-                <strong>Phòng:</strong> {{ lop.phong }}
-              </div>
-              <div class="lop-hoc-giaovien">
-                <strong>Giáo viên:</strong> {{ lop.giaoVien }}
-              </div>
-            </div>
-      
-            <!-- Thông tin chi tiết -->
-            <div class="lop-hoc-info">
-              <p><strong>Lịch học:</strong></p>
-              <!-- Mỗi thứ 1 dòng -->
-              <ul class="lich-hoc-list">
-                <!-- Ví dụ: lop.thoiGian là mảng, hoặc bạn tách chuỗi. 
-                     Tùy dữ liệu, bạn có thể loop *ngFor="let item of lop.thoiGianArr"
-                -->
-                <li>Thứ 2: 7h - 9h</li>
-                <li>Thứ 6: 17h - 19h</li>
-                <!-- ... -->
-              </ul>
-              <p><strong>Ngày:</strong> {{ lop.ngayBatDau }} - {{ lop.ngayKetThuc }}</p>
-              <p><strong>Học phí:</strong> {{ lop.hocPhi }}</p>
-              <p><strong>Trạng thái:</strong> Hoạt động</p>
-              <!-- Hoặc lop.trangThai -->
-            </div>
-      
-            <!-- Nút Sửa ở góc dưới bên phải -->
-            <div class="lop-hoc-footer">
-              <button class="btn edit-btn" (click)="onEditClass(i)">Sửa</button>
-            </div>
+
+          <div class="lop-hoc-info">
+            <p><strong>Lịch học:</strong></p>
+            <ul class="lich-hoc-list">
+              <li *ngFor="let item of lop.thoiGian?.split(', ')">{{ item }}</li>
+            </ul>
+            <p><strong>Ngày:</strong> {{ lop.ngayBatDau }} - {{ lop.ngayKetThuc }}</p>
+            <p><strong>Học phí:</strong> {{ lop.hocPhi | currency:'VND':'symbol-narrow' }} /buổi</p>
+            <p><strong>Trạng thái:</strong> {{lop.trangThai}}</p>
+          </div>
+
+          <div class="lop-hoc-footer">
+            <button class="btn edit-btn" (click)="onEditClass(i)">Sửa</button>
           </div>
         </div>
       </div>
-      
-    </div>
-  
-    <!-- Phân trang -->
-    <div class="pagination-container">
-      <ul class="pagination">
-        <li class="page-item" [class.active]="currentPage === 1">
-          <a class="page-link" (click)="goToPage(1)">1</a>
-        </li>
-        <li class="page-item" [class.active]="currentPage === 2">
-          <a class="page-link" (click)="goToPage(2)">2</a>
-        </li>
-      </ul>
     </div>
   </div>
-  
+
+  <!-- Phân trang -->
+  <div class="pagination-container" *ngIf="totalPages > 1">
+    <ul class="pagination">
+      <li
+        class="page-item"
+        *ngFor="let page of [].constructor(totalPages); let idx = index"
+        [class.active]="currentPage === idx + 1"
+      >
+        <a class="page-link" (click)="goToPage(idx + 1)">{{ idx + 1 }}</a>
+      </li>
+    </ul>
+  </div>
+</div>

@@ -11,6 +11,7 @@ public class BaiTap
     public Guid Id { get; set; }//k
     public DateOnly Ngay { get; set; }//u
     public required Guid LichHocId { get; set; }//u
+    public required string TieuDe { get; set; }
     public required string NoiDung { get; set; }
     public required TimeOnly ThoiGianBatDau { get; set; }
     public required TimeOnly ThoiGianKetThuc { get; set; }

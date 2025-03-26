@@ -60,5 +60,16 @@ exportGiaoViensToExcel(): Observable<Blob> {
 
   return this.http.post(`${this.baseUrl}/exportgiaovienstoexcel`, {}, { headers, responseType: 'blob' });
 }
+importGiaoViensFromExcel(file: File): Observable<any> {
+  const token = localStorage.getItem('token');
+  const headers = new HttpHeaders({
+    Authorization: `Bearer ${token}`
+  });
 
+  const formData = new FormData();
+  formData.append('File', file); // key = File (viết hoa theo yêu cầu Postman)
+
+  return this.http.post<any>(
+    `${this.baseUrl}/importgiaoviensfromexcel?file=string`,formData,{ headers });
+}
 }

@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { UserService } from '../shared/user.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { LoginRequest} from '../shared/user.model';
+import { LoginRequest, UserRole} from '../shared/user.model';
 
 @Component({
   selector: 'app-login-page',
@@ -46,12 +46,20 @@ export class LoginPageComponent {
 
     this.authService.login(request).subscribe(
       (res) => {
-        console.log('Login response:', res);
-
-        if (res.isError == false && res.message.includes('Đăng nhập thành công')) {   
+        if (res.isError == false) {   
           localStorage.setItem('token', res.data);
-          this.toastr.success('Đăng nhập thành công!', 'Thành công');
+          var role = this.authService.getRoleNames()[0];
+          console.log(role)
+          if(role==UserRole.Administrator)
           this.router.navigate(['/coso']);
+        else if(role==UserRole.CampusManager){
+          this.router.navigate(['/lophoc']);
+        }else if(role==UserRole.LearningManager){
+          this.router.navigate(['/chuongtrinh']);
+        }else{
+          this.router.navigate(['/coso']);
+        }
+          this.toastr.success(res.message, 'Thành công');
         } else {
           this.isLoginFailed = true;
           this.toastr.error(res.message, 'Lỗi');

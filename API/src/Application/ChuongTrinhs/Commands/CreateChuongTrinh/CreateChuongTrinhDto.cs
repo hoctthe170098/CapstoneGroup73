@@ -24,5 +24,5 @@ public class CreateNoiDungBaiHocDto
 public class CreateTaiLieuHocTapDto
 {
     public required string urlType { get; init; }
-    public IFormFile? File { get; init; } // Thêm thuộc tính này
+    public required IFormFile File { get; init; } // Thêm thuộc tính này
 }

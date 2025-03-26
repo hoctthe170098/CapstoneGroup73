@@ -8,6 +8,7 @@ import { environment } from 'environments/environment';
 export class LophocService {
   private phongUrl = `${environment.apiURL}/Phongs`;
   private giaovienUrl = `${environment.apiURL}/Giaoviens`;
+  private baseUrl = `${environment.apiURL}/LichHocs`;
   private chuongtrinhUrl = `${environment.apiURL}/ChuongTrinhs`;
 
   constructor(private http: HttpClient) {}
@@ -32,6 +33,15 @@ export class LophocService {
 
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.post<any>(`${this.giaovienUrl}/getgiaovienbycodeorname`, payload, { headers });
+  }
+
+  getDanhSachLopHoc(payload: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+      .set('Content-Type', 'application/json');
+
+    return this.http.post<any>(`${this.baseUrl}/getlophocwithpagination`, payload, { headers });
   }
   createLichHocCoDinh(payload: any): Observable<any> {
     const token = localStorage.getItem('token');

@@ -30,3 +30,10 @@ export interface ChangePasswordForm {
   newPassword: string;
   confirmPassword: string;
 }
+export enum UserRole {
+  Administrator = 'Administrator',
+  CampusManager = 'CampusManager',
+  LearningManager = 'LearningManager',
+  Student = 'Student',
+  Teacher= 'Teacher'
+}

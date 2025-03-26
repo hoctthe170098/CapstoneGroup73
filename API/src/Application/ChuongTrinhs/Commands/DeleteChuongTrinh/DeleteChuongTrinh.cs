@@ -61,7 +61,7 @@ public class DeleteChuongTrinhComandHandler : IRequestHandler<DeleteChuongTrinhC
             isError = false,
             code=200,
             data = entity,
-            message = "Xoá thành công"
+            message = "Xoá chương trình thành công"
         };
     }
     private void DeleteFile(string filePath)

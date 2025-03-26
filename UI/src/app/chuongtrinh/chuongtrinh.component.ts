@@ -89,17 +89,17 @@ export class ChuongtrinhComponent implements OnInit {
     if (confirm(`Bạn có chắc chắn muốn xóa chương trình này không?`)) {
       this.chuongtrinhService.deleteProgram(id).subscribe({
         next: (response) => {
-          
-          this.programs = this.programs.filter(program => program.id !== id);
-          this.cdr.detectChanges();
+          if(!response.isError){
+            this.toastr.success(response.message)
+            this.programs = this.programs.filter(program => program.id !== id);
+            this.cdr.detectChanges();
+          }else{
+            this.toastr.error(response.message)
+          }    
         },
         error: (error) => {
-         
-
-          if (error.status === 401) {
-            alert("⚠️ Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
+          this.toastr.error(error.message)
           }
-        }
       });
     }
   }
@@ -116,8 +116,7 @@ export class ChuongtrinhComponent implements OnInit {
         }
       },
       (error: any) => {
-        // Trường hợp lỗi HTTP
-       
+        // Trường hợp lỗi HTTP  
         this.toastr.error('Đã có lỗi xảy ra.');
       }
     );

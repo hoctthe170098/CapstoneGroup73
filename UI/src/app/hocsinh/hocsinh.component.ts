@@ -4,6 +4,7 @@ import { HocSinhService } from './shared/hocsinh.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { saveAs } from 'file-saver';
 @Component({
   selector: 'app-hocsinh',
   templateUrl: './hocsinh.component.html',
@@ -103,8 +104,50 @@ isEditModalOpen: boolean = false;
   }
 
   onExportFile() {
-    alert('Xuất Tệp');
+    const isActiveFilter: boolean | null = this.trangThai === 'Hoạt động' ? true : this.trangThai === 'Tạm ngừng' ? false : null;
+  
+    // Gọi lại API với pageSize rất lớn để lấy toàn bộ danh sách học sinh theo filter hiện tại
+    this.hocSinhService.getDanhSachHocSinh(1, 10000, this.searchTerm, '', isActiveFilter, '')
+      .subscribe({
+        next: (response) => {
+          if (!response.isError && response.data && response.data.items.length > 0) {
+            const payload = response.data.items.map((hs: any) => ({
+              code: hs.code || '',
+              ten: hs.ten || '',
+              gioiTinh: hs.gioiTinh || '',
+              diaChi: hs.diaChi || '',
+              lop: hs.lop || '',
+              truongDangHoc: hs.truongDangHoc || '',
+              ngaySinh: hs.ngaySinh ? this.formatDate(hs.ngaySinh) : '',
+              email: hs.email || '',
+              soDienThoai: hs.soDienThoai || '',
+              tenCoSo: hs.tenCoSo || '',
+              tenChinhSach: hs.tenChinhSach || null,
+              userId: hs.userId || '',
+              isActive: hs.isActive !== undefined ? hs.isActive : true,
+              tenLops: hs.tenLops || []
+            }));
+  
+            this.hocSinhService.exportHocSinhsToExcel(payload).subscribe({
+              next: (blob: Blob) => {
+                const fileName = 'DanhSachHocSinh.xlsx';
+                saveAs(blob, fileName);
+                this.toastr.success("Xuất tệp thành công!", "Thành công");
+              },
+              error: () => {
+                this.toastr.error("Xuất tệp thất bại!", "Lỗi");
+              }
+            });
+          } else {
+            this.toastr.warning("Không có học sinh để xuất!", "Cảnh báo");
+          }
+        },
+        error: () => {
+          this.toastr.error("Lỗi khi lấy dữ liệu học sinh!", "Lỗi");
+        }
+      });
   }
+  
 
 
 
@@ -193,21 +236,21 @@ isEditModalOpen: boolean = false;
       ten: ['', [Validators.required, Validators.maxLength(50)]],
       gioiTinh: ['Nam', Validators.required],
       ngaySinh: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
       soDienThoai: ['', [Validators.required, Validators.pattern(/^0\d{9,10}$/)]],
-      truongDangHoc: ['', Validators.required],
-      lop: ['', Validators.required], 
+      truongDangHoc: ['', Validators.required, Validators.maxLength(50)],
+      lop: ['', Validators.required, Validators.maxLength(20)], 
       province: ['', Validators.required], 
       district: ['', Validators.required],  
-      diaChiCuThe: ['', Validators.required], 
+      diaChiCuThe: ['', Validators.required,Validators.maxLength(150)], 
       chinhSachId: ['']
     });
     this.editStudentForm = this.fb.group({
       code: [''], 
-      ten: ['', [Validators.required, Validators.maxLength(18)]],
+      ten: ['', [Validators.required, Validators.maxLength(50)]],
       gioiTinh: ['Nam', Validators.required],
       ngaySinh: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email, Validators.maxLength(50)]],
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
       soDienThoai: ['', [Validators.required, Validators.pattern(/^0\d{9,10}$/)]],
       truongDangHoc: ['', [Validators.required, Validators.maxLength(50)]],
       lop: ['', Validators.required],
