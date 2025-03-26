@@ -21,7 +21,7 @@ const routes: Routes = [
     component: AddchuongtrinhComponent,
     data: {
       title: 'Thêm Chương Trình'
-    } 
+    }
   },
   {
     path: 'edit/:id',

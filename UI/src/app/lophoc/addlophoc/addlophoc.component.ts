@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { LophocService } from '../shared/lophoc.service';
-import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-addlophoc',
   templateUrl: './addlophoc.component.html',
@@ -15,7 +14,7 @@ export class AddlophocComponent implements OnInit {
   
   giaoVienList: any[] = [];
 
-  constructor(private fb: FormBuilder,private lophocService: LophocService,private toastr: ToastrService) {}
+  constructor(private fb: FormBuilder,private lophocService: LophocService) {}
 
   ngOnInit(): void {
     this.fetchPhongs(); // Gọi API lấy danh sách phòng
@@ -150,19 +149,14 @@ export class AddlophocComponent implements OnInit {
         }
       };
   
-     
+      console.log('Payload gửi đi:', JSON.stringify(payload));
   
       this.lophocService.createLichHocCoDinh(payload).subscribe(
-        (res: any) => {
-          if (res.isError) {
-            this.toastr.error(res.message || 'Đã xảy ra lỗi không xác định', 'Lỗi');
-          } else {
-            this.toastr.success('Tạo lịch học cố định thành công!', 'Thành công');
-          }
+        (res) => {
+          console.log('Tạo thành công:', res);
         },
         (err) => {
-          const message = err?.error?.message || 'Lỗi kết nối hoặc server không phản hồi';
-          this.toastr.error(message, 'Lỗi');
+          console.error('Lỗi tạo lớp:', err.error);
         }
       );
     } else {
