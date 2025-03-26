@@ -32,7 +32,13 @@ public class GetBaiKiemTrasWithPaginationQueryHandler : IRequestHandler<GetBaiKi
     }
     public async Task<Output> Handle(GetBaiKiemTrasWithPaginationQuery request, CancellationToken cancellationToken)
     {
-        var listTest = await _context.BaiKiemTras.ToListAsync(cancellationToken);
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
+        var listTest = await _context.BaiKiemTras
+            .Where(t=>t.LichHoc.Phong.CoSoId== coSoId)
+            .ToListAsync(cancellationToken);
         var query =  listTest.AsQueryable();
         if (request.TrangThai.ToLower().Trim() != "all")
         {

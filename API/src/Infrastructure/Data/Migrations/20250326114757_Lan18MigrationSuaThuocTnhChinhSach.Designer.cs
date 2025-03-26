@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudyFlow.Infrastructure.Data;
 
 #nullable disable
 
-namespace CleanArchitecture.Infrastructure.Data.Migrations
+namespace StudyFlow.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250326114757_Lan18MigrationSuaThuocTnhChinhSach")]
+    partial class Lan18MigrationSuaThuocTnhChinhSach
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -268,10 +271,9 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ChinhSach", null, t =>
-                        {
-                            t.HasCheckConstraint("CK_ChinhSach_PhanTramGiam", "[PhanTramGiam] > 0 AND [PhanTramGiam] <= 0.1");
-                        });
+                    b.ToTable("ChinhSach", (string)null);
+
+                    b.HasAnnotation("CheckConstraint:CK_ChinhSach_PhanTramGiam", "[PhanTramGiam] >= 0 AND [PhanTramGiam] <= 0.1");
                 });
 
             modelBuilder.Entity("StudyFlow.Domain.Entities.ChuongTrinh", b =>
