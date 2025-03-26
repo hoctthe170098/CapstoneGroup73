@@ -1,76 +1,184 @@
 <div class="chinhsach-wrapper">
-    <h2 class="title">CHÍNH SÁCH HỌC PHÍ</h2>
-    <div class="main-grid">
-      
-      <!-- Form Thêm Chính Sách -->
-      <div class="form-card">
-        <h3>Thêm Chính Sách Mới</h3>
-        <form>
+  <h2 class="title">CHÍNH SÁCH HỌC PHÍ</h2>
+  <div class="main-grid">
+    <!-- FORM ADD -->
+    <div class="form-card">
+      <h3>Thêm Chính Sách Mới</h3>
+      <form (ngSubmit)="addChinhSach()">
+        <!-- Tên -->
+        <div class="form-group">
+          <label for="ten">Tên</label>
+          <input
+            type="text"
+            id="ten"
+            class="form-control"
+            [(ngModel)]="ten"
+            name="ten"
+            placeholder="Nhập tên chính sách"
+          />
+          <div
+            class="error-message"
+            *ngIf="isSubmitted && (!ten.trim() || ten.trim().length > 30)"
+          >
+            <div *ngIf="!ten.trim()">Tên không được để trống.</div>
+            <div *ngIf="ten.trim().length > 30">Tên tối đa 30 ký tự.</div>
+          </div>
+        </div>
+
+        <!-- Mô tả -->
+        <div class="form-group">
+          <label for="moTa">Mô tả</label>
+          <textarea
+            id="moTa"
+            [(ngModel)]="mota"
+            name="mota"
+            class="form-control"
+            rows="4"
+            placeholder="Viết mô tả"
+          ></textarea>
+          <div
+            class="error-message"
+            *ngIf="isSubmitted && mota.trim().length > 200"
+          >
+            Mô tả tối đa 200 ký tự.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="giam">Phần trăm giảm (%)</label>
+          <input
+            type="number"
+            id="giam"
+            class="form-control"
+            [(ngModel)]="phanTramGiam"
+            name="phanTramGiam"
+            placeholder="Nhập phần trăm"
+          />
+          <div class="error-message" *ngIf="isSubmitted && (phanTramGiam === null || phanTramGiam < 0 || phanTramGiam > 10)">
+            Phần trăm giảm phải nằm trong khoảng từ 0 đến 10.
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-green">Thêm</button>
+          <button type="button" class="btn btn-red" (click)="resetForm()">
+            Reset
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Modal CHỈNH SỬA CHÍNH SÁCH -->
+    <div class="modal-container" *ngIf="isEditModalOpen">
+      <div class="modal-overlay" (click)="closeEditModal()"></div>
+      <div class="modal-content scale-fade">
+        <div class="modal-header">
+          <h2>CHỈNH SỬA CHÍNH SÁCH</h2>
+          <button class="close-btn" (click)="closeEditModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <!-- Tên -->
           <div class="form-group">
-            <label for="ten">Tên</label>
-            <input type="text" id="ten" class="form-control" placeholder="Nhập tên phòng" />
+            <label>Tên</label>
+            <input type="text" [(ngModel)]="editTen" class="form-control" />
+            <div
+              class="error-message"
+              *ngIf="
+                isSubmittedEdit &&
+                (!editTen.trim() || editTen.trim().length > 30)
+              "
+            >
+              <div *ngIf="!editTen.trim()">Tên không được để trống.</div>
+              <div *ngIf="editTen.trim().length > 30">Tên tối đa 30 ký tự.</div>
+            </div>
           </div>
-  
+
+          <!-- Mô tả -->
           <div class="form-group">
-            <label for="moTa">Mô tả</label>
-            <textarea id="moTa" class="form-control" rows="4" placeholder="Viết mô tả"></textarea>
+            <label>Mô Tả</label>
+            <textarea
+              rows="4"
+              [(ngModel)]="editMoTa"
+              class="form-control"
+            ></textarea>
+            <div
+              class="error-message"
+              *ngIf="isSubmittedEdit && editMoTa.trim().length > 200"
+            >
+              Mô tả tối đa 200 ký tự.
+            </div>
           </div>
-  
           <div class="form-group">
-            <label for="giam">Phần trăm giảm</label>
-            <input type="number" id="giam" class="form-control" placeholder="Nhập phần trăm" />
+            <label>Phần Trăm Giảm</label>
+            <input type="number" [(ngModel)]="editPhanTramGiam" class="form-control" />
+            <div
+              class="error-message"
+              *ngIf="isSubmittedEdit && (editPhanTramGiam === null || editPhanTramGiam < 0 || editPhanTramGiam > 10)">
+              Giá trị giảm phải từ 0 - 10.
+            </div>
           </div>
-  
-          <div class="form-actions">
-            <button type="submit" class="btn btn-green">Thêm</button>
-            <button type="button" class="btn btn-red">Reset</button>
-          </div>
-        </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn cancel-btn" (click)="closeEditModal()">Hủy</button>
+          <button class="btn save-btn" (click)="applyEdit()">ÁP DỤNG</button>
+        </div>
       </div>
-  
-      <!-- Danh Sách Chính Sách -->
-      <div class="table-card">
-        <h3>Danh Sách Chính Sách Học Phí</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th class="wide-col">Tên</th>
-              <th class="wide-col">Phần Trăm Giảm</th>
-              <th>Mô Tả</th>
-              <th>Sửa</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of pagedChinhSach">
-                <td>{{ item.id }}</td>
-                <td class="wide-col">{{ item.ten }}</td>
-                <td class="wide-col">{{ (item.phanTramGiam * 100) | number: '1.0-0' }}%</td>
-                <td>{{ item.mota }}</td>
-                <td class="action-icons">
-                  <i class="ft-trash-2 icon-red"></i>
-                  <i class="ft-edit icon-green"></i>
-                </td>
-              </tr>
-          </tbody>
-        </table>
-  
-        <!-- Phân trang -->
-        <div class="pagination" *ngIf="totalPages > 1">
-            <button class="page-btn" (click)="prevPage()" [disabled]="currentPage === 1">&lt;</button>
-          
-            <button
-              class="page-btn"
-              *ngFor="let page of [].constructor(totalPages); let i = index"
-              [class.active]="currentPage === i + 1"
-              (click)="goToPage(i + 1)">
-              {{ i + 1 }}
-            </button>
-          
-            <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">&gt;</button>
-          </div>
-          
+    </div>
+
+    <div class="table-card">
+      <h3>Danh Sách Chính Sách Học Phí</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th class="wide-col">Tên</th>
+            <th class="wide-col">Phần Trăm Giảm</th>
+            <th>Mô Tả</th>
+            <th>Sửa</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of danhSachChinhSach">
+            <td>{{ item.id }}</td>
+            <td class="wide-col">{{ item.ten }}</td>
+            <td class="wide-col">
+              {{ item.phanTramGiam * 100 | number : "1.0-0" }}%
+            </td>
+            <td>{{ item.mota }}</td>
+            <td class="action-icons">
+              <i
+                class="ft-trash-2 icon-red"
+                (click)="xoaChinhSach(item.id)"
+              ></i>
+              <i class="ft-edit icon-green" (click)="openEditModal(item)"></i>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="pagination" *ngIf="totalPages > 1">
+        <button
+          class="page-btn"
+          [disabled]="currentPage === 1"
+          (click)="goToPage(currentPage - 1)"
+        >
+          &lt;
+        </button>
+        <button
+          class="page-btn"
+          *ngFor="let page of [].constructor(totalPages); let i = index"
+          [class.active]="currentPage === i + 1"
+          (click)="goToPage(i + 1)"
+        >
+          {{ i + 1 }}
+        </button>
+        <button
+          class="page-btn"
+          [disabled]="currentPage === totalPages"
+          (click)="goToPage(currentPage + 1)"
+        >
+          &gt;
+        </button>
       </div>
     </div>
   </div>
-  
+</div>

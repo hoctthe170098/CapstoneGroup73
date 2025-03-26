@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { LophocService } from './shared/lophoc.service';
-
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-lophoc',
   templateUrl: './lophoc.component.html',
@@ -34,7 +34,8 @@ export class LophocComponent implements OnInit {
 
   constructor(
     private lophocService: LophocService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef, 
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -118,7 +119,7 @@ export class LophocComponent implements OnInit {
   }
 
   onAddClass() {
-    alert('Thêm lớp học');
+    this.router.navigate(['/lophoc/add']);
   }
 
   onEditClass(index: number) {

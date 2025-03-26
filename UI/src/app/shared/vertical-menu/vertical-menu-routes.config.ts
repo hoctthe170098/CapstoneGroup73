@@ -15,6 +15,7 @@ export const ROUTES: RouteInfo[] = [
   {path: '/phong', title: 'Phòng Học', icon: 'ft-briefcase', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
   {path: '/chuongtrinh', title: 'Chương Trình', icon: 'ft-briefcase', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
   {path: '/lophoc', title: 'Lớp Học', icon: 'ft-book-open', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
+  {path: '/chinhsach', title: 'Chính sách', icon: 'ft-sidebar', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
   {path: '/accountmanager', title: 'Quản lý', icon: 'ft-briefcase', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
   {path: '/giaovien', title: 'Giáo Viên', icon: 'ft-briefcase', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
   {path: '/hocsinh', title: 'Học Sinh', icon: 'ft-map-pin', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
