@@ -19,6 +19,7 @@ public interface IIdentityService
     Task<bool> IsUserActiveAsync(string userId);
     Task<bool> AssignRoleAsync(string userId, string role);
     Guid GetCampusId(string token);
+    Guid GetUserId(string token);
     Task<Result> UpdateStatusUser(string userId,bool status);
     Task<Result> changeEmail(string userId,string email);
 }
