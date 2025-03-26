@@ -21,6 +21,10 @@ export const Full_ROUTES: Routes = [
     loadChildren: () => import('../../chinhsach/chinhsach.module').then(m => m.ChinhsachModule)
   },
   {
+    path: 'testlist',
+    loadChildren: () => import('../../testlist/testlist.module').then(m => m.TestlistModule)
+  },
+  {
     path: 'hocsinh',
     loadChildren: () => import('../../hocsinh/hocsinh.module').then(m => m.HocSinhModule)
   },
