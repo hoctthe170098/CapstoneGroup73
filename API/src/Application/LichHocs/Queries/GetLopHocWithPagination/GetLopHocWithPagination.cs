@@ -97,7 +97,11 @@ public class GetLopHocWithPaginationQueryHandler : IRequestHandler<GetLopHocWith
             query = query.Where(lh => lh.NgayBatDau >= request.NgayBatDau 
                 && lh.NgayKetThuc <= request.NgayKetThuc);
         }
-        var listClass = query.Select(lh=>lh.TenLop).Distinct().ToList();
+        var listClass = query.Select(lh=>lh.TenLop)
+            .Distinct()
+            .Skip((request.PageNumber-1)*request.PageSize)
+            .Take(request.PageSize)
+            .ToList();
         LopHocWithPaginationDTO lopHocWithPaginationDTO = new LopHocWithPaginationDTO
         {
             PageNumber = request.PageNumber,
