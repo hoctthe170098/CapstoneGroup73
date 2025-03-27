@@ -1,6 +1,6 @@
 <div class="testlist-container">
   <h2>DANH SÁCH BÀI KIỂM TRA</h2>
-
+  <div class="card">
   <div class="filters">
     <div class="filters-left">
       <select [(ngModel)]="selectedStatus">
@@ -67,6 +67,7 @@
     <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages.length">&gt;</button>
   </div>
 </div>
+</div> 
 
 <!-- TẠO BÀI KIỂM TRA MODAL -->
 <div class="my-modal-overlay" *ngIf="showCreateForm">
