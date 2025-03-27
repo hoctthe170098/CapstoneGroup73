@@ -43,7 +43,13 @@ public class GetLopHocWithPaginationQueryHandler : IRequestHandler<GetLopHocWith
 
     public async Task<Output> Handle(GetLopHocWithPaginationQuery request, CancellationToken cancellationToken)
     {
-        var query =  _context.LichHocs.AsQueryable();
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
+        var query =  _context.LichHocs
+            .Where(q=>q.Phong.CoSoId == coSoId)
+            .AsQueryable();
         if (request.TenLop != "")
         {
             query = query.Where(lh => lh.TenLop.Contains(request.TenLop));
