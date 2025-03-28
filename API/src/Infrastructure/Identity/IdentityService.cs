@@ -122,9 +122,11 @@ public class IdentityService : IIdentityService
 
             
             var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.Name, username)
-    };
+                {
+                    new Claim(ClaimTypes.Name, username),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id)
+                };
+
             if (!roles.Contains(Roles.Administrator))
             {
                 var staff = _context.NhanViens.FirstOrDefault(s => s.UserId == user.Id);
@@ -557,8 +559,37 @@ public class IdentityService : IIdentityService
         var campusIdString = jwtToken.Claims
             .First(x => x.Type == ClaimTypes.Locality).Value;
         var chuyendoi = Guid.TryParse(campusIdString, out var campusId);
-        if(chuyendoi) return campusId;
+        if (chuyendoi) return campusId;
         else return Guid.Empty;
+    }
+
+    public Guid GetUserId(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var secretKey = _configuration["Jwt:SecretKey"] ?? throw
+            new ArgumentNullException(nameof(_configuration),
+            "Jwt:SecretKey is missing in configuration.");
+
+        var key = Encoding.ASCII.GetBytes(secretKey);
+
+        tokenHandler.ValidateToken(token, new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ClockSkew = TimeSpan.Zero
+        }, out SecurityToken validatedToken);
+
+        var jwtToken = (JwtSecurityToken)validatedToken;
+
+        var userIdString = jwtToken.Claims
+            .FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
+
+        if (Guid.TryParse(userIdString, out var userId))
+            return userId;
+        else
+            return Guid.Empty;
     }
 
     public async Task<Result> UpdateStatusUser(string userId,bool status)

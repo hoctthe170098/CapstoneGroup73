@@ -107,5 +107,9 @@ export const Full_ROUTES: Routes = [
   {
     path: 'taskboard-ngrx',
     loadChildren: () => import('../../taskboard-ngrx/taskboard-ngrx.module').then(m => m.TaskboardNGRXModule)
-  }
+  },
+  {
+    path: 'lopdangday',
+    loadChildren: () => import('../../lopdangday/lopdangday.module').then(m => m.LopdangdayModule)
+  },
 ];

@@ -19,7 +19,7 @@ public interface IApplicationDbContext
     public DbSet<DiemDanh> DiemDanhs {  get; }
     public DbSet<BaiTap> BaiTaps {  get; }
     public DbSet<TraLoi> TraLois {  get; }
-    public DbSet<BaiTap> BaiKiemTras {  get; }
+    public DbSet<BaiKiemTra> BaiKiemTras {  get; }
     public DbSet<KetQuaBaiKiemTra> KetQuaBaiKiemTras { get; }
     public DbSet<NoiDungBaiHoc> NoiDungBaiHocs {  get; }
     public DbSet<TaiLieuHocTap> TaiLieuHocTaps {  get; }

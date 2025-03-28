@@ -7,9 +7,9 @@ using FluentValidation;
 using Microsoft.AspNetCore.Http;
 
 namespace StudyFlow.Application.ChuongTrinhs.Commands.CreateChuongTrinh;
-public class CreateChuongTrinhCommandValidator : AbstractValidator<CreateChuongTrinhCommand>
+public class CreateBaiKiemTraCommandValidator : AbstractValidator<CreateChuongTrinhCommand>
 {
-    public CreateChuongTrinhCommandValidator()
+    public CreateBaiKiemTraCommandValidator()
     {
         RuleFor(v => v.ChuongTrinhDto.TieuDe)
             .NotEmpty()
