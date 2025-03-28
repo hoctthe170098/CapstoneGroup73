@@ -3,12 +3,12 @@
   <div class="card">
   <div class="filters">
     <div class="filters-left">
-      <select [(ngModel)]="selectedStatus">
+      <select [(ngModel)]="selectedStatus" (change)="loadTests()">
         <option value="">Trạng thái</option>
         <option *ngFor="let status of statusList" [value]="status">{{ status }}</option>
       </select>
 
-      <select [(ngModel)]="selectedClass">
+      <select [(ngModel)]="selectedClass" (change)="loadTests()">
         <option value="">Lớp</option>
         <option *ngFor="let cls of classList" [value]="cls">{{ cls }}</option>
       </select>
