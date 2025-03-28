@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { LophocService } from '../shared/lophoc.service';
 import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-addlophoc',
   templateUrl: './addlophoc.component.html',
@@ -15,13 +16,13 @@ export class AddlophocComponent implements OnInit {
   
   giaoVienList: any[] = [];
 
-  constructor(private fb: FormBuilder,private lophocService: LophocService,private toastr: ToastrService) {}
+  constructor(private fb: FormBuilder,private lophocService: LophocService,private toastr: ToastrService, private router: Router) {}
 
   ngOnInit(): void {
     this.fetchPhongs(); // Gọi API lấy danh sách phòng
     this.fetchGiaoViens(); // Gọi API lấy danh sách giáo viên
     this.fetchChuongTrinhs();
-     console.log('Danh sách phòng:', this.phongList);
+     
    
     this.themLopForm = this.fb.group({
       tenLop: ['', [Validators.required, Validators.maxLength(20)]], // Giới hạn 20 ký tự
@@ -41,13 +42,13 @@ export class AddlophocComponent implements OnInit {
       (res) => {
         if (!res.isError) {
           this.chuongTrinhList = res.data;
-          console.log('Danh sách chương trình:', this.chuongTrinhList);
+         
         } else {
-          console.error('Lỗi lấy chương trình:', res.message);
+          
         }
       },
       (err) => {
-        console.error('Lỗi gọi API chương trình:', err);
+       
       }
     );
   }
@@ -56,13 +57,13 @@ export class AddlophocComponent implements OnInit {
       (response) => {
         if (!response.isError) {
           this.phongList = response.data;
-          console.log('Danh sách phòng:', this.phongList); 
+         
         } else {
           
         }
       },
       (error) => {
-        console.error('Lỗi API:', error);
+        
       }
     );
   }
@@ -75,13 +76,13 @@ export class AddlophocComponent implements OnInit {
       (response) => {
         if (!response.isError) {
           this.giaoVienList = response.data; // Giả sử API trả về danh sách trực tiếp trong response.data
-          console.log('Danh sách giáo viên:', this.giaoVienList);
+          
         } else {
-          console.error('Lỗi lấy danh sách giáo viên:', response.message);
+          
         }
       },
       (error) => {
-        console.error('Lỗi API:', error);
+        
       }
     );
   }
@@ -158,6 +159,7 @@ export class AddlophocComponent implements OnInit {
             this.toastr.error(res.message, 'Lỗi');
           } else {
             this.toastr.success(res.message, 'Thành công');
+            this.router.navigate(['/lophoc']);
           }
         },
         (err) => {
@@ -174,8 +176,7 @@ export class AddlophocComponent implements OnInit {
 
   // Xử lý hủy
   onCancel(): void {
-    console.log('Đã hủy thao tác');
-    // Logic hủy form hoặc chuyển hướng
+    this.router.navigate(['/lophoc']);
   }
   // Validate ngày bắt đầu từ hôm nay trở đi
   validateStartDate(control: AbstractControl): { [key: string]: any } | null {
