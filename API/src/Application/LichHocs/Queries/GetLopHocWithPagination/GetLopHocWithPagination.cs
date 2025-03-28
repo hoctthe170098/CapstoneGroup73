@@ -103,8 +103,8 @@ public class GetLopHocWithPaginationQueryHandler : IRequestHandler<GetLopHocWith
             query = query.Where(lh => lh.NgayBatDau >= request.NgayBatDau 
                 && lh.NgayKetThuc <= request.NgayKetThuc);
         }
-        var listClass = query.Select(lh=>lh.TenLop)
-            .Distinct()
+        var listClass = query.Select(lh => lh.TenLop).Distinct().ToList();
+        var listClassPagging = listClass
             .Skip((request.PageNumber-1)*request.PageSize)
             .Take(request.PageSize)
             .ToList();
@@ -116,7 +116,7 @@ public class GetLopHocWithPaginationQueryHandler : IRequestHandler<GetLopHocWith
             ? listClass.Count / request.PageSize : listClass.Count / request.PageSize + 1,
             LopHocs = new List<LopHocDto>()
         };
-        foreach (var cla in listClass)
+        foreach (var cla in listClassPagging)
         {
             var lichHocs = await _context.LichHocs
                 .Include(lh=>lh.GiaoVien)

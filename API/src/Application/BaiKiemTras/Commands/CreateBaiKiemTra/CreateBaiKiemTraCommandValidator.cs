@@ -23,7 +23,7 @@ public class UpdateBaiKiemTraCommandValidator : AbstractValidator<CreateBaiKiemT
         RuleFor(x => x.BaiKiemTraDto.TenBaiKiemTra)
             .MaximumLength(50).WithMessage("Tên bài kiểm tra tối đa 50 ký tự.")
             .MinimumLength(5).WithMessage("Tên bài kiểm tra tối thiểu 5 ký tự.");
-        RuleFor(x=>x.BaiKiemTraDto.TenLop)
+        RuleFor(x => x.BaiKiemTraDto.TenLop)
             .MustAsync(ValidLop)
             .WithMessage("Lớp không tồn tại hoặc không còn hoạt động.")
             .MustAsync(ValidLopDaHocDuSoBuoi)
