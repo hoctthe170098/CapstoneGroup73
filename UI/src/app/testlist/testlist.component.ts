@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-
+import { TestlistService } from './shared/testlist.service';
 @Component({
   selector: 'app-testlist',
   templateUrl: './testlist.component.html',
@@ -9,8 +9,8 @@ export class TestListComponent implements OnInit {
   statusList = ['Đã kiểm tra', 'Chưa kiểm tra'];
   classList = ['Lớp 6A1', 'Lớp 6A2', 'Lớp 7A1', 'Lớp 9B'];
 
-  selectedStatus = '';
-  selectedClass = '';
+  selectedStatus = 'all';
+  selectedClass = 'all';
   searchText = '';
 
   testList = [ // Danh sách đầy đủ
@@ -136,9 +136,11 @@ export class TestListComponent implements OnInit {
   ];
 
   // Phân trang
+  paginatedList = [];
+  totalItems = 0;
+
   currentPage = 1;
   itemsPerPage = 5;
-  paginatedList = [];
 
   showCreateForm = false;
 
@@ -158,10 +160,30 @@ export class TestListComponent implements OnInit {
       url: ''
     }
   };
-
+  constructor(private testlistService: TestlistService) {}
   ngOnInit() {
-    this.updatePaginatedList();
+    this.loadTests(); // bắt buộc phải có dòng này
   }
+  loadTests() {
+    this.testlistService
+      .getTests(this.currentPage, this.itemsPerPage, this.selectedStatus, this.selectedClass)
+      .subscribe({
+        next: res => {
+          const responseData = res.data;
+          console.log('Full response:', responseData);
+  
+          this.totalItems = responseData.totalCount;
+          this.paginatedList = responseData.data;
+  
+          console.log('Total Items:', this.totalItems);
+          console.log('Paginated list:', this.paginatedList);
+        },
+        error: err => {
+          console.error('Lỗi API:', err);
+        }
+      });
+  }
+  
 
   updatePaginatedList() {
     const start = (this.currentPage - 1) * this.itemsPerPage;
@@ -172,13 +194,12 @@ export class TestListComponent implements OnInit {
   changePage(page: number) {
     if (page < 1 || page > this.totalPages.length) return;
     this.currentPage = page;
-    this.updatePaginatedList();
+    this.loadTests();
   }
 
   get totalPages(): number[] {
-    return Array(Math.ceil(this.testList.length / this.itemsPerPage))
-      .fill(0)
-      .map((_, i) => i + 1);
+    const total = Math.ceil(this.totalItems / this.itemsPerPage);
+    return total > 0 ? Array.from({ length: total }, (_, i) => i + 1) : [];
   }
 
   getFileIcon(fileName: string): string {
