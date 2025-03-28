@@ -15,12 +15,14 @@ public class BaiKiemTraDto
     public required DateOnly NgayKiemTra { get; set; }
     public required string TrangThai { get; set; }
     public required string TenLop { get; set; }
+    public required bool CoDiem {  get; set; } = false;
     private class Mapping : Profile
     {
         public Mapping()
         {
             CreateMap<BaiKiemTra, BaiKiemTraDto>()
-                .ForMember(dest => dest.TenLop, opt => opt.MapFrom(src => src.LichHoc.TenLop));
+                .ForMember(dest => dest.TenLop, opt => opt.MapFrom(src => src.LichHoc.TenLop))
+                .ForMember(dest =>dest.CoDiem, opt=> opt.MapFrom(src=>src.KetQuaBaiKiemTras.Count>0));
         }
     }
 }
