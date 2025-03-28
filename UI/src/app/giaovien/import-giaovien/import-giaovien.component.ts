@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { GiaovienService } from '../shared/giaovien.service';
 import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-import-giaovien',
@@ -15,7 +16,8 @@ export class ImportGiaovienComponent {
   constructor(
     private giaovienService: GiaovienService,
     private toastr: ToastrService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {}
 
   onFileSelected(event: any) {
@@ -80,17 +82,40 @@ export class ImportGiaovienComponent {
   }
 
   onConfirmImport() {
-    this.toastr.success('Đã xác nhận danh sách giáo viên!', 'Thành công');
-    // 👇 Giữ nguyên danh sách và chuyển trạng thái về đã import
-    this.importedTeachers.forEach(t => (t.status = 'Hoạt động'));
-    this.cdr.detectChanges();
+    const danhSachGuiLen = this.importedTeachers.map(gv => ({
+      code: gv.code,
+      ten: gv.ten,
+      gioiTinh: gv.gioiTinh,
+      diaChi: gv.diaChi,
+      truongDangDay: gv.truongDangDay,
+      ngaySinh: gv.ngaySinh.toISOString().split('T')[0],
+      email: gv.email,
+      soDienThoai: gv.soDienThoai
+    }));
+  
+    this.giaovienService.addListGiaoViens(danhSachGuiLen).subscribe({
+      next: (res) => {
+        if (!res.isError) {
+          this.toastr.success(res.message || 'Đã thêm giáo viên vào hệ thống!', 'Thành công');
+          this.router.navigate(['/giaovien']); 
+        } else {
+          const errorMessage = res.errors?.length ? res.errors.join(', ') : (res.message || 'Thêm giáo viên thất bại');
+          this.toastr.error(errorMessage, 'Lỗi');
+        }
+      },
+      error: (err) => {
+        console.error(' Lỗi khi gọi API thêm danh sách giáo viên:', err);
+        this.toastr.error('Không thể thêm giáo viên vào hệ thống.', 'Lỗi');
+      }
+    });
   }
+  
+  
+  
 
   goBack() {
     window.history.back();
   }
 
-  onEditStudentClick(index: number) {
-    this.toastr.info('Tính năng sửa đang được phát triển!');
-  }
+  
 }

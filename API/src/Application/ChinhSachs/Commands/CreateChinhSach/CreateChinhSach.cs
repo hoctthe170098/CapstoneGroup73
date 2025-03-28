@@ -27,7 +27,7 @@ public class CreateChinhSachCommandHandler : IRequestHandler<CreateChinhSachComm
         if (string.IsNullOrWhiteSpace(request.CreateChinhSachDto.Mota))
             throw new WrongInputException("Mô tả không được để trống.");
 
-        if (request.CreateChinhSachDto.PhanTramGiam <= 0f || request.CreateChinhSachDto.PhanTramGiam >= 0.1f)
+        if (request.CreateChinhSachDto.PhanTramGiam < 0| request.CreateChinhSachDto.PhanTramGiam > 0.1f)
             throw new WrongInputException("Phần trăm giảm phải nằm trong khoảng (0,0.1).");
 
         var existingChinhSach = await _context.ChinhSaches

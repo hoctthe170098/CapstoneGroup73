@@ -17,7 +17,8 @@ export class ChuongtrinhComponent implements OnInit {
   constructor(
     private chuongtrinhService: ChuongtrinhService,
     private router: Router,
-    private cdr: ChangeDetectorRef, private toastr: ToastrService
+    private cdr: ChangeDetectorRef, 
+    private toastr: ToastrService
   ) { }
 
   ngOnInit(): void {

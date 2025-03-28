@@ -72,4 +72,12 @@ importGiaoViensFromExcel(file: File): Observable<any> {
   return this.http.post<any>(
     `${this.baseUrl}/importgiaoviensfromexcel?file=string`,formData,{ headers });
 }
+addListGiaoViens(giaoViens: any[]): Observable<any> {
+  const token = localStorage.getItem('token');
+  const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+  const body = { giaoViens };
+
+  return this.http.post<any>(`${this.baseUrl}/addlistgiaoviens`, body, { headers });
+}
 }

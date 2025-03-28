@@ -76,5 +76,10 @@ importHocSinhsFromExcel(file: File): Observable<any> {
 
   return this.http.post<any>(`${this.baseUrl}/importhocsinhsfromexcel?file=string`, formData, { headers });
 }
+addListHocSinhs(body: any): Observable<any> {
+  const token = localStorage.getItem('token');
+  const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  return this.http.post(`${this.baseUrl}/addlisthocsinhs`, body, { headers });
+}
 
 }

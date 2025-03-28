@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { LophocService } from './shared/lophoc.service';
-
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-lophoc',
   templateUrl: './lophoc.component.html',
@@ -8,7 +8,6 @@ import { LophocService } from './shared/lophoc.service';
 })
 export class LophocComponent implements OnInit {
 
-  // Filter
   thuTrongTuan = {
     thu2: false,
     thu3: false,
@@ -18,6 +17,7 @@ export class LophocComponent implements OnInit {
     thu7: false,
     cn: false
   };
+
   chuongTrinh: string = '';
   trangThai: string = '';
   timeStart: string = '';
@@ -30,18 +30,19 @@ export class LophocComponent implements OnInit {
 
   currentPage: number = 1;
   totalPages: number = 1;
-  pageSize: number = 5;
+  pageSize: number = 3;
 
   constructor(
     private lophocService: LophocService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef, 
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadLopHocs();
   }
 
-  loadLopHocs() {
+  loadLopHocs(page: number = this.currentPage) {
     const thus: number[] = [];
     if (this.thuTrongTuan.thu2) thus.push(2);
     if (this.thuTrongTuan.thu3) thus.push(3);
@@ -52,7 +53,7 @@ export class LophocComponent implements OnInit {
     if (this.thuTrongTuan.cn)   thus.push(8);
 
     const payload = {
-      pageNumber: this.currentPage,
+      pageNumber: page,
       pageSize: this.pageSize,
       tenLop: this.searchTerm,
       thus: thus,
@@ -80,26 +81,31 @@ export class LophocComponent implements OnInit {
               chuongTrinh: item.tenChuongTrinh,
               phong: firstLich?.tenPhong || '',
               giaoVien: item.tenGiaoVien,
-              thoiGian: lichCoDinh.map((lh: any) =>
-                `Thứ ${lh.thu}: ${lh.gioBatDau?.substring(0, 5)} - ${lh.gioKetThuc?.substring(0, 5)}`
-              ).join(', '),
               ngayBatDau: firstLich?.ngayBatDau,
               ngayKetThuc: firstLich?.ngayKetThuc,
               hocPhi: item.hocPhi,
-              trangThai: item.trangThai   
+              trangThai: item.loaiLichHocs.find((l: any) => l.lichHocs.length > 0)?.trangThai || 'Không xác định',
+              
+              lichHocChiTiet: lichCoDinh.map((lh: any) => ({
+                thu: lh.thu,
+                gioBatDau: lh.gioBatDau?.substring(0, 5),
+                gioKetThuc: lh.gioKetThuc?.substring(0, 5),
+                tenPhong: lh.tenPhong || ''
+              }))
             };
           });
+          
 
-          this.totalPages = data.totalPages;
           this.currentPage = data.pageNumber;
-          this.cdr.detectChanges(); 
+          this.totalPages = Math.ceil(data.totalCount / this.pageSize);
+          this.cdr.detectChanges();
         } else {
           this.lophocs = [];
           this.totalPages = 1;
         }
       },
       error: (err) => {
-        console.error(' Lỗi khi lấy danh sách lớp học:', err);
+        console.error('Lỗi khi lấy danh sách lớp học:', err);
         this.lophocs = [];
         this.totalPages = 1;
       }
@@ -107,15 +113,16 @@ export class LophocComponent implements OnInit {
   }
 
   goToPage(page: number) {
+    if (page < 1 || page > this.totalPages) return;
     this.currentPage = page;
-    this.loadLopHocs();
+    this.loadLopHocs(page);
   }
 
   onAddClass() {
-    alert(' Thêm lớp học');
+    this.router.navigate(['/lophoc/add']);
   }
 
   onEditClass(index: number) {
-    alert(' Sửa lớp: ' + this.lophocs[index].tenLop);
+    alert('Sửa lớp: ' + this.lophocs[index].tenLop);
   }
 }

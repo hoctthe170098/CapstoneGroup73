@@ -24,7 +24,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<DiemDanh> DiemDanhs => Set<DiemDanh>();
     public DbSet<BaiTap> BaiTaps => Set<BaiTap>();
     public DbSet<TraLoi> TraLois => Set<TraLoi>();
-    public DbSet<BaiTap> BaiKiemTras => Set<BaiTap>();
+    public DbSet<BaiKiemTra> BaiKiemTras => Set<BaiKiemTra>();
     public DbSet<KetQuaBaiKiemTra> KetQuaBaiKiemTras => Set<KetQuaBaiKiemTra>();
     public DbSet<NoiDungBaiHoc> NoiDungBaiHocs => Set<NoiDungBaiHoc>();
     public DbSet<TaiLieuHocTap> TaiLieuHocTaps => Set<TaiLieuHocTap>();

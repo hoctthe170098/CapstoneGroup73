@@ -1,6 +1,7 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { HocSinhService } from 'app/hocsinh/shared/hocsinh.service';
 import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-import-hocsinh',
@@ -12,7 +13,12 @@ export class ImportHocsinhComponent {
   fileName: string = '';
   importedStudents: any[] = [];
 
-  constructor(private hocSinhService: HocSinhService, private toastr: ToastrService,private cdr: ChangeDetectorRef) {}
+  constructor(
+    private hocSinhService: HocSinhService,
+    private toastr: ToastrService,
+    private cdr: ChangeDetectorRef,
+    private router: Router
+  ) {}
 
   onFileSelected(event: any) {
     const file = event.target.files[0];
@@ -44,6 +50,7 @@ export class ImportHocsinhComponent {
             showDetails: false,
             status: s.isActive ? 'Hoạt động' : 'Không hoạt động',
             chinhSach: s.tenChinhSach || 'Cơ bản',
+            chinhSachId: s.chinhSachId || null,
             lopHocs: s.tenLops || []
           }));
           this.fileSelected = true;
@@ -71,8 +78,36 @@ export class ImportHocsinhComponent {
   }
 
   onConfirmImport() {
-    alert('✅ Đã xác nhận import file: ' + this.fileName);
-    // TODO: Gọi API lưu danh sách này nếu có
+    const body = {
+      hocSinhs: this.importedStudents.map(s => ({
+        code: s.code,
+        ten: s.ten,
+        gioiTinh: s.gioiTinh,
+        diaChi: s.diaChi,
+        lop: s.lop,
+        truongDangHoc: s.truongDangHoc,
+        ngaySinh: s.ngaySinh,
+        email: s.email,
+        soDienThoai: s.soDienThoai,
+        chinhSachId: s.chinhSachId || null,
+      }))
+    };
+
+    this.hocSinhService.addListHocSinhs(body).subscribe({
+      next: (res) => {
+        if (!res.isError) {
+          this.toastr.success(res.message || 'Thêm học sinh thành công!');
+          this.router.navigate(['/hocsinh']);
+        } else {
+          const errorMsg = res.errors?.join(', ') || res.message || 'Đã xảy ra lỗi khi thêm!';
+          this.toastr.error(errorMsg, 'Lỗi');
+        }
+      },
+      error: (err) => {
+        console.error(" Lỗi khi gọi API thêm học sinh:", err);
+        this.toastr.error('Không thể thêm học sinh. Vui lòng thử lại!', 'Lỗi');
+      }
+    });
   }
 
   goBack() {

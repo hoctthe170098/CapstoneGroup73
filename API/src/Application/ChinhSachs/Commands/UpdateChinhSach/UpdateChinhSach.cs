@@ -52,7 +52,7 @@ public class UpdateChinhSachCommandHandler : IRequestHandler<UpdateChinhSachComm
             if (!float.TryParse(request.UpdateChinhSachDto.PhanTramGiam.ToString(), out float phanTramGiam))
                 throw new WrongInputException("Phần trăm giảm phải là số thực.");
 
-            if (phanTramGiam <= 0f || phanTramGiam >= 0.1f)
+            if (phanTramGiam < 0f || phanTramGiam > 0.1f)
             {
                 throw new WrongInputException("Phần trăm giảm phải nằm trong khoảng (0,0.1).");
             }

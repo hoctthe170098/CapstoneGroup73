@@ -25,9 +25,9 @@
                   <th>Ngày Sinh</th>
                   <th>Email</th>
                   <th>Số điện thoại</th>
-                  <th>Trạng thái</th>
+                  
                   <th class="dropdown-col"></th>
-                  <th class="edit-col">Sửa</th>
+                  
                 </tr>
               </thead>
               <tbody>
@@ -40,10 +40,7 @@
                     <td>{{ hs.ngaySinh | date:'dd-MM-yyyy' }}</td>
                     <td>{{ hs.email }}</td>
                     <td>{{ hs.soDienThoai }}</td>
-                    <td>
-                      <span class="active-status">Hoạt động</span>
-                      <i class="check-icon"></i>
-                    </td>
+                    
                     <!-- Nút dropdown -->
                     <td class="dropdown-col">
                       <button class="btn dropdown-btn" (click)="toggleDetails(i)">
@@ -52,12 +49,7 @@
                       </button>
         
                     </td>
-                    <!-- Nút sửa (bên phải) -->
-                    <td class="edit-col">
-                      <button class="btn edit-btn" (click)="onEditStudentClick(i)">
-                        <i class="fas fa-pencil-alt"></i>
-                      </button>
-                    </td>
+                    
                   </tr>
         
                   <!-- Hàng chi tiết (hiển thị ngay dưới item đó) -->
