@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,ChangeDetectorRef  } from '@angular/core';
 import { TestlistService } from './shared/testlist.service';
+import { BaiKiemTraDto } from './shared/testlist.model';
 @Component({
   selector: 'app-testlist',
   templateUrl: './testlist.component.html',
@@ -7,182 +8,109 @@ import { TestlistService } from './shared/testlist.service';
 })
 export class TestListComponent implements OnInit {
   statusList = ['Đã kiểm tra', 'Chưa kiểm tra'];
-  classList = ['Lớp 6A1', 'Lớp 6A2', 'Lớp 7A1', 'Lớp 9B'];
-
+ classList: string[] = [];
+ selectedClassSchedule: any[] = [];
   selectedStatus = 'all';
   selectedClass = 'all';
   searchText = '';
+  classDropdownOpen: boolean = false;
+  classSearchTerm: string = '';
+  filteredClassListForFilter: string[] = [];
 
-  testList = [ // Danh sách đầy đủ
-    {
-      name: 'Bài kiểm tra chất lượng giữa kì',
-      class: 'Ôn luyện cấp 3',
-      createdDate: '23-08-2023',
-      testDate: '30-09-2023',
-      document: { name: 'toan_hinh_de2022.pdf', url: '#' },
-      status: 'Đã kiểm tra',
-      score: 'Download'
-    },
-    {
-      name: 'Bài kiểm tra chất lượng giữa kì',
-      class: 'Ôn luyện cấp 3',
-      createdDate: '23-08-2023',
-      testDate: '30-09-2023',
-      document: { name: 'toan_hinh_de2022.pdf', url: '#' },
-      status: 'Đã kiểm tra',
-      score: 'Download'
-    },
-    {
-      name: 'Bài kiểm tra chất lượng giữa kì',
-      class: 'Ôn luyện cấp 3',
-      createdDate: '23-08-2023',
-      testDate: '30-09-2023',
-      document: { name: 'toan_hinh_de2022.pdf', url: '#' },
-      status: 'Đã kiểm tra',
-      score: 'Download'
-    },
-    {
-      name: 'Bài kiểm tra chất lượng giữa kì',
-      class: 'Ôn luyện cấp 3',
-      createdDate: '23-08-2023',
-      testDate: '30-09-2023',
-      document: { name: 'toan_hinh_de2022.pdf', url: '#' },
-      status: 'Đã kiểm tra',
-      score: 'Download'
-    },
-    {
-      name: 'Bài kiểm tra chất lượng giữa kì',
-      class: 'Ôn luyện cấp 3',
-      createdDate: '23-08-2023',
-      testDate: '30-09-2023',
-      document: { name: 'toan_hinh_de2022.pdf', url: '#' },
-      status: 'Đã kiểm tra',
-      score: 'Download'
-    },
-    {
-      name: 'Bài kiểm tra chất lượng giữa kì',
-      class: 'Ôn luyện cấp 3',
-      createdDate: '23-08-2023',
-      testDate: '30-09-2023',
-      document: { name: 'toan_hinh_de2022.pdf', url: '#' },
-      status: 'Đã kiểm tra',
-      score: 'Download'
-    },
-    {
-      name: 'Bài kiểm tra chất lượng giữa kì',
-      class: 'Ôn luyện cấp 3',
-      createdDate: '23-08-2023',
-      testDate: '30-09-2023',
-      document: { name: 'toan_hinh_de2022.pdf', url: '#' },
-      status: 'Đã kiểm tra',
-      score: 'Download'
-    },
-    {
-      name: 'Bài kiểm tra chất lượng giữa kì',
-      class: 'Ôn luyện cấp 3',
-      createdDate: '23-08-2023',
-      testDate: '30-09-2023',
-      document: { name: 'toan_hinh_de2022.pdf', url: '#' },
-      status: 'Đã kiểm tra',
-      score: 'Download'
-    },
-    {
-      name: 'Bài kiểm tra chất lượng giữa kì',
-      class: 'Ôn luyện cấp 3',
-      createdDate: '23-08-2023',
-      testDate: '30-09-2023',
-      document: { name: 'toan_hinh_de2022.pdf', url: '#' },
-      status: 'Đã kiểm tra',
-      score: 'Download'
-    },
-    {
-      name: 'Bài kiểm tra chất lượng giữa kì',
-      class: 'Ôn luyện cấp 3',
-      createdDate: '23-08-2023',
-      testDate: '30-09-2023',
-      document: { name: 'toan_hinh_de2022.pdf', url: '#' },
-      status: 'Đã kiểm tra',
-      score: 'Download'
-    },
-    {
-      name: 'Bài kiểm tra chất lượng giữa kì',
-      class: 'Ôn luyện cấp 3',
-      createdDate: '23-08-2023',
-      testDate: '30-09-2023',
-      document: { name: 'toan_hinh_de2022.pdf', url: '#' },
-      status: 'Đã kiểm tra',
-      score: 'Download'
-    },
-    {
-      name: 'Bài kiểm tra chất lượng giữa kì',
-      class: 'Ôn luyện cấp 3',
-      createdDate: '23-08-2023',
-      testDate: '30-09-2023',
-      document: { name: 'toan_hinh_de2022.pdf', url: '#' },
-      status: 'Đã kiểm tra',
-      score: 'Download'
-    },
-    {
-      name: 'Bài kiểm tra chất lượng giữa kì',
-      class: 'Ôn luyện cấp 3',
-      createdDate: '23-08-2023',
-      testDate: '30-09-2023',
-      document: { name: 'toan_hinh_de2022.pdf', url: '#' },
-      status: 'Đã kiểm tra',
-      score: 'Download'
-    },
 
-    // Thêm nhiều dữ liệu để thử phân trang
-  ];
+  testList: any[] = [];
 
   // Phân trang
   paginatedList = [];
   totalItems = 0;
 
   currentPage = 1;
-  itemsPerPage = 5;
-
+  itemsPerPage = 2;
+  lopDropdownOpen = false;
+  lopSearchTerm = '';
+  filteredClassList: string[] = [];
   showCreateForm = false;
 
-  newTest = {
-    name: '',
-    testDate: '',
-    class: '',
-    document: null as any
+  newTest: BaiKiemTraDto = {
+    tenBaiKiemTra: '',
+    ngayKiemTra: '',
+    tenLop: '',
+    taiLieu: null as any 
   };
   showEditForm = false;
   editTest: any = {
     name: '',
     testDate: '',
-    class: '',
-    document: {
+    tenLop:'',
+    taiLieu: {
       name: '',
       url: ''
     }
   };
-  constructor(private testlistService: TestlistService) {}
+  constructor(private testlistService: TestlistService,private cdr: ChangeDetectorRef) {}
   ngOnInit() {
-    this.loadTests(); // bắt buộc phải có dòng này
+    this.loadTests();
+    this.searchClassByName(''); // load tất cả lớp
+    
+  }
+  toggleClassDropdown() {
+    this.classDropdownOpen = !this.classDropdownOpen;
+    this.classSearchTerm = '';
+    this.filteredClassListForFilter = this.classList.slice(); // reset danh sách đầy đủ
+  }
+
+  // Hàm lọc danh sách lớp dựa trên từ khóa nhập
+  onClassSearchTermChange() {
+    const lower = this.classSearchTerm.toLowerCase();
+    this.filteredClassListForFilter = this.classList.filter(cls =>
+      cls.toLowerCase().includes(lower)
+    );
+  }
+
+  // Hàm chọn lớp và load lại danh sách bài kiểm tra
+  selectClassFilter(selected: string) {
+    this.selectedClass = selected;
+    this.classDropdownOpen = false;
+    this.loadTests();
   }
   loadTests() {
-    this.testlistService
-      .getTests(this.currentPage, this.itemsPerPage, this.selectedStatus, this.selectedClass)
+    const trangThaiToSend = this.selectedStatus || 'all';
+    const tenLop = this.selectedClass || 'all';  
+    const tenBaiKiemTra = this.searchText?.trim() || '';
+    console.log('➡️ Gửi lên API:', {
+      trangThaiToSend,
+      tenLop,
+      tenBaiKiemTra
+    });
+  
+    this.testlistService.getTests(this.currentPage, this.itemsPerPage, trangThaiToSend, tenLop, tenBaiKiemTra)
       .subscribe({
         next: res => {
+          console.log('✅ Kết quả trả về:', res);
+          if (!res || !res.data) {
+            this.paginatedList = [];
+            this.totalItems = 0;
+            // Bắt buộc cập nhật giao diện ngay
+            this.cdr.detectChanges();
+            return;
+          }
+  
           const responseData = res.data;
-          console.log('Full response:', responseData);
+          this.totalItems = responseData.totalCount || 0;
+          this.paginatedList = Array.isArray(responseData.data) ? responseData.data : [];
   
-          this.totalItems = responseData.totalCount;
-          this.paginatedList = responseData.data;
-  
-          console.log('Total Items:', this.totalItems);
-          console.log('Paginated list:', this.paginatedList);
+          // Gọi detectChanges() sau khi cập nhật dữ liệu để trigger change detection
+          this.cdr.detectChanges();
         },
         error: err => {
-          console.error('Lỗi API:', err);
+          this.paginatedList = [];
+          this.totalItems = 0;
+          // Gọi detectChanges() ở trường hợp lỗi
+          this.cdr.detectChanges();
         }
       });
   }
+  
   
 
   updatePaginatedList() {
@@ -215,44 +143,92 @@ export class TestListComponent implements OnInit {
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
-      const fileData = {
-        name: file.name,
-        url: URL.createObjectURL(file)
+      this.newTest.taiLieu = file;
+    }
+
+  }
+  
+  allClassData: any[] = [];
+
+searchClassByName(name: string) {
+  const tenLop = name?.trim() || '';
+
+  this.testlistService.getLopByName(tenLop).subscribe({
+    next: (res: any) => {
+      if (res?.data) {
+        this.allClassData = res.data;
+        this.classList = res.data.map((item: any) => item.tenLop);
+      } else {
+        this.classList = [];
+        this.allClassData = [];
+      }
+    },
+    error: err => {
+      console.error('❌ Lỗi lấy danh sách lớp:', err);
+      this.classList = [];
+      this.allClassData = [];
+    }
+  });
+}
+onClassSelected(tenLop: string) {
+  const selected = this.allClassData.find(item => item.tenLop === tenLop);
+  this.selectedClassSchedule = selected?.lichHocs || [];
+}
+toggleLopDropdown() {
+  this.lopDropdownOpen = !this.lopDropdownOpen;
+  this.lopSearchTerm = '';
+  this.filteredClassList = this.classList.slice(); // reset về đầy đủ
+}
+
+onLopSearchTermChange() {
+  const lower = this.lopSearchTerm.toLowerCase();
+  this.filteredClassList = this.classList.filter(cls =>
+    cls.toLowerCase().includes(lower)
+  );
+}
+
+selectLop(selected: string) {
+  this.newTest.tenLop = selected;
+  this.lopDropdownOpen = false;
+  this.onClassSelected(selected); // nếu bạn đang dùng để lấy lịch
+}
+
+addTest() {
+  if (!this.newTest.tenBaiKiemTra || !this.newTest.ngayKiemTra || !this.newTest.tenLop || !this.newTest.taiLieu) {
+    alert('Vui lòng điền đầy đủ thông tin!');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('BaiKiemTraDto.TenBaiKiemTra', this.newTest.tenBaiKiemTra);
+  formData.append('BaiKiemTraDto.NgayKiemTra', this.newTest.ngayKiemTra);
+  formData.append('BaiKiemTraDto.TenLop', this.newTest.tenLop);
+  formData.append('BaiKiemTraDto.TaiLieu', this.newTest.taiLieu);
+
+  this.testlistService.createTest(formData).subscribe({
+    next: () => {
+      alert('✅ Tạo bài kiểm tra thành công!');
+      this.newTest = {
+        tenBaiKiemTra: '',
+        ngayKiemTra: '',
+        tenLop: '',
+        taiLieu: null as any
       };
-
-      // Nếu đang mở form tạo
-      if (this.showCreateForm) {
-        this.newTest.document = fileData;
-      }
-
-      // Nếu đang mở form sửa
-      if (this.showEditForm) {
-        this.editTest.document = fileData;
-      }
+      this.selectedClassSchedule = [];
+      this.showCreateForm = false;
+      this.loadTests();
+    },
+    error: (err) => {
+      console.error('❌ Tạo bài kiểm tra thất bại:', err);
+      alert('Tạo bài kiểm tra thất bại!');
     }
-  }
+  });
+}
 
-  addTest() {
-    if (!this.newTest.name || !this.newTest.testDate || !this.newTest.class || !this.newTest.document) {
-      alert('Vui lòng điền đầy đủ thông tin!');
-      return;
-    }
 
-    this.testList.unshift({
-      name: this.newTest.name,
-      class: this.newTest.class,
-      createdDate: new Date().toLocaleDateString('vi-VN'),
-      testDate: this.newTest.testDate,
-      document: this.newTest.document,
-      status: 'Chưa kiểm tra',
-      score: ''
-    });
 
-    this.newTest = { name: '', testDate: '', class: '', document: null };
-    this.showCreateForm = false;
-    this.currentPage = 1;
-    this.updatePaginatedList();
-  }
+
+  
 
   openModal() {
     this.showCreateForm = true;

@@ -4,14 +4,37 @@
   <div class="filters">
     <div class="filters-left">
       <select [(ngModel)]="selectedStatus" (change)="loadTests()">
-        <option value="">Trạng thái</option>
+        <option [value]="'all'">Trạng thái</option>
         <option *ngFor="let status of statusList" [value]="status">{{ status }}</option>
       </select>
 
-      <select [(ngModel)]="selectedClass" (change)="loadTests()">
-        <option value="">Lớp</option>
-        <option *ngFor="let cls of classList" [value]="cls">{{ cls }}</option>
-      </select>
+      <!-- DROPDOWN LỚP TRONG FILTER -->
+<div class="lop-select-container filter-mode">
+  <div class="lop-select-display" (click)="toggleClassDropdown()">
+    <span *ngIf="selectedClass === 'all'">Chọn lớp</span>
+    <span *ngIf="selectedClass !== 'all'">{{ selectedClass }}</span>
+    <i class="fa fa-caret-down caret-icon"></i>
+  </div>
+
+  <div class="lop-select-dropdown" *ngIf="classDropdownOpen">
+    <div class="search-box">
+      <input
+        type="text"
+        placeholder="Tìm lớp"
+        [(ngModel)]="classSearchTerm"
+        (input)="onClassSearchTermChange()"
+      />
+    </div>
+    <ul class="select-options">
+      <li (click)="selectClassFilter('all')">Tất cả</li>
+      <li *ngFor="let option of filteredClassListForFilter" (click)="selectClassFilter(option)">
+        {{ option }}
+      </li>
+      <li *ngIf="filteredClassListForFilter.length === 0" class="no-result">Không tìm thấy lớp</li>
+    </ul>
+  </div>
+</div>
+
 
       <input type="text" placeholder="Tìm tên bài kiểm tra..." [(ngModel)]="searchText" />
     </div>
@@ -34,21 +57,21 @@
     </thead>
     <tbody>
       <tr *ngFor="let test of paginatedList">
-        <td>{{ test.name }}</td>
-        <td>{{ test.class }}</td>
-        <td>{{ test.createdDate }}</td>
-        <td>{{ test.testDate }}</td>
+        <td>{{ test.ten }}</td>
+        <td>{{ test.tenLop }}</td>
+        <td>{{ test.ngayTao | date: 'dd/MM/yyyy' }}</td>
+        <td>{{ test.ngayKiemTra | date: 'dd/MM/yyyy' }}</td>
         <td>
-          <a [href]="test.document.url" download>
-            {{ test.document.name }}
+          <a [href]="test.urlFile" download>
+            {{ test.urlFile.split('/').pop() }}
           </a>
         </td>
-        <td><span [class.checked]="test.status === 'Đã kiểm tra'">{{ test.status }}</span></td>
+        <td><span [class.checked]="test.trangThai === 'Đã kiểm tra'">{{ test.trangThai }}</span></td>
         <td>
           <span
-            [class.download]="test.score === 'Download'"
-            [class.pending]="test.score === 'Chưa vào điểm'">
-            {{ test.score }}
+            [class.download]="test.coDiem"
+            [class.pending]="!test.coDiem">
+            {{ test.coDiem ? 'Download' : 'Chưa vào điểm' }}
           </span>
         </td>
         <td>
@@ -57,14 +80,21 @@
         </td>
       </tr>
     </tbody>
+    
   </table>
 
-  <div class="pagination">
-    <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">&lt;</button>
-    <button *ngFor="let page of totalPages" (click)="changePage(page)" [class.active]="page === currentPage">
-      {{ page }}
-    </button>
-    <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages.length">&gt;</button>
+  <div class="pagination-container" *ngIf="totalPages.length > 1">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <a class="page-link" (click)="changePage(currentPage - 1)">«</a>
+      </li>
+      <li *ngFor="let page of totalPages" class="page-item" [class.active]="currentPage === page">
+        <a class="page-link" (click)="changePage(page)">{{ page }}</a>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages.length">
+        <a class="page-link" (click)="changePage(currentPage + 1)">»</a>
+      </li>
+    </ul>
   </div>
 </div>
 </div> 
@@ -81,30 +111,63 @@
       <!-- TÊN -->
       <div class="form-group">
         <label>Tên Bài Kiểm Tra</label>
-        <input type="text" [(ngModel)]="newTest.name" placeholder="Nhập tên" />
+        <input type="text" [(ngModel)]="newTest.tenBaiKiemTra" placeholder="Nhập tên" />
       </div>
 
       <!-- NGÀY + LỚP -->
-      <div class="flex-row">
-        <div class="form-group">
-          <label>Ngày Kiểm Tra</label>
-          <input type="date" [(ngModel)]="newTest.testDate" />
-        </div>
-        <div class="form-group">
-          <label>Lớp</label>
-          <select [(ngModel)]="newTest.class">
-            <option value="" disabled selected>Chọn lớp</option>
-            <option *ngFor="let cls of classList" [value]="cls">{{ cls }}</option>
-          </select>
-        </div>
+<div class="flex-row">
+  <div class="form-group">
+    <label>Ngày Kiểm Tra</label>
+    <input type="date" [(ngModel)]="newTest.ngayKiemTra" />
+  </div>
+
+  <!-- Dropdown Lớp tùy chỉnh -->
+  <div class="form-group lop-select-container">
+    <label>Lớp</label>
+    <div class="lop-select-display" (click)="toggleLopDropdown()">
+      <span *ngIf="!newTest.tenLop">Chọn lớp</span>
+      <span *ngIf="newTest.tenLop">{{ newTest.tenLop }}</span>
+      <i class="fa fa-caret-down caret-icon"></i>
+    </div>
+
+    <!-- Dropdown nội dung -->
+    <div class="lop-select-dropdown" *ngIf="lopDropdownOpen">
+      <div class="search-box">
+        <input
+          type="text"
+          placeholder="Tìm lớp"
+          [(ngModel)]="lopSearchTerm"
+          (input)="onLopSearchTermChange()"
+        />
       </div>
+
+      <ul class="select-options">
+        <li
+          *ngFor="let option of filteredClassList"
+          (click)="selectLop(option)"
+        >
+          {{ option }}
+        </li>
+        <li *ngIf="filteredClassList.length === 0" class="no-result">
+          Không tìm thấy lớp
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
 
       <!-- LỊCH LỚP -->
       <div class="form-group">
         <label>Lịch của lớp</label>
         <ul class="class-schedule">
-          <li>Thứ 2 – phòng DE – 101</li>
-          <li>Thứ 3 – phòng BE – 102</li>
+          <li *ngIf="selectedClassSchedule.length === 0">Không có lịch</li>
+          <li *ngFor="let lich of selectedClassSchedule">
+            Thứ {{ lich.thu }} – {{ lich.tenPhong }}<br />
+            <small>
+              Từ {{ lich.ngayBatDau | date: 'dd/MM/yyyy' }} đến {{ lich.ngayKetThuc | date: 'dd/MM/yyyy' }}
+            </small>
+          </li>
         </ul>
       </div>
 
