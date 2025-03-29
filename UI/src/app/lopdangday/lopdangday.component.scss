@@ -1,0 +1,110 @@
+:host ::ng-deep .container {
+    max-width: 100% !important;
+}  
+
+h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.filters input {
+    padding: 10px;
+    flex: 1 1 200px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.class-grid {
+    display: grid;
+    //grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.class-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 200px;
+}
+
+.class-card h3 {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #222;
+}
+
+.class-card p {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    margin: 5px 0;
+    color: #333;
+}
+
+.class-card i {
+    margin-right: 8px;
+    width: 16px;
+    text-align: center;
+}
+
+.class-card p span.active {
+    color: green;
+  }
+  
+  .class-card p span.inactive {
+    color: red !important;
+  }
+  
+  
+.class-card a {
+    margin-top: auto;
+    font-weight: bold;
+    text-decoration: none;
+    color: #007bff;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s;
+}
+
+.class-card a:hover {
+    color: #0056b3;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    gap: 10px;
+}
+
+.pagination button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 50%;
+    background: #eee;
+    cursor: pointer;
+}
+
+.pagination button.active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.pagination button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}

@@ -25,12 +25,19 @@ export class LophocComponent implements OnInit {
   dateStart: string = '';
   dateEnd: string = '';
   searchTerm: string = '';
-
+  chuongTrinhOptions: any[] = [];
   lophocs: any[] = [];
-
+  chuongTrinhId: number = 0; 
   currentPage: number = 1;
   totalPages: number = 1;
   pageSize: number = 3;
+  
+
+  giaoVienSearch: string = '';
+  giaoVienOptions: { code: string, codeTen: string }[] = [];
+  filteredGiaoVienOptions: { code: string, codeTen: string }[] = [];
+  selectedGiaoVien: string = '';
+isGiaoVienDropdownOpen: boolean = false;
 
   constructor(
     private lophocService: LophocService,
@@ -39,8 +46,90 @@ export class LophocComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.getChuongTrinhs(); 
+    this.loadLopHocs();
+    this.getGiaoVienOptions();
+
+  }
+  getChuongTrinhs(): void {
+    this.lophocService.getChuongTrinhs().subscribe({
+      next: (res) => {
+        if (!res.isError && res.data) {
+          this.chuongTrinhOptions = res.data;
+        } else {
+          this.chuongTrinhOptions = [];
+        }
+      },
+      error: (err) => {
+        console.error('Lỗi khi lấy chương trình:', err);
+        this.chuongTrinhOptions = [];
+      }
+    });
+  }
+  getGiaoVienOptions() {
+    const payload = { searchTen: '' };
+    this.lophocService.getGiaoViens(payload).subscribe({
+      next: (res) => {
+        if (!res.isError && res.data) {
+          this.giaoVienOptions = res.data;
+          this.filteredGiaoVienOptions = res.data.slice();
+        } else {
+          this.giaoVienOptions = [];
+          this.filteredGiaoVienOptions = [];
+        }
+      },
+      error: (err) => {
+        console.error('Lỗi khi lấy giáo viên:', err);
+      }
+    });
+  }
+  getThuHienThi(thu: number): string {
+    const thuMap: { [key: number]: string } = {
+      2: 'Thứ 2',
+      3: 'Thứ 3',
+      4: 'Thứ 4',
+      5: 'Thứ 5',
+      6: 'Thứ 6',
+      7: 'Thứ 7',
+      8: 'Chủ Nhật'
+    };
+    return thuMap[thu] || `Thứ ${thu}`;
+  }
+  
+  getSelectedGiaoVienText(): string {
+    const selected = this.giaoVienOptions.find(gv => gv.code === this.selectedGiaoVien);
+    return selected ? selected.codeTen : '';
+  }
+  clearGiaoVienSelection(event: MouseEvent) {
+    event.stopPropagation(); 
+    this.selectedGiaoVien = '';
+    this.giaoVienSearch = '';
+    this.filteredGiaoVienOptions = this.giaoVienOptions.slice();
     this.loadLopHocs();
   }
+  
+  onGiaoVienSearch() {
+    const searchTerm = this.giaoVienSearch.toLowerCase();
+    this.filteredGiaoVienOptions = this.giaoVienOptions.filter(gv =>
+      gv.codeTen.toLowerCase().includes(searchTerm)
+    );
+  }
+  
+  
+  selectGiaoVien(gv: { code: string, codeTen: string }) {
+    this.selectedGiaoVien = gv.code;
+    this.giaoVienSearch = '';
+    this.isGiaoVienDropdownOpen = false;
+    this.loadLopHocs();
+  }
+  
+  
+  toggleGiaoVienDropdown() {
+    this.isGiaoVienDropdownOpen = !this.isGiaoVienDropdownOpen;
+  }
+ 
+  
+ 
 
   loadLopHocs(page: number = this.currentPage) {
     const thus: number[] = [];
@@ -57,9 +146,9 @@ export class LophocComponent implements OnInit {
       pageSize: this.pageSize,
       tenLop: this.searchTerm,
       thus: thus,
-      giaoVienCode: 'all',
+      giaoVienCode: this.selectedGiaoVien || 'all',
       phongId: 0,
-      chuongTrinhId: 0,
+      chuongTrinhId: this.chuongTrinhId || 0,
       trangThai: this.trangThai || 'all',
       thoiGianBatDau: this.timeStart || '',
       thoiGianKetThuc: this.timeEnd || '',
@@ -125,4 +214,6 @@ export class LophocComponent implements OnInit {
   onEditClass(index: number) {
     alert('Sửa lớp: ' + this.lophocs[index].tenLop);
   }
+
+  
 }

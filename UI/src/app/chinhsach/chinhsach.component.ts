@@ -75,19 +75,29 @@ export class ChinhsachComponent implements OnInit {
 
   addChinhSach(): void {
     this.isSubmitted = true;
-
+  
     const tenTrimmed = this.ten.trim();
-
-    if (!tenTrimmed || this.phanTramGiam === null || this.phanTramGiam < 0 || this.phanTramGiam > 100) {
-      return;
+    const motaTrimmed = this.mota?.trim() || '';
+  
+    const isInvalid =
+      !tenTrimmed ||
+      tenTrimmed.length > 30 ||
+      motaTrimmed.length > 200 ||
+      this.phanTramGiam === null ||
+      isNaN(this.phanTramGiam) ||
+      this.phanTramGiam < 0 ||
+      this.phanTramGiam > 10;
+  
+    if (isInvalid) {
+      return; 
     }
-
+  
     const body = {
       ten: tenTrimmed,
-      mota: this.mota?.trim() || '',
+      mota: motaTrimmed,
       phanTramGiam: this.phanTramGiam / 100
     };
-
+  
     this.chinhSachService.createChinhSach(body).subscribe({
       next: (res) => {
         if (!res.isError && res.data) {
@@ -104,6 +114,8 @@ export class ChinhsachComponent implements OnInit {
       }
     });
   }
+  
+  
 
   resetForm(): void {
     this.ten = '';
@@ -131,7 +143,6 @@ export class ChinhsachComponent implements OnInit {
       }
     });
   }
-  // Mở modal sửa
   openEditModal(cs: ChinhSach): void {
     this.editId = cs.id;
     this.editTen = cs.ten;
@@ -141,21 +152,40 @@ export class ChinhsachComponent implements OnInit {
     this.isEditModalOpen = true;
   }
 
-  // Gửi cập nhật
   applyEdit(): void {
     this.isSubmittedEdit = true;
+  
     const ten = this.editTen.trim();
+    const mota = this.editMoTa?.trim() || '';
     const giam = this.editPhanTramGiam;
-
-    if (!this.editId || !ten || giam === null || giam < 0 || giam > 100) return;
-
+  
+    const isInvalid =
+      !this.editId ||
+      !ten ||
+      ten.length > 30 ||
+      mota.length > 200 ||
+      giam === null ||
+      isNaN(giam) ||
+      giam < 0 ||
+      giam > 10;
+  
+    if (isInvalid) {
+      return; 
+    }
+  
+    const confirmResult = window.confirm('Bạn có chắc muốn cập nhật chính sách này?');
+    if (!confirmResult) return;
+  
     const body = {
-      id: this.editId,
-      ten,
-      mota: this.editMoTa?.trim() || '',
-      phanTramGiam: giam / 100
+     
+        id: this.editId,
+        ten,
+        mota,
+        phanTramGiam: giam / 100
+      
     };
-
+  
+   
     this.chinhSachService.updateChinhSach(body).subscribe({
       next: (res) => {
         if (!res.isError) {
@@ -166,12 +196,13 @@ export class ChinhsachComponent implements OnInit {
           this.toastr.error(res.message || 'Không thể cập nhật!');
         }
       },
-      error: (err) => {
-        console.error(' Lỗi khi cập nhật:', err);
+      error: () => {
         this.toastr.error('Đã xảy ra lỗi khi cập nhật chính sách!');
       }
     });
   }
+  
+  
 
   
 }
