@@ -56,6 +56,7 @@ public class GetLopHocByNameQueryHandler : IRequestHandler<GetLopHocByNameQuery,
             };
             var lichHoc = _context.LichHocs.Where(lh=>lh.TenLop == tenLop&&lh.NgayKetThuc> DateOnly.FromDateTime(DateTime.Now))
                 .Include(lh=>lh.Phong)
+                .OrderBy(lh=>lh.TrangThai)
                 .ToList();
             foreach(var lich in lichHoc)
             {

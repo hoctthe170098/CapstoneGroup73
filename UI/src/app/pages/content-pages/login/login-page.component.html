@@ -22,7 +22,7 @@
                         class="help-block mt-1 text-danger"> <i class="ft-alert-circle align-middle"></i> Bạn bắt buộc phải điền tên đăng nhập vào đây</div>
                     </div>
                     <div class="form-group">
-                      <input type="password" formControlName="password" class="form-control" placeholder="Old Password"
+                      <input type="password" formControlName="password" class="form-control" placeholder="Password"
                         [ngClass]="{ 'is-invalid': loginFormSubmitted && lf.password.invalid, 'is-valid': loginFormSubmitted && !lf.password.invalid }"
                         required>
                       <div *ngIf="loginFormSubmitted && (lf.password.invalid || lf.password.errors?.required)"
