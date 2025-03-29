@@ -55,7 +55,7 @@ public class GetBaiKiemTrasWithPaginationQueryHandler : IRequestHandler<GetBaiKi
         }
         if (request.TenLop.ToLower().Trim() != "all")
         {
-            query = query.Where(q => q.LichHoc.TenLop == request.TenLop.ToLower().Trim());
+            query = query.Where(q => q.LichHoc.TenLop.ToLower().Trim() == request.TenLop.ToLower().Trim());
         }
         var list = query
             .ProjectTo<BaiKiemTraDto>(_mapper.ConfigurationProvider)
