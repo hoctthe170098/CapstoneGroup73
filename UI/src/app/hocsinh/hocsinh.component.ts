@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { saveAs } from 'file-saver';
+import { NgxSpinnerService } from 'ngx-spinner';
 @Component({
   selector: 'app-hocsinh',
   templateUrl: './hocsinh.component.html',
@@ -174,10 +175,8 @@ isEditModalOpen: boolean = false;
   
     const formData = this.addStudentForm.value;
   
-    console.log(" Form Data:", formData);
   
   
-    // Tìm tên tỉnh/thành
     const provinceObj = this.provinces.find(p => String(p.code) === String(formData.province));
     const provinceName = provinceObj?.name || '';
   
@@ -188,7 +187,6 @@ isEditModalOpen: boolean = false;
   
     const diaChiFormatted = `${provinceName}, ${districtName}, ${chiTiet}`.trim();
   
-    // Chính sách
     let chinhSachId = formData.chinhSachId || null;
     if (chinhSachId === '') chinhSachId = null;
   
@@ -205,19 +203,21 @@ isEditModalOpen: boolean = false;
       ...(chinhSachId !== null && { chinhSachId })
     };
   
-    console.log(" Gửi API thêm học sinh:", newStudent);
-  
+    this.spinner.show();
     this.hocSinhService.createHocSinh(newStudent).subscribe({
       next: (res) => {
+        this.spinner.hide();
         if (!res.isError) {
           this.toastr.success("Thêm học sinh thành công!", "Thành công");
           this.closeModal();
           this.loadDanhSachHocSinh();
         } else {
+          
           this.toastr.error(res.message, "Lỗi");
         }
       },
       error: (err) => {
+        this.spinner.hide();
         console.error(" Lỗi khi gọi API:", err);
         this.toastr.error("Có lỗi xảy ra, vui lòng thử lại!", "Lỗi");
       }
@@ -225,7 +225,8 @@ isEditModalOpen: boolean = false;
   }
   constructor(private hocSinhService: HocSinhService,private router: Router,private cdr: ChangeDetectorRef, 
     private toastr: ToastrService,
-    private fb: FormBuilder) {
+    private fb: FormBuilder,
+    private spinner:NgxSpinnerService                        ) {
       // Form thêm học sinh
     this.addStudentForm = this.fb.group({
       code: ['', [Validators.required, Validators.maxLength(18)]],
@@ -269,14 +270,13 @@ isEditModalOpen: boolean = false;
       response => {
         if (!response.isError && response.data) {
           this.policies = response.data; // Gán dữ liệu vào biến policies
-          console.log("📌 Danh sách chính sách:", this.policies);
         } else {
           this.policies = [];
           console.error("Lỗi tải danh sách chính sách!");
         }
       },
       error => {
-        console.error("❌ Lỗi khi gọi API danh sách chính sách:", error);
+        console.error(" Lỗi khi gọi API danh sách chính sách:", error);
       }
     );
   }
@@ -299,7 +299,6 @@ isEditModalOpen: boolean = false;
 
     this.hocSinhService.getDanhSachHocSinh(this.currentPage, this.pageSize, this.searchTerm, '', isActiveFilter, '')
       .subscribe(response => {
-        console.log("📌 API Response:", response);
 
         if (!response.isError && response.data && response.data.items) {
           this.students = response.data.items.map((hs: any) => ({
@@ -321,8 +320,6 @@ isEditModalOpen: boolean = false;
           this.totalItems = response.data.totalCount || 0;
           this.totalPages = Math.ceil(this.totalItems / this.pageSize);
 
-          console.log("📌 Tổng số học sinh:", this.totalItems);
-          console.log("📌 Tổng số trang:", this.totalPages);
 
           this.cdr.detectChanges();
         } else {
@@ -334,11 +331,10 @@ isEditModalOpen: boolean = false;
 }
 
 openEditStudentModal(student: any) {
-  console.log("🔍 Học sinh được chọn để chỉnh sửa:", student);
 
   if (!student || !student.code) {
     this.toastr.error("Không tìm thấy mã học sinh!", "Lỗi");
-    console.error("❌ Lỗi: Học sinh không có mã!", student);
+    console.error(" Lỗi: Học sinh không có mã!", student);
     return;
   }
 
@@ -382,8 +378,6 @@ openEditStudentModal(student: any) {
       status: [true]
   });
 
-  console.log("✅ Dữ liệu sau khi patch vào form:", this.editStudentForm.value);
-  console.log("📌 Giá trị `code` trong Form sau khi patch:", this.editStudentForm.get('code')?.value);
   
   this.isEditModalOpen = true;
 }
@@ -395,7 +389,6 @@ openEditStudentModal(student: any) {
   changePage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
         this.currentPage = page;
-        console.log("📌 Chuyển trang:", this.currentPage);
         this.loadDanhSachHocSinh();  
     }
 }
@@ -432,11 +425,10 @@ openEditStudentModal(student: any) {
   onEditStudentClick(index: number) { 
     const hs = this.students[index];
   
-    console.log("🔍 Học sinh được chọn để chỉnh sửa:", hs);
   
     if (!hs || !hs.code) {
       this.toastr.error("Không tìm thấy mã học sinh!", "Lỗi");
-      console.error("❌ Lỗi: Học sinh không có mã!", hs);
+      console.error(" Lỗi: Học sinh không có mã!", hs);
       return;
     }
   
@@ -453,7 +445,6 @@ openEditStudentModal(student: any) {
     const policyObj = this.policies.find(p => p.ten === hs.chinhSach);
     const policyId = policyObj ? policyObj.id : '';
   
-    console.log("📌 Dữ liệu trước khi patch vào form:", hs);
   
     this.editStudentForm.patchValue({
       code: hs.code || '', 
@@ -471,7 +462,6 @@ openEditStudentModal(student: any) {
       
     });
   
-    console.log("✅ Dữ liệu sau khi patch vào form:", this.editStudentForm.value);
   
     this.isEditModalOpen = true;
   }
@@ -483,28 +473,24 @@ openEditStudentModal(student: any) {
   }
   submitEditStudent() {
     if (this.editStudentForm.invalid) {
-        console.log("⚠️ Form bị lỗi:", this.editStudentForm.errors);
         this.toastr.error("Vui lòng nhập đầy đủ thông tin!", "Lỗi");
         return;
     }
 
     let formData = { ...this.editStudentForm.value };
 
-    console.log("📌 Kiểm tra giá trị `code` trước khi gửi API:", formData.code);
 
     if (!formData.code || formData.code.trim() === "") {
         this.toastr.error("Không tìm thấy mã học sinh!", "Lỗi");
-        console.error("❌ Lỗi: Mã học sinh không tồn tại trong form!", formData);
+        console.error(" Lỗi: Mã học sinh không tồn tại trong form!", formData);
         return;
     }
 
-    // 🔄 Format ngày sinh về định dạng YYYY-MM-DD
     if (formData.ngaySinh) {
         const date = new Date(formData.ngaySinh);
         formData.ngaySinh = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     }
 
-    // 🏙️ Gộp địa chỉ đầy đủ
     const provinceObj = this.provinces.find(p => p.code == formData.province);
     const provinceName = provinceObj ? provinceObj.name : '';
 
@@ -513,20 +499,17 @@ openEditStudentModal(student: any) {
 
     formData.diaChi = `${provinceName}, ${districtName}, ${formData.diaChiCuThe || ''}`.trim();
 
-    // ✅ Chuyển đổi `status` sang string ("true"/"false") nếu API yêu cầu string
     formData.status = formData.status ? "true" : "false";
 
-    // ✅ Chuyển đổi `chinhSachId` sang string nếu API yêu cầu
     if (formData.chinhSachId) {
         formData.chinhSachId = String(formData.chinhSachId);
     }
 
-    // 🛠 Chỉ lấy các trường cần thiết theo API yêu cầu
     const filteredData = {
         code: formData.code,
         ten: formData.ten,
         gioiTinh: formData.gioiTinh,
-        diaChi: formData.diaChi, // ✅ Địa chỉ gộp
+        diaChi: formData.diaChi, 
         lop: formData.lop,
         truongDangHoc: formData.truongDangHoc,
         ngaySinh: formData.ngaySinh,
@@ -536,11 +519,9 @@ openEditStudentModal(student: any) {
         status: formData.status
     };
 
-    console.log("📤 Gửi API cập nhật học sinh với dữ liệu:", JSON.stringify(filteredData));
 
     this.hocSinhService.updateHocSinh(filteredData).subscribe({
         next: (res) => {
-            console.log("📌 Phản hồi từ API:", res);
             if (!res.isError) {
                 this.toastr.success("Cập nhật học sinh thành công!", "Thành công");
                 this.closeEditModal();
@@ -550,7 +531,7 @@ openEditStudentModal(student: any) {
             }
         },
         error: (error) => {
-            console.error("❌ Lỗi kết nối API:", error);
+            console.error(" Lỗi kết nối API:", error);
             this.toastr.error("Có lỗi xảy ra, vui lòng thử lại!", "Lỗi");
         }
     });
@@ -562,13 +543,10 @@ openEditStudentModal(student: any) {
 
 
 onProvinceChangeForEdit(provinceCode: string) {
-  console.log("Giá trị tỉnh/thành phố được chọn trong Edit:", provinceCode);
 
   const selectedProvince = this.provinces.find(p => String(p.code) === String(provinceCode));
 
   if (selectedProvince) {
-      console.log("Tỉnh đã chọn trong Edit:", selectedProvince);
-      console.log("Danh sách quận/huyện trong Edit:", selectedProvince.districts);
       this.editDistricts = selectedProvince.districts;
   } else {
       console.warn("Không tìm thấy tỉnh/thành phố trong danh sách Edit!");

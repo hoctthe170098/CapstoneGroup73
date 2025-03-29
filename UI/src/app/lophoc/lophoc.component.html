@@ -111,49 +111,48 @@
       </select>
 
       <label for="giaoVienFilter">Giáo Viên</label>
-<div class="custom-select-wrapper" (click)="toggleGiaoVienDropdown()">
-  <input
-    type="text"
-    class="custom-select-input"
-    placeholder="Chọn giáo viên"
-    [value]="getSelectedGiaoVienText()"
-    readonly
-  />
-  <span
-    class="clear-icon ft-x-circle"
-    *ngIf="selectedGiaoVien"
-    (click)="clearGiaoVienSelection($event)"
-    ></span
-  >
-  <span class="custom-select-arrow"><i class="ft-chevron-down"></i></span>
+      <div class="custom-select-wrapper" (click)="toggleGiaoVienDropdown()">
+        <input
+          type="text"
+          class="custom-select-input"
+          placeholder="Chọn giáo viên"
+          [value]="getSelectedGiaoVienText()"
+          readonly
+        />
+        <span
+          class="clear-icon ft-x-circle"
+          *ngIf="selectedGiaoVien"
+          (click)="clearGiaoVienSelection($event)"
+        ></span>
+        <span class="custom-select-arrow"><i class="ft-chevron-down"></i></span>
 
-  <div
-    class="custom-select-dropdown"
-    *ngIf="isGiaoVienDropdownOpen"
-    (click)="$event.stopPropagation()"
-  >
-    <div class="custom-select-search">
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Tìm giáo viên"
-        [(ngModel)]="giaoVienSearch"
-        (input)="onGiaoVienSearch()"
-      />
-    </div>
-    <ul class="custom-select-options">
-      <li
-        *ngFor="let gv of filteredGiaoVienOptions"
-        (click)="selectGiaoVien(gv); $event.stopPropagation()"
-      >
-        {{ gv.codeTen }}
-      </li>
-      <li *ngIf="filteredGiaoVienOptions.length === 0" class="no-result">
-        Không tìm thấy
-      </li>
-    </ul>
-  </div>
-</div>
+        <div
+          class="custom-select-dropdown"
+          *ngIf="isGiaoVienDropdownOpen"
+          (click)="$event.stopPropagation()"
+        >
+          <div class="custom-select-search">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Tìm giáo viên"
+              [(ngModel)]="giaoVienSearch"
+              (input)="onGiaoVienSearch()"
+            />
+          </div>
+          <ul class="custom-select-options">
+            <li
+              *ngFor="let gv of filteredGiaoVienOptions"
+              (click)="selectGiaoVien(gv); $event.stopPropagation()"
+            >
+              {{ gv.codeTen }}
+            </li>
+            <li *ngIf="filteredGiaoVienOptions.length === 0" class="no-result">
+              Không tìm thấy
+            </li>
+          </ul>
+        </div>
+      </div>
       <!-- Thời gian -->
       <label>Thời gian</label>
       <div class="time-range">
@@ -226,9 +225,9 @@
             <p><strong>Lịch học:</strong></p>
             <ul class="lich-hoc-list">
               <li *ngFor="let item of lop.lichHocChiTiet">
-                {{ getThuHienThi(item.thu) }}: {{ item.gioBatDau }} - {{ item.gioKetThuc }} - <u>{{ item.tenPhong }}</u>
+                {{ getThuHienThi(item.thu) }}: {{ item.gioBatDau }} -
+                {{ item.gioKetThuc }} - <u>{{ item.tenPhong }}</u>
               </li>
-              
             </ul>
             <p>
               <strong>Ngày bắt đầu:</strong>
@@ -238,7 +237,37 @@
               <strong>Ngày kết thúc:</strong>
               {{ lop.ngayKetThuc | date : "dd/MM/yyyy" }}
             </p>
-            <p><strong>Học phí:</strong> {{ lop.hocPhi | number:'1.0-0' }} VND/buổi</p>
+            <!-- Nút + và menu ẩn/hiện -->
+            <div
+              class="action-plus-wrapper"
+              (click)="toggleActionMenu(i, $event)"
+            >
+              <i class="ft-plus-circle action-plus-icon"></i>
+
+              <div
+                *ngIf="lop.showActionMenu"
+                class="action-menu"
+                (click)="$event.stopPropagation()"
+              >
+                <div
+                  class="action-option"
+                  (click)="openAddScheduleModal(lop, 'Dạy thay')"
+                >
+                  Dạy thay
+                </div>
+                <div
+                  class="action-option"
+                  (click)="openAddScheduleModal(lop, 'Dạy bù')"
+                >
+                  Dạy bù
+                </div>
+              </div>
+            </div>
+
+            <p>
+              <strong>Học phí:</strong>
+              {{ lop.hocPhi | number : "1.0-0" }} VND/buổi
+            </p>
             <p><strong>Trạng thái:</strong> {{ lop.trangThai }}</p>
           </div>
 
@@ -246,6 +275,110 @@
             <button class="btn edit-btn" (click)="onEditClass(i)">Sửa</button>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP Thêm Lịch Mới -->
+  <div class="modal-container" *ngIf="isAddScheduleModalOpen">
+    <div class="modal-overlay" (click)="closeAddScheduleModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>THÊM LỊCH {{ newSchedule.loaiLich.toUpperCase() }}</h3>
+        <button class="close-btn" (click)="closeAddScheduleModal()">
+          <i class="ft-x"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Ngày -->
+        <label>Ngày</label>
+        <input
+          type="date"
+          class="form-control"
+          [(ngModel)]="newSchedule.ngay"
+        />
+
+        <div *ngIf="newSchedule.loaiLich === 'Dạy thay'">
+          <label>Giáo viên</label>
+          <div
+            class="custom-select-wrapper"
+            (click)="togglePopupGiaoVienDropdown($event)"
+          >
+            <input
+              type="text"
+              class="custom-select-input"
+              placeholder="Chọn giáo viên"
+              [value]="getSelectedPopupGiaoVienText()"
+              readonly
+            />
+            <span class="custom-select-arrow"
+              ><i class="ft-chevron-down"></i
+            ></span>
+
+            <div
+              class="custom-select-dropdown"
+              *ngIf="isPopupGiaoVienDropdownOpen"
+              (click)="$event.stopPropagation()"
+            >
+              <div class="custom-select-search">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Tìm giáo viên"
+                  [(ngModel)]="popupGiaoVienSearch"
+                  (input)="onPopupGiaoVienSearch()"
+                />
+              </div>
+              <ul class="custom-select-options">
+                <li
+                  *ngFor="let gv of popupFilteredGiaoVienOptions"
+                  (click)="selectPopupGiaoVien(gv); $event.stopPropagation()"
+                >
+                  {{ gv.codeTen }}
+                </li>
+                <li
+                  *ngIf="popupFilteredGiaoVienOptions.length === 0"
+                  class="no-result"
+                >
+                  Không tìm thấy
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phòng -->
+        <label>Phòng</label>
+        <select class="form-control" [(ngModel)]="newSchedule.phong">
+          <option *ngFor="let phong of phongOptions" [value]="phong.id">
+            {{ phong.ten }}
+          </option>
+        </select>
+
+        <!-- Thời gian -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Thời gian bắt đầu</label>
+            <input
+              type="time"
+              class="form-control"
+              [(ngModel)]="newSchedule.batDau"
+            />
+          </div>
+          <div class="form-group">
+            <label>Thời gian kết thúc</label>
+            <input
+              type="time"
+              class="form-control"
+              [(ngModel)]="newSchedule.ketThuc"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn save-btn" (click)="submitNewSchedule()">THÊM</button>
       </div>
     </div>
   </div>

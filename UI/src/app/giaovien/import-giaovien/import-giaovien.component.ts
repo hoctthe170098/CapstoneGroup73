@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component } from '@angular/core';
 import { GiaovienService } from '../shared/giaovien.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
-
+import { NgxSpinnerService } from 'ngx-spinner';
 @Component({
   selector: 'app-import-giaovien',
   templateUrl: './import-giaovien.component.html',
@@ -17,7 +17,8 @@ export class ImportGiaovienComponent {
     private giaovienService: GiaovienService,
     private toastr: ToastrService,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router, 
+    private spinner: NgxSpinnerService
   ) {}
 
   onFileSelected(event: any) {
@@ -92,9 +93,10 @@ export class ImportGiaovienComponent {
       email: gv.email,
       soDienThoai: gv.soDienThoai
     }));
-  
+    this.spinner.show();
     this.giaovienService.addListGiaoViens(danhSachGuiLen).subscribe({
       next: (res) => {
+        this.spinner.hide();
         if (!res.isError) {
           this.toastr.success(res.message || 'Đã thêm giáo viên vào hệ thống!', 'Thành công');
           this.router.navigate(['/giaovien']); 
@@ -104,6 +106,7 @@ export class ImportGiaovienComponent {
         }
       },
       error: (err) => {
+        this.spinner.hide();
         console.error(' Lỗi khi gọi API thêm danh sách giáo viên:', err);
         this.toastr.error('Không thể thêm giáo viên vào hệ thống.', 'Lỗi');
       }
