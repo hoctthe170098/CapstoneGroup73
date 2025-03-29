@@ -105,6 +105,7 @@ isGiaoVienDropdownOpen: boolean = false;
     this.selectedGiaoVien = '';
     this.giaoVienSearch = '';
     this.filteredGiaoVienOptions = this.giaoVienOptions.slice();
+    this.currentPage = 1;
     this.loadLopHocs();
   }
   
@@ -120,6 +121,7 @@ isGiaoVienDropdownOpen: boolean = false;
     this.selectedGiaoVien = gv.code;
     this.giaoVienSearch = '';
     this.isGiaoVienDropdownOpen = false;
+    this.currentPage = 1;
     this.loadLopHocs();
   }
   
@@ -214,6 +216,9 @@ isGiaoVienDropdownOpen: boolean = false;
   onEditClass(index: number) {
     alert('Sửa lớp: ' + this.lophocs[index].tenLop);
   }
-
+  onFilterChange() {
+    this.currentPage = 1;
+    this.loadLopHocs();
+  }
   
 }
