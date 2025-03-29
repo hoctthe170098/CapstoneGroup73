@@ -163,13 +163,19 @@ public class IdentityService : IIdentityService
     public async Task<Output> ForgotPasswordByEmail(string email, string title)
     {
         Output output = new Output();
-        var user = await _userManager.FindByEmailAsync(email);
+        var user = await _userManager.FindByNameAsync(email);
         if (user == null)
         {
             output.isError = false;
-            output.message = "Email không khớp, vui lòng thử lại!";
+            output.message = "Username không khớp, vui lòng thử lại!";
             return output;
         };
+        if (user.Email==null)
+        {
+            output.isError = false;
+            output.message = "Tài khoản này không có email, vui lòng liên hệ với quản lý!";
+            return output;
+        }
         var newPassword = GenerateRandomPassword();
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
         var result = await _userManager.ResetPasswordAsync(user,token, newPassword);
@@ -177,7 +183,7 @@ public class IdentityService : IIdentityService
         {
             try
             {
-                await SendEmail(email, title, $"Mật khẩu mới của bạn là: {newPassword}");
+                await SendEmail(user.Email, title, $"Mật khẩu mới cho Tên đăng nhập: {email} của bạn là: {newPassword}");
                 output.isError = false;
                 output.message = "Đã gửi mật khẩu mới vào email";
                 return output;
