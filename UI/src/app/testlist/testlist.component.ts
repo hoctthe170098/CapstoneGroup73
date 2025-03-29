@@ -1,6 +1,8 @@
 import { Component, OnInit,ChangeDetectorRef  } from '@angular/core';
 import { TestlistService } from './shared/testlist.service';
 import { BaiKiemTraDto } from './shared/testlist.model';
+import { ToastrService } from 'ngx-toastr';
+
 @Component({
   selector: 'app-testlist',
   templateUrl: './testlist.component.html',
@@ -47,7 +49,7 @@ export class TestListComponent implements OnInit {
       url: ''
     }
   };
-  constructor(private testlistService: TestlistService,private cdr: ChangeDetectorRef) {}
+  constructor(private testlistService: TestlistService,private cdr: ChangeDetectorRef, private toastr: ToastrService) {}
   ngOnInit() {
     this.loadTests();
     this.searchClassByName(''); // load tất cả lớp
@@ -77,16 +79,12 @@ export class TestListComponent implements OnInit {
     const trangThaiToSend = this.selectedStatus || 'all';
     const tenLop = this.selectedClass || 'all';  
     const tenBaiKiemTra = this.searchText?.trim() || '';
-    console.log('➡️ Gửi lên API:', {
-      trangThaiToSend,
-      tenLop,
-      tenBaiKiemTra
-    });
+    ;
   
     this.testlistService.getTests(this.currentPage, this.itemsPerPage, trangThaiToSend, tenLop, tenBaiKiemTra)
       .subscribe({
         next: res => {
-          console.log('✅ Kết quả trả về:', res);
+          
           if (!res || !res.data) {
             this.paginatedList = [];
             this.totalItems = 0;
@@ -140,12 +138,16 @@ export class TestListComponent implements OnInit {
   // ===============================
   // TẠO BÀI KIỂM TRA
   // ===============================
-  onFileSelected(event: any) {
+  onFileSelected(event: any, mode: 'create' | 'edit' = 'create') {
     const file = event.target.files[0];
     if (file) {
-      this.newTest.taiLieu = file;
+      if (mode === 'create') {
+        this.newTest.taiLieu = file;
+      } else {
+        this.editTest.taiLieu = file;
+        this.editTest.document = null; // Xoá file cũ nếu chọn file mới
+      }
     }
-
   }
   
   allClassData: any[] = [];
@@ -164,7 +166,7 @@ searchClassByName(name: string) {
       }
     },
     error: err => {
-      console.error('❌ Lỗi lấy danh sách lớp:', err);
+     
       this.classList = [];
       this.allClassData = [];
     }
@@ -195,7 +197,7 @@ selectLop(selected: string) {
 
 addTest() {
   if (!this.newTest.tenBaiKiemTra || !this.newTest.ngayKiemTra || !this.newTest.tenLop || !this.newTest.taiLieu) {
-    alert('Vui lòng điền đầy đủ thông tin!');
+    this.toastr.warning('Vui lòng điền đầy đủ thông tin!');
     return;
   }
 
@@ -206,8 +208,13 @@ addTest() {
   formData.append('BaiKiemTraDto.TaiLieu', this.newTest.taiLieu);
 
   this.testlistService.createTest(formData).subscribe({
-    next: () => {
-      alert('✅ Tạo bài kiểm tra thành công!');
+    next: (res) => {
+      if (res?.isError) {
+        this.toastr.error(res.message || 'Tạo bài kiểm tra thất bại.');
+        return;
+      }
+
+      this.toastr.success('Tạo bài kiểm tra thành công!');
       this.newTest = {
         tenBaiKiemTra: '',
         ngayKiemTra: '',
@@ -218,12 +225,17 @@ addTest() {
       this.showCreateForm = false;
       this.loadTests();
     },
-    error: (err) => {
-      console.error('❌ Tạo bài kiểm tra thất bại:', err);
-      alert('Tạo bài kiểm tra thất bại!');
+    error: (error) => {
+      const res = error?.error;
+      if (res?.isError) {
+        this.toastr.error(res.message || res.errors?.[0] || 'Tạo bài kiểm tra thất bại!');
+      } else {
+        this.toastr.error('Đã xảy ra lỗi không xác định.');
+      }
     }
   });
 }
+
 
 
 
@@ -237,7 +249,7 @@ addTest() {
   
 
   closeModal() {
-    console.log('Modal đóng ❌');
+   
     this.showCreateForm = false;
   }
 
@@ -245,28 +257,93 @@ addTest() {
   // SỬA BÀI KIỂM TRA
   // ===============================
   openEditModal(test: any) {
-    this.editTest = { ...test };
+    this.editTest = {
+      id: test.id,
+      tenBaiKiemTra: test.tenBaiKiemTra || test.ten,
+      ngayKiemTra: this.formatDateToInput(test.ngayKiemTra), // 👈 Quan trọng!
+      tenLop: test.tenLop,
+      taiLieu: null,
+      document: test.urlFile
+        ? {
+            name: test.urlFile.split('/').pop(),
+            url: test.urlFile
+          }
+        : null
+    };
+  
+    this.onClassSelected(this.editTest.tenLop);
     this.showEditForm = true;
-    this.showCreateForm = false; // tắt modal tạo khi mở modal sửa
+    this.showCreateForm = false;
   }
+  formatDateToInput(date: string): string {
+    if (!date) return '';
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = ('0' + (d.getMonth() + 1)).slice(-2);
+    const day = ('0' + d.getDate()).slice(-2);
+    return `${year}-${month}-${day}`;
+  }
+  
 
   closeEditModal() {
     this.showEditForm = false;
   }
 
   updateTest() {
-    const index = this.testList.findIndex(t => t === this.editTest);
-    if (index > -1) {
-      this.testList[index] = {
-        ...this.editTest,
-        createdDate: this.testList[index].createdDate // giữ nguyên ngày tạo
-      };
-    }
-
-    this.showEditForm = false;
-    this.updatePaginatedList();
+  if (!this.editTest.id || !this.editTest.tenBaiKiemTra || !this.editTest.ngayKiemTra || !this.editTest.tenLop) {
+    this.toastr.warning('Vui lòng điền đầy đủ thông tin!');
+    return;
   }
+
+  const formData = new FormData();
+  formData.append('BaiKiemTraDto.Id', this.editTest.id);
+  formData.append('BaiKiemTraDto.TenBaiKiemTra', this.editTest.tenBaiKiemTra);
+  formData.append('BaiKiemTraDto.NgayKiemTra', this.editTest.ngayKiemTra);
+  formData.append('BaiKiemTraDto.TenLop', this.editTest.tenLop);
+
+  if (this.editTest.taiLieu instanceof File) {
+    formData.append('BaiKiemTraDto.TaiLieu', this.editTest.taiLieu);
+  }
+
+  this.testlistService.updateTest(formData).subscribe({
+    next: (res) => {
+      if (res?.isError) {
+        this.toastr.error(res.message || res.errors?.[0] || 'Cập nhật thất bại!');
+        return;
+      }
+
+      this.toastr.success('Cập nhật bài kiểm tra thành công!');
+      this.closeEditModal();
+      this.loadTests();
+    },
+    error: (err) => {
+      const res = err?.error;
+      if (res?.isError) {
+        this.toastr.error(res.message || res.errors?.[0] || 'Cập nhật thất bại!');
+      } else {
+        this.toastr.error('Đã xảy ra lỗi không xác định.');
+      }
+    }
+  });
+}
+
   removeDocument() {
     this.editTest.document = null;
   }
+  confirmAndDelete(test: any) {
+    const confirmDelete = confirm(`Bạn có chắc chắn muốn xoá bài kiểm tra "${test.tenBaiKiemTra || test.ten}"?`);
+    if (!confirmDelete) return;
+  
+    this.testlistService.deleteTest(test.id).subscribe({
+      next: () => {
+        this.toastr.success('Xoá bài kiểm tra thành công');
+        this.loadTests(); // Refresh danh sách
+      },
+      error: (err) => {
+       
+        this.toastr.error('Xoá bài kiểm tra thất bại ');
+      }
+    });
+  }
+  
 }
