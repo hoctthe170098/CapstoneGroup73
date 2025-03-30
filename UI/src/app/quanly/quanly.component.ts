@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { AccountmanagerService } from './shared/account.service';
+import { AccountmanagerService } from './shared/quanly.service';
 import { Router } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-accountmanager',
-  templateUrl: './accountmanager.component.html',
-  styleUrls: ['./accountmanager.component.scss']
+  templateUrl: './quanly.component.html',
+  styleUrls: ['./quanly.component.scss']
 })
 export class AccountmanagerComponent implements OnInit {
   selectedProvince: any = null;

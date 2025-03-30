@@ -1,12 +1,12 @@
 import { Component, OnInit,ChangeDetectorRef  } from '@angular/core';
-import { TestlistService } from './shared/testlist.service';
-import { BaiKiemTraDto } from './shared/testlist.model';
+import { TestlistService } from './shared/baikiemtra.service';
+import { BaiKiemTraDto } from './shared/baikiemtra.model';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-testlist',
-  templateUrl: './testlist.component.html',
-  styleUrls: ['./testlist.component.scss']
+  templateUrl: './baikiemtra.component.html',
+  styleUrls: ['./baikiemtra.component.scss']
 })
 export class TestListComponent implements OnInit {
   statusList = ['Đã kiểm tra', 'Chưa kiểm tra'];

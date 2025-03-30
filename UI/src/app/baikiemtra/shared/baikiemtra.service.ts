@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'environments/environment'; 
-import { BaiKiemTraDto } from './testlist.model';
+import { BaiKiemTraDto } from './baikiemtra.model';
 @Injectable({ providedIn: 'root' })
 export class TestlistService {
   private baseUrl = `${environment.apiURL}/BaiKiemTras`;

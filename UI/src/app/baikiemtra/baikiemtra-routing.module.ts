@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { TestListComponent } from './testlist.component';
+import { TestListComponent } from './baikiemtra.component';
+
 
 
 const routes: Routes = [
