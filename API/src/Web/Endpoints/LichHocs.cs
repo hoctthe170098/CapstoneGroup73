@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using StudyFlow.Domain.Constants;
 using StudyFlow.Application.LichHocs.Queries.GetLopHocWithPagination;
 using StudyFlow.Application.LichHocs.Queries.GetLopHocByName;
+using StudyFlow.Application.LichHocs.Queries.GetLopHocByTen;
 
 namespace StudyFlow.Web.Endpoints;
 
@@ -19,7 +20,8 @@ public class LichHocs : EndpointGroupBase
             .MapPost(GetLopHocWithPagination, "getlophocwithpagination")
             .MapPost(CreateLichHocCoDinh, "createlichhoccodinh")
             .MapPut(EditLichHoc, "editlichhoc")
-            .MapGet(GetTenLopHocByName,"gettenlophocbyname");
+            .MapGet(GetTenLopHocByName,"gettenlophocbyname")
+            .MapGet(GetLopHocByTen,"getlophocbyten");
     }
     [Authorize(Roles =Roles.CampusManager)]
     public async Task<Output> CreateLichHocCoDinh(ISender sender, [FromBody] CreateLichHocCommand command)
@@ -37,6 +39,11 @@ public class LichHocs : EndpointGroupBase
     }
     [Authorize(Roles = Roles.CampusManager+","+Roles.LearningManager)]
     public async Task<Output> GetTenLopHocByName(ISender sender, [AsParameters]GetLopHocByNameQuery query)
+    {
+        return await sender.Send(query);
+    }
+    [Authorize(Roles = Roles.CampusManager)]
+    public async Task<Output> GetLopHocByTen(ISender sender, [AsParameters] GetLopHocByTenQuery query)
     {
         return await sender.Send(query);
     }

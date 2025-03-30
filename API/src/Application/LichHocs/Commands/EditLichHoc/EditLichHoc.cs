@@ -5,12 +5,13 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using System.ComponentModel;
 using Microsoft.AspNetCore.Http;
+using StudyFlow.Domain.Entities;
 
 namespace StudyFlow.Application.LichHocs.Commands.EditLichHoc;
 
 public record EditLichHocCommand : IRequest<Output>
 {
-   public required EditlLichHocDto LichHocDto { get; init; }
+    public required EditLichHocDto LopHocDto { get; init; }
 }
 
 public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Output>
@@ -29,34 +30,133 @@ public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Out
 
     public async Task<Output> Handle(EditLichHocCommand request, CancellationToken cancellationToken)
     {
-        var lichHocDto = request.LichHocDto;
-
-        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-        if (string.IsNullOrEmpty(token))
-            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
-
-        var coSoId =  _identityService.GetCampusId(token);
-        var lichHoc = await _context.LichHocs.FindAsync(lichHocDto.Id)
-            ?? throw new NotFoundDataException($"Không tìm thấy lịch học với ID {lichHocDto.Id}.");
-
-        if (lichHocDto.PhongId.HasValue)
+        var daBatDau = await _context.LichHocs
+            .AnyAsync(lh => lh.NgayBatDau >= DateOnly.FromDateTime(DateTime.Now));
+        if(daBatDau)
         {
-            var phong = await _context.Phongs.FirstOrDefaultAsync(p => p.Id == lichHocDto.PhongId.Value && p.CoSoId == coSoId);
-            if (phong == null)
-                throw new NotFoundDataException("Phòng không tồn tại hoặc không thuộc cơ sở của bạn.");
+            foreach(var lh in request.LopHocDto.LichHocs)
+            {
+                if (lh.Id == null) break;
+                var lichHocData = await _context.LichHocs.FirstAsync(lh=>lh.Id==lh.Id);
+                lichHocData.PhongId = lh.PhongId;
+                await _context.SaveChangesAsync(cancellationToken);
+                var thamGiaCanXoaOrUpdate = _context.ThamGiaLopHocs
+                   .Where(tg => tg.LichHocId == lh.Id && !request.LopHocDto.HocSinhCodes
+                                                                     .Contains(tg.HocSinhCode))
+                   .ToList();
+                foreach(var thamGia in thamGiaCanXoaOrUpdate)
+                {
+                    if(await _context.DiemDanhs.AnyAsync(dh => dh.ThamGiaLopHocId == thamGia.Id))
+                    {
+                        thamGia.NgayKetThuc = DateOnly.FromDateTime(DateTime.Now);
+                    }
+                    else
+                    {
+                        _context.ThamGiaLopHocs.Remove(thamGia);
+                    }
+                    await _context.SaveChangesAsync(cancellationToken);
+                }
+                var codeHocSinhCanThem = request.LopHocDto.HocSinhCodes
+                    .Where(hs => !_context.ThamGiaLopHocs
+                                         .Where(tg => tg.LichHocId == lh.Id)
+                                         .Select(tg => tg.HocSinhCode)
+                                         .Contains(hs))
+                    .ToList();
+                foreach (var code in codeHocSinhCanThem)
+                {
+                    var thamGiaLopHoc = new ThamGiaLopHoc
+                    {
+                        Id = Guid.NewGuid(),
+                        HocSinhCode = code,
+                        LichHocId = (Guid)lh.Id,
+                        NgayBatDau = DateOnly.FromDateTime(DateTime.Now),
+                        NgayKetThuc = request.LopHocDto.NgayKetThuc,
+                        TrangThai = "Cố định"
+                    };
+                    _context.ThamGiaLopHocs.Add(thamGiaLopHoc);
+                    await _context.SaveChangesAsync(cancellationToken);
+                }
+            }
         }
-
-        if (lichHocDto.Thu.HasValue) lichHoc.Thu = lichHocDto.Thu.Value;
-        if (lichHocDto.PhongId.HasValue) lichHoc.PhongId = lichHocDto.PhongId.Value;
-        if (!string.IsNullOrWhiteSpace(lichHocDto.TenLop)) lichHoc.TenLop = lichHocDto.TenLop;
-
-        await _context.SaveChangesAsync(cancellationToken);
+        else
+        {
+            var lichHocData = await _context.LichHocs
+                .Where(lh => lh.TenLop == request.LopHocDto.TenLop)
+                .ToListAsync();
+            var lichHocCanUpDate = request.LopHocDto.LichHocs
+                .Where(l => l.Id != null)
+                .ToList();
+            var lichHocCanXoa = lichHocData
+                .Where(lh=>!lichHocCanUpDate.Select(l => l.Id).Contains(lh.Id))
+                .ToList();
+            var lichHocCanThem = request.LopHocDto.LichHocs.Where(lh=>lh.Id==null).ToList();
+            foreach(var lh in lichHocCanUpDate)
+            {
+                var lichHoc = _context.LichHocs.Where(l=>l.Id==lh.Id).First();
+                lichHoc.Thu = lh.Thu;
+                lichHoc.GioBatDau = TimeOnly.Parse(lh.GioBatDau);
+                lichHoc.GioKetThuc = TimeOnly.Parse(lh.GioKetThuc);
+                lichHoc.PhongId = lh.PhongId;
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+            _context.LichHocs.RemoveRange(lichHocCanXoa);
+            await _context.SaveChangesAsync(cancellationToken);
+            foreach(var lh in lichHocCanThem)
+            {
+                LichHoc lichHoc = new LichHoc {
+                    Id = Guid.NewGuid(),
+                    ChuongTrinhId = request.LopHocDto.ChuongTrinhId,
+                    GiaoVienCode = request.LopHocDto.GiaoVienCode,
+                    GioBatDau = TimeOnly.Parse(lh.GioBatDau),
+                    GioKetThuc = TimeOnly.Parse(lh.GioKetThuc),
+                    HocPhi = request.LopHocDto.HocPhi,
+                    NgayBatDau = request.LopHocDto.NgayBatDau,
+                    NgayKetThuc = request.LopHocDto.NgayKetThuc,
+                    PhongId = lh.PhongId,
+                    TenLop = request.LopHocDto.TenLop,
+                    Thu = lh.Thu,
+                    TrangThai = "Cố định"
+                };
+                _context.LichHocs.Add(lichHoc);
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+            var lichHocSauUpdate = await _context.LichHocs
+                .Where(lh=>lh.TenLop==request.LopHocDto.TenLop)
+                .ToListAsync();
+            foreach(var lh in lichHocSauUpdate)
+            {
+                var codeHocSinhCanXoa = _context.ThamGiaLopHocs
+                    .Where(tg=>tg.LichHocId==lh.Id&&!request.LopHocDto.HocSinhCodes
+                                                                      .Contains(tg.HocSinhCode))
+                    .ToList();
+                _context.ThamGiaLopHocs.RemoveRange(codeHocSinhCanXoa);
+                await _context.SaveChangesAsync(cancellationToken);
+                var codeHocSinhCanThem = request.LopHocDto.HocSinhCodes
+                    .Where(hs => !_context.ThamGiaLopHocs
+                                         .Where(tg => tg.LichHocId == lh.Id)
+                                         .Select(tg => tg.HocSinhCode)
+                                         .Contains(hs))
+                    .ToList();
+                foreach(var code in codeHocSinhCanThem)
+                {
+                    var thamGiaLopHoc = new ThamGiaLopHoc { 
+                        Id = Guid.NewGuid(),
+                        HocSinhCode = code,
+                        LichHocId = lh.Id,
+                        NgayBatDau = DateOnly.FromDateTime(DateTime.Now),
+                        NgayKetThuc = lh.NgayKetThuc,
+                        TrangThai = "Cố định"         
+                    };
+                    _context.ThamGiaLopHocs.Add(thamGiaLopHoc);
+                    await _context.SaveChangesAsync(cancellationToken);
+                }
+            }
+        }
         return new Output
         {
-            isError = false,
-            data = lichHoc,
             code = 200,
-            message = "Cập nhật lịch học thành công."
+            isError = false,
+            message = "Chỉnh sửa lớp thành công"
         };
     }
 }
