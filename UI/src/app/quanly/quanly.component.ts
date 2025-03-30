@@ -3,6 +3,7 @@ import { AccountmanagerService } from './shared/quanly.service';
 import { Router } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-accountmanager',
@@ -45,7 +46,10 @@ export class AccountmanagerComponent implements OnInit {
   isRoleInvalid: boolean = false;
   isCoSoInvalid: boolean = false;
 
-  constructor(private accountmanagerService: AccountmanagerService, private cd: ChangeDetectorRef, private toastr: ToastrService) { }
+  constructor(private accountmanagerService: AccountmanagerService, 
+    private cd: ChangeDetectorRef,
+     private toastr: ToastrService,
+    private spinner: NgxSpinnerService) { }
 
 
   ngOnInit(): void {
@@ -57,7 +61,6 @@ export class AccountmanagerComponent implements OnInit {
     );
     this.loadDanhSachNhanVien();
     this.loadDanhSachCoSo(); // Tải danh sách cơ sở khi khởi tạo component
-    console.log(this.cosoList);
   }
 
   // Tải danh sách nhân viên
@@ -69,6 +72,7 @@ export class AccountmanagerComponent implements OnInit {
     } else if (this.trangThai === 'Tạm ngừng') {
       isActiveFilter = false;
     }
+    this.spinner.show();
     // Gọi API với payload bao gồm isActive
     this.accountmanagerService.getDanhSachNhanVien(
       this.currentPage,  // trang hiện tại
@@ -80,8 +84,8 @@ export class AccountmanagerComponent implements OnInit {
       isActiveFilter     // filter trạng thái theo isActive (boolean)
     ).subscribe(
       (response: any) => {
+        this.spinner.hide();
         if (!response.isError && response.data) {
-          console.log('Dữ liệu nhân viên từ API:', response);
           // Map dữ liệu từ API, sử dụng trường isActive của API và tạo thuộc tính hiển thị trạng thái
           this.students = response.data.items.map((student: any) => ({
             ...student,
@@ -98,6 +102,7 @@ export class AccountmanagerComponent implements OnInit {
         this.cd.detectChanges();
       },
       error => {
+        this.spinner.hide();
         console.error("Lỗi kết nối API", error);
       }
     );
@@ -118,7 +123,6 @@ export class AccountmanagerComponent implements OnInit {
   loadDanhSachCoSo() {
     this.accountmanagerService.getDanhSachCoSo().subscribe(
       response => {
-        console.log('Dữ liệu từ API:', response);
         if (response && response.data) {
           this.cosoList = response.data;
         }
@@ -193,11 +197,12 @@ export class AccountmanagerComponent implements OnInit {
       role: this.newStudent.role
     };
 
-    console.log("📌 Dữ liệu gửi lên API:", newHs);
-
+    this.spinner.show();
     this.accountmanagerService.createNhanVien(newHs).subscribe(
       response => {
+        this.spinner.hide();
         if (!response.isError) {
+          
           this.toastr.success(response.message);
           this.loadDanhSachNhanVien();
           this.isModalOpen = false;
@@ -212,6 +217,7 @@ export class AccountmanagerComponent implements OnInit {
         }
       },
       error => {
+        this.spinner.hide();
         console.error('❌ Lỗi khi thêm nhân viên:', error);
         if (error.error && error.error.isError) {
           // ✅ Kiểm tra lỗi từ API và hiển thị
@@ -277,7 +283,6 @@ export class AccountmanagerComponent implements OnInit {
 
   getProvinceName(): string {
     if (this.selectedProvince) {
-      console.log("🔍 Tỉnh/Thành phố đã chọn:", this.selectedProvince.name);
       return this.selectedProvince.name;
     }
     return "Không xác định";
@@ -311,17 +316,13 @@ export class AccountmanagerComponent implements OnInit {
 
     if (this.selectedProvince) {
       this.districts = this.selectedProvince.districts || [];
-      console.log("🌍 Đã chọn tỉnh/thành phố:", this.selectedProvince.name);
-      console.log("🏙️ Danh sách quận/huyện cập nhật:", this.districts);
     } else {
       this.districts = [];
-      console.log("⚠️ Không tìm thấy tỉnh/thành phố!");
     }
   }
 
 
   onDistrictChange(districtCode: string) {
-    console.log("📌 Mã quận/huyện nhận được khi thêm mới:", districtCode);
 
     if (!this.districts || this.districts.length === 0) {
       console.error("⚠️ Không có danh sách quận/huyện để tìm kiếm khi thêm mới!");
@@ -333,7 +334,6 @@ export class AccountmanagerComponent implements OnInit {
     const districtCodeFormatted = isDistrictCodeString ? String(districtCode) : Number(districtCode);
 
     const availableDistrictCodes = this.districts.map(d => isDistrictCodeString ? String(d.code) : Number(d.code));
-    console.log("📌 Danh sách mã quận/huyện có sẵn khi thêm mới:", availableDistrictCodes);
 
     if (!availableDistrictCodes.includes(districtCodeFormatted)) {
       console.error(`⚠️ Không tìm thấy quận/huyện với mã: ${districtCodeFormatted}`);
@@ -341,7 +341,6 @@ export class AccountmanagerComponent implements OnInit {
     }
 
     this.selectedDistrict = this.districts.find(d => isDistrictCodeString ? String(d.code) === String(districtCodeFormatted) : Number(d.code) === Number(districtCodeFormatted));
-    console.log("🏙️ Đã chọn quận/huyện khi thêm mới:", this.selectedDistrict?.name);
   }
 
 
@@ -358,14 +357,7 @@ export class AccountmanagerComponent implements OnInit {
       status: hs.isActive ? "true" : "false"
 
     };
-    console.log("📌 Trạng thái trước khi sửa:", this.editStudent.status);
-    console.log("📌 Vai trò của nhân viên trước khi sửa:", this.editStudent)
-    console.log("📌 Vai trò của nhân viên trước khi sửa:", this.editStudent.role)
-    // Tìm cosoId từ cosoList dựa trên hs.tenCoSo
-    console.log('Dữ liệu nhân viên:', hs);
-    console.log('Các key của hs:', Object.keys(hs));
 
-    console.log('Giá trị role nhận từ API:', hs.tenVaiTro);
     const coSo = this.cosoList.find(cs => cs.ten === hs.tenCoSo);
     this.editStudent.coSoId = coSo ? coSo.id : null;
     if (!this.editStudent.gioiTinh) {
@@ -444,7 +436,6 @@ export class AccountmanagerComponent implements OnInit {
       role: this.editStudent.tenVaiTro,
       status: this.editStudent.status
     };
-    console.log("📌 Dữ liệu gửi lên API khi sửa:", updatedHs);
 
     this.accountmanagerService.updateNhanVien(updatedHs).subscribe(
       response => {
@@ -486,7 +477,6 @@ export class AccountmanagerComponent implements OnInit {
       return;
     }
 
-    console.log("📌 Mã quận/huyện nhận được khi chỉnh sửa:", districtCode);
 
     // Xác định kiểu dữ liệu của mã quận/huyện
     const isDistrictCodeString = typeof this.editDistricts[0].code === "string";
@@ -500,7 +490,6 @@ export class AccountmanagerComponent implements OnInit {
 
     if (this.selectedDistrict) {
       this.editStudent.district = this.selectedDistrict.code;
-      console.log(`✅ Đã chọn quận/huyện: ${this.selectedDistrict.name} (${this.selectedDistrict.code})`);
     } else {
       console.error(`⚠️ Không tìm thấy quận/huyện có mã: ${districtCodeFormatted}`);
       this.editStudent.district = '';  // Reset giá trị nếu không tìm thấy
