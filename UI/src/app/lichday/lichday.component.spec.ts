@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AccountmanagerComponent } from './accountmanager.component';
+import { LichDayComponent } from './lichday.component';
 
-describe('AccountmanagerComponent', () => {
-  let component: AccountmanagerComponent;
-  let fixture: ComponentFixture<AccountmanagerComponent>;
+describe('LichdayComponent', () => {
+  let component: LichDayComponent;
+  let fixture: ComponentFixture<LichDayComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ AccountmanagerComponent ]
+      declarations: [ LichDayComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AccountmanagerComponent);
+    fixture = TestBed.createComponent(LichDayComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

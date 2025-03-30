@@ -4,6 +4,8 @@ using StudyFlow.Application.BaiKiemTras.Queries.GetBaiKiemTrasWithPagination;
 using StudyFlow.Application.ChinhSachs.Commands.DeleteBaiKiemTra;
 using StudyFlow.Application.ChinhSachs.Commands.DeleteChinhSach;
 using StudyFlow.Application.ChuongTrinhs.Commands.CreateBaiKiemTra;
+using StudyFlow.Application.ChuongTrinhs.Commands.DownBaiThi;
+using StudyFlow.Application.ChuongTrinhs.Commands.DowntaiLieuHocTap;
 using StudyFlow.Application.ChuongTrinhs.Commands.UpdateBaiKiemTra;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Domain.Constants;
@@ -19,7 +21,8 @@ public class BaiKiemTras : EndpointGroupBase
             .MapPost(GetBaiKiemTrasWithPagination, "getbaikiemtraswithpagination")
             .MapPost(CreateBaiKiemTra,"createbaikiemtra")
             .MapPut(UpdateBaiKiemTra,"updatebaikiemtra")
-            .MapDelete(DeleteBaiKiemTra,"deletebaikiemtra");
+            .MapDelete(DeleteBaiKiemTra,"deletebaikiemtra")
+            .MapPost(DownloadBaiKiemTra, "downloadbaikiemtra");
     }
 
     [Authorize(Roles = Roles.LearningManager)]
@@ -49,5 +52,27 @@ public class BaiKiemTras : EndpointGroupBase
         {
             throw;
         }
+    }
+    [Authorize(Roles=Roles.LearningManager+","+Roles.Teacher)]
+    public async Task<IResult> DownloadBaiKiemTra(ISender sender, [FromBody] DownBaiThiCommand command)
+    {
+        var result = await sender.Send(command);
+
+        if (result.isError == true)
+        {
+            return Results.BadRequest(result.message);
+        }
+
+        if (result.data == null)
+        {
+            return Results.BadRequest("File not found or error occurred.");
+        }
+
+        if (!(result.data is FileContentResult fileContentResult))
+        {
+            return Results.BadRequest("Invalid file content.");
+        }
+
+        return Results.File(fileContentResult.FileContents, fileContentResult.ContentType, fileContentResult.FileDownloadName);
     }
 }
