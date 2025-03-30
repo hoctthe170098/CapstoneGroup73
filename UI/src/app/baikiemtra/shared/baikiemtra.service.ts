@@ -1,16 +1,20 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable ,throwError} from 'rxjs';
 import { environment } from 'environments/environment'; 
-import { BaiKiemTraDto } from './baikiemtra.model';
+import { catchError, tap, map } from 'rxjs/operators';
+
 @Injectable({ providedIn: 'root' })
 export class TestlistService {
   private baseUrl = `${environment.apiURL}/BaiKiemTras`;
  
-  private lopUrl = 'https://localhost:5001/api/LichHocs';
+  private lopUrl = `${environment.apiURL}/LichHocs`;
 
   constructor(private http: HttpClient) {}
-  
+  private getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  }
 
   getTests(pageNumber: number, pageSize: number, trangThai: string, tenLop: string, tenBaiKiemTra: string): Observable<any> {
     const token = localStorage.getItem('token');
@@ -48,6 +52,18 @@ export class TestlistService {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.delete(`${this.baseUrl}/deletebaikiemtra?id=${id}`, { headers });
   }
+  downloadFile(filePath: string): Observable<Blob> {
+      const headers = this.getHeaders().set('Content-Type', 'application/json');
+      return this.http.post(`${this.baseUrl}/downloadbaikiemtra`, { filePath: filePath }, {
+        headers: headers,
+        responseType: 'blob' // Yêu cầu response là Blob
+      }).pipe(
+        catchError(error => {
+         
+          return throwError(() => error);
+        })
+      );
+    }
   
   getLopByName(tenLop: string): Observable<string[]> {
     const token = localStorage.getItem('token');
