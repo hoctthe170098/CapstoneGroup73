@@ -5,7 +5,7 @@
     <a routerLink="lichkiemtra" routerLinkActive="active">Lịch kiểm tra</a>
   </div>
   
-  <div class="tab-content">
-    <router-outlet></router-outlet>
+  <div class="tab-content" [@routeAnimations]="getRouteAnimation(outlet)">
+    <router-outlet #outlet="outlet"></router-outlet>
   </div>
   
