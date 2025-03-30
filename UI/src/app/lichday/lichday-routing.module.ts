@@ -1,18 +1,18 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AccountmanagerComponent } from './accountmanager.component';
+import { LichDayComponent } from './lichday.component';
 
 const routes: Routes = [
   {
     path: '',
-     component: AccountmanagerComponent,
+     component: LichDayComponent,
     data: {
-      title: 'Nhân viên'
+      title: 'Lịch Dạy'
     }
   },
   {
-    path: 'danh-sach-nhan-vien',
-    component: AccountmanagerComponent
+    path: 'danh-sach-lich-day',
+    component: LichDayComponent
   },
   
 ];
@@ -20,5 +20,5 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class AccountmanagerRoutingModule { }
+export class LicdayRoutingModule { }
 
