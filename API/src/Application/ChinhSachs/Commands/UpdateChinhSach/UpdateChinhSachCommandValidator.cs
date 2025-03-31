@@ -14,8 +14,8 @@ public class UpdateChinhSachValidator : AbstractValidator<UpdateChinhSachCommand
             .MaximumLength(200).WithMessage("Mô tả không được vượt quá 200 ký tự.");
 
         RuleFor(x => x.UpdateChinhSachDto.PhanTramGiam)
-            .GreaterThan(0.8f).WithMessage("Phần trăm giảm phải lớn hơn 0.8.")
-            .LessThan(1.0f).WithMessage("Phần trăm giảm phải nhỏ hơn 1.")
+            .GreaterThan(0f).WithMessage("Phần trăm giảm phải lớn hơn 0.8.")
+            .LessThan(0.1f).WithMessage("Phần trăm giảm phải nhỏ hơn 1.")
             .When(x => x.UpdateChinhSachDto.PhanTramGiam.HasValue);
     }
 }

@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="BaiTaps\Commands\" />
     <Folder Include="LichHocs\Queries\" />
   </ItemGroup>
 
