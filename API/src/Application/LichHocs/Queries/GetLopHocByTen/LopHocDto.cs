@@ -14,7 +14,9 @@ namespace StudyFlow.Application.LichHocs.Queries.GetLopHocByTen
         public required DateOnly NgayKetThuc { get; init; }
         public int HocPhi { get; set; }
         public required string GiaoVienCode { get; init; }
+        public required string TenGiaoVien {  get; init; }
         public int ChuongTrinhId { get; set; }
+        public required string TenChuongTrinh { get; init; }
         public required List<LichHocDto> LichHocs { get; init; } = new List<LichHocDto>();
         public required List<HocSinhDto> HocSinhs { get; set; } = new List<HocSinhDto>();
         public required bool DaHoc {  get; set; }

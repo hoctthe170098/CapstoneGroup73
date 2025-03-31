@@ -1,5 +1,6 @@
 ﻿using CleanArchitecture.Application.ChuongTrinhs.Commands.DeleteChuongTrinh;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using StudyFlow.Application.Common.Exceptions;
 using StudyFlow.Application.Common.Interfaces;
@@ -14,23 +15,34 @@ public class DeleteBaiKiemTraCommandHandler : IRequestHandler<DeleteBaiKiemTraCo
     private readonly IApplicationDbContext _context;
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly ILogger<DeleteBaiKiemTraCommandHandler> _logger;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IIdentityService _identityService;
 
     public DeleteBaiKiemTraCommandHandler(IApplicationDbContext context
         , IWebHostEnvironment webHostEnvironment
-        , ILogger<DeleteBaiKiemTraCommandHandler> logger)
+        , ILogger<DeleteBaiKiemTraCommandHandler> logger
+        , IHttpContextAccessor httpContextAccessor
+        , IIdentityService identityService)
     {
         _context = context;
         _webHostEnvironment = webHostEnvironment;
         _logger = logger;
+        _httpContextAccessor = httpContextAccessor;
+        _identityService = identityService;
     }
 
     public async Task<Output> Handle(DeleteBaiKiemTraCommand request, CancellationToken cancellationToken)
     {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
         var baiKiemTra = await _context.BaiKiemTras
-            .FirstOrDefaultAsync(b=>b.Id == request.Id, cancellationToken);
+            .FirstOrDefaultAsync(b=>b.Id == request.Id
+            && b.LichHoc.Phong.CoSoId==coSoId, cancellationToken);
         if (baiKiemTra == null)
         {
-            throw new NotFoundDataException($"Không tìm thấy chính sách với ID {request.Id} này.");
+            throw new NotFoundDataException($"Không tìm thấy bài kiểm tra với ID {request.Id} này.");
         }
         if(baiKiemTra.TrangThai=="Đã kiểm tra")
         {
