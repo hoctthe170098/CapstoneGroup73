@@ -8,8 +8,9 @@ using Microsoft.AspNetCore.Http;
 using StudyFlow.Application.Common.Interfaces;
 using StudyFlow.Application.Common.Mappings;
 using StudyFlow.Application.Common.Models;
+using StudyFlow.Domain.Entities;
 
-namespace StudyFlow.Application.GiaoViens.Commands.GetGiaoVienAssignedClass;
+namespace StudyFlow.Application.GiaoViens.Queries.GetGiaoVienAssignedClass;
 public record GetGiaoVienAssignedClassWithPaginationCommand : IRequest<Output>
 {
     public int PageNumber { get; init; } = 1;
@@ -48,7 +49,23 @@ public class GetGiaoVienAssignedClassWithPaginationCommandHandler
             throw new Exception("Không tìm thấy giáo viên tương ứng với tài khoản.");
 
         var query = _context.LichHocs
-            .Where(lh => lh.GiaoVienCode == giaoVien.Code);
+            .Where(lh => lh.GiaoVienCode == giaoVien.Code)
+            .GroupBy(lh => lh.TenLop)
+            .Select(g => new LichHoc
+            {
+                Id = g.First().Id,
+                Thu = g.First().Thu,
+                PhongId = g.First().PhongId,
+                TenLop = g.Key, // Lấy key chính là TenLop
+                NgayBatDau = g.First().NgayBatDau,
+                NgayKetThuc = g.First().NgayKetThuc,
+                HocPhi = g.First().HocPhi,
+                TrangThai = g.First().TrangThai,
+                GiaoVienCode = g.First().GiaoVienCode,
+                ChuongTrinhId = g.First().ChuongTrinhId,
+                GioBatDau = g.First().GioBatDau,
+                GioKetThuc = g.First().GioKetThuc
+            }).AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(request.SearchClass))
         {

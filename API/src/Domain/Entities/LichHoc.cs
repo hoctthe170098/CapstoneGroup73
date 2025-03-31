@@ -32,4 +32,5 @@ public class LichHoc
     public IList<BaiTap> BaiTaps { get; private set; } = new List<BaiTap>();
     [JsonIgnore]
     public IList<BaiKiemTra> BaiKiemTras { get; private set; } = new List<BaiKiemTra>();
+
 }

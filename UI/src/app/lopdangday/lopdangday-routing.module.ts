@@ -4,13 +4,13 @@ import { LopdangdayComponent } from './lopdangday.component';
 
 const routes: Routes = [
   {
-    path: '',
+    path: '/lopdangday',
     component: LopdangdayComponent,
     data: {
       title: 'lopdangday'
-    }
-  }
+    },
     
+  }, 
 ];
 
 @NgModule({
