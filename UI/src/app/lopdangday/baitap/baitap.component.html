@@ -1,0 +1,47 @@
+<div class="baitap-wrapper">
+    <h3>DANH SÁCH BÀI TẬP</h3>
+  
+    <div class="filter-bar">
+      <select [(ngModel)]="trangThaiFilter" (change)="applyFilter()">
+        <option value="">Trạng thái</option>
+        <option value="DangMo">Đang mở</option>
+        <option value="DaDong">Đã đóng</option>
+      </select>
+  
+      <input type="date" [(ngModel)]="ngayFilter" (change)="applyFilter()" />
+    </div>
+  
+    <div class="list-container">
+      <div class="baitap-item" *ngFor="let bt of paginatedBaiTaps">
+        <div class="left-icon ft-book-open">
+          
+        </div>
+        <div class="info">
+          <h4>{{ bt.ten }}</h4>
+          <p>
+            <i class="ft-calendar"></i> {{ bt.ngay }} &nbsp;&nbsp; <i class="ft-clock"></i> {{ bt.gio }}
+          </p>
+        </div>
+        <div class="status">
+          <span>Trạng thái</span><br />
+          <span [ngClass]="bt.trangThai === 'DangMo' ? 'open' : 'closed'">
+            {{ bt.trangThai === 'DangMo' ? 'Đang mở' : 'Đã đóng' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Pagination -->
+    <div class="pagination">
+      <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">&lt;</button>
+      <button
+        *ngFor="let page of [].constructor(totalPages); let i = index"
+        [class.active]="currentPage === i + 1"
+        (click)="goToPage(i + 1)"
+      >
+        {{ i + 1 }}
+      </button>
+      <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">&gt;</button>
+    </div>
+  </div>
+  
