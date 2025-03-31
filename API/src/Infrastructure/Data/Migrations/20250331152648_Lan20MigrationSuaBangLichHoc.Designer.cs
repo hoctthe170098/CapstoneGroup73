@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudyFlow.Infrastructure.Data;
 
 #nullable disable
 
-namespace CleanArchitecture.Infrastructure.Data.Migrations
+namespace StudyFlow.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250331152648_Lan20MigrationSuaBangLichHoc")]
+    partial class Lan20MigrationSuaBangLichHoc
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -572,6 +575,9 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                     b.Property<Guid?>("LichHocGocId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("LichHocId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateOnly>("NgayBatDau")
                         .HasColumnType("date");
 
@@ -602,7 +608,7 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     b.HasIndex("GiaoVienCode");
 
-                    b.HasIndex("LichHocGocId");
+                    b.HasIndex("LichHocId");
 
                     b.HasIndex("PhongId");
 
@@ -1130,9 +1136,9 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("StudyFlow.Domain.Entities.LichHoc", "LichHocGoc")
-                        .WithMany()
-                        .HasForeignKey("LichHocGocId")
+                    b.HasOne("StudyFlow.Domain.Entities.LichHoc", null)
+                        .WithMany("LichHocPhus")
+                        .HasForeignKey("LichHocId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("StudyFlow.Domain.Entities.Phong", "Phong")
@@ -1144,8 +1150,6 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                     b.Navigation("ChuongTrinh");
 
                     b.Navigation("GiaoVien");
-
-                    b.Navigation("LichHocGoc");
 
                     b.Navigation("Phong");
                 });
@@ -1323,6 +1327,8 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                     b.Navigation("BaiKiemTras");
 
                     b.Navigation("BaiTaps");
+
+                    b.Navigation("LichHocPhus");
 
                     b.Navigation("ThamGiaLopHocs");
                 });

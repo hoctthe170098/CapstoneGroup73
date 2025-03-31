@@ -62,7 +62,9 @@ public class UpdateBaiKiemTraCommandValidator : AbstractValidator<CreateBaiKiemT
     private async Task<bool> ValidLichKiemTraCoDinh(CreateBaiKiemTraCommand command
         , DateOnly ngayKiemTra, CancellationToken token)
     {
-        var thu = ((int)ngayKiemTra.DayOfWeek > 0) ? (int)ngayKiemTra.DayOfWeek + 1 : (int)ngayKiemTra.DayOfWeek + 8;
+        var thu = ((int)ngayKiemTra.DayOfWeek > 0) 
+            ? (int)ngayKiemTra.DayOfWeek + 1 
+            : (int)ngayKiemTra.DayOfWeek + 8;
         return !await _context.LichHocs.AnyAsync(lh => lh.TenLop == command.BaiKiemTraDto.TenLop
         && lh.Thu == thu && lh.NgayKetThuc == ngayKiemTra 
         && (lh.TrangThai == "Dạy bù"||lh.TrangThai=="Dạy thay"));
@@ -87,7 +89,9 @@ public class UpdateBaiKiemTraCommandValidator : AbstractValidator<CreateBaiKiemT
     private async Task<bool> ValidNgayKiemTra(CreateBaiKiemTraCommand command,DateOnly ngayKiemTra, CancellationToken token)
     {
         if(ngayKiemTra< DateOnly.FromDateTime(DateTime.Now).AddDays(7)) return false;
-        var thu = ((int)ngayKiemTra.DayOfWeek >0) ? (int)ngayKiemTra.DayOfWeek + 1 : (int)ngayKiemTra.DayOfWeek + 8;
+        var thu = ((int)ngayKiemTra.DayOfWeek >0) 
+            ? (int)ngayKiemTra.DayOfWeek + 1 
+            : (int)ngayKiemTra.DayOfWeek + 8;
         return await _context.LichHocs.AnyAsync(lh => lh.TenLop == command.BaiKiemTraDto.TenLop
         && lh.Thu == thu&&lh.NgayKetThuc>=ngayKiemTra&&lh.TrangThai=="Cố định");
     }

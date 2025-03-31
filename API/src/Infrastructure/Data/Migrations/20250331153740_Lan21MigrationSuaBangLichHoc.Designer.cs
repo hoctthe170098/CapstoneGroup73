@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudyFlow.Infrastructure.Data;
 
 #nullable disable
 
-namespace CleanArchitecture.Infrastructure.Data.Migrations
+namespace StudyFlow.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250331153740_Lan21MigrationSuaBangLichHoc")]
+    partial class Lan21MigrationSuaBangLichHoc
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -602,8 +605,6 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     b.HasIndex("GiaoVienCode");
 
-                    b.HasIndex("LichHocGocId");
-
                     b.HasIndex("PhongId");
 
                     b.ToTable("LichHoc", (string)null);
@@ -1130,11 +1131,6 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("StudyFlow.Domain.Entities.LichHoc", "LichHocGoc")
-                        .WithMany()
-                        .HasForeignKey("LichHocGocId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("StudyFlow.Domain.Entities.Phong", "Phong")
                         .WithMany("LichHocs")
                         .HasForeignKey("PhongId")
@@ -1144,8 +1140,6 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                     b.Navigation("ChuongTrinh");
 
                     b.Navigation("GiaoVien");
-
-                    b.Navigation("LichHocGoc");
 
                     b.Navigation("Phong");
                 });

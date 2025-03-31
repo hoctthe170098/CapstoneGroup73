@@ -51,7 +51,9 @@ public class CreateLichHocCommandValidator : AbstractValidator<CreateLichHocComm
         RuleFor(x => x.LopHocDto.LichHocs)
             .NotEmpty().WithMessage("Danh sách Lịch Học không được để trống")
             .MustAsync(BeValidLichHocs)
-            .WithMessage("Danh sách Lịch Học đã bị trùng hoặc không hợp lệ(thời gian nghỉ giữa 2 tiết của 1 giáo viên ít nhất là 15p)");
+            .WithMessage("Danh sách Lịch Học đã bị trùng hoặc không hợp lệ, " +
+            "hãy kiểm tra lại lịch của các lớp khác bao gồm cả lịch dạy thay và dạy thêm" +
+            "(lưu ý: thời gian nghỉ giữa 2 tiết của 1 giáo viên ít nhất là 15p)");
     }
 
     private async Task<bool> NotExistClassName(string name, CancellationToken cToken)

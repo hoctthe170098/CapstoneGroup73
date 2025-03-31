@@ -9,6 +9,9 @@ using StudyFlow.Domain.Constants;
 using StudyFlow.Application.LichHocs.Queries.GetLopHocWithPagination;
 using StudyFlow.Application.LichHocs.Queries.GetLopHocByName;
 using StudyFlow.Application.LichHocs.Queries.GetLopHocByTen;
+using StudyFlow.Application.ChinhSachs.Commands.DeleteBaiKiemTra;
+using StudyFlow.Application.ChinhSachs.Commands.DeleteLichHoc;
+using StudyFlow.Application.LichHocs.Commands.CreateLichDayThay;
 
 namespace StudyFlow.Web.Endpoints;
 
@@ -21,7 +24,9 @@ public class LichHocs : EndpointGroupBase
             .MapPost(CreateLichHocCoDinh, "createlichhoccodinh")
             .MapPut(EditLichHoc, "editlichhoc")
             .MapGet(GetTenLopHocByName,"gettenlophocbyname")
-            .MapGet(GetLopHocByTen,"getlophocbyten");
+            .MapGet(GetLopHocByTen,"getlophocbyten")
+            .MapDelete(DeleteLichHoc,"deletelophoc")
+            .MapPost(CreateLichHocDayThay,"createlichdaythay");
     }
     [Authorize(Roles =Roles.CampusManager)]
     public async Task<Output> CreateLichHocCoDinh(ISender sender, [FromBody] CreateLichHocCommand command)
@@ -46,5 +51,15 @@ public class LichHocs : EndpointGroupBase
     public async Task<Output> GetLopHocByTen(ISender sender, [AsParameters] GetLopHocByTenQuery query)
     {
         return await sender.Send(query);
+    }
+    [Authorize(Roles = Roles.CampusManager)]
+    public async Task<Output> DeleteLichHoc(ISender sender, string tenLopHoc)
+    {
+        return await sender.Send(new DeleteLichHocCommand(tenLopHoc));
+    }
+    [Authorize(Roles = Roles.CampusManager)]
+    public async Task<Output> CreateLichHocDayThay(ISender sender,  CreateLichDayThayCommand command)
+    {
+        return await sender.Send(command);
     }
 }

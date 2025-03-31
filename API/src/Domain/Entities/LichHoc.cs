@@ -26,6 +26,10 @@ public class LichHoc
     public required int ChuongTrinhId { get; set; }
     [JsonIgnore]
     public ChuongTrinh ChuongTrinh { get; set; } = null!;
+    public Guid? LichHocGocId { get; set; }
+    [JsonIgnore]
+    public LichHoc LichHocGoc { get; set; } = null!;
+    public DateOnly? NgayHocGoc { get; set; }
     [JsonIgnore]
     public IList<ThamGiaLopHoc> ThamGiaLopHocs { get; private set; } = new List<ThamGiaLopHoc>();
     [JsonIgnore]
