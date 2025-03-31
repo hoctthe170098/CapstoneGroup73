@@ -268,9 +268,10 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ChinhSach", (string)null);
-
-                    b.HasAnnotation("CheckConstraint:CK_ChinhSach_PhanTramGiam", "[PhanTramGiam] > 0 AND [PhanTramGiam] < 0.1");
+                    b.ToTable("ChinhSach", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_ChinhSach_PhanTramGiam", "[PhanTramGiam] > 0 AND [PhanTramGiam] <= 0.1");
+                        });
                 });
 
             modelBuilder.Entity("StudyFlow.Domain.Entities.ChuongTrinh", b =>

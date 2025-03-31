@@ -43,7 +43,13 @@ public class GetLopHocWithPaginationQueryHandler : IRequestHandler<GetLopHocWith
 
     public async Task<Output> Handle(GetLopHocWithPaginationQuery request, CancellationToken cancellationToken)
     {
-        var query =  _context.LichHocs.AsQueryable();
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
+        var query =  _context.LichHocs
+            .Where(q=>q.Phong.CoSoId == coSoId)
+            .AsQueryable();
         if (request.TenLop != "")
         {
             query = query.Where(lh => lh.TenLop.Contains(request.TenLop));
@@ -97,7 +103,11 @@ public class GetLopHocWithPaginationQueryHandler : IRequestHandler<GetLopHocWith
             query = query.Where(lh => lh.NgayBatDau >= request.NgayBatDau 
                 && lh.NgayKetThuc <= request.NgayKetThuc);
         }
-        var listClass = query.Select(lh=>lh.TenLop).Distinct().ToList();
+        var listClass = query.Select(lh => lh.TenLop).Distinct().ToList();
+        var listClassPagging = listClass
+            .Skip((request.PageNumber-1)*request.PageSize)
+            .Take(request.PageSize)
+            .ToList();
         LopHocWithPaginationDTO lopHocWithPaginationDTO = new LopHocWithPaginationDTO
         {
             PageNumber = request.PageNumber,
@@ -106,7 +116,7 @@ public class GetLopHocWithPaginationQueryHandler : IRequestHandler<GetLopHocWith
             ? listClass.Count / request.PageSize : listClass.Count / request.PageSize + 1,
             LopHocs = new List<LopHocDto>()
         };
-        foreach (var cla in listClass)
+        foreach (var cla in listClassPagging)
         {
             var lichHocs = await _context.LichHocs
                 .Include(lh=>lh.GiaoVien)

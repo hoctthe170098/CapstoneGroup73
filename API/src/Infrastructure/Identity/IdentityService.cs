@@ -122,9 +122,11 @@ public class IdentityService : IIdentityService
 
             
             var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.Name, username)
-    };
+                {
+                    new Claim(ClaimTypes.Name, username),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id)
+                };
+
             if (!roles.Contains(Roles.Administrator))
             {
                 var staff = _context.NhanViens.FirstOrDefault(s => s.UserId == user.Id);
@@ -161,13 +163,19 @@ public class IdentityService : IIdentityService
     public async Task<Output> ForgotPasswordByEmail(string email, string title)
     {
         Output output = new Output();
-        var user = await _userManager.FindByEmailAsync(email);
+        var user = await _userManager.FindByNameAsync(email);
         if (user == null)
         {
             output.isError = false;
-            output.message = "Email không khớp, vui lòng thử lại!";
+            output.message = "Username không khớp, vui lòng thử lại!";
             return output;
         };
+        if (user.Email==null)
+        {
+            output.isError = false;
+            output.message = "Tài khoản này không có email, vui lòng liên hệ với quản lý!";
+            return output;
+        }
         var newPassword = GenerateRandomPassword();
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
         var result = await _userManager.ResetPasswordAsync(user,token, newPassword);
@@ -175,7 +183,7 @@ public class IdentityService : IIdentityService
         {
             try
             {
-                await SendEmail(email, title, $"Mật khẩu mới của bạn là: {newPassword}");
+                await SendEmail(user.Email, title, $"Mật khẩu mới cho Tên đăng nhập: {email} của bạn là: {newPassword}");
                 output.isError = false;
                 output.message = "Đã gửi mật khẩu mới vào email";
                 return output;
@@ -557,8 +565,37 @@ public class IdentityService : IIdentityService
         var campusIdString = jwtToken.Claims
             .First(x => x.Type == ClaimTypes.Locality).Value;
         var chuyendoi = Guid.TryParse(campusIdString, out var campusId);
-        if(chuyendoi) return campusId;
+        if (chuyendoi) return campusId;
         else return Guid.Empty;
+    }
+
+    public Guid GetUserId(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var secretKey = _configuration["Jwt:SecretKey"] ?? throw
+            new ArgumentNullException(nameof(_configuration),
+            "Jwt:SecretKey is missing in configuration.");
+
+        var key = Encoding.ASCII.GetBytes(secretKey);
+
+        tokenHandler.ValidateToken(token, new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ClockSkew = TimeSpan.Zero
+        }, out SecurityToken validatedToken);
+
+        var jwtToken = (JwtSecurityToken)validatedToken;
+
+        var userIdString = jwtToken.Claims
+            .FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
+
+        if (Guid.TryParse(userIdString, out var userId))
+            return userId;
+        else
+            return Guid.Empty;
     }
 
     public async Task<Result> UpdateStatusUser(string userId,bool status)

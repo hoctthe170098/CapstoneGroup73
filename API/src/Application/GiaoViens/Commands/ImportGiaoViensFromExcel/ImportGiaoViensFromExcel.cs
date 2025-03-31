@@ -39,6 +39,7 @@ public class ImportGiaoViensFromExcelCommandHandler : IRequestHandler<ImportGiao
             using (var stream = new MemoryStream())
             {
                 await request.File.CopyToAsync(stream, cancellationToken);
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                 using var package = new ExcelPackage(stream);
                 var worksheet = package.Workbook.Worksheets.FirstOrDefault();
                 if (worksheet == null)

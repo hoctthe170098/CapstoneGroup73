@@ -2,7 +2,9 @@
   <!-- Tiêu đề + nút Thêm lớp học -->
   <div class="top-bar">
     <h2 class="page-title">DANH SÁCH LỚP HỌC</h2>
-    <button class="btn add-class-btn" (click)="onAddClass()">Thêm lớp học</button>
+    <button class="btn add-class-btn" (click)="onAddClass()">
+      Thêm lớp học
+    </button>
   </div>
 
   <div class="content-row">
@@ -16,19 +18,68 @@
         class="form-control"
         placeholder="Tên lớp học..."
         [(ngModel)]="searchTerm"
-        (ngModelChange)="loadLopHocs()"
+        (ngModelChange)="onFilterChange()"
       />
 
       <!-- Thứ Trong Tuần -->
       <h4>Thứ Trong Tuần</h4>
       <div class="checkbox-group">
-        <label><input type="checkbox" [(ngModel)]="thuTrongTuan.thu2" (change)="loadLopHocs()" /> Thứ 2</label>
-        <label><input type="checkbox" [(ngModel)]="thuTrongTuan.thu3" (change)="loadLopHocs()" /> Thứ 3</label>
-        <label><input type="checkbox" [(ngModel)]="thuTrongTuan.thu4" (change)="loadLopHocs()" /> Thứ 4</label>
-        <label><input type="checkbox" [(ngModel)]="thuTrongTuan.thu5" (change)="loadLopHocs()" /> Thứ 5</label>
-        <label><input type="checkbox" [(ngModel)]="thuTrongTuan.thu6" (change)="loadLopHocs()" /> Thứ 6</label>
-        <label><input type="checkbox" [(ngModel)]="thuTrongTuan.thu7" (change)="loadLopHocs()" /> Thứ 7</label>
-        <label><input type="checkbox" [(ngModel)]="thuTrongTuan.cn" (change)="loadLopHocs()" /> Chủ Nhật</label>
+        <label
+          ><input
+            type="checkbox"
+            [(ngModel)]="thuTrongTuan.thu2"
+            (change)="onFilterChange()"
+          />
+          Thứ 2</label
+        >
+        <label
+          ><input
+            type="checkbox"
+            [(ngModel)]="thuTrongTuan.thu3"
+            (change)="onFilterChange()"
+          />
+          Thứ 3</label
+        >
+        <label
+          ><input
+            type="checkbox"
+            [(ngModel)]="thuTrongTuan.thu4"
+            (change)="onFilterChange()"
+          />
+          Thứ 4</label
+        >
+        <label
+          ><input
+            type="checkbox"
+            [(ngModel)]="thuTrongTuan.thu5"
+            (change)="onFilterChange()"
+          />
+          Thứ 5</label
+        >
+        <label
+          ><input
+            type="checkbox"
+            [(ngModel)]="thuTrongTuan.thu6"
+            (change)="onFilterChange()"
+          />
+          Thứ 6</label
+        >
+        <label
+          ><input
+            type="checkbox"
+            [(ngModel)]="thuTrongTuan.thu7"
+            (change)="onFilterChange()"
+          />
+          Thứ 7</label
+        >
+        <label
+          ><input
+            type="checkbox"
+            [(ngModel)]="thuTrongTuan.cn"
+            (change)="onFilterChange()"
+          />
+          Chủ Nhật</label
+        >
       </div>
 
       <!-- Chương Trình -->
@@ -36,12 +87,13 @@
       <select
         id="chuongTrinhSelect"
         class="form-control"
-        [(ngModel)]="chuongTrinh"
-        (change)="loadLopHocs()"
+        [(ngModel)]="chuongTrinhId"
+        (change)="onFilterChange()"
       >
-        <option value="">Chọn chương trình</option>
-        <option value="Anh">Tiếng Anh</option>
-        <option value="Toan">Toán</option>
+        <option [value]="0">Tất cả chương trình</option>
+        <option *ngFor="let item of chuongTrinhOptions" [value]="item.id">
+          {{ item.tieuDe }}
+        </option>
       </select>
 
       <!-- Trạng Thái -->
@@ -50,23 +102,77 @@
         id="trangThaiSelect"
         class="form-control"
         [(ngModel)]="trangThai"
-        (change)="loadLopHocs()"
+        (change)="onFilterChange()"
       >
         <option value="">Chọn trạng thái</option>
-        <option value="Hoạt động">Hoạt động</option>
-        <option value="Tạm ngừng">Tạm ngừng</option>
+        <option value="Cố định">Cố định</option>
+        <option value="Dạy thay">Dạy thay</option>
+        <option value="Dạy bù">Dạy bù</option>
       </select>
 
+      <label for="giaoVienFilter">Giáo Viên</label>
+      <div class="custom-select-wrapper" (click)="toggleGiaoVienDropdown()">
+        <input
+          type="text"
+          class="custom-select-input"
+          placeholder="Chọn giáo viên"
+          [value]="getSelectedGiaoVienText()"
+          readonly
+        />
+        <span
+          class="clear-icon ft-x-circle"
+          *ngIf="selectedGiaoVien"
+          (click)="clearGiaoVienSelection($event)"
+        ></span>
+        <span class="custom-select-arrow"><i class="ft-chevron-down"></i></span>
+
+        <div
+          class="custom-select-dropdown"
+          *ngIf="isGiaoVienDropdownOpen"
+          (click)="$event.stopPropagation()"
+        >
+          <div class="custom-select-search">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Tìm giáo viên"
+              [(ngModel)]="giaoVienSearch"
+              (input)="onGiaoVienSearch()"
+            />
+          </div>
+          <ul class="custom-select-options">
+            <li
+              *ngFor="let gv of filteredGiaoVienOptions"
+              (click)="selectGiaoVien(gv); $event.stopPropagation()"
+            >
+              {{ gv.codeTen }}
+            </li>
+            <li *ngIf="filteredGiaoVienOptions.length === 0" class="no-result">
+              Không tìm thấy
+            </li>
+          </ul>
+        </div>
+      </div>
       <!-- Thời gian -->
       <label>Thời gian</label>
       <div class="time-range">
         <div class="time-box">
           <label>Bắt đầu</label>
-          <input type="time" class="form-control" [(ngModel)]="timeStart" (change)="loadLopHocs()" />
+          <input
+            type="time"
+            class="form-control"
+            [(ngModel)]="timeStart"
+            (change)="onFilterChange()"
+          />
         </div>
         <div class="time-box">
           <label>Kết thúc</label>
-          <input type="time" class="form-control" [(ngModel)]="timeEnd" (change)="loadLopHocs()" />
+          <input
+            type="time"
+            class="form-control"
+            [(ngModel)]="timeEnd"
+            (change)="onFilterChange()"
+          />
         </div>
       </div>
 
@@ -75,17 +181,30 @@
       <div class="date-range">
         <div class="date-box">
           <label>Bắt đầu</label>
-          <input type="date" class="form-control" [(ngModel)]="dateStart" (change)="loadLopHocs()" />
+          <input
+            type="date"
+            class="form-control"
+            [(ngModel)]="dateStart"
+            (change)="onFilterChange()"
+          />
         </div>
         <div class="date-box">
           <label>Kết thúc</label>
-          <input type="date" class="form-control" [(ngModel)]="dateEnd" (change)="loadLopHocs()" />
+          <input
+            type="date"
+            class="form-control"
+            [(ngModel)]="dateEnd"
+            (change)="onFilterChange()"
+          />
         </div>
       </div>
     </div>
 
     <!-- Cột phải: Danh sách lớp -->
     <div class="right-list">
+      <div *ngIf="lophocs.length === 0" class="no-class-message">
+        Hiện không có lớp học nào !
+      </div>
       <div class="lop-hoc-item" *ngFor="let lop of lophocs; let i = index">
         <div class="lop-hoc-title-bar">
           {{ lop.tenLop }}
@@ -106,14 +225,51 @@
             <p><strong>Lịch học:</strong></p>
             <ul class="lich-hoc-list">
               <li *ngFor="let item of lop.lichHocChiTiet">
-                Thứ {{ item.thu }}: {{ item.gioBatDau }} - {{ item.gioKetThuc }} - <u>{{ item.tenPhong }}</u>
+                {{ getThuHienThi(item.thu) }}: {{ item.gioBatDau }} -
+                {{ item.gioKetThuc }} - <u>{{ item.tenPhong }}</u>
               </li>
             </ul>
-            <p><strong>Ngày bắt đầu:</strong> {{ lop.ngayBatDau | date: 'dd/MM/yyyy' }}</p>
-            <p><strong>Ngày kết thúc:</strong> {{ lop.ngayKetThuc | date: 'dd/MM/yyyy' }}</p>
-            <p><strong>Học phí:</strong> {{ lop.hocPhi }} VND/buổi</p>
-            <p><strong>Trạng thái:</strong> {{lop.trangThai}}</p>
-          </div>  
+            <p>
+              <strong>Ngày bắt đầu:</strong>
+              {{ lop.ngayBatDau | date : "dd/MM/yyyy" }}
+            </p>
+            <p>
+              <strong>Ngày kết thúc:</strong>
+              {{ lop.ngayKetThuc | date : "dd/MM/yyyy" }}
+            </p>
+            <!-- Nút + và menu ẩn/hiện -->
+            <div
+              class="action-plus-wrapper"
+              (click)="toggleActionMenu(i, $event)"
+            >
+              <i class="ft-plus-circle action-plus-icon"></i>
+
+              <div
+                *ngIf="lop.showActionMenu"
+                class="action-menu"
+                (click)="$event.stopPropagation()"
+              >
+                <div
+                  class="action-option"
+                  (click)="openAddScheduleModal(lop, 'Dạy thay')"
+                >
+                  Dạy thay
+                </div>
+                <div
+                  class="action-option"
+                  (click)="openAddScheduleModal(lop, 'Dạy bù')"
+                >
+                  Dạy bù
+                </div>
+              </div>
+            </div>
+
+            <p>
+              <strong>Học phí:</strong>
+              {{ lop.hocPhi | number : "1.0-0" }} VND/buổi
+            </p>
+            <p><strong>Trạng thái:</strong> {{ lop.trangThai }}</p>
+          </div>
 
           <div class="lop-hoc-footer">
             <button class="btn edit-btn" (click)="onEditClass(i)">Sửa</button>
@@ -123,24 +279,128 @@
     </div>
   </div>
 
- <!-- Phân trang -->
-<div class="pagination-container" *ngIf="totalPages > 1">
-  <ul class="pagination">
-    <li class="page-item" [class.disabled]="currentPage === 1">
-      <a class="page-link" (click)="goToPage(currentPage - 1)">«</a>
-    </li>
+  <!-- POPUP Thêm Lịch Mới -->
+  <div class="modal-container" *ngIf="isAddScheduleModalOpen">
+    <div class="modal-overlay" (click)="closeAddScheduleModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>THÊM LỊCH {{ newSchedule.loaiLich.toUpperCase() }}</h3>
+        <button class="close-btn" (click)="closeAddScheduleModal()">
+          <i class="ft-x"></i>
+        </button>
+      </div>
 
-    <li
-      class="page-item"
-      *ngFor="let page of [].constructor(totalPages); let idx = index"
-      [class.active]="currentPage === idx + 1"
-    >
-      <a class="page-link" (click)="goToPage(idx + 1)">{{ idx + 1 }}</a>
-    </li>
+      <div class="modal-body">
+        <!-- Ngày -->
+        <label>Ngày</label>
+        <input
+          type="date"
+          class="form-control"
+          [(ngModel)]="newSchedule.ngay"
+        />
 
-    <li class="page-item" [class.disabled]="currentPage === totalPages">
-      <a class="page-link" (click)="goToPage(currentPage + 1)">»</a>
-    </li>
-  </ul>
+        <div *ngIf="newSchedule.loaiLich === 'Dạy thay'">
+          <label>Giáo viên</label>
+          <div
+            class="custom-select-wrapper"
+            (click)="togglePopupGiaoVienDropdown($event)"
+          >
+            <input
+              type="text"
+              class="custom-select-input"
+              placeholder="Chọn giáo viên"
+              [value]="getSelectedPopupGiaoVienText()"
+              readonly
+            />
+            <span class="custom-select-arrow"
+              ><i class="ft-chevron-down"></i
+            ></span>
+
+            <div
+              class="custom-select-dropdown"
+              *ngIf="isPopupGiaoVienDropdownOpen"
+              (click)="$event.stopPropagation()"
+            >
+              <div class="custom-select-search">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Tìm giáo viên"
+                  [(ngModel)]="popupGiaoVienSearch"
+                  (input)="onPopupGiaoVienSearch()"
+                />
+              </div>
+              <ul class="custom-select-options">
+                <li
+                  *ngFor="let gv of popupFilteredGiaoVienOptions"
+                  (click)="selectPopupGiaoVien(gv); $event.stopPropagation()"
+                >
+                  {{ gv.codeTen }}
+                </li>
+                <li
+                  *ngIf="popupFilteredGiaoVienOptions.length === 0"
+                  class="no-result"
+                >
+                  Không tìm thấy
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phòng -->
+        <label>Phòng</label>
+        <select class="form-control" [(ngModel)]="newSchedule.phong">
+          <option *ngFor="let phong of phongOptions" [value]="phong.id">
+            {{ phong.ten }}
+          </option>
+        </select>
+
+        <!-- Thời gian -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Thời gian bắt đầu</label>
+            <input
+              type="time"
+              class="form-control"
+              [(ngModel)]="newSchedule.batDau"
+            />
+          </div>
+          <div class="form-group">
+            <label>Thời gian kết thúc</label>
+            <input
+              type="time"
+              class="form-control"
+              [(ngModel)]="newSchedule.ketThuc"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn save-btn" (click)="submitNewSchedule()">THÊM</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phân trang -->
+  <div class="pagination-container" *ngIf="totalPages > 1">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <a class="page-link" (click)="goToPage(currentPage - 1)">«</a>
+      </li>
+
+      <li
+        class="page-item"
+        *ngFor="let page of [].constructor(totalPages); let idx = index"
+        [class.active]="currentPage === idx + 1"
+      >
+        <a class="page-link" (click)="goToPage(idx + 1)">{{ idx + 1 }}</a>
+      </li>
+
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <a class="page-link" (click)="goToPage(currentPage + 1)">»</a>
+      </li>
+    </ul>
+  </div>
 </div>
-

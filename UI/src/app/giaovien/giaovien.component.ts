@@ -65,7 +65,6 @@ export class GiaovienComponent implements OnInit {
   loadProvinces() {
     this.giaovienService.getProvinces().subscribe(
         data => {
-            console.log("Dữ liệu tỉnh/thành phố từ API:", data); // Debug xem API có trả về dữ liệu không
             this.provinces = data;
         },
         error => {
@@ -75,18 +74,13 @@ export class GiaovienComponent implements OnInit {
 }
 
 
-// Khi chọn tỉnh/thành phố -> cập nhật quận/huyện
 onProvinceChange(provinceCode: string) {
-    console.log("Giá trị tỉnh/thành phố được chọn:", provinceCode); // Kiểm tra giá trị từ select dropdown
 
-    const selectedProvince = this.provinces.find(p => p.code == provinceCode); // Kiểm tra kiểu dữ liệu
+    const selectedProvince = this.provinces.find(p => p.code == provinceCode); 
 
     if (selectedProvince) {
-      console.log("Tỉnh đã chọn:", selectedProvince);
-      console.log("Danh sách quận/huyện:", selectedProvince.districts);
       this.districts = selectedProvince.districts;
   } else {
-      console.warn("Không tìm thấy tỉnh/thành phố trong danh sách!");
       this.districts = [];
   }
   this.addTeacherForm.patchValue({ district: '' }); 
@@ -122,16 +116,12 @@ checkPhoneExists(phone: string): Promise<boolean> {
 
 
 onProvinceChangeForEdit(provinceCode: string) {
-    console.log("Giá trị tỉnh/thành phố được chọn trong Edit:", provinceCode);
 
     const selectedProvince = this.provinces.find(p => String(p.code) === String(provinceCode));
 
     if (selectedProvince) {
-        console.log("Tỉnh đã chọn trong Edit:", selectedProvince);
-        console.log("Danh sách quận/huyện trong Edit:", selectedProvince.districts);
         this.editDistricts = selectedProvince.districts;
     } else {
-        console.warn("Không tìm thấy tỉnh/thành phố trong danh sách Edit!");
         this.editDistricts = [];
     }
 
@@ -143,7 +133,6 @@ loadDanhSachGiaoVien() {
 
   this.giaovienService.getDanhSachGiaoVien(this.currentPage, this.pageSize, this.searchTerm, '', isActiveFilter)
     .subscribe(response => {
-      console.log("📌 API Response (Giáo Viên):", response);
 
       if (!response.isError && response.data && response.data.items) {
         this.students = response.data.items.map((gv: any) => ({
@@ -164,8 +153,6 @@ loadDanhSachGiaoVien() {
         this.totalItems = response.data.totalCount || 0;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
 
-        console.log("📌 Tổng số giáo viên:", this.totalItems);
-        console.log("📌 Tổng số trang:", this.totalPages);
 
         this.cdr.detectChanges();
       } else {
@@ -176,30 +163,25 @@ loadDanhSachGiaoVien() {
     });
 }
 
-/** 🔄 Chuyển trang */
 changePage(page: number) {
   if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
-      console.log("📌 Chuyển trang:", this.currentPage);
-      this.loadDanhSachGiaoVien(); // 🔄 Gọi API lấy dữ liệu trang mới
+      this.loadDanhSachGiaoVien(); 
   }
 }
 
   
 
-  /** Tìm kiếm giáo viên */
   searchGiaoVien() {
     this.currentPage = 1;
     this.loadDanhSachGiaoVien();
   }
 
-  /** Mở rộng chi tiết giáo viên */
   toggleDetails(index: number) {
     this.students[index].showDetails = !this.students[index].showDetails;
   }
 
   openEditTeacherModal(teacher: any) {
-    console.log("🔍 Giáo viên được chọn để chỉnh sửa:", teacher);
   
     this.selectedTeacher = { ...teacher };
   
@@ -208,7 +190,6 @@ changePage(page: number) {
       return;
     }
   
-    // Cập nhật form với dữ liệu chính xác từ API
     this.editTeacherForm.patchValue({
       code: teacher.code,
       ten: teacher.ten,
@@ -220,10 +201,9 @@ changePage(page: number) {
       province: teacher.province,
       district: teacher.district,
       diaChiCuThe: teacher.diaChiCuThe,
-      status: teacher.isActive // 🔥 Đảm bảo trạng thái `isActive` được gán vào `status`
+      status: teacher.isActive 
     });
   
-    console.log("✅ Dữ liệu sau khi gán vào form:", this.editTeacherForm.value);
   
     this.isEditModalOpen = true;
   }
@@ -255,7 +235,6 @@ changePage(page: number) {
     this.isModalOpen = false;
   }
 
-  /**  Gửi API để thêm giáo viên */
  async submitNewTeacher() {
     if (this.addTeacherForm.invalid) {
       this.addTeacherForm.markAllAsTouched();
@@ -263,21 +242,18 @@ changePage(page: number) {
     }
   
     const formData = this.addTeacherForm.value;
-    //  Kiểm tra email trùng
   const emailExists = await this.checkEmailExists(formData.email);
   if (emailExists) {
     this.toastr.error("Email đã tồn tại!", "Lỗi");
     return;
   }
 
-  //  Kiểm tra số điện thoại trùng
   const phoneExists = await this.checkPhoneExists(formData.soDienThoai);
   if (phoneExists) {
     this.toastr.error("Số điện thoại đã tồn tại!", "Lỗi");
     return;
   }
   
-    console.log(" Kiểm tra dữ liệu form:", formData);
   
     // 🔹 Kiểm tra province và district
     const provinceObj = this.provinces.find(p => p.code == formData.province);
@@ -286,8 +262,6 @@ changePage(page: number) {
     const districtObj = this.districts.find(d => d.code == formData.district);
     const districtName = districtObj ? districtObj.name : '';
   
-    console.log(" Province Name:", provinceName);
-    console.log(" District Name:", districtName);
   
     //  Nếu không có giá trị thì gán là chuỗi rỗng để tránh lỗi `undefined`
     const diaChiFormatted = `${provinceName || ''}, ${districtName || ''}, ${formData.diaChiCuThe || ''}`.trim();
@@ -303,7 +277,6 @@ changePage(page: number) {
       diaChi: diaChiFormatted
     };
   
-    console.log(" Gửi API thêm giáo viên:", newTeacher);
   
     this.giaovienService.createGiaoVien(newTeacher).subscribe({
       next: (res) => {
@@ -380,7 +353,6 @@ getDistrictName(districtCode: string): string {
 
     this.selectedTeacher = { ...teacher }; // 🆕 Lưu lại giáo viên đang chỉnh sửa
 
-    console.log("🔍 Giáo viên được chọn:", this.selectedTeacher);
 
     //  Tách địa chỉ thành phần riêng (Tỉnh, Quận/Huyện, Địa chỉ cụ thể)
     const addressParts = teacher.diaChi ? teacher.diaChi.split(',').map(part => part.trim()) : ['', '', ''];
@@ -415,7 +387,6 @@ getDistrictName(districtCode: string): string {
         diaChiCuThe: detailAddress
     });
 
-    console.log("✅ Dữ liệu trong form sau khi gán:", this.editTeacherForm.value);
     this.isEditModalOpen = true;
 }
 
@@ -439,8 +410,6 @@ getDistrictName(districtCode: string): string {
   }
 
   async submitEditStudent() {
-  console.log("🔍 Giáo viên đang chỉnh sửa:", this.selectedTeacher);
-  console.log("🔍 Dữ liệu từ Form:", this.editTeacherForm.value);
 
   let formData = { ...this.editTeacherForm.value };
 
@@ -454,7 +423,6 @@ getDistrictName(districtCode: string): string {
     }
   }
 
-  console.log(" Mã giáo viên sau khi gán:", formData.code);
   const emailExists = await this.checkEmailExists(formData.email);
   if (emailExists && formData.email !== this.selectedTeacher.email) {
     this.toastr.error("Email đã tồn tại!", "Lỗi");
@@ -481,11 +449,9 @@ getDistrictName(districtCode: string): string {
 
   formData.status = formData.status ? "true" : "false";
 
-  console.log("📤 Gửi API cập nhật giáo viên với dữ liệu:", JSON.stringify(formData));
 
   this.giaovienService.updateGiaoVien(formData).subscribe({
     next: (res) => {
-      console.log(" Phản hồi từ API:", res);
       if (!res.isError) {
         this.toastr.success("Cập nhật giáo viên thành công!", "Thành công");
         this.closeEditModal();

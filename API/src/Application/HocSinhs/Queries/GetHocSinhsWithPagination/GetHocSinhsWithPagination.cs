@@ -90,6 +90,17 @@ public class GetHocSinhsWithPaginationQueryHandler
                 query = query.Where(gv => gv.UserId != null && filteredUserIds.Contains(gv.UserId!));
             }
 
+            if (!string.IsNullOrWhiteSpace(request.FilterByClass))
+            {
+                var hocSinhCodesInClass = await _context.ThamGiaLopHocs
+                    .Where(tg => tg.LichHoc.TenLop == request.FilterByClass)
+                    .Select(tg => tg.HocSinhCode)
+                    .Distinct()
+                    .ToListAsync();
+
+                query = query.Where(hs => hocSinhCodesInClass.Contains(hs.Code));
+            }
+
             var list = await query
                .ProjectTo<HocSinhDto>(_mapper.ConfigurationProvider)
                .PaginatedListAsync(request.PageNumber, request.PageSize);

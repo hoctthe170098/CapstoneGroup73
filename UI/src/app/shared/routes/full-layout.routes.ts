@@ -21,16 +21,20 @@ export const Full_ROUTES: Routes = [
     loadChildren: () => import('../../chinhsach/chinhsach.module').then(m => m.ChinhsachModule)
   },
   {
-    path: 'testlist',
-    loadChildren: () => import('../../testlist/testlist.module').then(m => m.TestlistModule)
+    path: 'baikiemtra',
+    loadChildren: () => import('../../baikiemtra/baikiemtra.module').then(m => m.TestlistModule)
+  },
+  {
+    path: 'lichday',
+    loadChildren: () => import('../../lichday/lichday.module').then(m => m.LichdayModule)
   },
   {
     path: 'hocsinh',
     loadChildren: () => import('../../hocsinh/hocsinh.module').then(m => m.HocSinhModule)
   },
   {
-    path: 'accountmanager',
-    loadChildren: () => import('../../accountmanager/accountmanager.module').then(m => m.AccountmanagerModule)
+    path: 'quanly',
+    loadChildren: () => import('../../quanly/quanly.module').then(m => m.AccountmanagerModule)
   },
   {
     path: 'giaovien',
@@ -107,5 +111,9 @@ export const Full_ROUTES: Routes = [
   {
     path: 'taskboard-ngrx',
     loadChildren: () => import('../../taskboard-ngrx/taskboard-ngrx.module').then(m => m.TaskboardNGRXModule)
-  }
+  },
+  {
+    path: 'lopdangday',
+    loadChildren: () => import('../../lopdangday/lopdangday.module').then(m => m.LopdangdayModule)
+  },
 ];
