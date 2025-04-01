@@ -39,7 +39,7 @@ public class EditLichHocCommandValidator : AbstractValidator<EditLichHocCommand>
             .MustAsync(ExistHocSinh)
             .WithMessage("Có học sinh không tồn tại trong cơ sở này")
             .MustAsync(ValidLichHocHocSinh)
-            .WithMessage("Có học sinh bị trùng lịch");
+            .WithMessage("Có học sinh bị trùng lịch, vui lòng kiểm tra lại (bao gồm cả lịch học bù)");
     }
 
     private async Task<bool> ValidLichHocHocSinh(EditLichHocCommand command

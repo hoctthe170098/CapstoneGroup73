@@ -44,6 +44,8 @@ public class GetLopHocByTenQueryHandler : IRequestHandler<GetLopHocByTenQuery, O
         var coSoId = _identityService.GetCampusId(token);
         var lichHoc = await _context.LichHocs
             .Where(lh=>lh.TenLop==request.TenLop&&lh.TrangThai=="Cố định"&&lh.Phong.CoSoId==coSoId)
+            .Include(lh=>lh.GiaoVien)
+            .Include(lh=>lh.ChuongTrinh)
             .ToListAsync();
         var daHoc = _context.DiemDanhs.Any(dh => dh.ThamGiaLopHoc.LichHoc.TenLop == request.TenLop);
         if (lichHoc.Count == 0) throw new NotFoundIDException();
@@ -51,9 +53,11 @@ public class GetLopHocByTenQueryHandler : IRequestHandler<GetLopHocByTenQuery, O
         {
             TenLop = request.TenLop,
             GiaoVienCode = lichHoc[0].GiaoVienCode,
+            TenGiaoVien = lichHoc[0].GiaoVien.Ten,
             NgayBatDau = lichHoc[0].NgayBatDau,
             NgayKetThuc = lichHoc[0].NgayKetThuc,
             ChuongTrinhId = lichHoc[0].ChuongTrinhId,
+            TenChuongTrinh = lichHoc[0].ChuongTrinh.TieuDe,
             HocPhi = lichHoc[0].HocPhi,
             LichHocs = new List<LichHocDto>(),
             HocSinhs = new List<HocSinhDto>(),
