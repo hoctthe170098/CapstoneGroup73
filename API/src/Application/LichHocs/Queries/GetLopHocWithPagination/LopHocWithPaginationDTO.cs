@@ -28,7 +28,7 @@ public class LoaiLichHocDto
 }
 public class LichHocDto
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public int Thu { get; set; }
     public TimeOnly gioBatDau { get; set; }
     public TimeOnly gioKetThuc { get; set; }

@@ -8,40 +8,32 @@ import { LichkiemtraComponent } from './lichkiemtra/lichkiemtra.component';
 import { ChiTietComponent } from './chi-tiet/chi-tiet.component';
 const routes: Routes = [
   {
-    path: '',
+    path: "/lopdangday",
     component: LopdangdayComponent,
     data: {
-      title: 'lopdangday'
-    }
+      title: "lopdangday",
+    },
   },
-  { path: 'baitap', 
-      component: BaitapComponent
-    },
-    { path: 'danhsachhocsinh', 
-      component: DanhsachhocsinhComponent
-    },
-    { path: 'diemdanh', 
-      component: DiemdanhComponent
-    },
-    { path: 'lichkiemtra', 
-      component: LichkiemtraComponent
-    },
+  { path: "baitap", component: BaitapComponent },
+  { path: "danhsachhocsinh", component: DanhsachhocsinhComponent },
+  { path: "diemdanh", component: DiemdanhComponent },
+  { path: "lichkiemtra", component: LichkiemtraComponent },
 
-    {
-      path: 'chi-tiet/:id',
-      component: ChiTietComponent,
-      children: [
-        { path: '', redirectTo: 'danhsachhocsinh', pathMatch: 'full' },
-        { path: 'baitap', component: BaitapComponent },
-        { path: 'danhsachhocsinh', component: DanhsachhocsinhComponent },
-        { path: 'diemdanh', component: DiemdanhComponent },
-        { path: 'lichkiemtra', component: LichkiemtraComponent }
-      ]
-    }
+  {
+    path: "chi-tiet/:id",
+    component: ChiTietComponent,
+    children: [
+      { path: "", redirectTo: "danhsachhocsinh", pathMatch: "full" },
+      { path: "baitap", component: BaitapComponent },
+      { path: "danhsachhocsinh", component: DanhsachhocsinhComponent },
+      { path: "diemdanh", component: DiemdanhComponent },
+      { path: "lichkiemtra", component: LichkiemtraComponent },
+    ],
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class LopdangdayRoutingModule { }
+export class LopdangdayRoutingModule {}
