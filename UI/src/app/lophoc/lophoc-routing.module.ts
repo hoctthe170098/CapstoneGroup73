@@ -20,7 +20,7 @@ const routes: Routes = [
         }
     },
     {
-       path: 'edit/:id',
+       path: 'edit/:tenLop',
        component: EditLopHocComponent,
        data: {
          title: 'Chỉnh Sửa Lớp Học'
