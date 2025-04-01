@@ -263,7 +263,7 @@ export class LophocComponent implements OnInit {
     if (this.thuTrongTuan.thu6) thus.push(6);
     if (this.thuTrongTuan.thu7) thus.push(7);
     if (this.thuTrongTuan.cn) thus.push(8);
-
+    
     const payload = {
       pageNumber: page,
       pageSize: this.pageSize,
@@ -292,7 +292,7 @@ export class LophocComponent implements OnInit {
             const firstLich = lichCoDinh[0];
 
             return {
-              tenLop: item.tenLop,
+              ...item,
               chuongTrinh: item.tenChuongTrinh,
               phong: firstLich?.tenPhong || "",
               giaoVien: item.tenGiaoVien,
@@ -339,9 +339,23 @@ export class LophocComponent implements OnInit {
     this.router.navigate(["/lophoc/add"]);
   }
 
-  onEditClass(index: number) {
-    alert("Sửa lớp: " + this.lophocs[index].tenLop);
+  onEditClass(index: number): void {
+    const tenLop = this.lophocs[index].tenLop;
+    console.log('🚀 Tên lớp từ UI:', tenLop);
+  
+    this.lophocService.getLopHocByTenLop(tenLop).subscribe(
+      (res) => {
+        console.log('✅ Kết quả API:',tenLop);
+        this.router.navigate(['/lophoc/edit', tenLop]);
+
+      },
+      (err) => {
+        console.error('❌ Lỗi gọi API:', err);
+      }
+    );
   }
+  
+  
   onFilterChange() {
     this.currentPage = 1;
     this.loadLopHocs();

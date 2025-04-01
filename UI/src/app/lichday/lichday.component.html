@@ -1,30 +1,40 @@
 <div class="calendar-container">
-    <!-- Bộ lọc tuần / năm -->
-    <div class="filter-bar">
-      <select [(ngModel)]="selectedWeek">
-        <option *ngFor="let week of weeks" [value]="week">{{ week }}</option>
-      </select>
-      <select [(ngModel)]="selectedYear">
-        <option *ngFor="let year of years" [value]="year">Năm {{ year }}</option>
-      </select>
-    </div>
-<div class="calendar-container">
-    <!-- Header: thứ & ngày -->
+  <h2 class="calendar-title">Lịch dạy</h2>
+
+  <!-- Bộ lọc tuần / năm -->
+  <div class="filter-bar">
+    <select [(ngModel)]="selectedWeek" (change)="onWeekChange(selectedWeek)">
+      <option *ngFor="let week of weeks" [value]="week">{{ week }}</option>
+    </select>
+    <select [(ngModel)]="selectedYear" (change)="onYearChange(selectedYear)">
+      <option *ngFor="let year of years" [value]="year">Năm {{ year }}</option>
+    </select>
+  </div>
+
+  <!-- Bọc toàn bảng bằng .calendar-table để thêm viền -->
+  <div class="calendar-table">
+    <!-- Header: Thứ + Ngày -->
     <div class="calendar-header">
-      <div class="time-column-header"></div>
-      <div class="day-column-header" *ngFor="let day of schedule">{{ day.label }}</div>
+      <div class="time-column-header">Giờ</div>
+      <div class="day-column-header" *ngFor="let day of schedule">
+        {{ day.label }}
+      </div>
     </div>
-  
-    <!-- Grid chính -->
+
+    <!-- Thân bảng -->
     <div class="calendar-body">
-      <!-- Cột giờ (8h → 20h) -->
+      <!-- Cột giờ -->
       <div class="time-column">
         <div class="time-slot" *ngFor="let hour of hours">{{ hour }}:00</div>
       </div>
-  
+
       <!-- Các cột ngày -->
       <div class="day-column" *ngFor="let day of schedule">
         <div class="time-blocks">
+          <!-- Dòng chia theo giờ -->
+          <div class="hour-line" *ngFor="let hour of hours"></div>
+
+          <!-- Các buổi học -->
           <div *ngFor="let lesson of day.lessons"
                class="lesson-block"
                [ngStyle]="getLessonStyle(lesson)">
@@ -36,4 +46,4 @@
       </div>
     </div>
   </div>
-  
+</div>

@@ -1,92 +1,131 @@
 .calendar-container {
-    font-family: sans-serif;
-    padding: 1rem;
-    background: #f9fafb;
-  
-    .calendar-header {
-      display: grid;
-      grid-template-columns: 60px repeat(7, 1fr);
-      font-weight: bold;
-      margin-bottom: 0.5rem;
-  
-      .day-column-header {
-        text-align: center;
-        padding: 0.5rem;
-        background: #f3f4f6;
-        border-bottom: 1px solid #d1d5db;
+  font-family: sans-serif;
+  padding: 1rem;
+  background: #f9fafb;
+  border: 1px solid #d1d5db; // ✅ đường viền tổng thể
+  border-radius: 8px;         // tuỳ chọn bo góc nhẹ
+
+  .filter-bar {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+
+    select {
+      padding: 0.5rem 1rem;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      cursor: pointer;
+      width: 140px;
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.4);
       }
     }
-  
-    .calendar-body {
-      display: grid;
-      grid-template-columns: 60px repeat(7, 1fr);
-      position: relative;
-  
-      .time-column {
-        display: flex;
-        flex-direction: column;
-  
-        .time-slot {
-          height: 60px;
-          font-size: 0.75rem;
-          color: #6b7280;
-          border-top: 1px solid #e5e7eb;
-          padding-top: 4px;
-          text-align: right;
-          padding-right: 8px;
-        }
-      }
-  
-      .day-column {
-        border-left: 1px solid #e5e7eb;
-        position: relative;
-  
-        .time-blocks {
-          position: relative;
-        }
-  
-        .lesson-block {
-          position: absolute;
-          left: 8px;
-          right: 8px;
-          background: #10b981;
-          color: white;
-          padding: 4px 6px;
-          border-radius: 6px;
-          font-size: 0.75rem;
-          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  
-          .title {
-            font-weight: 600;
-          }
-  
-          .room, .time {
-            font-size: 0.7rem;
-          }
-        }
-      }
-    }
-    .filter-bar {
-        display: flex;
-        gap: 0.75rem;
-        margin-bottom: 1rem;
-      
-        select {
-          padding: 0.5rem 1rem;
-          background-color: #2563eb;
-          color: white;
-          border: none;
-          border-radius: 0.375rem;
-          font-weight: 500;
-          cursor: pointer;
-          width: 140px;
-      
-          &:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.4);
-          }
-        }
-      }
-      
   }
-  
+
+  .calendar-header {
+    display: grid;
+    grid-template-columns: 60px repeat(7, 1fr);
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+
+    .time-column-header {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f3f4f6;
+      font-size: 0.8rem;
+      border-bottom: 1px solid #d1d5db; /* ✅ Gạch dưới rõ hơn */
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .day-column-header {
+      text-align: center;
+      padding: 0.5rem;
+      background: #f3f4f6;
+      border-bottom: 1px solid #d1d5db;
+      border-left: 1px solid #e5e7eb; /* ✅ đường ngăn cách giữa các ngày */
+    }
+  }
+  .calendar-title {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #1f2937; // màu đậm dễ nhìn
+  }
+
+  .calendar-body {
+    display: grid;
+    grid-template-columns: 60px repeat(7, 1fr);
+    position: relative;
+
+    .time-column {
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+
+      .time-slot {
+        height: 60px;
+        font-size: 0.75rem;
+        color: #6b7280;
+        border-bottom: 1px solid #ccc; // ✅ Đồng bộ với .hour-line
+        padding-top: 4px;
+        text-align: right;
+        padding-right: 8px;
+        box-sizing: border-box;
+      }
+    }
+
+    .day-column {
+      border-left: 1px solid #e5e7eb; /* ngăn cách với cột trước */
+      border-right: 1px solid #e5e7eb; /* ✅ ngăn cách với cột kế tiếp */
+      position: relative;
+
+      .time-blocks {
+        position: relative;
+        box-sizing: border-box;
+      }
+
+      .hour-line {
+        height: 60px;
+        border-bottom: 1px solid #ccc;
+        box-sizing: border-box;
+      }
+
+      .lesson-block {
+        position: absolute;
+        left: 8px;
+        right: 8px;
+        background: #10b981;
+        color: white;
+        padding: 4px 6px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+        .title {
+          font-weight: 600;
+        }
+
+        .room,
+        .time {
+          font-size: 0.7rem;
+        }
+      }
+    }
+  }
+  .calendar-table {
+    border: 2px solid #d1d5db;      // ✅ Viền ngoài tổng thể
+    border-radius: 6px;
+    overflow: hidden;               // Ẩn phần viền tràn (nếu có)
+    background: white;              // Giữ cho nền trắng đẹp
+  }
+}

@@ -74,7 +74,7 @@ export class LichDayComponent {
 
   // Lịch được hiển thị theo tuần
   schedule = this.allSchedules[this.selectedWeek];
-
+  
   constructor() {}
 
   ngOnInit(): void {
@@ -86,6 +86,7 @@ export class LichDayComponent {
     this.schedule = this.allSchedules[this.selectedWeek] || [];
     // Nếu fetch từ API: gọi API tại đây với selectedWeek, selectedYear
   }
+  
 
   // Tự động load lại nếu chọn thay đổi
   onWeekChange(week: string) {
