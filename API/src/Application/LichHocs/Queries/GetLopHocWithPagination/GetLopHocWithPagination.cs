@@ -156,6 +156,7 @@ public class GetLopHocWithPaginationQueryHandler : IRequestHandler<GetLopHocWith
             {
                 LichHocDto lich = new LichHocDto
                 {
+                    Id = lichHoc.Id,
                     gioBatDau = lichHoc.GioBatDau,
                     gioKetThuc = lichHoc.GioKetThuc,
                     ngayBatDau = lichHoc.NgayBatDau,
