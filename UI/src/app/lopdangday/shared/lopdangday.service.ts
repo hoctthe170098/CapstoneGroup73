@@ -1,7 +1,10 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { environment } from "environments/environment";
 import { Observable } from "rxjs";
-
+import { Injectable } from '@angular/core';
+@Injectable({
+  providedIn: 'root',
+})
 export class LopdangdayService {
   private baseUrl = `${environment.apiURL}/GiaoViens`;
   constructor(private http: HttpClient) {}

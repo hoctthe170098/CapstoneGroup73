@@ -8,7 +8,7 @@ import { LichkiemtraComponent } from './lichkiemtra/lichkiemtra.component';
 import { ChiTietComponent } from './chi-tiet/chi-tiet.component';
 const routes: Routes = [
   {
-    path: "",
+    path: '',
     component: LopdangdayComponent,
     data: {
       title: "lopdangday",

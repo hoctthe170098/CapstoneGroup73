@@ -54,6 +54,6 @@ export class LopdangdayComponent implements OnInit {
   }
 
   goToDetail(lopId: string) {
-    this.router.navigate([`/lopdangday/chi-tiet/${lopId}`]);
+    this.router.navigate(['/lopdangday', 'chi-tiet', lopId]);
   }
 }
