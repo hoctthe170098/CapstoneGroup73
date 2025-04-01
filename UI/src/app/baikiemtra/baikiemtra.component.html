@@ -32,7 +32,8 @@
         </div>
 
 
-        <input type="text" placeholder="Tìm tên bài kiểm tra..." [(ngModel)]="searchText" />
+        <input type="text" placeholder="Tìm tên bài kiểm tra..." [(ngModel)]="searchText" (ngModelChange)="onSearchTextChanged()" />
+
       </div>
 
       <button class="add-button" (click)="openModal()">+ Thêm</button>
