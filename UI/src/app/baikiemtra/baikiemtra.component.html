@@ -58,8 +58,8 @@
           <td>{{ test.ngayTao | date: 'dd/MM/yyyy' }}</td>
           <td>{{ test.ngayKiemTra | date: 'dd/MM/yyyy' }}</td>
           <td>
-            <a [href]="test.urlFile" download>
-              {{ test.urlFile.split('/').pop() }}
+            <a href="javascript:void(0)" (click)="downloadFile(test.urlFile, test.urlFile.split('/').pop())">
+              <i [class]="getFileIcon(test.urlFile)"></i> {{ test.urlFile.split('/').pop() }}
             </a>
           </td>
           <td><span [class.checked]="test.trangThai === 'Đã kiểm tra'">{{ test.trangThai }}</span></td>

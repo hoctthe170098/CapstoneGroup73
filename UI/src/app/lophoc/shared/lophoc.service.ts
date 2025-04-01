@@ -53,5 +53,11 @@ export class LophocService {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get<any>(`${this.chuongtrinhUrl}/getallchuongtrinhs`, { headers });
   }
+  getLopHocByTenLop(tenLop: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const url = `${this.baseUrl}/getlophocbyten?TenLop=${encodeURIComponent(tenLop)}`;
+    return this.http.get<any>(url, { headers });
+  }
   
 }

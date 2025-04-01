@@ -6,101 +6,67 @@
       <form [formGroup]="editLopForm" (ngSubmit)="onSubmit()">
         <div class="row">
           <!-- Tên lớp -->
-          <div class="col-md-4">
+          <div class="col-md-6">
             <div class="form-group">
               <label for="tenLop">Tên Lớp</label>
-              <input id="tenLop" type="text" class="form-control" formControlName="tenLop" />
+              <input type="text" class="form-control" [value]="editLopForm.get('tenLop')?.value" readonly />
+
             </div>
-            <small class="text-danger" *ngIf="editLopForm.get('tenLop').touched && editLopForm.get('tenLop').hasError('required')">
-              Tên lớp không được để trống!
-            </small>
-            <small class="text-danger"
-                *ngIf="editLopForm.get('tenLop').touched && editLopForm.get('tenLop').hasError('maxlength')">
-                Tên lớp không được quá 20 ký tự!
-              </small>
+            
             
           </div>
 
           <!-- Chương trình học -->
-          <div class="col-md-4">
+          <div class="col-md-6">
             <div class="form-group">
               <label for="chuongTrinh">Chương Trình Học</label>
-              <select id="chuongTrinh" class="form-control" formControlName="chuongTrinh">
-                <option *ngFor="let ct of chuongTrinhList" [ngValue]="ct">{{ ct.tenChuongTrinh }}</option>
-              </select>
-              <small class="text-danger" *ngIf="editLopForm.get('chuongTrinh').touched && editLopForm.get('chuongTrinh').hasError('required')">
-                Vui lòng chọn chương trình học!
-              </small>
+              <input type="text" class="form-control" [value]="editLopForm.get('chuongTrinh')?.value?.tieuDe" readonly />
             </div>
           </div>
 
-          <!-- Trạng thái -->
-          <div class="col-md-4">
-            <div class="form-group">
-              <label for="trangThai">Trạng Thái</label>
-              <select id="trangThai" class="form-control" formControlName="trangThai">
-                <option value="" selected>Chọn Trạng thái</option>
-                <option value="active">Đang hoạt động</option>
-                <option value="inactive">Ngừng hoạt động</option>
-              </select>
-            </div>
-          </div>
+          
+          
         </div>
 
         <div class="row">
           <!-- Học phí -->
-          <div class="col-md-4">
+          <div class="col-md-3">
             <div class="form-group">
               <label for="hocPhi">Học Phí</label>
-              <input id="hocPhi" type="text" class="form-control" formControlName="hocPhi" />
-              <small class="text-danger" *ngIf="editLopForm.get('hocPhi').touched && editLopForm.get('hocPhi').hasError('required')">
-                Học phí không được để trống!
-              </small>
-              <small class="text-danger" *ngIf="editLopForm.get('hocPhi').touched && editLopForm.get('hocPhi').hasError('min')">
-                Học phí phải lớn hơn hoặc bằng 50.000!
-              </small>
+              <input type="text" class="form-control" [value]="editLopForm.get('hocPhi')?.value" readonly />
+              
+              
             </div>
           </div>
 
           <!-- Giáo viên -->
-          <div class="col-md-4">
+          <div class="col-md-3">
             <div class="form-group">
               <label for="giaoVien">Giáo Viên</label>
-              <select id="giaoVien" class="form-control" formControlName="giaoVien">
-                <option *ngFor="let gv of giaoVienList" [ngValue]="gv">{{ gv.tenGiaoVien }}</option>
-              </select>
-              <small class="text-danger" *ngIf="editLopForm.get('giaoVien').touched && editLopForm.get('giaoVien').hasError('required')">
-                Vui lòng chọn giáo viên!
-              </small>
+              <input type="text" class="form-control" [value]="editLopForm.get('giaoVien')?.value?.codeTen" readonly />
+
+             
             </div>
           </div>
 
           <!-- Ngày bắt đầu -->
-          <div class="col-md-2">
+          <div class="col-md-3">
             <div class="form-group">
               <label for="ngayBatDau">Ngày Bắt Đầu</label>
-              <input id="ngayBatDau" type="date" class="form-control" formControlName="ngayBatDau" />
-              <small class="text-danger" *ngIf="editLopForm.get('ngayBatDau').touched && editLopForm.get('ngayBatDau').hasError('required')">
-                Vui lòng chọn ngày bắt đầu!
-              </small>
-              <small class="text-danger" *ngIf="editLopForm.get('ngayBatDau').touched && editLopForm.get('ngayBatDau').hasError('invalidStartDate')">
-                Ngày bắt đầu phải từ hôm nay trở đi!
-              </small>
+              <input type="date" class="form-control" [value]="editLopForm.get('ngayBatDau')?.value" readonly />
+
+
+              
             </div>
            
           </div>
 
           <!-- Ngày kết thúc -->
-          <div class="col-md-2">
+          <div class="col-md-3">
             <div class="form-group">
               <label for="ngayKetThuc">Ngày Kết Thúc</label>
-              <input id="ngayKetThuc" type="date" class="form-control" formControlName="ngayKetThuc" />
-              <small class="text-danger" *ngIf="editLopForm.get('ngayKetThuc').touched && editLopForm.get('ngayKetThuc').hasError('required')">
-                Vui lòng chọn ngày kết thúc!
-              </small>
-              <small class="text-danger" *ngIf="editLopForm.get('ngayKetThuc').touched && editLopForm.get('ngayKetThuc').hasError('invalidEndDate')">
-                Ngày kết thúc phải sau ít nhất 2 tháng kể từ ngày bắt đầu!
-              </small>
+              <input type="date" class="form-control" [value]="editLopForm.get('ngayKetThuc')?.value" readonly />
+              
             </div>
           </div>
         </div>
@@ -114,7 +80,9 @@
           <div class="form-group row align-items-center" *ngFor="let schedule of lichHoc.controls; let i = index" [formGroupName]="i">
             <div class="col-md-3 mb-2">
               <label for="Chonthutrongtuan">Thứ trong tuần</label>
-              <select class="form-control" formControlName="thu">
+              <input type="text" class="form-control" [value]="'Thứ ' + schedule.get('thu')?.value" readonly />
+
+              <!-- <select class="form-control" formControlName="thu">
                 
                 <option value="" selected>Chọn thứ trong tuần</option>
                 <option value="2">Thứ hai</option>
@@ -124,40 +92,28 @@
                 <option value="6">Thứ sáu</option>
                 <option value="7">Thứ bảy</option>
                 <option value="8">Chủ nhật</option>
-              </select>
-              <small class="text-danger" *ngIf="schedule.get('thu').touched && schedule.get('thu').hasError('required')">
-                  Vui lòng chọn thứ trong tuần!
-                </small>
+              </select> -->
+              
             </div>
 
             <div class="col-md-2 mb-2">
               <label for="gioBatDau">Giờ bắt đầu</label>
-              <input type="time" class="form-control" formControlName="gioBatDau" placeholder="Giờ bắt đầu" />
-              <small class="text-danger" *ngIf="schedule.get('gioBatDau').touched && schedule.get('gioBatDau').hasError('required')">
-                  Vui lòng chọn giờ bắt đầu!
-                </small>
+              <input type="time" class="form-control" [value]="schedule.get('gioBatDau')?.value" readonly />
+              
             </div>
 
             <div class="col-md-2 mb-2">
               <label for="gioKetThuc">Giờ kết thúc</label>
-              <input type="time" class="form-control" formControlName="gioKetThuc" placeholder="Giờ kết thúc" />
-              <small class="text-danger" *ngIf="schedule.get('gioKetThuc').touched && schedule.get('gioKetThuc').hasError('required')">
-                  Vui lòng chọn giờ kết thúc!
-                </small>
+              <input type="time" class="form-control" [value]="schedule.get('gioKetThuc')?.value" readonly />
+              
             </div>
             <!-- Phòng -->
           <div class="col-md-2 mb-2">
             
               <label for="phong">Phòng</label>
-              <select id="phong" class="form-control" formControlName="phong">
-                <option [ngValue]="null">Chọn phòng</option>
-                <option *ngFor="let p of phongList" [ngValue]="p">
-                  {{ p.tenPhong }}
-                </option>>
-              </select>
-              <small class="text-danger" *ngIf="schedule.get('phong').touched && schedule.get('phong').hasError('required')">
-                Vui lòng chọn phòng học!
-              </small>
+              <input type="text" class="form-control" [value]="schedule.get('phong')?.value?.ten" readonly />
+
+              
               
             
           </div>

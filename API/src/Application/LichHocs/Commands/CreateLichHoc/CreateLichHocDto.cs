@@ -15,3 +15,10 @@ public class CreateLichHocDto
     public int ChuongTrinhId { get; set; }
     public required List<LichHocDto> LichHocs { get; init; }
 }
+public class LichHocDto
+{
+    public int Thu { get; init; }
+    public int PhongId { get; init; }
+    public required string GioBatDau { get; init; }
+    public required string GioKetThuc { get; init; }
+}

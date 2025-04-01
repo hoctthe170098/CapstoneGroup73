@@ -1,7 +1,9 @@
 import { Component, OnInit,ChangeDetectorRef  } from '@angular/core';
 import { TestlistService } from './shared/baikiemtra.service';
 import { BaiKiemTraDto } from './shared/baikiemtra.model';
+import { saveAs } from 'file-saver';
 import { ToastrService } from 'ngx-toastr';
+
 
 @Component({
   selector: 'app-testlist',
@@ -108,6 +110,27 @@ export class TestListComponent implements OnInit {
         }
       });
   }
+  
+  downloadFile(fileUrl: string, fileName: string): void {
+    if (!fileUrl) {
+      this.toastr.warning('Không có tài liệu để tải!');
+      return;
+    }
+  
+    
+  
+    this.testlistService.downloadFile(fileUrl).subscribe(
+      (res: Blob) => {
+        saveAs(res, fileName);
+      },
+      (error: any) => {
+        console.error('Lỗi tải file:', error);
+        this.toastr.error('Tải tài liệu thất bại!');
+      }
+    );
+  }
+  
+  // Tách đường dẫn tương đối từ URL
   
   
 
