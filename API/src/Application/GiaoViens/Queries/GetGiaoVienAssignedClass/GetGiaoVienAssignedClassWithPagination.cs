@@ -16,8 +16,8 @@ public record GetGiaoVienAssignedClassWithPaginationCommand : IRequest<Output>
     public int PageNumber { get; init; } = 1;
     public int PageSize { get; init; } = 9;
     public string? SearchClass { get; init; }
-    public string? StartDate { get; init; }
-    public string? EndDate { get; init; }
+    public DateOnly? StartDate { get; init; }
+    public DateOnly? EndDate { get; init; }
 }
 
 public class GetGiaoVienAssignedClassWithPaginationCommandHandler
