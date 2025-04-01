@@ -1,0 +1,39 @@
+<div class="calendar-container">
+    <!-- Bộ lọc tuần / năm -->
+    <div class="filter-bar">
+      <select [(ngModel)]="selectedWeek">
+        <option *ngFor="let week of weeks" [value]="week">{{ week }}</option>
+      </select>
+      <select [(ngModel)]="selectedYear">
+        <option *ngFor="let year of years" [value]="year">Năm {{ year }}</option>
+      </select>
+    </div>
+<div class="calendar-container">
+    <!-- Header: thứ & ngày -->
+    <div class="calendar-header">
+      <div class="time-column-header"></div>
+      <div class="day-column-header" *ngFor="let day of schedule">{{ day.label }}</div>
+    </div>
+  
+    <!-- Grid chính -->
+    <div class="calendar-body">
+      <!-- Cột giờ (8h → 20h) -->
+      <div class="time-column">
+        <div class="time-slot" *ngFor="let hour of hours">{{ hour }}:00</div>
+      </div>
+  
+      <!-- Các cột ngày -->
+      <div class="day-column" *ngFor="let day of schedule">
+        <div class="time-blocks">
+          <div *ngFor="let lesson of day.lessons"
+               class="lesson-block"
+               [ngStyle]="getLessonStyle(lesson)">
+            <div class="title">{{ lesson.title }}</div>
+            <div class="room">{{ lesson.room }}</div>
+            <div class="time">{{ lesson.time }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

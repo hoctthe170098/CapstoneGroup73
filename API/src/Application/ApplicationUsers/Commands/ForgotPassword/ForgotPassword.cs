@@ -35,7 +35,6 @@ public class ForgotPasswordComandHandler : IRequestHandler<ForgotPasswordComand,
         {
             if (request.Email != null)
             {
-                if (!IsValidEmail(request.Email)) throw new FormatException();
                 output = await _identityService.ForgotPasswordByEmail(request.Email, "Thay đổi mật khẩu mới");
             }
             if(request.SoDienThoai!=null)

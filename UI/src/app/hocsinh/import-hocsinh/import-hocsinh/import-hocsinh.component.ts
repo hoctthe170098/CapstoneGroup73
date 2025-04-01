@@ -2,7 +2,7 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { HocSinhService } from 'app/hocsinh/shared/hocsinh.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
-
+import { NgxSpinnerService } from 'ngx-spinner';
 @Component({
   selector: 'app-import-hocsinh',
   templateUrl: './import-hocsinh.component.html',
@@ -17,7 +17,8 @@ export class ImportHocsinhComponent {
     private hocSinhService: HocSinhService,
     private toastr: ToastrService,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private spinner: NgxSpinnerService
   ) {}
 
   onFileSelected(event: any) {
@@ -92,9 +93,10 @@ export class ImportHocsinhComponent {
         chinhSachId: s.chinhSachId || null,
       }))
     };
-
+    this.spinner.show();
     this.hocSinhService.addListHocSinhs(body).subscribe({
       next: (res) => {
+        this.spinner.hide();
         if (!res.isError) {
           this.toastr.success(res.message || 'Thêm học sinh thành công!');
           this.router.navigate(['/hocsinh']);
@@ -104,6 +106,7 @@ export class ImportHocsinhComponent {
         }
       },
       error: (err) => {
+        this.spinner.hide(); 
         console.error(" Lỗi khi gọi API thêm học sinh:", err);
         this.toastr.error('Không thể thêm học sinh. Vui lòng thử lại!', 'Lỗi');
       }

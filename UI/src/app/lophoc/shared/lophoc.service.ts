@@ -50,14 +50,8 @@ export class LophocService {
   }
   getChuongTrinhs(): Observable<any> {
     const token = localStorage.getItem('token');
-    if (!token) {
-      console.error('Token không tồn tại!');
-      return new Observable((observer) => observer.error('Unauthorized: Token missing'));
-    }
-  
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get<any>(`${this.chuongtrinhUrl}/getallchuongtrinhs`, { headers });
   }
-  
   
 }

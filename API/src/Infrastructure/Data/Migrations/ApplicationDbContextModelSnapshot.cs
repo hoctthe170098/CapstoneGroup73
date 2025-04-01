@@ -569,7 +569,13 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                     b.Property<int>("HocPhi")
                         .HasColumnType("int");
 
+                    b.Property<Guid?>("LichHocGocId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateOnly>("NgayBatDau")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("NgayHocGoc")
                         .HasColumnType("date");
 
                     b.Property<DateOnly>("NgayKetThuc")
@@ -595,6 +601,8 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                     b.HasIndex("ChuongTrinhId");
 
                     b.HasIndex("GiaoVienCode");
+
+                    b.HasIndex("LichHocGocId");
 
                     b.HasIndex("PhongId");
 
@@ -1122,6 +1130,11 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("StudyFlow.Domain.Entities.LichHoc", "LichHocGoc")
+                        .WithMany()
+                        .HasForeignKey("LichHocGocId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("StudyFlow.Domain.Entities.Phong", "Phong")
                         .WithMany("LichHocs")
                         .HasForeignKey("PhongId")
@@ -1131,6 +1144,8 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                     b.Navigation("ChuongTrinh");
 
                     b.Navigation("GiaoVien");
+
+                    b.Navigation("LichHocGoc");
 
                     b.Navigation("Phong");
                 });

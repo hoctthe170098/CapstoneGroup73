@@ -7,12 +7,12 @@ using System.Linq;
 
 namespace StudyFlow.Application.LichHocs.Commands.CreateLichHoc;
 
-public class GetLopHocWithPaginationQueryValidator : AbstractValidator<CreateLichHocCommand>
+public class CreateLichHocCommandValidator : AbstractValidator<CreateLichHocCommand>
 {
     private readonly IApplicationDbContext _context;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IIdentityService _identityService;
-    public GetLopHocWithPaginationQueryValidator(IApplicationDbContext context
+    public CreateLichHocCommandValidator(IApplicationDbContext context
         , IHttpContextAccessor httpContextAccessor
         , IIdentityService identityService)
     {
@@ -51,7 +51,9 @@ public class GetLopHocWithPaginationQueryValidator : AbstractValidator<CreateLic
         RuleFor(x => x.LopHocDto.LichHocs)
             .NotEmpty().WithMessage("Danh sách Lịch Học không được để trống")
             .MustAsync(BeValidLichHocs)
-            .WithMessage("Danh sách Lịch Học đã bị trùng hoặc không hợp lệ, thời gian nghỉ giữa 2 tiết của 1 giáo viên ít nhất là 15p");
+            .WithMessage("Danh sách Lịch Học đã bị trùng hoặc không hợp lệ, " +
+            "hãy kiểm tra lại lịch của các lớp khác bao gồm cả lịch dạy thay và dạy thêm" +
+            "(lưu ý: thời gian nghỉ giữa 2 tiết của 1 giáo viên ít nhất là 15p)");
     }
 
     private async Task<bool> NotExistClassName(string name, CancellationToken cToken)
@@ -97,11 +99,15 @@ public class GetLopHocWithPaginationQueryValidator : AbstractValidator<CreateLic
         return time != default; // Kiểm tra xem TimeOnly có giá trị mặc định hay không
     }
 
-    private async Task<bool> BeValidLichHocs(CreateLichHocCommand command, List<LichHocDto> lichHocs, CancellationToken token)
+    private async Task<bool> BeValidLichHocs(CreateLichHocCommand command, List<LichHocDto> lichHocs, CancellationToken cToken)
     {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
         if (lichHocs == null || lichHocs.Count == 0)
         {
-            return true; // Danh sách rỗng hoặc null thì không cần validate
+            return false; // Danh sách rỗng hoặc null thì không cần validate
         }
         var listThu = lichHocs.Select(lh=>lh.Thu).Distinct()
             .ToList();
@@ -112,7 +118,7 @@ public class GetLopHocWithPaginationQueryValidator : AbstractValidator<CreateLic
             var checktime2 = TimeOnly.TryParse(lichHoc.GioKetThuc, out var gioKetThuc);
             if(!checktime1||!checktime2) return false;
             if (lichHoc.Thu<2||lichHoc.Thu>8) return false;
-            var check = await ExistPhong(lichHoc.PhongId, token);
+            var check = await ExistPhong(lichHoc.PhongId, cToken);
             if (!check) return false;
 
             // Kiểm tra GioBatDau định dạng TimeOnly
@@ -133,6 +139,7 @@ public class GetLopHocWithPaginationQueryValidator : AbstractValidator<CreateLic
             }
         }
         var lichHocData = await _context.LichHocs
+            .Where(l=>l.Phong.CoSoId== coSoId)
             .Select(l => new {l.GiaoVienCode,l.PhongId,l.GioBatDau
             ,l.GioKetThuc,l.Thu,l.NgayBatDau,l.NgayKetThuc})
             .ToListAsync();

@@ -233,5 +233,257 @@
     background-color: #6f52ed;
     color: #fff;
     border-color: #6f52ed;
+    
+  }    
+  .custom-select-wrapper {
+    position: relative;
+    width: 100%;
   }
+  
+  .custom-select-input {
+    width: 100%;
+    padding: 6px 30px 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  .custom-select-arrow {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 14px;
+    color: #555;
+  }
+  
+  .custom-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    margin-top: 2px;
+  }
+  
+  .custom-select-search {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .custom-select-search input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .custom-select-options {
+    max-height: 200px;
+    overflow-y: auto;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .custom-select-options li {
+    padding: 8px 10px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .custom-select-options li:hover {
+    background-color: #f2f2f2;
+  }
+  
+  .no-result {
+    text-align: center;
+    padding: 8px;
+    color: #888;
+  }
+  .clear-icon {
+    position: absolute;
+    right: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #999;
+    cursor: pointer;
+    z-index: 10;
+  }
+  .clear-icon:hover {
+    color: #333;
+  }
+  
+  .no-class-message {
+    padding: 16px;
+    text-align: center;
+    color: red;
+    font-style: italic;
+    font-size: 16px;
+  }
+
+  .action-plus-wrapper {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    margin-top: 4px;
+  
+    .action-plus-icon {
+      font-size: 18px;
+      color: #28a745;
+    }
+  
+    .action-menu {
+      position: absolute;
+      top: 24px;
+      left: 0;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      z-index: 1000;
+      min-width: 100px;
+    }
+  
+    .action-option {
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
+  
+      &:hover {
+        background-color: #f5f5f5;
+      }
+    }
+  }
+ 
+  /* ======= POPUP CHUNG ======= */
+.modal-container {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: transparent;
+}
+
+.modal-content {
+  position: relative;
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px 24px;
+  width: 360px;
+  max-width: 95%;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  z-index: 10000;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #221c3d;
+  margin-bottom: 12px;
+}
+
+.modal-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: #221c3d;
+}
+
+.close-btn {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  color: #333;
+  cursor: pointer;
+  padding: 0;
+}
+
+.close-btn i {
+  font-size: 18px;
+}
+
+.modal-body label {
+  font-weight: 500;
+  font-size: 13px;
+  color: #221c3d;
+  display: block;
+  margin-bottom: 4px; 
+  margin-top: 10px;
+}
+
+.modal-body .form-control {
+  width: 100%;
+  height: 44px;   
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.modal-body .form-control:focus {
+  border-color: #6c5ce7;
+  outline: none;
+}
+
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.form-group {
+  flex: 1;
+}
+
+.modal-footer {
+  margin-top: 20px;
+  border-top: 1px solid #eee;
+  padding-top: 16px;
+  text-align: right;
+}
+
+.save-btn {
+  background-color: #d1f5e1;
+  color: #007f5f;
+  font-weight: bold;
+  padding: 8px 20px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.save-btn:hover {
+  opacity: 0.9;
+}
+.modal-header,
+.modal-footer {
+  padding: 12px 20px;
+}
+.modal-body {
+  padding: 16px 20px;
+}
   

@@ -1,4 +1,51 @@
 <h2>DANH SÁCH LỚP</h2>
-
-
-
+<div class="filters">
+    <input type="date" placeholder="Ngày bắt đầu">
+    <input type="date" placeholder="Ngày kết thúc">
+    <input type="text" placeholder="Tìm tên lớp...">
+</div>
+<div class="class-grid">
+    <!-- Lặp ô lớp học -->
+    <div class="class-card">
+        <h3>LỚP TOÁN CƠ BẢN KHỐI 6</h3>
+        <p><i class="far fa-calendar-alt mr-1"></i>12/12/2023 - 12/02/2024</p>
+        <p><i class="fas fa-stream mr-1"></i><span class="active">Hoạt động</span></p>
+        <a (click)="goToDetail('123')">Chi tiết <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="class-card">
+        <h3>LỚP ÔN LUYỆN ANH NGỮ CHO HỌC SINH KHỐI C</h3>
+        <p><i class="far fa-calendar-alt mr-1"></i>12/12/2023 - 12/02/2024</p>
+        <p><i class="fas fa-stream"></i> <span class="inactive">Không hoạt động</span></p>
+        <a href="#">Chi tiết <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="class-card">
+        <h3>LỚP ÔN LUYỆN CẤP 3 CHO HỌC SINH LỚP 9</h3>
+        <p><i class="far fa-calendar-alt mr-1"></i>12/12/2023 - 12/02/2024</p>
+        <p><i class="fas fa-stream mr-1"></i><span class="active">Hoạt động</span></p>
+        <a href="#">Chi tiết <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="class-card">
+        <h3>LỚP ÔN LUYỆN CẤP 3 CHO HỌC SINH LỚP 9</h3>
+        <p><i class="far fa-calendar-alt mr-1"></i>12/12/2023 - 12/02/2024</p>
+        <p><i class="fas fa-stream mr-1"></i><span class="active">Hoạt động</span></p>
+        <a href="#">Chi tiết <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="class-card">
+        <h3>LỚP ÔN LUYỆN CẤP 3 CHO HỌC SINH LỚP 9</h3>
+        <p><i class="far fa-calendar-alt mr-1"></i>12/12/2023 - 12/02/2024</p>
+        <p><i class="fas fa-stream mr-1"></i><span class="active">Hoạt động</span></p>
+        <a href="#">Chi tiết <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="class-card">
+        <h3>LỚP ÔN LUYỆN CẤP 3 CHO HỌC SINH LỚP 9</h3>
+        <p><i class="far fa-calendar-alt mr-1"></i>12/12/2023 - 12/02/2024</p>
+        <p><i class="fas fa-stream mr-1"></i><span class="active">Hoạt động</span></p>
+        <a href="#">Chi tiết <i class="fas fa-arrow-right"></i></a>
+    </div>
+</div>
+<div class="pagination">
+    <button disabled>&lt;</button>
+    <button class="active">1</button>
+    <button>2</button>
+    <button>&gt;</button>
+</div>
