@@ -7,6 +7,7 @@ using StudyFlow.Application.GiaoViens.Commands.CreateGiaoVien;
 using StudyFlow.Application.GiaoViens.Commands.EditGiaoVien;
 using StudyFlow.Application.GiaoViens.Commands.ExportGiaoViensToExcel;
 using StudyFlow.Application.GiaoViens.Commands.ImportGiaoViensFromExcel;
+using StudyFlow.Application.GiaoViens.Queries.GetGiaoVienAssignedClass;
 using StudyFlow.Application.GiaoViens.Queries.GetGiaoViensByNameOrCode;
 using StudyFlow.Application.GiaoViens.Queries.GetGiaoViensWithPagination;
 using StudyFlow.Domain.Constants;
@@ -25,7 +26,8 @@ public class GiaoViens : EndpointGroupBase
             .MapPut(EditGiaoVien, "editgiaovien")
             .MapPost(AddListGiaoViens, "addlistgiaoviens")
             .MapPost(ImportGiaoViensFromEXcel, "importgiaoviensfromexcel")
-            .MapPost(ExportGiaoViensToExcel, "exportgiaovienstoexcel");
+            .MapPost(ExportGiaoViensToExcel, "exportgiaovienstoexcel")
+            .MapPost(GetGiaoVienAssignedClass, "getgiaovienassignedclass");
     }
     [Authorize(Roles = Roles.CampusManager)]
     public async Task<Output> CreateGiaoVien(ISender sender, CreateGiaoVienCommand comand)
@@ -78,5 +80,10 @@ public class GiaoViens : EndpointGroupBase
         }
 
         return Results.File(fileContentResult.FileContents, fileContentResult.ContentType, fileContentResult.FileDownloadName);
+    }
+    [Authorize(Roles = Roles.Teacher)]
+    public async Task<Output> GetGiaoVienAssignedClass(ISender sender, GetGiaoVienAssignedClassWithPaginationCommand query)
+    {
+        return await sender.Send(query);
     }
 }

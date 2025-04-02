@@ -70,6 +70,10 @@ export class TestListComponent implements OnInit {
       cls.toLowerCase().includes(lower)
     );
   }
+  onSearchTextChanged() {
+    this.currentPage = 1;
+    this.loadTests();
+  }
 
   // Hàm chọn lớp và load lại danh sách bài kiểm tra
   selectClassFilter(selected: string) {
