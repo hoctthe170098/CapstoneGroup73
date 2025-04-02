@@ -14,6 +14,7 @@ using StudyFlow.Application.ChinhSachs.Commands.DeleteLichHoc;
 using StudyFlow.Application.LichHocs.Commands.CreateLichDayThay;
 using StudyFlow.Application.LichHocs.Commands.UpdateLichDayThay;
 using StudyFlow.Application.ChinhSachs.Commands.DeleteLichDayThay;
+using StudyFlow.Application.LichHocs.Commands.CreateLichDayBu;
 
 namespace StudyFlow.Web.Endpoints;
 
@@ -30,7 +31,8 @@ public class LichHocs : EndpointGroupBase
             .MapDelete(DeleteLichHoc,"deletelophoc")
             .MapPost(CreateLichHocDayThay,"createlichdaythay")
             .MapPut(UpdateLichHocDayThay,"updatelichdaythay")
-            .MapDelete(DeleteLichHocDayThay,"deletelichdaythay");
+            .MapDelete(DeleteLichHocDayThay,"deletelichdaythay")
+            .MapPost(CreateLichHocDayBu,"createlichdaybu");
     }
     [Authorize(Roles =Roles.CampusManager)]
     public async Task<Output> CreateLichHocCoDinh(ISender sender, [FromBody] CreateLichHocCommand command)
@@ -75,5 +77,10 @@ public class LichHocs : EndpointGroupBase
     public async Task<Output> DeleteLichHocDayThay(ISender sender, Guid lichHocId)
     {
         return await sender.Send(new DeleteLichDayThayCommand(lichHocId));
+    }
+    [Authorize(Roles = Roles.CampusManager)]
+    public async Task<Output> CreateLichHocDayBu(ISender sender, CreateLichDayBuCommand command)
+    {
+        return await sender.Send(command);
     }
 }

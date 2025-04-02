@@ -122,15 +122,28 @@ public class GetLopHocWithPaginationQueryHandler : IRequestHandler<GetLopHocWith
                 .Include(lh=>lh.GiaoVien)
                 .Include(lh=>lh.Phong)
                 .Include(lh=>lh.ChuongTrinh)
-                .Where(lh=>lh.TenLop== cla).ToListAsync();
+                .Where(lh=>lh.TenLop== cla).ToListAsync();      
             LopHocDto lopHoc = new LopHocDto
             {
                 HocPhi = lichHocs[0].HocPhi,
                 TenChuongTrinh = lichHocs[0].ChuongTrinh.TieuDe,
                 TenGiaoVien = lichHocs[0].GiaoVien.Ten,
                 TenLop = cla,
-                LoaiLichHocs = new List<LoaiLichHocDto>()
+                LoaiLichHocs = new List<LoaiLichHocDto>(),
+                NgayNghis = new List<NgayNghi>()
             };
+            var ngayNghis = lichHocs.Where(lh => lh.TrangThai == "Dạy bù");
+            foreach(var ngay in ngayNghis)
+            {
+                NgayNghi ngayNghi = new NgayNghi();
+                ngayNghi.Ngay = ngay.NgayHocGoc;
+                if (ngay.NgayKetThuc != DateOnly.MinValue)
+                {
+                    ngayNghi.TrangThai = "Chưa bù";
+                }
+                else ngayNghi.TrangThai = "Đã bù";
+                lopHoc.NgayNghis.Add(ngayNghi);
+            }
             lopHoc.LoaiLichHocs.Add(GetListLichHoc(lichHocs, "Cố định"));
             lopHoc.LoaiLichHocs.Add(GetListLichHoc(lichHocs, "Dạy bù"));
             lopHoc.LoaiLichHocs.Add(GetListLichHoc(lichHocs, "Dạy thay"));
@@ -162,8 +175,10 @@ public class GetLopHocWithPaginationQueryHandler : IRequestHandler<GetLopHocWith
                     ngayBatDau = lichHoc.NgayBatDau,
                     ngayKetThuc = lichHoc.NgayKetThuc,
                     TenPhong = lichHoc.Phong.Ten,
-                    Thu = lichHoc.Thu
+                    Thu = lichHoc.Thu,
+                    ngayGoc = lichHoc.NgayHocGoc
                 };
+            if(trangThai=="Dạy thay") lich.TenGiaoVien = lichHoc.GiaoVien.Ten;
             LoaiLichHoc.LichHocs.Add(lich);
             }
         return LoaiLichHoc;

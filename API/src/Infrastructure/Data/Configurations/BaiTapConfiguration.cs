@@ -14,7 +14,7 @@ public class BaiTapConfiguration : IEntityTypeConfiguration<BaiTap>
     {
         builder.ToTable(nameof(BaiTap));
         builder.HasKey(x => x.Id);
-        builder.HasIndex(x => new { x.Ngay, x.LichHocId })
+        builder.HasIndex(x => new { x.NgayTao, x.LichHocId })
        .IsUnique();
         builder.Property(kq => kq.TieuDe)
             .IsRequired()
@@ -27,6 +27,6 @@ public class BaiTapConfiguration : IEntityTypeConfiguration<BaiTap>
         builder.Property(kq => kq.TrangThai)
             .IsRequired()
             .HasMaxLength(10);
-        builder.HasAnnotation($"CheckConstraint:CK_BaiTap_TrangThai", "[TrangThai] IN ('open', 'close')");
+        builder.HasAnnotation($"CheckConstraint:CK_BaiTap_TrangThai", "[TrangThai] IN ('Chưa mở', 'Đang mở', 'Kết Thúc')");
     }
 }
