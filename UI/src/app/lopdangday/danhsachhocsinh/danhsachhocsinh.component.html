@@ -1,1 +1,21 @@
-<p>danhsachhocsinh works!</p>
+<h2>DANH SÁCH HỌC SINH</h2>
+<table>
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Họ và Tên</th>
+            <th>Giới Tính</th>
+            <th>Email</th>
+            <th>Số Điện Thoại</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let hs of danhSachHocSinh">
+            <td>{{hs.code}}</td>
+            <td>{{hs.ten}}</td>
+            <td>{{hs.gioiTinh}}</td>
+            <td>{{hs.email}}</td>
+            <td>{{hs.soDienThoai}}</td>
+          </tr>
+    </tbody>
+</table>

@@ -6,18 +6,41 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class LopdangdayService {
-  private baseUrl = `${environment.apiURL}/GiaoViens`;
+  private baseUrl = `${environment.apiURL}`;
   constructor(private http: HttpClient) {}
 
-  getDanhSachLopHoc(payload: any): Observable<any> {
+  getDanhSachLopHoc(pageNumber: number, pageSize: number, searchClass: string, startDate: string, endDate: string): Observable<any> {
     const token = localStorage.getItem("token");
     const headers = new HttpHeaders()
-      .set("Authorization", `Bearer ${token}`)
-      .set("Content-Type", "application/json");
+      .set("Authorization", `Bearer ${token}`);
+     
+    const body = {
+      pageNumber,
+      pageSize,
+      searchClass,
+      startDate,
+      endDate,
+    };
 
     return this.http.post<any>(
-      `${this.baseUrl}/getgiaovienassignedclass`,
-      payload,
+      `${this.baseUrl}/GiaoViens/getgiaovienassignedclass`,
+      body,
+      { headers }
+    );
+  }
+
+  getDanhSachHocSinhLop(id: string): Observable<any> {
+    const token = localStorage.getItem("token");
+    const headers = new HttpHeaders()
+      .set("Authorization", `Bearer ${token}`);
+     
+    const body = {
+      id
+    };
+
+    return this.http.post<any>(
+      `${this.baseUrl}/ThamGiaLopHocs/gethocsinhsinclass`,
+      body,
       { headers }
     );
   }
