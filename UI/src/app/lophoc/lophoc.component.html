@@ -222,13 +222,55 @@
           </div>
 
           <div class="lop-hoc-info">
-            <p><strong>Lịch học:</strong></p>
-            <ul class="lich-hoc-list">
-              <li *ngFor="let item of lop.lichHocChiTiet">
-                {{ getThuHienThi(item.thu) }}: {{ item.gioBatDau }} -
-                {{ item.gioKetThuc }} - <u>{{ item.tenPhong }}</u>
-              </li>
-            </ul>
+            <div *ngIf="lop.lichCoDinh?.length">
+              <p><strong>Lịch học cố định:</strong></p>
+              <ul>
+                <li *ngFor="let lh of lop.lichCoDinh">
+                  {{ getThuHienThi(lh.thu) }} |
+                  {{ lh.gioBatDau?.substring(0, 5) }} -
+                  {{ lh.gioKetThuc?.substring(0, 5) }} | phòng:
+                  {{ lh.tenPhong }}
+                </li>
+              </ul>
+            </div>
+            <div *ngIf="lop.lichDayBu?.length">
+              <p><strong style="color: #ff9800">Lịch dạy bù:</strong></p>
+              <ul>
+                <li *ngFor="let lh of lop.lichDayBu">
+                  {{ lh.ngayBatDau | date : "dd/MM/yyyy" }} |
+                  {{ lh.gioBatDau?.substring(0, 5) }} -
+                  {{ lh.gioKetThuc?.substring(0, 5) }} | phòng:
+                  {{ lh.tenPhong }}
+                </li>
+              </ul>
+            </div>
+
+            <!-- LỊCH DẠY THAY -->
+            <div *ngIf="lop.lichDayThay?.length">
+              <p><strong style="color: #3f51b5">Lịch dạy thay:</strong></p>
+              <ul>
+                <li *ngFor="let lh of lop.lichDayThay">
+                  {{ getThuHienThi(lh.thu) }} |
+                  {{ lh.ngayBatDau | date : "dd/MM/yyyy" }} |
+                  {{ lh.gioBatDau?.substring(0, 5) }} -
+                  {{ lh.gioKetThuc?.substring(0, 5) }} | phòng:
+                  {{ lh.tenPhong }}
+                </li>
+              </ul>
+            </div>
+
+            <!-- LỊCH ĐÃ NGHỈ -->
+            <div *ngIf="lop.lichNghi?.length">
+              <p><strong style="color: red">Lịch đã nghỉ:</strong></p>
+              <ul>
+                <li *ngFor="let lh of lop.lichNghi">
+                  {{ lh.ngayBatDau | date : "dd/MM/yyyy" }} |
+                  {{ lh.gioBatDau?.substring(0, 5) }} -
+                  {{ lh.gioKetThuc?.substring(0, 5) }} | phòng:
+                  {{ lh.tenPhong }}
+                </li>
+              </ul>
+            </div>
             <p>
               <strong>Ngày bắt đầu:</strong>
               {{ lop.ngayBatDau | date : "dd/MM/yyyy" }}
@@ -284,22 +326,24 @@
     <div class="modal-overlay" (click)="closeAddScheduleModal()"></div>
     <div class="modal-content">
       <div class="modal-header">
-        <h3>THÊM LỊCH {{ newSchedule.loaiLich.toUpperCase() }}</h3>
-        <button class="close-btn" (click)="closeAddScheduleModal()">
-          <i class="ft-x"></i>
-        </button>
+        <h3>
+          {{ newSchedule.loaiLich === "Dạy bù" ? "HỌC BÙ" : "THÊM LỊCH MỚI" }}
+        </h3>
+        <i class="ft-x close-icon" (click)="closeAddScheduleModal()"></i>
       </div>
 
       <div class="modal-body">
-        <!-- Ngày -->
-        <label>Ngày</label>
+        <!-- Tên lớp -->
+        <label>Tên Lớp</label>
         <input
-          type="date"
+          type="text"
           class="form-control"
-          [(ngModel)]="newSchedule.ngay"
+          [value]="newSchedule.lop?.tenLop"
+          readonly
         />
 
-        <div *ngIf="newSchedule.loaiLich === 'Dạy thay'">
+        <!-- DẠY THAY -->
+        <ng-container *ngIf="newSchedule.loaiLich === 'Dạy thay'">
           <label>Giáo viên</label>
           <div
             class="custom-select-wrapper"
@@ -346,35 +390,69 @@
               </ul>
             </div>
           </div>
-        </div>
+          <label>Ngày</label>
+          <input
+            type="date"
+            class="form-control"
+            [(ngModel)]="newSchedule.ngay"
+          />
+        </ng-container>
 
-        <!-- Phòng -->
-        <label>Phòng</label>
-        <select class="form-control" [(ngModel)]="newSchedule.phong">
-          <option *ngFor="let phong of phongOptions" [value]="phong.id">
-            {{ phong.ten }}
-          </option>
-        </select>
+        <!-- DẠY BÙ -->
+        <ng-container *ngIf="newSchedule.loaiLich === 'Dạy bù'">
+          <!-- Chọn ngày nghỉ -->
+          <label>Chọn Ngày Nghỉ</label>
+          <input
+            type="date"
+            class="form-control"
+            [(ngModel)]="newSchedule.ngayNghi"
+          />
 
-        <!-- Thời gian -->
-        <div class="form-row">
-          <div class="form-group">
-            <label>Thời gian bắt đầu</label>
+          <a
+            (click)="showExtraFields = true"
+            *ngIf="!showExtraFields"
+            class="show-more-link"
+            >Hiển thị thêm</a
+          >
+
+          <div *ngIf="showExtraFields">
+            <!-- Ngày dạy bù -->
+            <label>Ngày</label>
             <input
-              type="time"
+              type="date"
               class="form-control"
-              [(ngModel)]="newSchedule.batDau"
+              [(ngModel)]="newSchedule.ngay"
             />
+
+            <!-- Phòng -->
+            <label>Phòng</label>
+            <select class="form-control" [(ngModel)]="newSchedule.phong">
+              <option *ngFor="let phong of phongOptions" [value]="phong.id">
+                {{ phong.ten }}
+              </option>
+            </select>
+
+            <!-- Thời gian -->
+            <div class="form-row">
+              <div class="form-group">
+                <label>Thời gian bắt đầu</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  [(ngModel)]="newSchedule.batDau"
+                />
+              </div>
+              <div class="form-group">
+                <label>Thời gian kết thúc</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  [(ngModel)]="newSchedule.ketThuc"
+                />
+              </div>
+            </div>
           </div>
-          <div class="form-group">
-            <label>Thời gian kết thúc</label>
-            <input
-              type="time"
-              class="form-control"
-              [(ngModel)]="newSchedule.ketThuc"
-            />
-          </div>
-        </div>
+        </ng-container>
       </div>
 
       <div class="modal-footer">

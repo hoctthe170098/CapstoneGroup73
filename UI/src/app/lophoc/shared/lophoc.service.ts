@@ -59,5 +59,10 @@ export class LophocService {
     const url = `${this.baseUrl}/getlophocbyten?TenLop=${encodeURIComponent(tenLop)}`;
     return this.http.get<any>(url, { headers });
   }
+  createLichDayThay(payload: { tenLop: string; ngayDay: string; giaoVienCode: string }): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<any>(`${this.baseUrl}/createlichdaythay`, payload, { headers });
+  }
   
 }

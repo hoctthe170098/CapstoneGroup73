@@ -38,9 +38,13 @@ export class LophocComponent implements OnInit {
   filteredGiaoVienOptions: { code: string; codeTen: string }[] = [];
   selectedGiaoVien: string = "";
   isGiaoVienDropdownOpen: boolean = false;
-
+  phongOptions: { id: string; ten: string }[] = [];
+  popupGiaoVienOptions: { code: string; codeTen: string }[] = [];
+  popupFilteredGiaoVienOptions: { code: string; codeTen: string }[] = [];
+  popupGiaoVienSearch: string = "";
+  isPopupGiaoVienDropdownOpen: boolean = false;
   isAddScheduleModalOpen: boolean = false;
-
+  showExtraFields: boolean = false;
   constructor(
     private lophocService: LophocService,
     private cdr: ChangeDetectorRef,
@@ -84,34 +88,34 @@ export class LophocComponent implements OnInit {
   }
 
   newSchedule = {
-    loaiLich: "", // "Dạy thay" | "Dạy bù"
+    loaiLich: "",
     ngay: "",
+    ngayNghi: "", 
     phong: "",
     batDau: "",
     ketThuc: "",
     giaoVienCode: "",
     lop: null,
   };
-
-  phongOptions: { id: string; ten: string }[] = [];
-  popupGiaoVienOptions: { code: string; codeTen: string }[] = [];
-  popupFilteredGiaoVienOptions: { code: string; codeTen: string }[] = [];
-  popupGiaoVienSearch: string = "";
-  isPopupGiaoVienDropdownOpen: boolean = false;
-
   openAddScheduleModal(lop: any, loai: string) {
     this.newSchedule = {
       loaiLich: loai,
-      ngay: "",
-      phong: "",
-      batDau: "",
-      ketThuc: "",
-      giaoVienCode: "",
       lop: lop,
+      ngay: '',
+      ngayNghi: '',
+      phong: '',
+      batDau: '',
+      ketThuc: '',
+       giaoVienCode: ''
     };
     this.isAddScheduleModalOpen = true;
-    this.loadPhongs();
-    if (loai === "Dạy thay") this.loadPopupGiaoViens();
+    this.showExtraFields = false;
+  
+    if (loai === 'Dạy bù') {
+      this.loadPhongs();
+    } else if (loai === 'Dạy thay') {
+      this.loadPopupGiaoViens(); 
+    }
   }
 
   closeAddScheduleModal() {
@@ -170,9 +174,33 @@ export class LophocComponent implements OnInit {
   
 
   submitNewSchedule() {
-    console.log(" Thêm lịch:", this.newSchedule);
-    this.toastr.success("Đã thêm lịch mới!");
-    this.closeAddScheduleModal();
+    if (this.newSchedule.loaiLich === 'Dạy thay') {
+      const payload = {
+        tenLop: this.newSchedule.lop?.tenLop,
+        ngayDay: this.newSchedule.ngay,
+        giaoVienCode: this.newSchedule.giaoVienCode
+      };
+  
+      this.lophocService.createLichDayThay(payload).subscribe({
+        next: (res) => {
+          if (!res.isError) {
+            this.toastr.success(res.message || 'Thêm lịch dạy thay thành công!');
+            this.closeAddScheduleModal();
+            this.loadLopHocs(); 
+          } else {
+            this.toastr.error(res.message || 'Thêm lịch dạy thay thất bại!');
+          }
+        },
+        error: (err) => {
+          console.error('Lỗi khi tạo lịch dạy thay:', err);
+          this.toastr.error('Không thể tạo lịch dạy thay!');
+        }
+      });
+    } else {
+      console.log("Thêm lịch dạy bù:", this.newSchedule);
+      this.toastr.success("Đã thêm lịch dạy bù!");
+      this.closeAddScheduleModal();
+    }
   }
 
   getChuongTrinhs(): void {
@@ -262,8 +290,8 @@ export class LophocComponent implements OnInit {
     if (this.thuTrongTuan.thu5) thus.push(5);
     if (this.thuTrongTuan.thu6) thus.push(6);
     if (this.thuTrongTuan.thu7) thus.push(7);
-    if (this.thuTrongTuan.cn) thus.push(8);
-    
+    if (this.thuTrongTuan.cn)  thus.push(8);
+  
     const payload = {
       pageNumber: page,
       pageSize: this.pageSize,
@@ -278,19 +306,21 @@ export class LophocComponent implements OnInit {
       ngayBatDau: this.dateStart || "0001-01-01",
       ngayKetThuc: this.dateEnd || "0001-01-01",
     };
+  
     this.spinner.show();
     this.lophocService.getDanhSachLopHoc(payload).subscribe({
       next: (response) => {
         this.spinner.hide();
         if (!response.isError && response.data) {
           const data = response.data;
-
+  
           this.lophocs = data.lopHocs.map((item: any) => {
-            const lichCoDinh =
-              item.loaiLichHocs.find((l: any) => l.trangThai === "Cố định")
-                ?.lichHocs || [];
-            const firstLich = lichCoDinh[0];
-
+            const coDinh = item.loaiLichHocs.find((l: any) => l.trangThai === 'Cố định')?.lichHocs || [];
+            const dayBu = item.loaiLichHocs.find((l: any) => l.trangThai === 'Dạy bù')?.lichHocs || [];
+            const dayThay = item.loaiLichHocs.find((l: any) => l.trangThai === 'Dạy thay')?.lichHocs || [];
+            const daNghi = item.loaiLichHocs.find((l: any) => l.trangThai === 'Đã nghỉ')?.lichHocs || [];
+            const firstLich = coDinh[0];
+  
             return {
               ...item,
               chuongTrinh: item.tenChuongTrinh,
@@ -299,19 +329,15 @@ export class LophocComponent implements OnInit {
               ngayBatDau: firstLich?.ngayBatDau,
               ngayKetThuc: firstLich?.ngayKetThuc,
               hocPhi: item.hocPhi,
-              trangThai:
-                item.loaiLichHocs.find((l: any) => l.lichHocs.length > 0)
-                  ?.trangThai || "Không xác định",
-
-              lichHocChiTiet: lichCoDinh.map((lh: any) => ({
-                thu: lh.thu,
-                gioBatDau: lh.gioBatDau?.substring(0, 5),
-                gioKetThuc: lh.gioKetThuc?.substring(0, 5),
-                tenPhong: lh.tenPhong || "",
-              })),
+              trangThai: item.loaiLichHocs.find((l: any) => l.lichHocs.length > 0)?.trangThai || "Không xác định",
+  
+              lichCoDinh: coDinh,
+              lichDayBu: dayBu,
+              lichDayThay: dayThay,
+              lichNghi: daNghi
             };
           });
-
+  
           this.currentPage = data.pageNumber;
           this.totalPages = Math.ceil(data.totalCount / this.pageSize);
           this.cdr.detectChanges();
@@ -328,6 +354,7 @@ export class LophocComponent implements OnInit {
       },
     });
   }
+  
 
   goToPage(page: number) {
     if (page < 1 || page > this.totalPages) return;
