@@ -20,22 +20,32 @@ public class CreateBaiTapCommandValidator : AbstractValidator<CreateBaiTapComman
 
         RuleFor(x => x.CreateBaiTapDto.UrlFile)
             .MaximumLength(200).WithMessage("Đường dẫn file tối đa 200 ký tự.")
-            .When(x => !string.IsNullOrWhiteSpace(x.CreateBaiTapDto.UrlFile));
+            .Must(BeValidFileType)
+            .When(x => !string.IsNullOrWhiteSpace(x.CreateBaiTapDto.UrlFile))
+            .WithMessage("Tệp phải là .pdf, .doc hoặc .docx");
 
         RuleFor(x => x.CreateBaiTapDto.LichHocId)
             .NotEmpty().WithMessage("Lịch học không được để trống.");
 
-        RuleFor(x => x.CreateBaiTapDto.Ngay)
-            .NotEmpty().WithMessage("Ngày giao bài không được để trống.");
-
-        RuleFor(x => x.CreateBaiTapDto.ThoiGianBatDau)
-            .NotEmpty().WithMessage("Thời gian bắt đầu không được để trống.");
-
         RuleFor(x => x.CreateBaiTapDto.ThoiGianKetThuc)
-            .NotEmpty().WithMessage("Thời gian kết thúc không được để trống.");
+            .NotNull().WithMessage("Thời gian kết thúc không được để trống.")
+            .Must(BeFutureTime)
+            .WithMessage("Thời gian kết thúc phải sau thời điểm hiện tại.");
+    }
 
-        RuleFor(x => x)
-            .Must(x => x.CreateBaiTapDto.ThoiGianBatDau < x.CreateBaiTapDto.ThoiGianKetThuc)
-            .WithMessage("Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc.");
+    private bool BeValidFileType(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url)) return true;
+
+        var allowedExtensions = new[] { ".pdf", ".doc", ".docx" };
+        var ext = Path.GetExtension(url).ToLower();
+
+        return allowedExtensions.Contains(ext);
+    }
+
+    private bool BeFutureTime(DateTime? thoiGianKetThuc)
+    {
+        if (!thoiGianKetThuc.HasValue) return false;
+        return thoiGianKetThuc.Value > DateTime.UtcNow;
     }
 }
