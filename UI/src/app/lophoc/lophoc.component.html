@@ -233,6 +233,7 @@
                 </li>
               </ul>
             </div>
+            
             <div *ngIf="lop.lichDayBu?.length">
               <p><strong style="color: #ff9800">Lịch dạy bù:</strong></p>
               <ul>
@@ -255,7 +256,9 @@
                   {{ lh.ngayBatDau | date : "dd/MM/yyyy" }} |
                   {{ lh.gioBatDau?.substring(0, 5) }} -
                   {{ lh.gioKetThuc?.substring(0, 5) }} | phòng:
-                  {{ lh.tenPhong }}
+                  {{ lh.tenPhong }} |
+      <a class="text-primary"  (click)="onEditLichDayThay(lh, lop)">Sửa</a> |
+      <a class="text-danger"  (click)="onDeleteLichDayThay(lh)">Xóa</a>
                 </li>
               </ul>
             </div>
@@ -461,6 +464,80 @@
       </div>
     </div>
   </div>
+<!-- POPUP Chỉnh sửa lịch dạy thay -->
+<div class="modal-container" *ngIf="isEditScheduleModalOpen">
+  <div class="modal-overlay" (click)="closeEditScheduleModal()"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>CHỈNH SỬA LỊCH DẠY THAY</h3>
+      <button class="close-btn" (click)="closeEditScheduleModal()">
+        <i class="ft-x"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <label>Tên Lớp</label>
+      <input
+        type="text"
+        class="form-control"
+        [value]="editingLichDayThay?.tenLop"
+        readonly
+      />
+
+      <label>Giáo Viên</label>
+<div class="custom-select-wrapper" (click)="togglePopupGiaoVienDropdown_Edit($event)">
+  <input
+    type="text"
+    class="custom-select-input"
+    placeholder="Chọn giáo viên"
+    [value]="getSelectedPopupGiaoVienText(editingLichDayThay?.giaoVienCode)"
+    readonly
+  />
+  <span class="custom-select-arrow"><i class="ft-chevron-down"></i></span>
+
+  <div
+    class="custom-select-dropdown"
+    *ngIf="isPopupGiaoVienDropdownOpen_Edit"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="custom-select-search">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Tìm giáo viên"
+        [(ngModel)]="popupGiaoVienSearch"
+        (input)="onPopupGiaoVienSearch_Edit()"
+      />
+    </div>
+    <ul class="custom-select-options">
+      <li
+        *ngFor="let gv of popupFilteredGiaoVienOptions_Edit"
+        (click)="selectPopupGiaoVien_Edit(gv); $event.stopPropagation()"
+      >
+        {{ gv.codeTen }}
+      </li>
+      <li *ngIf="popupFilteredGiaoVienOptions_Edit.length === 0" class="no-result">
+        Không tìm thấy
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+      <label>Ngày</label>
+      <input
+        type="date"
+        class="form-control"
+        [value]="editingLichDayThay?.ngayBatDau | date: 'yyyy-MM-dd'"
+        readonly
+      />
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn save-btn" (click)="submitEditLichDayThay()">CHỈNH SỬA</button>
+    </div>
+  </div>
+</div>
 
   <!-- Phân trang -->
   <div class="pagination-container" *ngIf="totalPages > 1">

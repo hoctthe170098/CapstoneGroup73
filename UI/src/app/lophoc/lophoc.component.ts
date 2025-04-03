@@ -45,6 +45,12 @@ export class LophocComponent implements OnInit {
   isPopupGiaoVienDropdownOpen: boolean = false;
   isAddScheduleModalOpen: boolean = false;
   showExtraFields: boolean = false;
+
+  isEditScheduleModalOpen: boolean = false;
+editingLichDayThay: any = null; 
+isPopupGiaoVienDropdownOpen_Edit: boolean = false;
+popupFilteredGiaoVienOptions_Edit: { code: string, codeTen: string }[] = [];
+
   constructor(
     private lophocService: LophocService,
     private cdr: ChangeDetectorRef,
@@ -150,6 +156,10 @@ export class LophocComponent implements OnInit {
     event.stopPropagation();
     this.isPopupGiaoVienDropdownOpen = !this.isPopupGiaoVienDropdownOpen;
   }
+  togglePopupGiaoVienDropdown_Edit(event: Event) {
+    event.stopPropagation();
+    this.isPopupGiaoVienDropdownOpen_Edit = !this.isPopupGiaoVienDropdownOpen_Edit;
+  }
 
   getSelectedPopupGiaoVienText(): string {
     const selected = this.popupGiaoVienOptions.find(
@@ -164,7 +174,18 @@ export class LophocComponent implements OnInit {
       gv.codeTen.toLowerCase().includes(search)
     );
   }
-
+  onPopupGiaoVienSearch_Edit() {
+    const search = this.popupGiaoVienSearch.toLowerCase();
+    this.popupFilteredGiaoVienOptions_Edit = this.giaoVienOptions.filter(gv =>
+      gv.codeTen.toLowerCase().includes(search)
+    );
+  }
+  selectPopupGiaoVien_Edit(gv: { code: string, codeTen: string }) {
+    this.editingLichDayThay.giaoVienCode = gv.code;
+    this.popupGiaoVienSearch = '';
+    this.popupFilteredGiaoVienOptions_Edit = this.giaoVienOptions.slice();
+    this.isPopupGiaoVienDropdownOpen_Edit = false;
+  }
   selectPopupGiaoVien(gv: { code: string, codeTen: string }) {
     this.newSchedule.giaoVienCode = gv.code;
     this.popupGiaoVienSearch = ''; 
@@ -331,10 +352,14 @@ export class LophocComponent implements OnInit {
               hocPhi: item.hocPhi,
               trangThai: item.loaiLichHocs.find((l: any) => l.lichHocs.length > 0)?.trangThai || "Không xác định",
   
-              lichCoDinh: coDinh,
-              lichDayBu: dayBu,
-              lichDayThay: dayThay,
-              lichNghi: daNghi
+              lichCoDinh: coDinh.map((lh: any) => ({ ...lh })), 
+              lichDayBu: dayBu.map((lh: any) => ({ ...lh })),
+              lichDayThay: dayThay.map((lh: any) => ({
+                ...lh,
+                giaoVienCode: lh.giaoVienCode || '',
+                tenGiaoVien: lh.tenGiaoVien || ''
+              })),
+              lichNghi: daNghi.map((lh: any) => ({ ...lh }))
             };
           });
   
@@ -386,5 +411,38 @@ export class LophocComponent implements OnInit {
   onFilterChange() {
     this.currentPage = 1;
     this.loadLopHocs();
+  }
+  
+  
+  onDeleteLichDayThay(lich: any) {
+    console.log(" Xóa lịch dạy thay:", lich);
+  }
+  
+  onEditLichDayThay(lich: any, lop: any) {
+    console.log("GV code:", lich.giaoVienCode);
+    console.log("Lịch dạy thay được chọn để sửa:", lich);
+    const matchedGV = this.giaoVienOptions.find(gv => gv.codeTen === lich.tenGiaoVien);
+  
+    this.editingLichDayThay = {
+      ...lich,
+      tenLop: lop.tenLop,
+      giaoVienCode: lich.giaoVienCode || '',
+    };
+  
+    this.popupGiaoVienSearch = '';
+    this.popupFilteredGiaoVienOptions_Edit = this.giaoVienOptions.slice(); // ← clone cho edit
+    this.isPopupGiaoVienDropdownOpen_Edit = false;
+    
+    this.isEditScheduleModalOpen = true;
+  }
+  
+  closeEditScheduleModal() {
+    this.isEditScheduleModalOpen = false;
+    this.editingLichDayThay = null;
+  }
+  submitEditLichDayThay() {
+    console.log(" Chỉnh sửa lịch dạy thay:", this.editingLichDayThay);
+    this.toastr.success("Đã cập nhật lịch dạy thay!");
+    this.closeEditScheduleModal();
   }
 }
