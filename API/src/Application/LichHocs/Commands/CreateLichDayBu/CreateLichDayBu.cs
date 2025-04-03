@@ -1,0 +1,89 @@
+﻿using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using StudyFlow.Application.Common.Exceptions;
+using StudyFlow.Application.Common.Interfaces;
+using StudyFlow.Application.Common.Models;
+using StudyFlow.Domain.Entities;
+
+namespace StudyFlow.Application.LichHocs.Commands.CreateLichDayBu;
+public record CreateLichDayBuCommand : IRequest<Output>
+{
+    public required string TenLop {  get; init; }
+    public required DateOnly NgayNghi { get; init; }
+    public LichDayBuDto? LichDayBu { get; init; }
+}
+    public class CreateLichDayBuCommandHandler : IRequestHandler<CreateLichDayBuCommand, Output>
+    {
+        private readonly IApplicationDbContext _context;
+        private readonly IIdentityService _identityService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public CreateLichDayBuCommandHandler(IApplicationDbContext context, IIdentityService identityService,
+            IHttpContextAccessor httpContextAccessor)
+        {
+            _context = context;
+            _identityService = identityService;
+            _httpContextAccessor = httpContextAccessor;
+        }
+        public async Task<Output> Handle(CreateLichDayBuCommand request, CancellationToken cancellationToken)
+        {
+        var thu = ((int)request.NgayNghi.DayOfWeek > 0)
+        ? (int)request.NgayNghi.DayOfWeek + 1
+        : (int)request.NgayNghi.DayOfWeek + 8;
+        var lichHoc = await _context.LichHocs
+            .FirstAsync(lh=>lh.Thu == thu&&lh.TenLop==request.TenLop);
+        if (request.LichDayBu == null)
+        {
+            var lichDayBu = new LichHoc
+            {
+                Id = Guid.NewGuid(),
+                ChuongTrinhId = lichHoc.ChuongTrinhId,
+                GiaoVienCode = lichHoc.GiaoVienCode,
+                GioBatDau = lichHoc.GioBatDau,
+                GioKetThuc = lichHoc.GioKetThuc,
+                HocPhi = lichHoc.HocPhi,
+                NgayBatDau = DateOnly.MinValue,
+                NgayKetThuc = DateOnly.MinValue,
+                PhongId = lichHoc.PhongId,
+                TenLop = lichHoc.TenLop,
+                Thu = lichHoc.Thu,
+                TrangThai = "Dạy bù",
+                LichHocGocId = lichHoc.Id,
+                NgayHocGoc = request.NgayNghi,
+            };
+            _context.LichHocs.Add(lichDayBu);
+        }
+        else
+        {
+            var thuHocBu = ((int)request.LichDayBu.NgayHocBu.DayOfWeek > 0)
+        ? (int)request.LichDayBu.NgayHocBu.DayOfWeek + 1
+        : (int)request.LichDayBu.NgayHocBu.DayOfWeek + 8;
+            var lichDayBu = new LichHoc
+            {
+                Id = Guid.NewGuid(),
+                ChuongTrinhId = lichHoc.ChuongTrinhId,
+                GiaoVienCode = lichHoc.GiaoVienCode,
+                GioBatDau = TimeOnly.Parse(request.LichDayBu.GioBatDau),
+                GioKetThuc = TimeOnly.Parse(request.LichDayBu.GioKetThuc),
+                HocPhi = lichHoc.HocPhi,
+                NgayBatDau = request.NgayNghi,
+                NgayKetThuc = request.NgayNghi,
+                PhongId = request.LichDayBu.PhongId,
+                TenLop = lichHoc.TenLop,
+                Thu = thuHocBu,
+                TrangThai = "Dạy bù",
+                LichHocGocId = lichHoc.Id,
+                NgayHocGoc = request.NgayNghi
+            };
+        }
+        await _context.SaveChangesAsync(cancellationToken);
+        return new Output
+        {
+            code = 200,
+            isError = false,
+            data = null,
+            message = "Tạo lịch dạy bù thành công."
+        };
+        }
+    }

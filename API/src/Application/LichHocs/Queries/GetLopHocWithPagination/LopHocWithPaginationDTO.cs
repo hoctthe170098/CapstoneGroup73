@@ -20,6 +20,7 @@ public class LopHocDto
     public string TenChuongTrinh { get; set; } = "";
     public int HocPhi { get; set; }
     public List<LoaiLichHocDto> LoaiLichHocs { get; set; } = new List<LoaiLichHocDto>();
+    public List<NgayNghi> NgayNghis { get; set; } = new List<NgayNghi>();
 }
 public class LoaiLichHocDto
 {
@@ -33,6 +34,13 @@ public class LichHocDto
     public TimeOnly gioBatDau { get; set; }
     public TimeOnly gioKetThuc { get; set; }
     public string TenPhong { get; set; } = "";
+    public string? TenGiaoVien { get; set; } = "";
     public DateOnly ngayBatDau { get; set; }
     public DateOnly ngayKetThuc { get; set; }
+    public DateOnly? ngayGoc {  get; set; }
+}
+public class NgayNghi
+{
+    public DateOnly? Ngay { get; set; }
+    public string TrangThai { get; set; } = "";
 }
