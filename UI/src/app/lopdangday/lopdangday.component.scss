@@ -62,13 +62,12 @@ h2 {
 
 .class-card p span.active {
     color: green;
-  }
-  
-  .class-card p span.inactive {
+}
+
+.class-card p span.inactive {
     color: red !important;
-  }
-  
-  
+}
+
 .class-card a {
     margin-top: auto;
     font-weight: bold;
@@ -84,27 +83,42 @@ h2 {
     color: #0056b3;
 }
 
-.pagination {
-    display: flex;
-    justify-content: center;
-    margin-top: 30px;
-    gap: 10px;
-}
+// .pagination {
+//     display: flex;
+//     justify-content: center;
+//     margin-top: 30px;
+//     gap: 10px;
+//     list-style: none;
+// }
 
-.pagination button {
-    padding: 8px 14px;
-    border: none;
-    border-radius: 50%;
-    background: #eee;
-    cursor: pointer;
-}
+// .pagination .page-item {
+//     list-style: none;
+// }
 
-.pagination button.active {
-    background-color: #007bff;
-    color: #fff;
-}
+// .pagination .page-link {
+//     border: none !important;
+//     border-radius: 50% !important;
+//     background: #eee !important;
+//     color: #000 !important;
+//     padding: 8px 14px !important;
+//     cursor: pointer !important;
+//     text-decoration: none !important;
+//     display: inline-flex;
+//     align-items: center;
+//     justify-content: center;
+// }
 
-.pagination button:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
+// .pagination .page-item.active .page-link {
+//     background-color: #007bff !important;
+//     color: #fff !important;
+// }
+
+// .pagination .page-item.disabled .page-link {
+//     opacity: 0.4 !important;
+//     cursor: not-allowed !important;
+// }
+
+// .pagination .page-link:hover {
+//     background: #ccc !important;
+//     color: #000 !important;
+// }

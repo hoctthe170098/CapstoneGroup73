@@ -5,6 +5,7 @@ using StudyFlow.Application.Common.Exceptions;
 using StudyFlow.Application.Common.Interfaces;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Domain.Entities;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace StudyFlow.Application.LichHocs.Commands.CreateLichDayBu;
 public record CreateLichDayBuCommand : IRequest<Output>
@@ -76,6 +77,29 @@ public record CreateLichDayBuCommand : IRequest<Output>
                 LichHocGocId = lichHoc.Id,
                 NgayHocGoc = request.NgayNghi
             };
+            _context.LichHocs.Add(lichDayBu);
+            var lichCoDinh = _context.LichHocs
+            .Where(lh => lh.TenLop == request.TenLop && lh.TrangThai == "Cố định")
+            .Select(lh => lh.Id)
+            .ToList();
+            var hocSinhCodes = _context.ThamGiaLopHocs
+            .Where(tg => lichCoDinh.Contains(tg.LichHocId))
+            .Select(tg => tg.HocSinhCode)
+            .Distinct()
+            .ToList();
+            foreach(var hs in hocSinhCodes)
+            {
+                var thamGia = new ThamGiaLopHoc
+                {
+                    Id = Guid.NewGuid(),
+                    NgayBatDau = lichDayBu.NgayBatDau,
+                    NgayKetThuc = lichDayBu.NgayKetThuc,
+                    HocSinhCode = hs,
+                    LichHocId = lichDayBu.Id,
+                    TrangThai = "Học bù",
+                };
+                _context.ThamGiaLopHocs.Add(thamGia);
+            }
         }
         await _context.SaveChangesAsync(cancellationToken);
         return new Output

@@ -69,13 +69,14 @@ public class CreateLichDayBuCommandValidator : AbstractValidator<CreateLichDayBu
             .ToList();
         foreach(var code in hocSinhCodes)
         {
-            var checkLichSinhVien = await _context.LichHocs
-                .AnyAsync(lh => lh.ThamGiaLopHocs.Select(tg => tg.HocSinhCode).Contains(code)
+            var lichHocSinhVien = await _context.LichHocs
+                .Where(lh => lh.ThamGiaLopHocs.Select(tg => tg.HocSinhCode).Contains(code)
                 && lh.NgayKetThuc != DateOnly.MinValue
-                && TinhNgayBuoiHocCuoiCung(lh.NgayKetThuc, lh.Thu) >= lichDayBu.NgayHocBu
                 && lh.Thu == thu
                 && !(lh.GioKetThuc <= TimeOnly.Parse(lichDayBu.GioBatDau).AddMinutes(-15)
-                || lh.GioBatDau >= TimeOnly.Parse(lichDayBu.GioKetThuc).AddMinutes(15)));
+                || lh.GioBatDau >= TimeOnly.Parse(lichDayBu.GioKetThuc).AddMinutes(15))).ToListAsync();
+            var checkLichSinhVien = lichHocSinhVien
+                .Any(lh => TinhNgayBuoiHocCuoiCung(lh.NgayKetThuc, lh.Thu) >= lichDayBu.NgayHocBu);
             if (checkLichSinhVien) return false;
         }
         return true;
@@ -89,12 +90,13 @@ public class CreateLichDayBuCommandValidator : AbstractValidator<CreateLichDayBu
     ? (int)lichDayBu.NgayHocBu.DayOfWeek + 1
     : (int)lichDayBu.NgayHocBu.DayOfWeek + 8;
         var lichHocPhong = await _context.LichHocs
-            .AnyAsync(lh => lh.TenLop == command.TenLop
+            .Where(lh => lh.TenLop == command.TenLop
             && lh.Thu == thu
-            && TinhNgayBuoiHocCuoiCung(lh.NgayKetThuc, lh.Thu) >= lichDayBu.NgayHocBu
             && !(lh.GioKetThuc <= TimeOnly.Parse(lichDayBu.GioBatDau).AddMinutes(-15)
-                || lh.GioBatDau >= TimeOnly.Parse(lichDayBu.GioKetThuc).AddMinutes(15)));
-        if (lichHocPhong) return false;
+                || lh.GioBatDau >= TimeOnly.Parse(lichDayBu.GioKetThuc).AddMinutes(15))).ToListAsync();
+        var checkLichHocPhong = lichHocPhong
+            .Any(lh => TinhNgayBuoiHocCuoiCung(lh.NgayKetThuc, lh.Thu) >= lichDayBu.NgayHocBu);
+        if (checkLichHocPhong) return false;
         return true;
     }
 
@@ -139,13 +141,15 @@ public class CreateLichDayBuCommandValidator : AbstractValidator<CreateLichDayBu
     ? (int)lichDayBu.NgayHocBu.DayOfWeek + 1
     : (int)lichDayBu.NgayHocBu.DayOfWeek + 8;
         var lichHocPhong = await _context.LichHocs
-            .AnyAsync(lh => lh.TenLop != command.TenLop
+            .Where(lh => lh.TenLop != command.TenLop
             && lh.Thu == thu
             && lh.PhongId == lichDayBu.PhongId
-            && TinhNgayBuoiHocCuoiCung(lh.NgayKetThuc, lh.Thu) >= lichDayBu.NgayHocBu
             && !(lh.GioKetThuc <= TimeOnly.Parse(lichDayBu.GioBatDau).AddMinutes(-15)
-                || lh.GioBatDau >= TimeOnly.Parse(lichDayBu.GioKetThuc).AddMinutes(15)));
-        if (lichHocPhong) return false;
+                || lh.GioBatDau >= TimeOnly.Parse(lichDayBu.GioKetThuc).AddMinutes(15)))
+            .ToListAsync();
+        var checkLichHocPhong = lichHocPhong
+            .Any(lh => TinhNgayBuoiHocCuoiCung(lh.NgayKetThuc, lh.Thu) >= lichDayBu.NgayHocBu);
+        if (checkLichHocPhong) return false;
         return true;
     }
 
@@ -161,15 +165,17 @@ public class CreateLichDayBuCommandValidator : AbstractValidator<CreateLichDayBu
             .Select(lh=>lh.GiaoVienCode)
             .FirstOrDefault();
         if(giaoVienCode==null) return false;
-        var lichHocGiaoVien = await _context.LichHocs
-            .AnyAsync(lh => lh.TenLop != command.TenLop
+        var lichDayGiaoVien = await _context.LichHocs
+            .Where(lh => lh.TenLop != command.TenLop
             && lh.NgayKetThuc != DateOnly.MinValue
             && lh.Thu == thu
             && lh.GiaoVienCode == giaoVienCode
-            && TinhNgayBuoiHocCuoiCung(lh.NgayKetThuc, lh.Thu) >= lichDayBu.NgayHocBu
             && !(lh.GioKetThuc <= TimeOnly.Parse(lichDayBu.GioBatDau).AddMinutes(-15)
-                || lh.GioBatDau >= TimeOnly.Parse(lichDayBu.GioKetThuc).AddMinutes(15)));
-        if (lichHocGiaoVien) return false;
+                || lh.GioBatDau >= TimeOnly.Parse(lichDayBu.GioKetThuc).AddMinutes(15)))
+            .ToListAsync();
+        var checkLichDayGiaoVien = lichDayGiaoVien
+            .Any(lh => TinhNgayBuoiHocCuoiCung(lh.NgayKetThuc, lh.Thu) >= lichDayBu.NgayHocBu);
+        if (checkLichDayGiaoVien) return false;
         return true;
     }
 

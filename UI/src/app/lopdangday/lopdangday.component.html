@@ -2,7 +2,7 @@
 <div class="filters">
   <input type="date" placeholder="Ngày bắt đầu" [(ngModel)]="startDate" >
   <input type="date" placeholder="Ngày kết thúc" [(ngModel)]="endDate" >
-  <input type="text" placeholder="Tìm tên lớp..." [(ngModel)]="searchClass" >
+  <input type="text" placeholder="Tìm tên lớp..." [(ngModel)]="searchClass" (change)="searchClasses()">
 </div>
 <div class="class-grid">
   <div class="class-card" *ngFor="let lop of classes">
@@ -13,17 +13,37 @@
     </p>
     <p>
       <i class="fas fa-stream mr-1"></i>
-      <span [ngClass]="{'active': lop.trangThai === 'Hoạt động', 'inactive': lop.trangThai !== 'Hoạt động'}">
-        {{ lop.trangThai }}
+      <span [ngClass]="{'active': lop.isActive, 'inactive': !lop.isActive}">
+        {{ lop.isActive ? 'Đang hoạt động' : 'Kết thúc' }}
       </span>
     </p>
-    <a [routerLink]="['/chi-tiet', lop.id]">
+    <a (click)="goToDetail(lop.id)" >
       Chi tiết <i class="fas fa-arrow-right"></i>
     </a>
   </div>
 </div>
-<div class="pagination">
 
-</div>
+<nav aria-label="Page navigation" class="d-flex justify-content-center mt-4">
+  <ul class="pagination">
+    <li class="page-item" [class.disabled]="pageNumber === 1">
+      <a class="page-link" (click)="changePage(pageNumber - 1)" aria-label="Trước">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+
+    <li class="page-item" *ngFor="let page of getPageNumbers()" [class.active]="page === currentPage">
+      <a class="page-link" (click)="changePage(page)">{{ page }}</a>
+    </li>
+
+    <li class="page-item" [class.disabled]="pageNumber === totalPages">
+      <a class="page-link" (click)="changePage(pageNumber + 1)" aria-label="Sau">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+
+
+
 
 

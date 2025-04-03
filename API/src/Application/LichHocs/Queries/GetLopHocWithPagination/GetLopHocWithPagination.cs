@@ -178,7 +178,12 @@ public class GetLopHocWithPaginationQueryHandler : IRequestHandler<GetLopHocWith
                     Thu = lichHoc.Thu,
                     ngayGoc = lichHoc.NgayHocGoc
                 };
-            if(trangThai=="Dạy thay") lich.TenGiaoVien = lichHoc.GiaoVien.Ten;
+            if(trangThai=="Dạy thay")
+            {
+                lich.GiaoVienCode = lichHoc.GiaoVienCode;
+                lich.TenGiaoVien = lichHoc.GiaoVien.Ten;
+            }
+                
             LoaiLichHoc.LichHocs.Add(lich);
             }
         return LoaiLichHoc;
