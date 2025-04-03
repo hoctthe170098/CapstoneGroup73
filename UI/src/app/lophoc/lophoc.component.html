@@ -411,14 +411,14 @@
             class="form-control"
             [(ngModel)]="newSchedule.ngayNghi"
           />
-
+        
           <a
             (click)="showExtraFields = true"
             *ngIf="!showExtraFields"
             class="show-more-link"
             >Hiển thị thêm</a
           >
-
+        
           <div *ngIf="showExtraFields">
             <!-- Ngày dạy bù -->
             <label>Ngày</label>
@@ -427,7 +427,7 @@
               class="form-control"
               [(ngModel)]="newSchedule.ngay"
             />
-
+        
             <!-- Phòng -->
             <label>Phòng</label>
             <select class="form-control" [(ngModel)]="newSchedule.phong">
@@ -435,7 +435,7 @@
                 {{ phong.ten }}
               </option>
             </select>
-
+        
             <!-- Thời gian -->
             <div class="form-row">
               <div class="form-group">
@@ -480,43 +480,44 @@
       <input
         type="text"
         class="form-control"
-        [value]="editingLichDayThay?.tenLop"
+        [value]="newScheduleEdit?.tenLop"
         readonly
       />
 
       <label>Giáo Viên</label>
-<div class="custom-select-wrapper" (click)="togglePopupGiaoVienDropdown_Edit($event)">
+<div
+  class="custom-select-wrapper edit-giaovien-dropdown-wrapper"
+  (click)="toggleEditGiaoVienDropdown($event)">
   <input
-    type="text"
-    class="custom-select-input"
-    placeholder="Chọn giáo viên"
-    [value]="getSelectedPopupGiaoVienText(editingLichDayThay?.giaoVienCode)"
-    readonly
-  />
+  type="text"
+  class="custom-select-input"
+  placeholder="Chọn giáo viên"
+  [value]="getSelectedEditGiaoVienText()"
+  readonly
+/>
   <span class="custom-select-arrow"><i class="ft-chevron-down"></i></span>
 
   <div
     class="custom-select-dropdown"
-    *ngIf="isPopupGiaoVienDropdownOpen_Edit"
-    (click)="$event.stopPropagation()"
-  >
+    *ngIf="isEditGiaoVienDropdownOpen"
+    (click)="$event.stopPropagation()">
+    
     <div class="custom-select-search">
       <input
         type="text"
         class="form-control"
         placeholder="Tìm giáo viên"
-        [(ngModel)]="popupGiaoVienSearch"
-        (input)="onPopupGiaoVienSearch_Edit()"
-      />
+        [(ngModel)]="editGiaoVienSearch"
+        (input)="onEditGiaoVienSearch()" />
     </div>
+
     <ul class="custom-select-options">
       <li
-        *ngFor="let gv of popupFilteredGiaoVienOptions_Edit"
-        (click)="selectPopupGiaoVien_Edit(gv); $event.stopPropagation()"
-      >
+        *ngFor="let gv of editFilteredGiaoVienOptions"
+        (click)="selectEditGiaoVien(gv)">
         {{ gv.codeTen }}
       </li>
-      <li *ngIf="popupFilteredGiaoVienOptions_Edit.length === 0" class="no-result">
+      <li *ngIf="editFilteredGiaoVienOptions.length === 0" class="no-result">
         Không tìm thấy
       </li>
     </ul>
@@ -526,11 +527,10 @@
 
       <label>Ngày</label>
       <input
-        type="date"
-        class="form-control"
-        [value]="editingLichDayThay?.ngayBatDau | date: 'yyyy-MM-dd'"
-        readonly
-      />
+  type="date"
+  class="form-control"
+  [value]="formatDateForInput(newScheduleEdit?.ngayBatDau)"
+  readonly />
     </div>
 
     <div class="modal-footer">

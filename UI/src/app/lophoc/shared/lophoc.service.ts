@@ -64,5 +64,24 @@ export class LophocService {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.post<any>(`${this.baseUrl}/createlichdaythay`, payload, { headers });
   }
+  updateLichDayThay(payload: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+      .set('Content-Type', 'application/json');
   
+    return this.http.put<any>(
+      `${this.baseUrl}/updatelichdaythay`,
+      payload,
+      { headers }
+    );
+  }
+  createLichDayBu(payload: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+      .set('Content-Type', 'application/json');
+  
+    return this.http.post(`${environment.apiURL}/LichHocs/createlichdaybu`, payload, { headers });
+  }
 }

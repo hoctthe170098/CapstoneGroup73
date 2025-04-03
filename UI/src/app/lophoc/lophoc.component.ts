@@ -45,12 +45,19 @@ export class LophocComponent implements OnInit {
   isPopupGiaoVienDropdownOpen: boolean = false;
   isAddScheduleModalOpen: boolean = false;
   showExtraFields: boolean = false;
-
   isEditScheduleModalOpen: boolean = false;
 editingLichDayThay: any = null; 
 isPopupGiaoVienDropdownOpen_Edit: boolean = false;
 popupFilteredGiaoVienOptions_Edit: { code: string, codeTen: string }[] = [];
-
+newScheduleEdit: any = {
+  tenLop: '',
+  giaoVienCode: '',
+  ngayBatDau: ''
+};
+isEditGiaoVienDropdownOpen = false;
+editGiaoVienSearch = '';
+editSelectedGiaoVien: any = null;
+editFilteredGiaoVienOptions: any[] = [];
   constructor(
     private lophocService: LophocService,
     private cdr: ChangeDetectorRef,
@@ -69,6 +76,13 @@ popupFilteredGiaoVienOptions_Edit: { code: string, codeTen: string }[] = [];
         this.closeAllActionMenus();
       }
     });
+    document.addEventListener("click", this.handleClickOutsideEditDropdown.bind(this));
+  }
+  handleClickOutsideEditDropdown(event: any) {
+    const dropdown = document.querySelector('.edit-giaovien-dropdown-wrapper');
+    if (dropdown && !dropdown.contains(event.target as Node)) {
+      this.isEditGiaoVienDropdownOpen = false;
+    }
   }
   toggleActionMenu(index: number, event: MouseEvent) {
     event.stopPropagation();
@@ -217,10 +231,33 @@ popupFilteredGiaoVienOptions_Edit: { code: string, codeTen: string }[] = [];
           this.toastr.error('Không thể tạo lịch dạy thay!');
         }
       });
-    } else {
-      console.log("Thêm lịch dạy bù:", this.newSchedule);
-      this.toastr.success("Đã thêm lịch dạy bù!");
-      this.closeAddScheduleModal();
+    } else if (this.newSchedule.loaiLich === 'Dạy bù') {
+      const payload = {
+        tenLop: this.newSchedule.lop?.tenLop,
+        ngayNghi: this.newSchedule.ngayNghi,
+        lichDayBu: {
+          ngayHocBu: this.newSchedule.ngay,
+          phongId: this.newSchedule.phong,
+          gioBatDau: this.newSchedule.batDau,
+          gioKetThuc: this.newSchedule.ketThuc
+        }
+      };
+    
+      this.lophocService.createLichDayBu(payload).subscribe({
+        next: (res) => {
+          if (!res.isError) {
+            this.toastr.success(res.message || 'Thêm lịch dạy bù thành công!');
+            this.closeAddScheduleModal();
+            this.loadLopHocs(); 
+          } else {
+            this.toastr.error(res.message || 'Thêm lịch dạy bù thất bại!');
+          }
+        },
+        error: (err) => {
+          console.error('Lỗi khi tạo lịch dạy bù:', err);
+          this.toastr.error('Không thể tạo lịch dạy bù!');
+        }
+      });
     }
   }
 
@@ -417,23 +454,47 @@ popupFilteredGiaoVienOptions_Edit: { code: string, codeTen: string }[] = [];
   onDeleteLichDayThay(lich: any) {
     console.log(" Xóa lịch dạy thay:", lich);
   }
-  
   onEditLichDayThay(lich: any, lop: any) {
-    console.log("GV code:", lich.giaoVienCode);
-    console.log("Lịch dạy thay được chọn để sửa:", lich);
-    const matchedGV = this.giaoVienOptions.find(gv => gv.codeTen === lich.tenGiaoVien);
+    console.log('GVCODE:', lich.giaoVienCode);
   
-    this.editingLichDayThay = {
+    this.newScheduleEdit = {
       ...lich,
       tenLop: lop.tenLop,
-      giaoVienCode: lich.giaoVienCode || '',
+      giaoVienCode: lich.giaoVienCode || ''
     };
   
-    this.popupGiaoVienSearch = '';
-    this.popupFilteredGiaoVienOptions_Edit = this.giaoVienOptions.slice(); // ← clone cho edit
-    this.isPopupGiaoVienDropdownOpen_Edit = false;
-    
+    // Clone lại danh sách và cập nhật text hiển thị
+    this.editGiaoVienSearch = '';
+    this.editFilteredGiaoVienOptions = this.giaoVienOptions.slice();
+  
     this.isEditScheduleModalOpen = true;
+  }
+ 
+  toggleEditGiaoVienDropdown(event: Event) {
+    event.stopPropagation();
+    this.isEditGiaoVienDropdownOpen = !this.isEditGiaoVienDropdownOpen;
+  }
+  
+  onEditGiaoVienSearch() {
+    const search = this.editGiaoVienSearch.toLowerCase();
+    this.editFilteredGiaoVienOptions = this.giaoVienOptions.filter(
+      (gv: any) =>
+        gv.code?.toLowerCase().includes(search) ||
+        gv.ten?.toLowerCase().includes(search) ||
+        gv.codeTen?.toLowerCase().includes(search)
+    );
+  }
+  
+  getSelectedEditGiaoVienText(): string {
+    const gvCode = this.newScheduleEdit?.giaoVienCode;
+    const selected = this.giaoVienOptions.find(gv => gv.code === gvCode);
+    return selected ? selected.codeTen : '';
+  }
+  
+  selectEditGiaoVien(gv: any) {
+    this.editSelectedGiaoVien = gv;
+    this.newScheduleEdit.giaoVienCode = gv.code;
+    this.isEditGiaoVienDropdownOpen = false;
   }
   
   closeEditScheduleModal() {
@@ -441,8 +502,36 @@ popupFilteredGiaoVienOptions_Edit: { code: string, codeTen: string }[] = [];
     this.editingLichDayThay = null;
   }
   submitEditLichDayThay() {
-    console.log(" Chỉnh sửa lịch dạy thay:", this.editingLichDayThay);
-    this.toastr.success("Đã cập nhật lịch dạy thay!");
-    this.closeEditScheduleModal();
+    const payload = {
+      id: this.newScheduleEdit.id,
+      tenLop: this.newScheduleEdit.tenLop,
+      ngayDay: this.newScheduleEdit.ngayBatDau,
+      giaoVienCode: this.newScheduleEdit.giaoVienCode
+    };
+  
+    this.lophocService.updateLichDayThay(payload).subscribe({
+      next: (res) => {
+        if (!res.isError) {
+          this.toastr.success(res.message || 'Cập nhật lịch dạy thay thành công!');
+          this.closeEditScheduleModal();
+          this.loadLopHocs();
+        } else {
+          this.toastr.error(res.message || 'Cập nhật thất bại!');
+        }
+      },
+      error: (err) => {
+        console.error('Lỗi khi cập nhật lịch dạy thay:', err);
+        this.toastr.error('Không thể cập nhật lịch dạy thay!');
+      }
+    });
+  }
+  
+  formatDateForInput(dateStr: string): string {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    const year = d.getFullYear();
+    const month = ('0' + (d.getMonth() + 1)).slice(-2);
+    const day = ('0' + d.getDate()).slice(-2);
+    return `${year}-${month}-${day}`;
   }
 }
