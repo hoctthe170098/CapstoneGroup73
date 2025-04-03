@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import {
-  FormArray,
   FormBuilder,
   FormGroup,
+  FormArray,
 } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 import { LophocService } from '../shared/lophoc.service';
-import { ChangeDetectorRef } from '@angular/core';
+import { Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+
 @Component({
   selector: 'app-edit-lophoc',
   templateUrl: './editlophoc.component.html',
@@ -14,11 +15,13 @@ import { ChangeDetectorRef } from '@angular/core';
 })
 export class EditLopHocComponent implements OnInit {
   editLopForm: FormGroup;
-
   chuongTrinhList: any[] = [];
   giaoVienList: any[] = [];
   phongList: any[] = [];
-  hocVienList = [];
+  hocVienList: any[] = [];
+
+  canEditAll: boolean = true;
+  isEditable: boolean = true;
 
   constructor(
     private fb: FormBuilder,
@@ -29,14 +32,15 @@ export class EditLopHocComponent implements OnInit {
 
   ngOnInit(): void {
     this.editLopForm = this.fb.group({
-      tenLop: [''],
-      chuongTrinh: [null],
-      hocPhi: [null],
-      giaoVien: [null],
-      ngayBatDau: [''],
-      ngayKetThuc: [''],
+      tenLop: ['', [Validators.required, Validators.maxLength(20)]],
+      chuongTrinh: [null, Validators.required],
+      hocPhi: [null, [Validators.required, Validators.min(50000)]],
+      giaoVien: [null, Validators.required],
+      ngayBatDau: ['', [Validators.required, this.validateStartDateAfterToday()]],
+      ngayKetThuc: ['', [Validators.required, this.validateEndDate()]],
       lichHoc: this.fb.array([]),
     });
+    
 
     this.loadAllData();
   }
@@ -55,12 +59,21 @@ export class EditLopHocComponent implements OnInit {
 
       if (tenLop) {
         this.lophocService.getLopHocByTenLop(tenLop).subscribe({
-          next: (res) => {
+          next: async (res) => {
             if (res?.data) {
-              // Đợi 1 chút để DOM render xong select option
+              const today = new Date();
+                    today.setHours(0, 0, 0, 0); // reset về đầu ngày
+
+              const startDate = new Date(res.data.ngayBatDau);
+                    startDate.setHours(0, 0, 0, 0);
+
+              this.canEditAll = startDate > today;
+
+              this.isEditable = true;
+
               setTimeout(() => {
                 this.patchForm(res.data);
-                this.cdr.detectChanges(); // ép render lại
+                this.cdr.detectChanges();
               });
             }
           },
@@ -69,7 +82,6 @@ export class EditLopHocComponent implements OnInit {
           },
         });
       }
-      
     });
   }
 
@@ -93,6 +105,7 @@ export class EditLopHocComponent implements OnInit {
       const phongObj = this.phongList.find(p => p.id === lich.phongId);
       lichHocArray.push(
         this.fb.group({
+          id: [lich.id],
           thu: [lich.thu],
           gioBatDau: [lich.gioBatDau],
           gioKetThuc: [lich.gioKetThuc],
@@ -102,6 +115,21 @@ export class EditLopHocComponent implements OnInit {
     });
 
     this.hocVienList = data.hocSinhs || [];
+
+    // Disable fields if cannot edit all
+    if (!this.canEditAll) {
+      this.editLopForm.get('tenLop')?.disable();
+      this.editLopForm.get('chuongTrinh')?.disable();
+      this.editLopForm.get('hocPhi')?.disable();
+      this.editLopForm.get('giaoVien')?.disable();
+      this.editLopForm.get('ngayKetThuc')?.disable();
+
+      this.lichHoc.controls.forEach(control => {
+        control.get('thu')?.disable();
+        control.get('gioBatDau')?.disable();
+        control.get('gioKetThuc')?.disable();
+      });
+    }
   }
 
   get lichHoc(): FormArray {
@@ -109,19 +137,95 @@ export class EditLopHocComponent implements OnInit {
   }
 
   onCancel(): void {
-    console.log('Đã hủy chỉnh sửa lớp học.');
+    console.log('❌ Hủy chỉnh sửa.');
   }
 
   onSubmit(): void {
-    console.log('Dữ liệu lớp học:', this.editLopForm.value);
+    if (!this.isEditable || this.editLopForm.invalid) {
+      console.warn('⛔ Không thể gửi vì không hợp lệ hoặc không được phép chỉnh sửa.');
+      return;
+    }
+  
+    const formValue = this.editLopForm.getRawValue();
+  
+    const payload = {
+      lopHocDto: {
+        tenLop: formValue.tenLop,
+        giaoVienCode: formValue.giaoVien?.code || '',
+        ngayBatDau: this.formatDate(formValue.ngayBatDau),
+        ngayKetThuc: this.formatDate(formValue.ngayKetThuc),
+        hocPhi: formValue.hocPhi,
+        chuongTrinhId: formValue.chuongTrinh?.id || 0,
+        lichHocs: formValue.lichHoc.map((lich: any) => ({
+          id: lich.id || null,
+          thu: lich.thu,
+          phongId: lich.phong?.id || 0,
+          gioBatDau: lich.gioBatDau,
+          gioKetThuc: lich.gioKetThuc,
+        })),
+        hocSinhCodes: this.hocVienList.map((hv: any) => hv.code),
+      },
+    };
+  
+    console.log('📦 Payload gửi đi:', payload); // 👉 log ở đây
+  
+    this.lophocService.editLichHoc(payload).subscribe({
+      next: (res) => {
+        console.log('✅ Cập nhật lớp học thành công:', res);
+      },
+      error: (err) => {
+        console.error('❌ Lỗi khi cập nhật lớp học:', err);
+      },
+    });
+  }
+  
+  
+  
+
+  removeHocVien(index: number): void {
+    this.hocVienList.splice(index, 1);
   }
 
-  // Compare functions (giữ lại nếu cần xài trong HTML template)
-  compareById(o1: any, o2: any): boolean {
-    return o1 && o2 && o1.id === o2.id;
+  removeSchedule(index: number): void {
+    if (this.canEditAll) {
+      this.lichHoc.removeAt(index);
+    }
+  }
+  validateEndDate() {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const start = new Date(this.editLopForm?.get('ngayBatDau')?.value);
+      const end = new Date(control.value);
+      const twoMonthsLater = new Date(start);
+      twoMonthsLater.setMonth(twoMonthsLater.getMonth() + 2);
+  
+      return end < twoMonthsLater ? { invalidEndDate: true } : null;
+    };
+  }
+  validateStartDateAfterToday() {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) return null;
+  
+      const inputDate = new Date(control.value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+  
+      return inputDate <= today ? { invalidStartDate: true } : null;
+    };
   }
 
-  compareByCode(o1: any, o2: any): boolean {
-    return o1 && o2 && o1.code === o2.code;
+  addSchedule(): void {
+    if (this.canEditAll) {
+      const lichHocArray = this.editLopForm.get('lichHoc') as FormArray;
+      lichHocArray.push(this.fb.group({
+        thu: [''],
+        gioBatDau: [''],
+        gioKetThuc: [''],
+        phong: [null],
+      }));
+    }
+  }
+  private formatDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toISOString().split('T')[0]; // Trả về dạng yyyy-MM-dd
   }
 }
