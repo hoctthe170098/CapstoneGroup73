@@ -205,9 +205,13 @@ public class CreateLichDayBuCommandValidator : AbstractValidator<CreateLichDayBu
     private async Task<bool> ChuaDuocNghi(CreateLichDayBuCommand command, 
         DateOnly ngayDay, CancellationToken token)
     {
-        return !await _context.LichHocs.AnyAsync(lh => lh.TenLop == command.TenLop
+        if(command.LichDayBu==null) return !await _context.LichHocs.AnyAsync(lh => lh.TenLop == command.TenLop
       && lh.NgayHocGoc == ngayDay
       && lh.TrangThai == "Dạy bù");
+        else return !await _context.LichHocs.AnyAsync(lh => lh.TenLop == command.TenLop
+      && lh.NgayHocGoc == ngayDay
+      && lh.TrangThai == "Dạy bù"
+      &&lh.NgayKetThuc!=DateOnly.MinValue);
     }
     private async Task<bool> SauNgayBatDau(CreateLichDayBuCommand command, 
         DateOnly ngayDay,CancellationToken token)

@@ -34,6 +34,20 @@ export class LophocService {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.post<any>(`${this.giaovienUrl}/getgiaovienbycodeorname`, payload, { headers });
   }
+  editLichHoc(payload: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('Token không tồn tại!');
+      return new Observable((observer) => observer.error('Unauthorized: Token missing'));
+    }
+  
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+      .set('Content-Type', 'application/json');
+  
+    return this.http.put<any>(`${this.baseUrl}/editlichhoc`, payload, { headers });
+  }
+  
 
   getDanhSachLopHoc(payload: any): Observable<any> {
     const token = localStorage.getItem('token');
