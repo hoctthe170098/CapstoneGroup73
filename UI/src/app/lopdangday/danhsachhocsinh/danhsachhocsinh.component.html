@@ -1,21 +1,27 @@
-<h2>DANH SÁCH HỌC SINH</h2>
-<table>
-    <thead>
-        <tr>
-            <th>STT</th>
-            <th>Họ và Tên</th>
-            <th>Giới Tính</th>
-            <th>Email</th>
-            <th>Số Điện Thoại</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let hs of danhSachHocSinh">
-            <td>{{hs.code}}</td>
-            <td>{{hs.ten}}</td>
-            <td>{{hs.gioiTinh}}</td>
-            <td>{{hs.email}}</td>
-            <td>{{hs.soDienThoai}}</td>
-          </tr>
-    </tbody>
-</table>
+<h2 class="title">DANH SÁCH HỌC SINH</h2>
+<div class="table-responsive background">
+    <table class="table">
+        <thead class="thead-light">
+            <tr>
+                <th>Code</th>
+                <th>Họ và Tên</th>
+                <th class="text-center">Giới Tính</th>
+                <th>Email</th>
+                <th>Số Điện Thoại</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngIf="!danhSachHocSinh || danhSachHocSinh.length === 0">
+                <td colspan="5" class="text-center danger">Chưa có học sinh trong lớp</td>
+            </tr>
+            <tr *ngFor="let hs of danhSachHocSinh">
+                <td>{{hs.code}}</td>
+                <td>{{hs.ten}}</td>
+                <td class="text-center">{{hs.gioiTinh}}</td>
+                <td>{{hs.email}}</td>
+                <td>{{hs.soDienThoai}}</td>
+              </tr>
+        </tbody>
+    </table>
+</div>
+
