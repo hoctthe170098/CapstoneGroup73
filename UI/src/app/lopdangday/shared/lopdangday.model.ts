@@ -12,3 +12,15 @@ export class LopDangDay {
   giaoVienCode: string = '';     
   chuongTrinhId: number = 0;
 }
+
+export class DanhSachHocSinh {
+  code: string = '';
+  ten: string = '';
+  gioiTinh: string = '';
+  diaChi: string = '';
+  lop: string = '';
+  truongDangHoc: string = '';
+  ngaySinh: Date = new Date();
+  email?: string;
+  soDienThoai?: string;
+}
