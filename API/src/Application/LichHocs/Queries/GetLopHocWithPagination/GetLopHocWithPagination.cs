@@ -122,12 +122,13 @@ public class GetLopHocWithPaginationQueryHandler : IRequestHandler<GetLopHocWith
                 .Include(lh=>lh.GiaoVien)
                 .Include(lh=>lh.Phong)
                 .Include(lh=>lh.ChuongTrinh)
-                .Where(lh=>lh.TenLop== cla).ToListAsync();      
+                .Where(lh=>lh.TenLop== cla).ToListAsync();
+            var lichCoDinh = lichHocs.First(lh => lh.TrangThai == "Cố định");
             LopHocDto lopHoc = new LopHocDto
             {
-                HocPhi = lichHocs[0].HocPhi,
-                TenChuongTrinh = lichHocs[0].ChuongTrinh.TieuDe,
-                TenGiaoVien = lichHocs[0].GiaoVien.Ten,
+                HocPhi = lichCoDinh.HocPhi,
+                TenChuongTrinh = lichCoDinh.ChuongTrinh.TieuDe,
+                TenGiaoVien = lichCoDinh.GiaoVien.Ten,
                 TenLop = cla,
                 LoaiLichHocs = new List<LoaiLichHocDto>(),
                 NgayNghis = new List<NgayNghi>()

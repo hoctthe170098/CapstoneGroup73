@@ -54,30 +54,55 @@ public record CreateLichDayBuCommand : IRequest<Output>
                 NgayHocGoc = request.NgayNghi,
             };
             _context.LichHocs.Add(lichDayBu);
+            await _context.SaveChangesAsync(cancellationToken);
+            return new Output
+            {
+                code = 200,
+                isError = false,
+                data = null,
+                message = $"Đã cho nghỉ buổi học ngày {request.NgayNghi.ToString("dd-MM-yyyy")} " +
+                $"của lớp {request.TenLop} thành công."
+            };
         }
         else
         {
             var thuHocBu = ((int)request.LichDayBu.NgayHocBu.DayOfWeek > 0)
         ? (int)request.LichDayBu.NgayHocBu.DayOfWeek + 1
         : (int)request.LichDayBu.NgayHocBu.DayOfWeek + 8;
-            var lichDayBu = new LichHoc
+            var lichDayBu = _context.LichHocs
+                .FirstOrDefault(lh => lh.TenLop == request.TenLop
+                && lh.TrangThai == "Dạy bù"
+                && lh.NgayHocGoc == request.NgayNghi
+                && lh.NgayKetThuc == DateOnly.MinValue);
+            if(lichDayBu != null)
             {
-                Id = Guid.NewGuid(),
-                ChuongTrinhId = lichHoc.ChuongTrinhId,
-                GiaoVienCode = lichHoc.GiaoVienCode,
-                GioBatDau = TimeOnly.Parse(request.LichDayBu.GioBatDau),
-                GioKetThuc = TimeOnly.Parse(request.LichDayBu.GioKetThuc),
-                HocPhi = lichHoc.HocPhi,
-                NgayBatDau = request.NgayNghi,
-                NgayKetThuc = request.NgayNghi,
-                PhongId = request.LichDayBu.PhongId,
-                TenLop = lichHoc.TenLop,
-                Thu = thuHocBu,
-                TrangThai = "Dạy bù",
-                LichHocGocId = lichHoc.Id,
-                NgayHocGoc = request.NgayNghi
-            };
-            _context.LichHocs.Add(lichDayBu);
+                lichDayBu.Thu = thuHocBu;
+                lichDayBu.PhongId = request.LichDayBu.PhongId;
+                lichDayBu.GioBatDau = TimeOnly.Parse(request.LichDayBu.GioBatDau);
+                lichDayBu.GioKetThuc = TimeOnly.Parse(request.LichDayBu.GioKetThuc);
+                lichDayBu.NgayBatDau = request.LichDayBu.NgayHocBu;
+                lichDayBu.NgayKetThuc = request.LichDayBu.NgayHocBu;
+            }
+            else {
+                lichDayBu = new LichHoc
+                {
+                    Id = Guid.NewGuid(),
+                    ChuongTrinhId = lichHoc.ChuongTrinhId,
+                    GiaoVienCode = lichHoc.GiaoVienCode,
+                    GioBatDau = TimeOnly.Parse(request.LichDayBu.GioBatDau),
+                    GioKetThuc = TimeOnly.Parse(request.LichDayBu.GioKetThuc),
+                    HocPhi = lichHoc.HocPhi,
+                    NgayBatDau = request.NgayNghi,
+                    NgayKetThuc = request.NgayNghi,
+                    PhongId = request.LichDayBu.PhongId,
+                    TenLop = lichHoc.TenLop,
+                    Thu = thuHocBu,
+                    TrangThai = "Dạy bù",
+                    LichHocGocId = lichHoc.Id,
+                    NgayHocGoc = request.NgayNghi
+                };
+                _context.LichHocs.Add(lichDayBu);
+            }
             var lichCoDinh = _context.LichHocs
             .Where(lh => lh.TenLop == request.TenLop && lh.TrangThai == "Cố định")
             .Select(lh => lh.Id)
@@ -107,7 +132,8 @@ public record CreateLichDayBuCommand : IRequest<Output>
             code = 200,
             isError = false,
             data = null,
-            message = "Tạo lịch dạy bù thành công."
+            message = $"Tạo lịch dạy bù cho ngày {request.NgayNghi.ToString("dd-MM-yyyy")}" +
+            $" lớp {request.TenLop} thành công."
         };
         }
     }

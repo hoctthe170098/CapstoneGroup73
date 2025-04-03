@@ -32,7 +32,7 @@ public record CreateLichDayThayCommand : IRequest<Output>
         ? (int)request.NgayDay.DayOfWeek + 1
         : (int)request.NgayDay.DayOfWeek + 8;
         var lichHoc = await _context.LichHocs
-            .FirstAsync(lh=>lh.Thu == thu&&lh.TenLop==request.TenLop);
+            .FirstAsync(lh=>lh.Thu == thu&&lh.TenLop==request.TenLop&&lh.TrangThai=="Cố định");
         var lichDayThay = new LichHoc
         {
             Id = Guid.NewGuid(),

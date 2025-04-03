@@ -139,7 +139,7 @@ public class CreateLichHocCommandValidator : AbstractValidator<CreateLichHocComm
             }
         }
         var lichHocData = await _context.LichHocs
-            .Where(l=>l.Phong.CoSoId== coSoId)
+            .Where(l=>l.Phong.CoSoId== coSoId&&l.TrangThai!="Dạy thay"&&l.NgayKetThuc!=DateOnly.MinValue)
             .Select(l => new {l.GiaoVienCode,l.PhongId,l.GioBatDau
             ,l.GioKetThuc,l.Thu,l.NgayBatDau,l.NgayKetThuc})
             .ToListAsync();
