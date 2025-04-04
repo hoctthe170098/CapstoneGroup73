@@ -138,7 +138,7 @@ public class GetLopHocWithPaginationQueryHandler : IRequestHandler<GetLopHocWith
             {
                 NgayNghi ngayNghi = new NgayNghi();
                 ngayNghi.Ngay = ngay.NgayHocGoc;
-                if (ngay.NgayKetThuc != DateOnly.MinValue)
+                if (ngay.NgayKetThuc == DateOnly.MinValue)
                 {
                     ngayNghi.TrangThai = "Chưa bù";
                 }
@@ -160,7 +160,8 @@ public class GetLopHocWithPaginationQueryHandler : IRequestHandler<GetLopHocWith
     }
     private LoaiLichHocDto GetListLichHoc(List<LichHoc>lichHocs,string trangThai)
     {
-        var LichHocs = lichHocs.Where(lh => lh.TrangThai == trangThai).ToList();
+        var LichHocs = lichHocs.Where(lh => lh.TrangThai == trangThai
+        &&lh.NgayKetThuc!=DateOnly.MinValue).ToList();
             LoaiLichHocDto LoaiLichHoc = new LoaiLichHocDto
             {
                 TrangThai = trangThai,
@@ -168,6 +169,7 @@ public class GetLopHocWithPaginationQueryHandler : IRequestHandler<GetLopHocWith
             };
             foreach (var lichHoc in LichHocs)
             {
+            
                 LichHocDto lich = new LichHocDto
                 {
                     Id = lichHoc.Id,
@@ -183,8 +185,7 @@ public class GetLopHocWithPaginationQueryHandler : IRequestHandler<GetLopHocWith
             {
                 lich.GiaoVienCode = lichHoc.GiaoVienCode;
                 lich.TenGiaoVien = lichHoc.GiaoVien.Ten;
-            }
-                
+            }  
             LoaiLichHoc.LichHocs.Add(lich);
             }
         return LoaiLichHoc;
