@@ -34,6 +34,7 @@ public class LichHocDto
     public TimeOnly gioBatDau { get; set; }
     public TimeOnly gioKetThuc { get; set; }
     public string TenPhong { get; set; } = "";
+    public string? GiaoVienCode { get; set; } = "";
     public string? TenGiaoVien { get; set; } = "";
     public DateOnly ngayBatDau { get; set; }
     public DateOnly ngayKetThuc { get; set; }

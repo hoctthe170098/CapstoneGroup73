@@ -3,11 +3,14 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { Router } from '@angular/router';
 import { LopDangDay } from './shared/lopdangday.model';
 import { LopdangdayService } from './shared/lopdangday.service';
+import { ChangeDetectorRef } from '@angular/core';
+import { is } from 'core-js/core/object';
 @Component({
   selector: "app-lopdangday",
   templateUrl: "./lopdangday.component.html",
   styleUrls: ["./lopdangday.component.scss"],
 })
+
 export class LopdangdayComponent implements OnInit {
   classes: LopDangDay[] = [];
   pageNumber: number = 1;
@@ -17,33 +20,38 @@ export class LopdangdayComponent implements OnInit {
   startDate: string = '';
   endDate: string = '';
 
-  constructor( private spinner: NgxSpinnerService, private router: Router, private lopDangDayService: LopdangdayService ) { }
+  today: Date = new Date();
+  parseDate(dateString: string): Date {
+    return new Date(dateString);
+  }
+
+  constructor( private spinner: NgxSpinnerService, private router: Router, private lopDangDayService: LopdangdayService, private cdr: ChangeDetectorRef ) { }
   
 
   ngOnInit(): void {
-    console.debug('LopdangdayComponent ngOnInit has been called!'); 
+    this.loadLopdangday();
+  }
+
+  loadLopdangday() {
     // Hiển thị spinner trong khi load dữ liệu
     this.spinner.show();
-  
-    // Tạo payload dựa trên các giá trị của component
-    const payload = {
-      search: this.searchClass,
-      pageNumber: this.pageNumber,
-      pageSize: this.pageSize,
-      startDate: this.startDate,
-      endDate: this.endDate
-    };
-  
+    console.debug("today", this.today);
     // Gọi service và subscribe để nhận dữ liệu
-    this.lopDangDayService.getDanhSachLopHoc(payload).subscribe(
+    this.lopDangDayService.getDanhSachLopHoc(this.pageNumber, this.pageSize, this.searchClass, this.startDate, this.endDate).subscribe(
       (response) => {
         // Ẩn spinner sau khi dữ liệu được load
         this.spinner.hide();
-  
+
         // Giả sử response có các thuộc tính 'classes' và 'totalItems'
-        this.classes = response.classes;
-        this.totalItems = response.totalItems;
-        console.debug('Danh sách lớp học:', this.classes);
+        this.classes = response.data.items.map((lop: any) =>{
+          return {
+            ...lop,
+            isActive: this.parseDate(lop.ngayKetThuc) >= this.today
+          };
+        });
+        console.debug("endDate", this.classes);
+        this.totalItems = response.data.totalCount;
+        this.cdr.detectChanges(); // Cập nhật view nếu cần thiết
       },
       (error) => {
         // Ẩn spinner nếu có lỗi
@@ -53,7 +61,24 @@ export class LopdangdayComponent implements OnInit {
     );
   }
 
+  // Hàm gọi lại API khi tìm kiếm
+  searchClasses(): void {
+    this.pageNumber = 1; // reset trang về 1 khi tìm kiếm
+    this.loadLopdangday();
+  }
+
   goToDetail(lopId: string) {
     this.router.navigate(['/lopdangday', 'chi-tiet', lopId]);
+  }
+
+  // Phân trang
+  changePage(page: number) { this.pageNumber = page; this.loadLopdangday(); }
+  get totalPages() { return Math.ceil(this.totalItems / this.pageSize); }
+  getPageNumbers(): number[] {
+      const pages: number[] = [];
+      for (let i = 1; i <= this.totalPages; i++) {
+          pages.push(i);
+      }
+      return pages;
   }
 }

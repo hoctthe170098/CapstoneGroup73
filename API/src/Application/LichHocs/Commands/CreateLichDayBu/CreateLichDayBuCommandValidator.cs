@@ -69,18 +69,30 @@ public class CreateLichDayBuCommandValidator : AbstractValidator<CreateLichDayBu
             .ToList();
         foreach(var code in hocSinhCodes)
         {
-            var checkLichSinhVien = await _context.LichHocs
-                .AnyAsync(lh => lh.ThamGiaLopHocs.Select(tg => tg.HocSinhCode).Contains(code)
+            var lichHocSinhVien = await _context.LichHocs
+                .Where(lh => lh.ThamGiaLopHocs.Select(tg => tg.HocSinhCode).Contains(code)
                 && lh.NgayKetThuc != DateOnly.MinValue
-                && TinhNgayBuoiHocCuoiCung(lh.NgayKetThuc, lh.Thu) >= lichDayBu.NgayHocBu
                 && lh.Thu == thu
                 && !(lh.GioKetThuc <= TimeOnly.Parse(lichDayBu.GioBatDau).AddMinutes(-15)
-                || lh.GioBatDau >= TimeOnly.Parse(lichDayBu.GioKetThuc).AddMinutes(15)));
+                || lh.GioBatDau >= TimeOnly.Parse(lichDayBu.GioKetThuc).AddMinutes(15))).ToListAsync();
+            var checkLichSinhVien = lichHocSinhVien
+                .Any(lh => (TinhNgayBuoiHocCuoiCung(lh.NgayKetThuc, lh.Thu) >= lichDayBu.NgayHocBu 
+                            && lh.TrangThai == "Cố định"
+                            && ngayNghi(lh.Id) != lichDayBu.NgayHocBu)
+                          || ((lh.TrangThai == "Dạy bù") && lh.NgayKetThuc == lichDayBu.NgayHocBu));
             if (checkLichSinhVien) return false;
         }
         return true;
     }
-
+    private DateOnly? ngayNghi(Guid lichHocId)
+    {
+        var ngayNghi = _context.LichHocs
+            .Where(lh => lh.LichHocGocId == lichHocId && lh.NgayKetThuc == DateOnly.MinValue
+            && lh.TrangThai == "Học bù")
+            .Select(lh => lh.NgayHocGoc)
+            .FirstOrDefault();
+        return ngayNghi;
+    }
     private async Task<bool> KhongTrungLichDayCoDinh(CreateLichDayBuCommand command, 
         LichDayBuDto? lichDayBu, CancellationToken token)
     {
@@ -88,13 +100,14 @@ public class CreateLichDayBuCommandValidator : AbstractValidator<CreateLichDayBu
         var thu = ((int)lichDayBu.NgayHocBu.DayOfWeek > 0)
     ? (int)lichDayBu.NgayHocBu.DayOfWeek + 1
     : (int)lichDayBu.NgayHocBu.DayOfWeek + 8;
-        var lichHocPhong = await _context.LichHocs
-            .AnyAsync(lh => lh.TenLop == command.TenLop
+        var lichCoDinh = await _context.LichHocs
+            .Where(lh => lh.TenLop == command.TenLop && lh.TrangThai == "Cố định"
             && lh.Thu == thu
-            && TinhNgayBuoiHocCuoiCung(lh.NgayKetThuc, lh.Thu) >= lichDayBu.NgayHocBu
             && !(lh.GioKetThuc <= TimeOnly.Parse(lichDayBu.GioBatDau).AddMinutes(-15)
-                || lh.GioBatDau >= TimeOnly.Parse(lichDayBu.GioKetThuc).AddMinutes(15)));
-        if (lichHocPhong) return false;
+                || lh.GioBatDau >= TimeOnly.Parse(lichDayBu.GioKetThuc).AddMinutes(15))).ToListAsync();
+        var checkLichHocCoDinh = lichCoDinh
+            .Any(lh =>TinhNgayBuoiHocCuoiCung(lh.NgayKetThuc, lh.Thu) >= lichDayBu.NgayHocBu);
+        if (checkLichHocCoDinh) return false;
         return true;
     }
 
@@ -139,13 +152,16 @@ public class CreateLichDayBuCommandValidator : AbstractValidator<CreateLichDayBu
     ? (int)lichDayBu.NgayHocBu.DayOfWeek + 1
     : (int)lichDayBu.NgayHocBu.DayOfWeek + 8;
         var lichHocPhong = await _context.LichHocs
-            .AnyAsync(lh => lh.TenLop != command.TenLop
+            .Where(lh => lh.TenLop != command.TenLop && ngayNghi(lh.Id) != lichDayBu.NgayHocBu
             && lh.Thu == thu
             && lh.PhongId == lichDayBu.PhongId
-            && TinhNgayBuoiHocCuoiCung(lh.NgayKetThuc, lh.Thu) >= lichDayBu.NgayHocBu
             && !(lh.GioKetThuc <= TimeOnly.Parse(lichDayBu.GioBatDau).AddMinutes(-15)
-                || lh.GioBatDau >= TimeOnly.Parse(lichDayBu.GioKetThuc).AddMinutes(15)));
-        if (lichHocPhong) return false;
+                || lh.GioBatDau >= TimeOnly.Parse(lichDayBu.GioKetThuc).AddMinutes(15)))
+            .ToListAsync();
+        var checkLichHocPhong = lichHocPhong
+            .Any(lh => (TinhNgayBuoiHocCuoiCung(lh.NgayKetThuc, lh.Thu) >= lichDayBu.NgayHocBu && lh.TrangThai == "Cố định")
+            || ((lh.TrangThai == "Dạy bù") && lh.NgayKetThuc == lichDayBu.NgayHocBu));
+        if (checkLichHocPhong) return false;
         return true;
     }
 
@@ -161,15 +177,18 @@ public class CreateLichDayBuCommandValidator : AbstractValidator<CreateLichDayBu
             .Select(lh=>lh.GiaoVienCode)
             .FirstOrDefault();
         if(giaoVienCode==null) return false;
-        var lichHocGiaoVien = await _context.LichHocs
-            .AnyAsync(lh => lh.TenLop != command.TenLop
+        var lichDayGiaoVien = await _context.LichHocs
+            .Where(lh => lh.TenLop != command.TenLop && ngayNghi(lh.Id) != lichDayBu.NgayHocBu
             && lh.NgayKetThuc != DateOnly.MinValue
             && lh.Thu == thu
             && lh.GiaoVienCode == giaoVienCode
-            && TinhNgayBuoiHocCuoiCung(lh.NgayKetThuc, lh.Thu) >= lichDayBu.NgayHocBu
             && !(lh.GioKetThuc <= TimeOnly.Parse(lichDayBu.GioBatDau).AddMinutes(-15)
-                || lh.GioBatDau >= TimeOnly.Parse(lichDayBu.GioKetThuc).AddMinutes(15)));
-        if (lichHocGiaoVien) return false;
+                || lh.GioBatDau >= TimeOnly.Parse(lichDayBu.GioKetThuc).AddMinutes(15)))
+            .ToListAsync();
+        var checkLichDayGiaoVien = lichDayGiaoVien
+            .Any(lh => (TinhNgayBuoiHocCuoiCung(lh.NgayKetThuc, lh.Thu) >= lichDayBu.NgayHocBu && lh.TrangThai == "Cố định")
+            || ((lh.TrangThai == "Dạy bù" || lh.TrangThai == "Dạy thay") && lh.NgayKetThuc == lichDayBu.NgayHocBu));
+        if (checkLichDayGiaoVien) return false;
         return true;
     }
 
@@ -199,9 +218,13 @@ public class CreateLichDayBuCommandValidator : AbstractValidator<CreateLichDayBu
     private async Task<bool> ChuaDuocNghi(CreateLichDayBuCommand command, 
         DateOnly ngayDay, CancellationToken token)
     {
-        return !await _context.LichHocs.AnyAsync(lh => lh.TenLop == command.TenLop
+        if(command.LichDayBu==null) return !await _context.LichHocs.AnyAsync(lh => lh.TenLop == command.TenLop
       && lh.NgayHocGoc == ngayDay
       && lh.TrangThai == "Dạy bù");
+        else return !await _context.LichHocs.AnyAsync(lh => lh.TenLop == command.TenLop
+      && lh.NgayHocGoc == ngayDay
+      && lh.TrangThai == "Dạy bù"
+      &&lh.NgayKetThuc!=DateOnly.MinValue);
     }
     private async Task<bool> SauNgayBatDau(CreateLichDayBuCommand command, 
         DateOnly ngayDay,CancellationToken token)
