@@ -33,7 +33,7 @@ public record CreateLichDayBuCommand : IRequest<Output>
         ? (int)request.NgayNghi.DayOfWeek + 1
         : (int)request.NgayNghi.DayOfWeek + 8;
         var lichHoc = await _context.LichHocs
-            .FirstAsync(lh=>lh.Thu == thu&&lh.TenLop==request.TenLop);
+            .FirstAsync(lh=>lh.Thu == thu&&lh.TenLop==request.TenLop&&lh.TrangThai=="Cố định");
         if (request.LichDayBu == null)
         {
             var lichDayBu = new LichHoc
