@@ -43,11 +43,18 @@ public class UpdateLichDayThayCommandValidator : AbstractValidator<UpdateLichDay
             .WithMessage("Lớp đã có lịch dạy thay vào ngày này.")
             .MustAsync(KhongTrungNgayKiemTra)
             .WithMessage("Lớp có bài kiểm tra vào ngày này, không thể đổi giáo viên dạy thay.")
+            .MustAsync(KhongTrungNgayNghi)
+            .WithMessage("Lớp đã được nghỉ vào ngày này")
             .MustAsync(KhongTrungLichGiaoVien)
             .WithMessage("Giáo viên dạy thay bị trùng lịch" +
             "(lưu ý: giữa 2 slot của lớp phải có ít nhất 15 phút nghỉ).");
     }
-
+    private async Task<bool> KhongTrungNgayNghi(UpdateLichDayThayCommand command,
+        DateOnly ngayDay, CancellationToken token)
+    {
+        return !await _context.LichHocs.AnyAsync(lh => lh.TrangThai == "Dạy bù"
+        && lh.TenLop == command.TenLop && lh.NgayHocGoc == ngayDay);
+    }
     private bool SauHomNay(DateOnly ngayDay)
     {
         if (ngayDay <= DateOnly.FromDateTime(DateTime.Now)) return false;

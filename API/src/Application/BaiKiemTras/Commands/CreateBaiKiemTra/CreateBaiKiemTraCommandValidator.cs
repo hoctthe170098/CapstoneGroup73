@@ -32,6 +32,8 @@ public class UpdateBaiKiemTraCommandValidator : AbstractValidator<CreateBaiKiemT
             .MustAsync(ValidNgayKiemTra)
             .WithMessage("Ngày kiểm tra phải sau hôm nay ít nhất 7 ngày, " +
             "phải vào thứ mà học sinh học và phải nhỏ hơn ngày kết thúc khoá học.")
+            .MustAsync(KhongVaoNgayNghi)
+            .WithMessage("Lớp nghỉ đã có lịch nghỉ vào ngày này")
             .MustAsync(ValidLichKiemTraCoDinh)
             .WithMessage("Ngày kiểm tra phải vào lịch học cố định và giáo viên chính.")
             .MustAsync(NotDuplicatedLichThi)
@@ -39,6 +41,14 @@ public class UpdateBaiKiemTraCommandValidator : AbstractValidator<CreateBaiKiemT
         RuleFor(x => x.BaiKiemTraDto.TaiLieu)
             .Must(ValidTaiLieu)
             .WithMessage("Đề thi phải là word hoặc pdf và độ lớn không quá 10Mb.");
+    }
+
+    private async Task<bool> KhongVaoNgayNghi(CreateBaiKiemTraCommand command, 
+        DateOnly ngayKiemTra, CancellationToken token)
+    {
+        return await _context.LichHocs.AnyAsync(lh => lh.TenLop == command.BaiKiemTraDto.TenLop
+        && lh.NgayHocGoc == ngayKiemTra
+        && lh.TrangThai == "Học bù");
     }
 
     private async Task<bool> ValidLopDaHocDuSoBuoi(string tenLop, CancellationToken token)
