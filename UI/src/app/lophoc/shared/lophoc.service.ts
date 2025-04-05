@@ -119,6 +119,19 @@ export class LophocService {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.post<any>(`${this.hocSinhUrl}/gethocsinhbycodeorname`,payload,{ headers });
   }
- 
-
+  deleteLichDayBu(lichHocId: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const url = `${this.baseUrl}/deletelichdaybu?lichHocId=${lichHocId}`;
+    return this.http.delete<any>(url, { headers });
+  }  
+  updateLichDayBu(payload: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+      .set('Content-Type', 'application/json');
+  
+    return this.http.put<any>(`${this.baseUrl}/updatelichdaybu`, payload, { headers });
+  }
+  
 }

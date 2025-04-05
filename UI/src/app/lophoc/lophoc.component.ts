@@ -58,6 +58,16 @@ isEditGiaoVienDropdownOpen = false;
 editGiaoVienSearch = '';
 editSelectedGiaoVien: any = null;
 editFilteredGiaoVienOptions: any[] = [];
+
+isEditDayBuModalOpen = false;
+editScheduleDayBu: any = {
+  tenLop: '',
+  ngayNghi: '',
+  ngay: '',
+  phong: '',
+  batDau: '',
+  ketThuc: ''
+};
   constructor(
     private lophocService: LophocService,
     private cdr: ChangeDetectorRef,
@@ -70,6 +80,7 @@ editFilteredGiaoVienOptions: any[] = [];
     this.getChuongTrinhs();
     this.loadLopHocs();
     this.getGiaoVienOptions();
+    this.loadPhongs(); 
     document.addEventListener("click", (event: any) => {
       const isInside = event.target.closest(".action-plus-wrapper");
       if (!isInside) {
@@ -386,7 +397,7 @@ editFilteredGiaoVienOptions: any[] = [];
             return {
               ...item,
               chuongTrinh: item.tenChuongTrinh,
-              phong: firstLich?.tenPhong || "",
+              phong: "",
               giaoVien: item.tenGiaoVien,
               ngayBatDau: firstLich?.ngayBatDau,
               ngayKetThuc: firstLich?.ngayKetThuc,
@@ -470,7 +481,7 @@ editFilteredGiaoVienOptions: any[] = [];
       next: (res) => {
         if (!res.isError) {
           this.toastr.success(res.message || 'Xóa lịch dạy thay thành công!');
-          this.loadLopHocs(); // refresh lại danh sách
+          this.loadLopHocs(); 
         } else {
           this.toastr.error(res.message || 'Xóa lịch dạy thay thất bại!');
         }
@@ -491,7 +502,6 @@ editFilteredGiaoVienOptions: any[] = [];
       giaoVienCode: lich.giaoVienCode || ''
     };
   
-    // Clone lại danh sách và cập nhật text hiển thị
     this.editGiaoVienSearch = '';
     this.editFilteredGiaoVienOptions = this.giaoVienOptions.slice();
   
@@ -562,4 +572,85 @@ editFilteredGiaoVienOptions: any[] = [];
     const day = ('0' + d.getDate()).slice(-2);
     return `${year}-${month}-${day}`;
   }
+  onDeleteLichDayBu(lich: any) {
+    if (!lich?.id) {
+      this.toastr.error('Lịch học không hợp lệ!');
+      return;
+    }
+  
+    const confirmed = confirm('Bạn có chắc chắn muốn xóa lịch dạy bù này?');
+    if (!confirmed) return;
+  
+    this.lophocService.deleteLichDayBu(lich.id).subscribe({
+      next: (res) => {
+        if (!res.isError) {
+          this.toastr.success(res.message || 'Xóa lịch dạy bù thành công!');
+          this.loadLopHocs(); 
+        } else {
+          this.toastr.error(res.message || 'Xóa thất bại!');
+        }
+      },
+      error: (err) => {
+        console.error("Lỗi khi xóa lịch dạy bù:", err);
+        this.toastr.error("Không thể xóa lịch dạy bù!");
+      }
+    });
+  }
+  onEditLichDayBu(lich: any, lop: any) {
+    console.log('📋 Lịch dạy bù được chọn để sửa:', lich);
+    console.log('🏫 Lớp:', lop.tenLop);
+  
+    // Dùng phongOptions đã load sẵn ở ngOnInit
+    const matchedPhong = this.phongOptions.find(p => p.ten === lich.tenPhong);
+  
+    this.editScheduleDayBu = {
+      id: lich.id,
+      tenLop: lop.tenLop,
+      ngayNghi: lich.ngayGoc || '',
+      ngay: lich.ngayBatDau || '',
+      phong: matchedPhong?.id || '', // lấy đúng id phòng từ tên
+      batDau: lich.gioBatDau?.substring(0,5),
+      ketThuc: lich.gioKetThuc?.substring(0,5)
+    };
+  
+    
+    this.isEditDayBuModalOpen = true;
+  }
+  submitEditLichDayBu() {
+    if (!this.editScheduleDayBu?.id) {
+      this.toastr.error("Không tìm thấy ID lịch học!");
+      return;
+    }
+  
+    const payload = {
+      id: this.editScheduleDayBu.id,
+      tenLop: this.editScheduleDayBu.tenLop,
+      ngayNghi: this.editScheduleDayBu.ngayNghi,
+      lichDayBu: {
+        ngayHocBu: this.editScheduleDayBu.ngay,
+        phongId: this.editScheduleDayBu.phong,
+        gioBatDau: this.editScheduleDayBu.batDau,
+        gioKetThuc: this.editScheduleDayBu.ketThuc
+      }
+    };
+  
+    this.lophocService.updateLichDayBu(payload).subscribe({
+      next: (res) => {
+        if (!res.isError) {
+          this.toastr.success(res.message || 'Cập nhật lịch dạy bù thành công!');
+          this.isEditDayBuModalOpen = false;
+          this.loadLopHocs();
+        } else {
+          this.toastr.error(res.message || 'Cập nhật lịch dạy bù thất bại!');
+        }
+      },
+      error: (err) => {
+        console.error('❌ Lỗi khi cập nhật lịch dạy bù:', err);
+        this.toastr.error('Không thể cập nhật lịch dạy bù!');
+      }
+    });
+  }
+  
+  
+  
 }
