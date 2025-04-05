@@ -95,13 +95,16 @@ export class AddlophocComponent implements OnInit {
 
   // Hàm tạo form group cho từng lịch học
   createSchedule(): FormGroup {
-    return this.fb.group({
-      thu: ['', Validators.required], // Bắt buộc chọn thứ
-      gioBatDau: ['', [Validators.required, this.validateTimeStart]], // Giờ bắt đầu >= 08:00
-      gioKetThuc: ['', [Validators.required, this.validateTimeEnd]], // Giờ kết thúc <= 22:00
-      phong: [null, Validators.required] // Bắt buộc chọn phòng
-    });
-  } 
+    const group = this.fb.group({
+      thu: ['', Validators.required],
+      gioBatDau: ['', [Validators.required, this.validateTimeStart]],
+      gioKetThuc: ['', [Validators.required, this.validateTimeEnd]],
+      phong: [null, Validators.required]
+    }, { validators: this.validateTimeRange }); // 👈 Thêm validator ở đây
+  
+    return group;
+  }
+   
 
   // Thêm 1 dòng lịch học
   addSchedule(): void {
@@ -228,5 +231,24 @@ export class AddlophocComponent implements OnInit {
     const endTime = control.value;
     return endTime > '22:00' ? { invalidEndTime: true } : null;
   }
+  validateTimeRange(group: AbstractControl): { [key: string]: any } | null {
+    const start = group.get('gioBatDau')?.value;
+    const end = group.get('gioKetThuc')?.value;
+  
+    if (!start || !end) return null;
+  
+    const [startHour, startMinute] = start.split(':').map(Number);
+    const [endHour, endMinute] = end.split(':').map(Number);
+  
+    const startTime = startHour * 60 + startMinute;
+    const endTime = endHour * 60 + endMinute;
+  
+    if (endTime - startTime < 60) {
+      return { invalidTimeRange: true };
+    }
+  
+    return null;
+  }
+  
 }
 

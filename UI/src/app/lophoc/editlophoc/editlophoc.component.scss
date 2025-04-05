@@ -1,19 +1,52 @@
-.label-spacing {
-    margin-right: 20px; /* Điều chỉnh khoảng cách tùy ý */
+.hoc-vien-header {
+  flex-wrap: wrap;
+  gap: 12px;
+
+  .form-label {
+    white-space: nowrap;
   }
-  .hoc-vien-header {
-    margin-bottom: 1rem;
-  
-    .form-label {
-      font-size: 1.1rem;
-    }
-  
-    .hoc-vien-dropdown {
-      width: 300px;
-  
-      select {
+
+  .hoc-sinh-dropdown-wrapper {
+    position: relative;
+    min-width: 240px;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .lop-select-display {
+    border: 1px solid #ccc;
+    padding: 6px 12px;
+    border-radius: 4px;
+    background-color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 38px;
+  }
+
+  .lop-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    width: 100%;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+    .search-box {
+      padding: 8px;
+
+      input {
         width: 100%;
       }
     }
+
+    .select-options {
+      max-height: 200px;
+      overflow-y: auto;
+    }
   }
-  
+}
