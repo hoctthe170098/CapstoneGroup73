@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using System.ComponentModel;
 using Microsoft.AspNetCore.Http;
 using StudyFlow.Domain.Entities;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace StudyFlow.Application.LichHocs.Commands.EditLichHoc;
 
@@ -31,15 +32,18 @@ public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Out
     public async Task<Output> Handle(EditLichHocCommand request, CancellationToken cancellationToken)
     {
         var daBatDau = await _context.LichHocs
-            .AnyAsync(lh => lh.NgayBatDau >= DateOnly.FromDateTime(DateTime.Now));
+            .AnyAsync(lh => lh.TenLop == request.LopHocDto.TenLop && lh.TrangThai == "Cố định" && lh.NgayBatDau <= DateOnly.FromDateTime(DateTime.Now));
         if(daBatDau)
         {
-            foreach(var lh in request.LopHocDto.LichHocs)
+            var lichHocCu = _context.LichHocs
+            .Where(lh => lh.TenLop == request.LopHocDto.TenLop 
+            && lh.TrangThai !="Dạy bù"
+            && lh.TrangThai != "Dạy thay")
+            .ToList();
+            foreach (var lh in lichHocCu)
             {
-                if (lh.Id == null) break;
-                var lichHocData = await _context.LichHocs.FirstAsync(lh=>lh.Id==lh.Id);
-                lichHocData.PhongId = lh.PhongId;
-                await _context.SaveChangesAsync(cancellationToken);
+                var lichHocData = request.LopHocDto.LichHocs.First(l=>l.Id==lh.Id);
+                lh.PhongId = lichHocData.PhongId;
                 var thamGiaCanXoaOrUpdate = _context.ThamGiaLopHocs
                    .Where(tg => tg.LichHocId == lh.Id && !request.LopHocDto.HocSinhCodes
                                                                      .Contains(tg.HocSinhCode))
@@ -49,12 +53,12 @@ public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Out
                     if(await _context.DiemDanhs.AnyAsync(dh => dh.ThamGiaLopHocId == thamGia.Id))
                     {
                         thamGia.NgayKetThuc = DateOnly.FromDateTime(DateTime.Now);
+                        thamGia.TrangThai = lh.TrangThai;
                     }
                     else
                     {
                         _context.ThamGiaLopHocs.Remove(thamGia);
                     }
-                    await _context.SaveChangesAsync(cancellationToken);
                 }
                 var codeHocSinhCanThem = request.LopHocDto.HocSinhCodes
                     .Where(hs => !_context.ThamGiaLopHocs
@@ -64,19 +68,28 @@ public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Out
                     .ToList();
                 foreach (var code in codeHocSinhCanThem)
                 {
-                    var thamGiaLopHoc = new ThamGiaLopHoc
+                    var thamGiaLopHocCu = _context.ThamGiaLopHocs
+                        .FirstOrDefault(tg=>tg.HocSinhCode==code&&tg.LichHocId==lh.Id);
+                    if(thamGiaLopHocCu != null)
                     {
-                        Id = Guid.NewGuid(),
-                        HocSinhCode = code,
-                        LichHocId = (Guid)lh.Id,
-                        NgayBatDau = DateOnly.FromDateTime(DateTime.Now),
-                        NgayKetThuc = request.LopHocDto.NgayKetThuc,
-                        TrangThai = "Cố định"
-                    };
-                    _context.ThamGiaLopHocs.Add(thamGiaLopHoc);
-                    await _context.SaveChangesAsync(cancellationToken);
+                        thamGiaLopHocCu.NgayKetThuc = lh.NgayKetThuc;
+                    }
+                    else
+                    {
+                        var thamGiaLopHoc = new ThamGiaLopHoc
+                        {
+                            Id = Guid.NewGuid(),
+                            HocSinhCode = code,
+                            LichHocId = (Guid)lh.Id,
+                            NgayBatDau = DateOnly.FromDateTime(DateTime.Now),
+                            NgayKetThuc = request.LopHocDto.NgayKetThuc,
+                            TrangThai = lh.TrangThai
+                        };
+                        _context.ThamGiaLopHocs.Add(thamGiaLopHoc);
+                    }
                 }
             }
+            await _context.SaveChangesAsync(cancellationToken);
         }
         else
         {

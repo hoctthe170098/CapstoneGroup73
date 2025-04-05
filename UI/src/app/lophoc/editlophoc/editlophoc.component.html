@@ -4,69 +4,67 @@
   <div class="card shadow-sm">
     <div class="card-body">
       <form [formGroup]="editLopForm" (ngSubmit)="onSubmit()">
+        <!-- Tên lớp & chương trình -->
         <div class="row">
-          <!-- Tên lớp -->
           <div class="col-md-6">
             <div class="form-group">
-              <label for="tenLop">Tên Lớp</label>
-              <input type="text" class="form-control" [value]="editLopForm.get('tenLop')?.value" readonly />
-
+              <label for="tenLop">Tên lớp</label>
+              <input id="tenLop" type="text" class="form-control" formControlName="tenLop"
+       [readonly]="canEditAll" placeholder="Nhập tên lớp" />
             </div>
-            
-            
+           
           </div>
 
-          <!-- Chương trình học -->
           <div class="col-md-6">
             <div class="form-group">
-              <label for="chuongTrinh">Chương Trình Học</label>
-              <input type="text" class="form-control" [value]="editLopForm.get('chuongTrinh')?.value?.tieuDe" readonly />
+              <label for="chuongTrinh">Chương trình học</label>
+            <input type="text" id="chuongTrinh" class="form-control"
+                   [value]="editLopForm.get('chuongTrinh')?.value?.tieuDe"
+                   readonly />
+             
             </div>
           </div>
-
-          
-          
         </div>
 
+        <!-- Học phí, giáo viên, ngày bắt đầu, ngày kết thúc -->
         <div class="row">
-          <!-- Học phí -->
           <div class="col-md-3">
             <div class="form-group">
-              <label for="hocPhi">Học Phí</label>
-              <input type="text" class="form-control" [value]="editLopForm.get('hocPhi')?.value" readonly />
-              
-              
+              <label for="hocPhi">Học phí</label>
+              <input id="hocPhi" type="number" class="form-control" formControlName="hocPhi"
+                [readonly]="canEditAll" />
+
+                          
             </div>
+            
           </div>
 
-          <!-- Giáo viên -->
           <div class="col-md-3">
             <div class="form-group">
-              <label for="giaoVien">Giáo Viên</label>
-              <input type="text" class="form-control" [value]="editLopForm.get('giaoVien')?.value?.codeTen" readonly />
+              <label for="giaoVien">Giáo viên</label>
+              <input id="giaoVien" type="text" class="form-control"
+                     [value]="editLopForm.get('giaoVien')?.value?.codeTen"
+                     readonly />
+            </div>
+          </div>
+          
+
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="ngayBatDau">Ngày bắt đầu</label>
+              <input id="ngayBatDau" type="date" class="form-control" formControlName="ngayBatDau"
+                readonly/>
 
              
             </div>
           </div>
 
-          <!-- Ngày bắt đầu -->
           <div class="col-md-3">
             <div class="form-group">
-              <label for="ngayBatDau">Ngày Bắt Đầu</label>
-              <input type="date" class="form-control" [value]="editLopForm.get('ngayBatDau')?.value" readonly />
-
-
-              
-            </div>
-           
-          </div>
-
-          <!-- Ngày kết thúc -->
-          <div class="col-md-3">
-            <div class="form-group">
-              <label for="ngayKetThuc">Ngày Kết Thúc</label>
-              <input type="date" class="form-control" [value]="editLopForm.get('ngayKetThuc')?.value" readonly />
-              
+              <label for="ngayKetThuc">Ngày kết thúc</label>
+              <input id="ngayKetThuc" type="date" class="form-control" formControlName="ngayKetThuc"
+                     readonly />
+                    
             </div>
           </div>
         </div>
@@ -79,12 +77,9 @@
         <div formArrayName="lichHoc">
           <div class="form-group row align-items-center" *ngFor="let schedule of lichHoc.controls; let i = index" [formGroupName]="i">
             <div class="col-md-3 mb-2">
-              <label for="Chonthutrongtuan">Thứ trong tuần</label>
-              <input type="text" class="form-control" [value]="'Thứ ' + schedule.get('thu')?.value" readonly />
-
-              <!-- <select class="form-control" formControlName="thu">
-                
-                <option value="" selected>Chọn thứ trong tuần</option>
+              <label>Thứ trong tuần</label>
+              <select class="form-control" formControlName="thu" [disabled]="!canEditAll">
+                <option value="">Chọn thứ trong tuần</option>
                 <option value="2">Thứ hai</option>
                 <option value="3">Thứ ba</option>
                 <option value="4">Thứ tư</option>
@@ -92,43 +87,103 @@
                 <option value="6">Thứ sáu</option>
                 <option value="7">Thứ bảy</option>
                 <option value="8">Chủ nhật</option>
-              </select> -->
-              
+              </select>
+              <small class="text-danger"
+                *ngIf="schedule.get('thu').touched && schedule.get('thu').hasError('required')">
+                Vui lòng chọn thứ trong tuần!
+              </small>
             </div>
 
             <div class="col-md-2 mb-2">
-              <label for="gioBatDau">Giờ bắt đầu</label>
-              <input type="time" class="form-control" [value]="schedule.get('gioBatDau')?.value" readonly />
-              
+              <label>Giờ bắt đầu</label>
+              <input type="time" class="form-control" formControlName="gioBatDau" [readonly]="!canEditAll" />
+              <small class="text-danger"
+                *ngIf="schedule.get('gioBatDau').touched && schedule.get('gioBatDau').hasError('required')">
+                Vui lòng chọn giờ bắt đầu!
+              </small>
+              <small class="text-danger" *ngIf="schedule.get('gioBatDau').hasError('invalidStartTime')">
+                Giờ bắt đầu phải từ 08:00 sáng trở đi!
+              </small>
             </div>
 
             <div class="col-md-2 mb-2">
-              <label for="gioKetThuc">Giờ kết thúc</label>
-              <input type="time" class="form-control" [value]="schedule.get('gioKetThuc')?.value" readonly />
-              
+              <label>Giờ kết thúc</label>
+              <input type="time" class="form-control" formControlName="gioKetThuc" [readonly]="!canEditAll" />
+              <small class="text-danger"
+              *ngIf="schedule.get('gioKetThuc').touched && schedule.get('gioKetThuc').hasError('required')">
+              Vui lòng chọn giờ kết thúc!
+            </small>
+            <small class="text-danger" *ngIf="schedule.get('gioKetThuc').hasError('invalidEndTime')">
+              Giờ kết thúc không được sau 10:00 tối!
+            </small>
             </div>
-            <!-- Phòng -->
-          <div class="col-md-2 mb-2">
-            
-              <label for="phong">Phòng</label>
-              <input type="text" class="form-control" [value]="schedule.get('phong')?.value?.ten" readonly />
 
-              
-              
-            
+            <div class="col-md-3 mb-2">
+              <label>Phòng</label>
+              <select class="form-control" formControlName="phong">
+                <option [ngValue]="null">Chọn phòng</option>
+                <option *ngFor="let p of phongList" [ngValue]="p">{{ p.ten }}</option>
+              </select>
+              <small class="text-danger"
+              *ngIf="schedule.get('phong').touched && schedule.get('phong').hasError('required')">
+              Vui lòng chọn phòng học!
+            </small>
+            </div>
+
+            <div class="col-md-2 mb-2 d-flex align-items-center justify-content-center" *ngIf="canEditAll">
+              <button type="button" class="btn btn-danger" (click)="removeSchedule(i)">-</button>
+            </div>
           </div>
-            
 
-            
+          <button type="button" class="btn btn-primary mt-2" (click)="addSchedule()" *ngIf="canEditAll">+</button>
         </div>
 
-          
+        <!-- Danh sách học viên -->
+        <div class="mt-4">
+          <div class="hoc-vien-header d-flex align-items-center gap-3">
+            <label class="form-label fw-bold mb-0">Danh Sách Học Viên</label>
+            <div class="hoc-vien-dropdown" *ngIf="hocSinhDropdownList.length > 0">
+              <select id="hocSinhDropdown" class="form-control" (change)="onSelectHocSinh($event.target.value)">
+                <option [value]="''" disabled selected>Chọn học viên để thêm</option>
+                <option *ngFor="let hs of hocSinhDropdownList" [value]="hs.code">
+                  {{ hs.code }} - {{ hs.ten }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <table class="table table-bordered table-hover mt-2">
+            <thead class="table-light">
+              <tr>
+                <th>Code</th>
+                <th>Tên</th>
+                <th>Giới tính</th>
+                <th>Ngày sinh</th>
+                <th>Email</th>
+                <th>SĐT</th>
+                <th *ngIf="true">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let hv of hocVienList; let i = index">
+                <td>{{ hv.code }}</td>
+                <td>{{ hv.ten }}</td>
+                <td>{{ hv.gioiTinh }}</td>
+                <td>{{ hv.ngaySinh | date: 'dd-MM-yyyy' }}</td>
+                <td>{{ hv.email }}</td>
+                <td>{{ hv.soDienThoai }}</td>
+                <td>
+                  <button type="button" class="btn btn-sm btn-danger ft-x" (click)="removeHocVien(i)"></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        <!-- Nút Hủy & Xác Nhận -->
+        <!-- Buttons -->
         <div class="d-flex justify-content-end mt-4">
-          <button class="btn btn-danger ms-2" (click)="onCancel()">Hủy</button>
-          <button class="btn btn-success" type="submit">Xác Nhận</button>
+          <button class="btn btn-secondary me-2" type="button" (click)="onCancel()">Hủy</button>
+          <button type="submit" class="btn btn-success" [disabled]="!isEditable">Xác nhận</button>
+
         </div>
       </form>
     </div>

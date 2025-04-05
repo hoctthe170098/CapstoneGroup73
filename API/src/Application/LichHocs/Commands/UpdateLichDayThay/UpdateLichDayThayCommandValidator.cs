@@ -43,11 +43,18 @@ public class UpdateLichDayThayCommandValidator : AbstractValidator<UpdateLichDay
             .WithMessage("Lớp đã có lịch dạy thay vào ngày này.")
             .MustAsync(KhongTrungNgayKiemTra)
             .WithMessage("Lớp có bài kiểm tra vào ngày này, không thể đổi giáo viên dạy thay.")
+            .MustAsync(KhongTrungNgayNghi)
+            .WithMessage("Lớp đã được nghỉ vào ngày này")
             .MustAsync(KhongTrungLichGiaoVien)
             .WithMessage("Giáo viên dạy thay bị trùng lịch" +
             "(lưu ý: giữa 2 slot của lớp phải có ít nhất 15 phút nghỉ).");
     }
-
+    private async Task<bool> KhongTrungNgayNghi(UpdateLichDayThayCommand command,
+        DateOnly ngayDay, CancellationToken token)
+    {
+        return !await _context.LichHocs.AnyAsync(lh => lh.TrangThai == "Dạy bù"
+        && lh.TenLop == command.TenLop && lh.NgayHocGoc == ngayDay);
+    }
     private bool SauHomNay(DateOnly ngayDay)
     {
         if (ngayDay <= DateOnly.FromDateTime(DateTime.Now)) return false;
@@ -77,23 +84,25 @@ public class UpdateLichDayThayCommandValidator : AbstractValidator<UpdateLichDay
         if (lichDinhDoi == null) return false;
         var lichGiaoVienDayThay =  _context.LichHocs
             .Where(lh=>lh.Id!=command.Id&&lh.GiaoVienCode==command.GiaoVienCode)
-            .Select(l => new {
-                l.GiaoVienCode,
-                l.PhongId,
-                l.GioBatDau,
-                l.GioKetThuc,
-                l.Thu,
-                l.NgayBatDau,
-                l.NgayKetThuc
-            })
             .ToList();
-            var checkThuAndPhong = lichGiaoVienDayThay
-                .Any(lh => lh.Thu == lichDinhDoi.Thu
-                && TinhNgayBuoiHocCuoiCung(lh.NgayKetThuc, lh.Thu) >= command.NgayDay
-                && !(lh.GioKetThuc <= lichDinhDoi.GioBatDau.AddMinutes(-15)
-                || lh.GioBatDau >= lichDinhDoi.GioKetThuc.AddMinutes(15)));
-            if (checkThuAndPhong) return false;
+        var checkLichGiaoVien = lichGiaoVienDayThay
+            .Any(lh => lh.Thu == lichDinhDoi.Thu && ngayNghi(lh.Id) != command.NgayDay
+            && ((TinhNgayBuoiHocCuoiCung(lh.NgayKetThuc, lh.Thu) >= command.NgayDay
+                && lh.TrangThai == "Cố định")
+               || ((lh.TrangThai == "Dạy bù" || lh.TrangThai == "Dạy thay") && lh.NgayKetThuc == command.NgayDay))
+            && !(lh.GioKetThuc <= lichDinhDoi.GioBatDau.AddMinutes(-15)
+            || lh.GioBatDau >= lichDinhDoi.GioKetThuc.AddMinutes(15)));
+        if (checkLichGiaoVien) return false;
             return true;
+    }
+    private DateOnly? ngayNghi(Guid lichHocId)
+    {
+        var ngayNghi = _context.LichHocs
+            .Where(lh => lh.LichHocGocId == lichHocId && lh.NgayKetThuc == DateOnly.MinValue
+            && lh.TrangThai == "Học bù")
+            .Select(lh => lh.NgayHocGoc)
+            .FirstOrDefault();
+        return ngayNghi;
     }
     private DateOnly TinhNgayBuoiHocCuoiCung(DateOnly ngayKetThuc, int thu)
     {

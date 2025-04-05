@@ -38,104 +38,39 @@ public class EditLichHocCommandValidator : AbstractValidator<EditLichHocCommand>
             .WithMessage("Lớp học phải có ít nhất 3 học sinh")
             .MustAsync(ExistHocSinh)
             .WithMessage("Có học sinh không tồn tại trong cơ sở này")
-            .MustAsync(ValidLichHocHocSinh)
+            .Must(ValidLichHocHocSinh)
             .WithMessage("Có học sinh bị trùng lịch, vui lòng kiểm tra lại (bao gồm cả lịch học bù)");
     }
 
-    private async Task<bool> ValidLichHocHocSinh(EditLichHocCommand command
-        , List<string> hocSinhCodes, CancellationToken cToken)
+    private bool ValidLichHocHocSinh(EditLichHocCommand command
+        , List<string> hocSinhCodes)
     {
         List<string> invalidCodes = new List<string>();
-        //var command = context.InstanceToValidate; // Lấy EditLichHocCommand từ context
-        var lichHocDtos = command.LopHocDto.LichHocs; // Lấy danh sách lịch học mới
-        var ngayBatDauLop = command.LopHocDto.NgayBatDau;
-        var ngayKetThucLop = command.LopHocDto.NgayKetThuc;
-
-        // Bước 1: Lấy tất cả lịch học hiện tại của các học sinh trong hocSinhCodes
-        var thamGiaLopHocs = await _context.ThamGiaLopHocs
-            .Include(tg => tg.LichHoc)
-            .Where(tg => hocSinhCodes.Contains(tg.HocSinhCode))
-            .ToListAsync(cToken);
-
-        // Bước 2: Kiểm tra từng học sinh
-        foreach (var hocSinhCode in hocSinhCodes)
+        var lichHocMois = command.LopHocDto.LichHocs;
+        var lichHocCu = _context.LichHocs
+            .Where(lh=>lh.TenLop == command.LopHocDto.TenLop 
+            && lh.NgayKetThuc!= DateOnly.MinValue 
+            && lh.TrangThai!="Dạy thay")
+            .Select(lh=>lh.Id)
+            .ToList();
+        foreach(var hs in command.LopHocDto.HocSinhCodes )
         {
-            // Lấy tất cả lịch học hiện tại của học sinh này
-            var lichHocHienTais = thamGiaLopHocs
-                .Where(tg => tg.HocSinhCode == hocSinhCode)
-                .Select(tg => new
-                {
-                    LichHoc = tg.LichHoc,
-                    NgayBatDauThamGia = tg.NgayBatDau,
-                    NgayKetThucThamGia = tg.NgayKetThuc
-                })
+            var lichHocHocSinhHienTai = _context.ThamGiaLopHocs
+                .Where(tg => tg.HocSinhCode == hs && !lichHocCu.Contains(tg.LichHoc.Id))
+                .Select(tg => tg.LichHoc)
+                .Distinct()
                 .ToList();
-
-            // Bước 3: So sánh với từng lịch học mới trong LichHocDtos
-            foreach (var lichHocDto in lichHocDtos)
+            foreach(var lichHocMoi in lichHocMois)
             {
-                var gioBatDauMoi = TimeOnly.Parse(lichHocDto.GioBatDau);
-                var gioKetThucMoi = TimeOnly.Parse(lichHocDto.GioKetThuc);
-                var thuMoi = lichHocDto.Thu;
-
-                foreach (var lichHocHienTai in lichHocHienTais)
+                var checkLichSinhVien = lichHocHocSinhHienTai
+                    .Any(lh => lh.Thu == lichHocMoi.Thu
+                    && !(lh.GioKetThuc <= TimeOnly.Parse(lichHocMoi.GioBatDau).AddMinutes(-15)
+                || lh.GioBatDau >= TimeOnly.Parse(lichHocMoi.GioKetThuc).AddMinutes(15)) 
+                && TinhNgayBuoiHocCuoiCung(lh.NgayKetThuc, lh.Thu) >= command.LopHocDto.NgayBatDau);
+                if(checkLichSinhVien)
                 {
-                    var lichHoc = lichHocHienTai.LichHoc;
-                    var ngayBatDauHienTai = lichHoc.NgayBatDau > lichHocHienTai.NgayBatDauThamGia 
-                        ? lichHoc.NgayBatDau : lichHocHienTai.NgayBatDauThamGia;
-                    var ngayKetThucHienTai = lichHoc.NgayKetThuc < lichHocHienTai.NgayKetThucThamGia 
-                        ? lichHoc.NgayKetThuc : lichHocHienTai.NgayKetThucThamGia;
-
-                    // Kiểm tra xem hai lịch học có giao nhau về khoảng ngày không
-                    if (ngayKetThucHienTai < ngayBatDauLop || ngayBatDauHienTai > ngayKetThucLop)
-                    {
-                        continue; // Không giao nhau về khoảng ngày, bỏ qua
-                    }
-
-                    // Kiểm tra xem hai lịch học có cùng ngày (cùng thứ) không
-                    if (lichHoc.Thu != thuMoi)
-                    {
-                        continue; // Không cùng thứ, không cần kiểm tra
-                    }
-
-                    // So sánh thời gian
-                    var gioBatDauHienTai = lichHoc.GioBatDau;
-                    var gioKetThucHienTai = lichHoc.GioKetThuc;
-
-                    // Kiểm tra giao nhau về thời gian
-                    if (gioBatDauMoi < gioKetThucHienTai && gioKetThucMoi > gioBatDauHienTai)
-                    {
-                        invalidCodes.Add(hocSinhCode);
-                        break; // Đã trùng lịch, không cần kiểm tra thêm
-                    }
-
-                    // Kiểm tra khoảng nghỉ 15 phút
-                    var thoiGianNghi = TimeSpan.FromMinutes(15);
-                    if (gioKetThucMoi <= gioBatDauHienTai)
-                    {
-                        // Lịch mới kết thúc trước lịch hiện tại
-                        var thoiGianNghiThucTe = gioBatDauHienTai.ToTimeSpan() - gioKetThucMoi.ToTimeSpan();
-                        if (thoiGianNghiThucTe < thoiGianNghi)
-                        {
-                            invalidCodes.Add(hocSinhCode);
-                            break;
-                        }
-                    }
-                    else if (gioKetThucHienTai <= gioBatDauMoi)
-                    {
-                        // Lịch hiện tại kết thúc trước lịch mới
-                        var thoiGianNghiThucTe = gioBatDauMoi.ToTimeSpan() - gioKetThucHienTai.ToTimeSpan();
-                        if (thoiGianNghiThucTe < thoiGianNghi)
-                        {
-                            invalidCodes.Add(hocSinhCode);
-                            break;
-                        }
-                    }
-                }
-
-                if (invalidCodes.Contains(hocSinhCode))
-                {
-                    break; // Đã tìm thấy trùng lịch, không cần kiểm tra thêm lịch mới
+                    invalidCodes.Add(hs);
+                    break;
                 }
             }
         }
@@ -151,8 +86,10 @@ public class EditLichHocCommandValidator : AbstractValidator<EditLichHocCommand>
         var coSoId = _identityService.GetCampusId(token);
         foreach (var item in list)
         {
-            var exist = await _context.HocSinhs.AnyAsync(hs => hs.Code == item && hs.CoSoId == coSoId);
-            if(!exist) return false;
+            var hocSinh = await _context.HocSinhs.FirstOrDefaultAsync(hs => hs.Code == item && hs.CoSoId == coSoId);
+            if (hocSinh==null) return false;
+            var active = await _identityService.IsUserActiveAsync(hocSinh.UserId!);
+            if(!active) return false;
         }
         return true;
     }
@@ -166,18 +103,22 @@ public class EditLichHocCommandValidator : AbstractValidator<EditLichHocCommand>
         List<LichHocDto> lichHocs, CancellationToken token)
     {
         var daBatDau = await _context.LichHocs
-            .AnyAsync(lh => lh.NgayBatDau >= DateOnly.FromDateTime(DateTime.Now));
+                    .AnyAsync(lh => lh.TenLop == command.LopHocDto.TenLop && lh.TrangThai == "Cố định"
+                  && lh.NgayBatDau <= DateOnly.FromDateTime(DateTime.Now));
+
         var lichHocHienTais = await _context.LichHocs
                  .Where(lh => lh.TenLop == command.LopHocDto.TenLop)
-                 .Select(lh => lh.Id)
                  .ToListAsync();
         if (daBatDau)
         {
             foreach (var lh in lichHocs)
             {
                 if (lh.Id == null) return false;
-                else
-                    if (!lichHocHienTais.Contains((Guid)lh.Id)) return false;
+                var lichHoc = lichHocHienTais.FirstOrDefault(l => l.Id == lh.Id);
+                if(lichHoc == null) return false;
+                if(lh.Thu!=lichHoc.Thu
+                    ||TimeOnly.Parse(lh.GioBatDau)!=lichHoc.GioBatDau
+                    ||TimeOnly.Parse(lh.GioKetThuc)!=lichHoc.GioKetThuc) return false;
             }
         }
         return true;
@@ -228,7 +169,10 @@ public class EditLichHocCommandValidator : AbstractValidator<EditLichHocCommand>
                 }
             }
             var lichHocData = await _context.LichHocs
-                .Where(lh=>!lichHocHienTais.Contains(lh.Id)&& lh.Phong.CoSoId == coSoId)
+                .Where(lh=>!lichHocHienTais.Contains(lh.Id)
+                && lh.Phong.CoSoId == coSoId
+                &&lh.TrangThai!="Dạy thay"
+                &&lh.NgayKetThuc!=DateOnly.MinValue)
                 .Select(l => new {
                     l.GiaoVienCode,
                     l.PhongId,
