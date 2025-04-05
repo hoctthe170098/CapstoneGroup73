@@ -57,7 +57,7 @@ export class LoginPageComponent {
         }else if(role==UserRole.LearningManager){
           this.router.navigate(['/chuongtrinh']);
         }else{
-          this.router.navigate(['/coso']);
+          this.router.navigate(['/lopdangday']);
         }
           this.toastr.success(res.message, 'Thành công');
         } else {
