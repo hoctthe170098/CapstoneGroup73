@@ -20,7 +20,9 @@ public class UpdateBaiTapCommandValidator : AbstractValidator<UpdateBaiTapComman
 
         RuleFor(x => x.UpdateBaiTapDto.TrangThai)
             .NotEmpty().WithMessage("Trạng thái không được để trống.")
-            .MaximumLength(10).WithMessage("Trạng thái tối đa 10 ký tự.");
+            .MaximumLength(10).WithMessage("Trạng thái tối đa 10 ký tự.")
+            .Must(BeAllowedStatus)
+            .WithMessage("Trạng thái không hợp lệ (chỉ chấp nhận: 'Đang mở', 'Đã đóng', 'Tạm dừng').");
 
         RuleFor(x => x.UpdateBaiTapDto.UrlFile)
             .MaximumLength(200).WithMessage("Đường dẫn file tối đa 200 ký tự.")
@@ -47,5 +49,11 @@ public class UpdateBaiTapCommandValidator : AbstractValidator<UpdateBaiTapComman
     private bool BeFutureTime(DateTime? time)
     {
         return time.HasValue && time.Value > DateTime.UtcNow;
+    }
+
+    private bool BeAllowedStatus(string trangThai)
+    {
+        var allowed = new[] { "Chưa mở", "Đang Mở", "Kết Thúc" };
+        return allowed.Contains(trangThai.Trim(), StringComparer.OrdinalIgnoreCase);
     }
 }

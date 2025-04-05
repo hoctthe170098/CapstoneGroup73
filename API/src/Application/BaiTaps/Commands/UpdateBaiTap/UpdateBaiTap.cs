@@ -17,22 +17,47 @@ public class UpdateBaiTapCommandHandler : IRequestHandler<UpdateBaiTapCommand, O
 {
     private readonly IApplicationDbContext _context;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IIdentityService _identityService;
 
-    public UpdateBaiTapCommandHandler(IApplicationDbContext context,IHttpContextAccessor httpContextAccessor)
+    public UpdateBaiTapCommandHandler(
+        IApplicationDbContext context,
+        IHttpContextAccessor httpContextAccessor,
+        IIdentityService identityService)
     {
         _context = context;
         _httpContextAccessor = httpContextAccessor;
+        _identityService = identityService;
     }
 
     public async Task<Output> Handle(UpdateBaiTapCommand request, CancellationToken cancellationToken)
     {
+        //  Lấy token
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+
+        var giaoVienId = _identityService.GetUserId(token);
         var dto = request.UpdateBaiTapDto;
 
+        //  Tìm bài tập và kiểm tra quyền sở hữu
         var baiTap = await _context.BaiTaps
-            .FirstOrDefaultAsync(x => x.Id == dto.Id, cancellationToken);
+            .Include(bt => bt.LichHoc)
+            .ThenInclude(lh => lh.GiaoVien)
+            .FirstOrDefaultAsync(bt => bt.Id == dto.Id, cancellationToken);
 
         if (baiTap == null)
             throw new NotFoundDataException("Không tìm thấy bài tập.");
+
+        if (baiTap.LichHoc.GiaoVien.UserId != giaoVienId.ToString())
+            throw new UnauthorizedAccessException("Bạn không có quyền chỉnh sửa bài tập này.");
+
+        //  Trạng thái chỉ được phép: "Đang mở" hoặc "Chưa mở"
+        var allowedStatuses = new[] { "Đang mở", "Chưa mở" };
+        if (!string.IsNullOrWhiteSpace(dto.TrangThai) &&
+            !allowedStatuses.Contains(dto.TrangThai.Trim(), StringComparer.OrdinalIgnoreCase))
+        {
+            throw new WrongInputException("Trạng thái không hợp lệ. Chỉ được phép 'Đang mở' hoặc 'Chưa mở'.");
+        }
 
         baiTap.TieuDe = dto.TieuDe;
         baiTap.NoiDung = dto.NoiDung;
@@ -42,13 +67,9 @@ public class UpdateBaiTapCommandHandler : IRequestHandler<UpdateBaiTapCommand, O
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        var giaoVienCode = GetCurrentUserCode();
-        if (string.IsNullOrWhiteSpace(giaoVienCode))
-            throw new UnauthorizedAccessException("Không xác định được giáo viên từ token.");
-
         var lichHocs = await _context.LichHocs
             .AsNoTracking()
-            .Where(lh => lh.GiaoVienCode == giaoVienCode)
+            .Where(lh => lh.GiaoVien.UserId == giaoVienId.ToString())
             .Select(lh => new LichHocDropdownDto
             {
                 Id = lh.Id,
@@ -67,14 +88,7 @@ public class UpdateBaiTapCommandHandler : IRequestHandler<UpdateBaiTapCommand, O
             isError = false,
             code = 200,
             data = response,
-            message = "Cập nhật bài tập thành công ."
+            message = "Cập nhật bài tập thành công."
         };
-    }
-
-    private string? GetCurrentUserCode()
-    {
-        var user = _httpContextAccessor.HttpContext?.User;
-        return user?.FindFirst(ClaimTypes.NameIdentifier)?.Value
-            ?? user?.FindFirst("sub")?.Value;
     }
 }
