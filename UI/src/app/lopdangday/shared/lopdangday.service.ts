@@ -29,13 +29,13 @@ export class LopdangdayService {
     );
   }
 
-  getDanhSachHocSinhLop(id: string): Observable<any> {
+  getDanhSachHocSinhLop(tenLop: string): Observable<any> {
     const token = localStorage.getItem("token");
     const headers = new HttpHeaders()
       .set("Authorization", `Bearer ${token}`);
      
     const body = {
-      id
+      tenLop
     };
 
     return this.http.post<any>(

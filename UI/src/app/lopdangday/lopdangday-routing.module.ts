@@ -14,13 +14,14 @@ const routes: Routes = [
       title: "lopdangday",
     },
   },
+
   { path: "baitap", component: BaitapComponent },
   { path: "danhsachhocsinh", component: DanhsachhocsinhComponent },
   { path: "diemdanh", component: DiemdanhComponent },
   { path: "lichkiemtra", component: LichkiemtraComponent },
 
   {
-    path: "chi-tiet/:id",
+    path: "chi-tiet/:tenLop",
     component: ChiTietComponent,
     children: [
       { path: "", redirectTo: "danhsachhocsinh", pathMatch: "full" },
