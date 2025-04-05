@@ -264,14 +264,14 @@
             </div>
 
             <!-- LỊCH ĐÃ NGHỈ -->
-            <div *ngIf="lop.lichNghi?.length">
-              <p><strong style="color: red">Lịch đã nghỉ:</strong></p>
+            <div *ngIf="lop.ngayNghis?.length">
+              <p><strong style="color: #097969">Lịch đã nghỉ:</strong></p>
               <ul>
-                <li *ngFor="let lh of lop.lichNghi">
-                  {{ lh.ngayBatDau | date : "dd/MM/yyyy" }} |
-                  {{ lh.gioBatDau?.substring(0, 5) }} -
-                  {{ lh.gioKetThuc?.substring(0, 5) }} | phòng:
-                  {{ lh.tenPhong }}
+                <li *ngFor="let nn of lop.ngayNghis">
+                  Ngày {{ nn.ngay | date: "dd/MM/yyyy" }} :
+                  <span [ngStyle]="{ color: nn.trangThai === 'Đã bù' ? 'green' : 'red' }">
+                    {{ nn.trangThai }}
+                  </span>
                 </li>
               </ul>
             </div>
@@ -283,7 +283,7 @@
               <strong>Ngày kết thúc:</strong>
               {{ lop.ngayKetThuc | date : "dd/MM/yyyy" }}
             </p>
-            <!-- Nút + và menu ẩn/hiện -->
+            
             <div
               class="action-plus-wrapper"
               (click)="toggleActionMenu(i, $event)"

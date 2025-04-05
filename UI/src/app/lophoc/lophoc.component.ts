@@ -232,25 +232,29 @@ editFilteredGiaoVienOptions: any[] = [];
         }
       });
     } else if (this.newSchedule.loaiLich === 'Dạy bù') {
-      const payload = {
+      const payload: any = {
         tenLop: this.newSchedule.lop?.tenLop,
-        ngayNghi: this.newSchedule.ngayNghi,
-        lichDayBu: {
+        ngayNghi: this.newSchedule.ngayNghi
+      };
+    
+      // Nếu người dùng nhập thêm lịch học bù
+      if (this.newSchedule.ngay && this.newSchedule.phong && this.newSchedule.batDau && this.newSchedule.ketThuc) {
+        payload.lichDayBu = {
           ngayHocBu: this.newSchedule.ngay,
           phongId: this.newSchedule.phong,
           gioBatDau: this.newSchedule.batDau,
           gioKetThuc: this.newSchedule.ketThuc
-        }
-      };
+        };
+      }
     
       this.lophocService.createLichDayBu(payload).subscribe({
         next: (res) => {
           if (!res.isError) {
-            this.toastr.success(res.message || 'Thêm lịch dạy bù thành công!');
+            this.toastr.success(res.message || 'Tạo lịch dạy bù thành công!');
             this.closeAddScheduleModal();
-            this.loadLopHocs(); 
+            this.loadLopHocs();
           } else {
-            this.toastr.error(res.message || 'Thêm lịch dạy bù thất bại!');
+            this.toastr.error(res.message || 'Tạo lịch dạy bù thất bại!');
           }
         },
         error: (err) => {
@@ -396,7 +400,8 @@ editFilteredGiaoVienOptions: any[] = [];
                 giaoVienCode: lh.giaoVienCode || '',
                 tenGiaoVien: lh.tenGiaoVien || ''
               })),
-              lichNghi: daNghi.map((lh: any) => ({ ...lh }))
+              lichNghi: daNghi.map((lh: any) => ({ ...lh })),
+  ngayNghis: item.ngayNghis || []
             };
           });
   
@@ -452,8 +457,31 @@ editFilteredGiaoVienOptions: any[] = [];
   
   
   onDeleteLichDayThay(lich: any) {
-    console.log(" Xóa lịch dạy thay:", lich);
+    if (!lich?.id) {
+      this.toastr.error("Không tìm thấy ID của lịch học để xóa!");
+      return;
+    }
+  
+    if (!confirm("Bạn có chắc chắn muốn xóa lịch dạy thay này?")) {
+      return;
+    }
+  
+    this.lophocService.deleteLichDayThay(lich.id).subscribe({
+      next: (res) => {
+        if (!res.isError) {
+          this.toastr.success(res.message || 'Xóa lịch dạy thay thành công!');
+          this.loadLopHocs(); // refresh lại danh sách
+        } else {
+          this.toastr.error(res.message || 'Xóa lịch dạy thay thất bại!');
+        }
+      },
+      error: (err) => {
+        console.error("Lỗi khi xóa lịch dạy thay:", err);
+        this.toastr.error("Đã xảy ra lỗi khi xóa lịch dạy thay.");
+      }
+    });
   }
+  
   onEditLichDayThay(lich: any, lop: any) {
     console.log('GVCODE:', lich.giaoVienCode);
   
