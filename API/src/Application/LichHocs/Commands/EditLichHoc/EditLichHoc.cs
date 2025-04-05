@@ -32,7 +32,7 @@ public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Out
     public async Task<Output> Handle(EditLichHocCommand request, CancellationToken cancellationToken)
     {
         var daBatDau = await _context.LichHocs
-            .AnyAsync(lh => lh.NgayBatDau >= DateOnly.FromDateTime(DateTime.Now));
+            .AnyAsync(lh => lh.TenLop == request.LopHocDto.TenLop && lh.TrangThai == "Cố định" && lh.NgayBatDau <= DateOnly.FromDateTime(DateTime.Now));
         if(daBatDau)
         {
             var lichHocCu = _context.LichHocs

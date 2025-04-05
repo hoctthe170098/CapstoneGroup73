@@ -5,7 +5,7 @@ import { LophocRoutingModule } from './lophoc-routing.module';
 import { LophocComponent } from './lophoc.component';
 import { AddlophocComponent } from './addlophoc/addlophoc.component';
 import { EditLopHocComponent } from './editlophoc/editlophoc.component';
-
+import { NgSelectModule } from '@ng-select/ng-select'
 
 @NgModule({
   declarations: [
@@ -14,6 +14,7 @@ import { EditLopHocComponent } from './editlophoc/editlophoc.component';
     EditLopHocComponent
   ],
   imports: [
+    NgSelectModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,

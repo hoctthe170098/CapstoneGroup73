@@ -7,6 +7,7 @@ import {
 } from '@angular/forms';
 import { LophocService } from '../shared/lophoc.service';
 import { Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-edit-lophoc',
@@ -19,7 +20,7 @@ export class EditLopHocComponent implements OnInit {
   giaoVienList: any[] = [];
   phongList: any[] = [];
   hocVienList: any[] = [];
-
+  hocSinhDropdownList: any[] = [];
   canEditAll: boolean = true;
   isEditable: boolean = true;
 
@@ -27,7 +28,8 @@ export class EditLopHocComponent implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private lophocService: LophocService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -38,11 +40,20 @@ export class EditLopHocComponent implements OnInit {
       giaoVien: [null, Validators.required],
       ngayBatDau: ['', [Validators.required, this.validateStartDateAfterToday()]],
       ngayKetThuc: ['', [Validators.required, this.validateEndDate()]],
-      lichHoc: this.fb.array([]),
+      lichHoc: this.fb.array([], this.validateDuplicateDays)
     });
-    
-
+  
     this.loadAllData();
+  
+    // 👇 Thêm đoạn này để load danh sách học viên cho dropdown
+    this.lophocService.searchHocSinh({ searchTen: '' }).subscribe({
+      next: (res) => {
+        this.hocSinhDropdownList = res?.data || [];
+      },
+      error: (err) => {
+        console.error('❌ Lỗi khi tải danh sách học sinh:', err);
+      },
+    });
   }
 
   loadAllData(): void {
@@ -62,25 +73,25 @@ export class EditLopHocComponent implements OnInit {
           next: async (res) => {
             if (res?.data) {
               const today = new Date();
-                    today.setHours(0, 0, 0, 0); // reset về đầu ngày
-
+              today.setHours(0, 0, 0, 0);
+        
               const startDate = new Date(res.data.ngayBatDau);
-                    startDate.setHours(0, 0, 0, 0);
-
+              startDate.setHours(0, 0, 0, 0);
+        
               this.canEditAll = startDate > today;
-
-              this.isEditable = true;
-
+              this.isEditable = true; // ✅ Luôn cho phép submit
+        
               setTimeout(() => {
                 this.patchForm(res.data);
                 this.cdr.detectChanges();
               });
             }
           },
-          error: (err) => {
-            console.error('❌ Không thể tải lớp học theo tên:', err);
+          error: () => {
+            this.toastr.error('Không thể tải lớp học theo tên.');
           },
         });
+        
       }
     });
   }
@@ -88,7 +99,7 @@ export class EditLopHocComponent implements OnInit {
   patchForm(data: any): void {
     const chuongTrinhObj = this.chuongTrinhList.find(ct => ct.id === data.chuongTrinhId);
     const giaoVienObj = this.giaoVienList.find(gv => gv.code === data.giaoVienCode);
-
+  
     this.editLopForm.patchValue({
       tenLop: data.tenLop,
       chuongTrinh: chuongTrinhObj || null,
@@ -97,33 +108,33 @@ export class EditLopHocComponent implements OnInit {
       ngayBatDau: data.ngayBatDau?.substring(0, 10),
       ngayKetThuc: data.ngayKetThuc?.substring(0, 10),
     });
-
+  
     const lichHocArray = this.editLopForm.get('lichHoc') as FormArray;
     lichHocArray.clear();
-
+  
     data.lichHocs.forEach((lich: any) => {
       const phongObj = this.phongList.find(p => p.id === lich.phongId);
+  
       lichHocArray.push(
         this.fb.group({
           id: [lich.id],
-          thu: [lich.thu],
-          gioBatDau: [lich.gioBatDau],
-          gioKetThuc: [lich.gioKetThuc],
-          phong: [phongObj || null],
+          thu: [lich.thu, Validators.required],
+          gioBatDau: [lich.gioBatDau, [Validators.required, this.validateTimeStart]],
+          gioKetThuc: [lich.gioKetThuc, [Validators.required, this.validateTimeEnd]],
+          phong: [phongObj || null, Validators.required],
         })
       );
     });
-
+  
     this.hocVienList = data.hocSinhs || [];
-
-    // Disable fields if cannot edit all
+  
     if (!this.canEditAll) {
       this.editLopForm.get('tenLop')?.disable();
       this.editLopForm.get('chuongTrinh')?.disable();
       this.editLopForm.get('hocPhi')?.disable();
       this.editLopForm.get('giaoVien')?.disable();
       this.editLopForm.get('ngayKetThuc')?.disable();
-
+  
       this.lichHoc.controls.forEach(control => {
         control.get('thu')?.disable();
         control.get('gioBatDau')?.disable();
@@ -131,6 +142,7 @@ export class EditLopHocComponent implements OnInit {
       });
     }
   }
+  
 
   get lichHoc(): FormArray {
     return this.editLopForm.get('lichHoc') as FormArray;
@@ -141,10 +153,8 @@ export class EditLopHocComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (!this.isEditable || this.editLopForm.invalid) {
-      console.warn('⛔ Không thể gửi vì không hợp lệ hoặc không được phép chỉnh sửa.');
-      return;
-    }
+   
+    
   
     const formValue = this.editLopForm.getRawValue();
   
@@ -167,14 +177,18 @@ export class EditLopHocComponent implements OnInit {
       },
     };
   
-    console.log('📦 Payload gửi đi:', payload); // 👉 log ở đây
+   
   
     this.lophocService.editLichHoc(payload).subscribe({
       next: (res) => {
-        console.log('✅ Cập nhật lớp học thành công:', res);
+        if (res?.isError) {
+          this.toastr.error(res.message);
+        } else {
+          this.toastr.success(res.message);
+        }
       },
       error: (err) => {
-        console.error('❌ Lỗi khi cập nhật lớp học:', err);
+        this.toastr.error('Lỗi khi gửi dữ liệu đến máy chủ.');
       },
     });
   }
@@ -212,15 +226,16 @@ export class EditLopHocComponent implements OnInit {
       return inputDate <= today ? { invalidStartDate: true } : null;
     };
   }
+   
 
   addSchedule(): void {
     if (this.canEditAll) {
       const lichHocArray = this.editLopForm.get('lichHoc') as FormArray;
       lichHocArray.push(this.fb.group({
-        thu: [''],
-        gioBatDau: [''],
-        gioKetThuc: [''],
-        phong: [null],
+        thu: ['', Validators.required], // Bắt buộc chọn thứ
+        gioBatDau: ['', [Validators.required, this.validateTimeStart]], // Giờ bắt đầu >= 08:00
+        gioKetThuc: ['', [Validators.required, this.validateTimeEnd]], // Giờ kết thúc <= 22:00
+        phong: [null, Validators.required] // Bắt buộc chọn phòng
       }));
     }
   }
@@ -228,4 +243,35 @@ export class EditLopHocComponent implements OnInit {
     const date = new Date(dateStr);
     return date.toISOString().split('T')[0]; // Trả về dạng yyyy-MM-dd
   }
+  onSelectHocSinh(code: string): void {
+    const selected = this.hocSinhDropdownList.find(hs => hs.code === code);
+    if (selected && !this.hocVienList.find(hv => hv.code === code)) {
+      this.hocVienList.push(selected);
+    }
+  
+    // 👉 Reset dropdown
+    const selectElement = document.getElementById('hocSinhDropdown') as HTMLSelectElement;
+    if (selectElement) {
+      selectElement.value = '';
+    }
+  }
+  validateDuplicateDays(formArray: AbstractControl): { [key: string]: any } | null {
+    const days = formArray.value.map((entry: any) => entry.thu);
+    const hasDuplicates = new Set(days).size !== days.length;
+    return hasDuplicates ? { duplicateDays: true } : null;
+  }
+  validateTimeStart(control: AbstractControl): { [key: string]: any } | null {
+    if (!control.value) return null; // Không validate nếu chưa nhập
+    const startTime = control.value;
+    return startTime < '08:00' ? { invalidStartTime: true } : null;
+  }
+
+  // Validate giờ kết thúc <= 22:00
+  validateTimeEnd(control: AbstractControl): { [key: string]: any } | null {
+    if (!control.value) return null;
+    const endTime = control.value;
+    return endTime > '22:00' ? { invalidEndTime: true } : null;
+  }
+  
+  
 }
