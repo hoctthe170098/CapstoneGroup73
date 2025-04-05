@@ -10,13 +10,7 @@
             <div class="form-group">
               <label for="tenLop">Tên lớp</label>
               <input id="tenLop" type="text" class="form-control" formControlName="tenLop"
-                     [readonly]="!canEditAll" placeholder="Nhập tên lớp" />
-                     <small class="text-danger" *ngIf="editLopForm.get('tenLop')?.touched && editLopForm.get('tenLop')?.hasError('required')">
-                      Tên lớp không được để trống!
-                    </small>
-                    <small class="text-danger" *ngIf="editLopForm.get('tenLop')?.touched && editLopForm.get('tenLop')?.hasError('maxlength')">
-                      Tên lớp không được quá 20 ký tự!
-                    </small>
+       [readonly]="canEditAll" placeholder="Nhập tên lớp" />
             </div>
            
           </div>
@@ -24,13 +18,10 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="chuongTrinh">Chương trình học</label>
-              <select id="chuongTrinh" class="form-control" formControlName="chuongTrinh" [disabled]="!canEditAll">
-                <option [ngValue]="null" disabled>Chọn chương trình học</option>
-                <option *ngFor="let ct of chuongTrinhList" [ngValue]="ct">{{ ct.tieuDe }}</option>
-              </select>
-              <small class="text-danger" *ngIf="editLopForm.get('chuongTrinh')?.touched && editLopForm.get('chuongTrinh')?.hasError('required')">
-                Vui lòng chọn chương trình học!
-              </small>
+            <input type="text" id="chuongTrinh" class="form-control"
+                   [value]="editLopForm.get('chuongTrinh')?.value?.tieuDe"
+                   readonly />
+             
             </div>
           </div>
         </div>
@@ -41,13 +32,9 @@
             <div class="form-group">
               <label for="hocPhi">Học phí</label>
               <input id="hocPhi" type="number" class="form-control" formControlName="hocPhi"
-                     [readonly]="!canEditAll" />
-                     <small class="text-danger" *ngIf="editLopForm.get('hocPhi')?.touched && editLopForm.get('hocPhi')?.hasError('required')">
-                      Học phí không được để trống!
-                    </small>
-                    <small class="text-danger" *ngIf="editLopForm.get('hocPhi')?.touched && editLopForm.get('hocPhi')?.hasError('min')">
-                      Học phí phải lớn hơn hoặc bằng 50.000!
-                    </small>       
+                [readonly]="canEditAll" />
+
+                          
             </div>
             
           </div>
@@ -55,23 +42,20 @@
           <div class="col-md-3">
             <div class="form-group">
               <label for="giaoVien">Giáo viên</label>
-              <select id="giaoVien" class="form-control" formControlName="giaoVien" [disabled]="!canEditAll">
-                <option [ngValue]="null" disabled>Chọn giáo viên</option>
-                <option *ngFor="let gv of giaoVienList" [ngValue]="gv">{{ gv.codeTen }}</option>
-              </select>
-              <small class="text-danger" *ngIf="editLopForm.get('giaoVien')?.touched && editLopForm.get('giaoVien')?.hasError('required')">
-                Vui lòng chọn giáo viên!
-              </small>
+              <input id="giaoVien" type="text" class="form-control"
+                     [value]="editLopForm.get('giaoVien')?.value?.codeTen"
+                     readonly />
             </div>
           </div>
+          
 
           <div class="col-md-3">
             <div class="form-group">
               <label for="ngayBatDau">Ngày bắt đầu</label>
-              <input id="ngayBatDau" type="date" class="form-control" formControlName="ngayBatDau" [readonly]="!canEditAll" />
-              <small class="text-danger" *ngIf="editLopForm.get('ngayBatDau')?.touched && editLopForm.get('ngayBatDau')?.hasError('invalidStartDate')">
-                Ngày bắt đầu phải sau hôm nay!
-              </small>
+              <input id="ngayBatDau" type="date" class="form-control" formControlName="ngayBatDau"
+                readonly/>
+
+             
             </div>
           </div>
 
@@ -79,13 +63,8 @@
             <div class="form-group">
               <label for="ngayKetThuc">Ngày kết thúc</label>
               <input id="ngayKetThuc" type="date" class="form-control" formControlName="ngayKetThuc"
-                     [readonly]="!canEditAll" />
-                     <small class="text-danger" *ngIf="editLopForm.get('ngayKetThuc')?.touched && editLopForm.get('ngayKetThuc')?.hasError('required')">
-                      Vui lòng chọn ngày kết thúc!
-                    </small>
-                    <small class="text-danger" *ngIf="editLopForm.get('ngayKetThuc')?.hasError('invalidEndDate')">
-                      Ngày kết thúc phải sau ít nhất 2 tháng kể từ ngày bắt đầu!
-                    </small>
+                     readonly />
+                    
             </div>
           </div>
         </div>
@@ -109,16 +88,34 @@
                 <option value="7">Thứ bảy</option>
                 <option value="8">Chủ nhật</option>
               </select>
+              <small class="text-danger"
+                *ngIf="schedule.get('thu').touched && schedule.get('thu').hasError('required')">
+                Vui lòng chọn thứ trong tuần!
+              </small>
             </div>
 
             <div class="col-md-2 mb-2">
               <label>Giờ bắt đầu</label>
               <input type="time" class="form-control" formControlName="gioBatDau" [readonly]="!canEditAll" />
+              <small class="text-danger"
+                *ngIf="schedule.get('gioBatDau').touched && schedule.get('gioBatDau').hasError('required')">
+                Vui lòng chọn giờ bắt đầu!
+              </small>
+              <small class="text-danger" *ngIf="schedule.get('gioBatDau').hasError('invalidStartTime')">
+                Giờ bắt đầu phải từ 08:00 sáng trở đi!
+              </small>
             </div>
 
             <div class="col-md-2 mb-2">
               <label>Giờ kết thúc</label>
               <input type="time" class="form-control" formControlName="gioKetThuc" [readonly]="!canEditAll" />
+              <small class="text-danger"
+              *ngIf="schedule.get('gioKetThuc').touched && schedule.get('gioKetThuc').hasError('required')">
+              Vui lòng chọn giờ kết thúc!
+            </small>
+            <small class="text-danger" *ngIf="schedule.get('gioKetThuc').hasError('invalidEndTime')">
+              Giờ kết thúc không được sau 10:00 tối!
+            </small>
             </div>
 
             <div class="col-md-3 mb-2">
@@ -127,6 +124,10 @@
                 <option [ngValue]="null">Chọn phòng</option>
                 <option *ngFor="let p of phongList" [ngValue]="p">{{ p.ten }}</option>
               </select>
+              <small class="text-danger"
+              *ngIf="schedule.get('phong').touched && schedule.get('phong').hasError('required')">
+              Vui lòng chọn phòng học!
+            </small>
             </div>
 
             <div class="col-md-2 mb-2 d-flex align-items-center justify-content-center" *ngIf="canEditAll">
@@ -139,7 +140,17 @@
 
         <!-- Danh sách học viên -->
         <div class="mt-4">
-          <label class="form-label fw-bold">Danh Sách Học Viên</label>
+          <div class="hoc-vien-header d-flex align-items-center gap-3">
+            <label class="form-label fw-bold mb-0">Danh Sách Học Viên</label>
+            <div class="hoc-vien-dropdown" *ngIf="hocSinhDropdownList.length > 0">
+              <select id="hocSinhDropdown" class="form-control" (change)="onSelectHocSinh($event.target.value)">
+                <option [value]="''" disabled selected>Chọn học viên để thêm</option>
+                <option *ngFor="let hs of hocSinhDropdownList" [value]="hs.code">
+                  {{ hs.code }} - {{ hs.ten }}
+                </option>
+              </select>
+            </div>
+          </div>
           <table class="table table-bordered table-hover mt-2">
             <thead class="table-light">
               <tr>
@@ -159,9 +170,9 @@
                 <td>{{ hv.gioiTinh }}</td>
                 <td>{{ hv.ngaySinh | date: 'dd-MM-yyyy' }}</td>
                 <td>{{ hv.email }}</td>
-                <td>{{ hv.sdt }}</td>
+                <td>{{ hv.soDienThoai }}</td>
                 <td>
-                  <button type="button" class="btn btn-sm btn-danger" (click)="removeHocVien(i)">🗑️</button>
+                  <button type="button" class="btn btn-sm btn-danger ft-x" (click)="removeHocVien(i)"></button>
                 </td>
               </tr>
             </tbody>
@@ -171,7 +182,8 @@
         <!-- Buttons -->
         <div class="d-flex justify-content-end mt-4">
           <button class="btn btn-secondary me-2" type="button" (click)="onCancel()">Hủy</button>
-          <button class="btn btn-success" type="submit">Xác nhận</button>
+          <button type="submit" class="btn btn-success" [disabled]="!isEditable">Xác nhận</button>
+
         </div>
       </form>
     </div>

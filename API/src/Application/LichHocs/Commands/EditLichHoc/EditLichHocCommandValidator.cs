@@ -96,14 +96,16 @@ public class EditLichHocCommandValidator : AbstractValidator<EditLichHocCommand>
 
     private bool EnoughHocSinh(List<string> list)
     {
-        return list.Count >= 1;
+        return list.Count >= 3;
     }
 
     private async Task<bool> ChuaBatDau(EditLichHocCommand command, 
         List<LichHocDto> lichHocs, CancellationToken token)
     {
         var daBatDau = await _context.LichHocs
-            .AnyAsync(lh => lh.NgayBatDau <= DateOnly.FromDateTime(DateTime.Now));
+                    .AnyAsync(lh => lh.TenLop == command.LopHocDto.TenLop && lh.TrangThai == "Cố định"
+                  && lh.NgayBatDau <= DateOnly.FromDateTime(DateTime.Now));
+
         var lichHocHienTais = await _context.LichHocs
                  .Where(lh => lh.TenLop == command.LopHocDto.TenLop)
                  .ToListAsync();

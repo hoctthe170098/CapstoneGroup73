@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using StudyFlow.Application.Common.Exceptions;
 using StudyFlow.Application.Common.Interfaces;
 using StudyFlow.Application.Common.Models;
+using StudyFlow.Application.LichHocs.Queries.GetLopHocWithPagination;
 using StudyFlow.Domain.Entities;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
@@ -32,6 +33,10 @@ public record CreateLichDayBuCommand : IRequest<Output>
         var thu = ((int)request.NgayNghi.DayOfWeek > 0)
         ? (int)request.NgayNghi.DayOfWeek + 1
         : (int)request.NgayNghi.DayOfWeek + 8;
+        var lichDayThem = _context.LichHocs
+            .FirstOrDefault(lh => lh.NgayHocGoc == request.NgayNghi && lh.TrangThai == "Dạy thay");
+        if (lichDayThem != null)
+        _context.LichHocs.Remove(lichDayThem);
         var lichHoc = await _context.LichHocs
             .FirstAsync(lh=>lh.Thu == thu&&lh.TenLop==request.TenLop&&lh.TrangThai=="Cố định");
         if (request.LichDayBu == null)
@@ -60,8 +65,7 @@ public record CreateLichDayBuCommand : IRequest<Output>
                 code = 200,
                 isError = false,
                 data = null,
-                message = $"Đã cho nghỉ buổi học ngày {request.NgayNghi.ToString("dd-MM-yyyy")} " +
-                $"của lớp {request.TenLop} thành công."
+                message = "Đã cho nghỉ buổi học thành công."
             };
         }
         else
@@ -83,7 +87,8 @@ public record CreateLichDayBuCommand : IRequest<Output>
                 lichDayBu.NgayBatDau = request.LichDayBu.NgayHocBu;
                 lichDayBu.NgayKetThuc = request.LichDayBu.NgayHocBu;
             }
-            else {
+            else 
+            {
                 lichDayBu = new LichHoc
                 {
                     Id = Guid.NewGuid(),
@@ -92,8 +97,8 @@ public record CreateLichDayBuCommand : IRequest<Output>
                     GioBatDau = TimeOnly.Parse(request.LichDayBu.GioBatDau),
                     GioKetThuc = TimeOnly.Parse(request.LichDayBu.GioKetThuc),
                     HocPhi = lichHoc.HocPhi,
-                    NgayBatDau = request.NgayNghi,
-                    NgayKetThuc = request.NgayNghi,
+                    NgayBatDau = request.LichDayBu.NgayHocBu,
+                    NgayKetThuc = request.LichDayBu.NgayHocBu,
                     PhongId = request.LichDayBu.PhongId,
                     TenLop = lichHoc.TenLop,
                     Thu = thuHocBu,
@@ -125,15 +130,14 @@ public record CreateLichDayBuCommand : IRequest<Output>
                 };
                 _context.ThamGiaLopHocs.Add(thamGia);
             }
-        }
-        await _context.SaveChangesAsync(cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+        }     
         return new Output
         {
             code = 200,
             isError = false,
             data = null,
-            message = $"Tạo lịch dạy bù cho ngày {request.NgayNghi.ToString("dd-MM-yyyy")}" +
-            $" lớp {request.TenLop} thành công."
+            message = "Tạo lịch dạy bù thành công."
         };
         }
     }
