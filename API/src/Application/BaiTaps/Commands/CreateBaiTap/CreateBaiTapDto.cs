@@ -12,7 +12,6 @@ public class CreateBaiTapDto
     public string NoiDung { get; set; } = string.Empty;
     public DateTime? ThoiGianKetThuc { get; set; }  
     public string? UrlFile { get; set; }
-    public string TrangThai { get; set; } = string.Empty;
 }
 public class LichHocDropdownDto
 {
