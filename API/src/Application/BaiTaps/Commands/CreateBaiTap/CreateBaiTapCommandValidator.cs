@@ -1,4 +1,8 @@
-﻿using StudyFlow.Application.BaiTaps.Commands.CreateBaiTap;
+﻿using System.Linq;
+using FluentValidation;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using StudyFlow.Application.BaiTaps.Commands.CreateBaiTap;
 using StudyFlow.Application.Common.Interfaces;
 
 public class CreateBaiTapCommandValidator : AbstractValidator<CreateBaiTapCommand>
@@ -17,68 +21,68 @@ public class CreateBaiTapCommandValidator : AbstractValidator<CreateBaiTapComman
             .NotEmpty().WithMessage("Nội dung không được để trống.")
             .MaximumLength(750).WithMessage("Nội dung tối đa 750 ký tự.");
 
-        RuleFor(x => x.CreateBaiTapDto.UrlFile)
-            .MaximumLength(200).WithMessage("Đường dẫn file tối đa 200 ký tự.")
-            .Must(BeValidFileType)
-            .When(x => !string.IsNullOrWhiteSpace(x.CreateBaiTapDto.UrlFile))
-            .WithMessage("Tệp phải là .pdf, .doc hoặc .docx");
-
-        RuleFor(x => x.CreateBaiTapDto.LichHocId)
-            .NotEmpty().WithMessage("Lịch học không được để trống.");
-
         RuleFor(x => x.CreateBaiTapDto.ThoiGianKetThuc)
             .NotNull().WithMessage("Thời gian kết thúc không được để trống.")
             .Must(BeFutureTime)
             .WithMessage("Thời gian kết thúc phải sau thời điểm hiện tại.");
 
+        RuleFor(x => x.CreateBaiTapDto.TaiLieu)
+            .Must(BeValidFileType)
+            .When(x => x.CreateBaiTapDto.TaiLieu != null)
+            .WithMessage("Tệp phải có định dạng .pdf, .doc hoặc .docx.");
+
         RuleFor(x => x)
             .MustAsync(NgayTaoValidWithLichHoc)
-            .WithMessage("Ngày tạo không hợp lệ với lịch học (ngoài phạm vi hoặc sai thứ).");
+            .WithMessage("Hôm nay không có lịch học của lớp hoặc ngày tạo không hợp lệ.");
 
         RuleFor(x => x)
             .MustAsync(KhongTrungNgayTao)
             .WithMessage("Đã tồn tại bài tập được tạo hôm nay cho lớp học này.");
     }
 
-    private bool BeValidFileType(string? url)
+    private bool BeValidFileType(IFormFile? file)
     {
-        if (string.IsNullOrWhiteSpace(url)) return true;
+        if (file == null) return true;
         var allowedExtensions = new[] { ".pdf", ".doc", ".docx" };
-        var ext = Path.GetExtension(url).ToLower();
-        return allowedExtensions.Contains(ext);
+        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+        return allowedExtensions.Contains(extension);
     }
 
-    private bool BeFutureTime(DateTime? thoiGianKetThuc)
+    private bool BeFutureTime(DateTime? dateTime)
     {
-        return thoiGianKetThuc.HasValue && thoiGianKetThuc.Value > DateTime.UtcNow;
-    }
-
-    private async Task<bool> KhongTrungNgayTao(CreateBaiTapCommand command, CancellationToken cancellationToken)
-    {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
-        return !await _context.BaiTaps.AnyAsync(bt =>
-            bt.LichHocId == command.CreateBaiTapDto.LichHocId &&
-            bt.NgayTao == today, cancellationToken);
+        return dateTime.HasValue && dateTime.Value > DateTime.UtcNow;
     }
 
     private async Task<bool> NgayTaoValidWithLichHoc(CreateBaiTapCommand command, CancellationToken cancellationToken)
     {
         var dto = command.CreateBaiTapDto;
-        var ngayTao = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var thu = ConvertDayOfWeekToThu(DateTime.UtcNow.DayOfWeek);
 
         var lichHoc = await _context.LichHocs
-            .AsNoTracking()
-            .FirstOrDefaultAsync(lh => lh.Id == dto.LichHocId, cancellationToken);
+            .FirstOrDefaultAsync(lh =>
+                lh.TenLop == dto.TenLop &&
+                lh.Thu == thu &&
+                lh.NgayBatDau <= today &&
+                today <= lh.NgayKetThuc,
+                cancellationToken);
 
-        if (lichHoc == null) return false;
-
-        var thuCuaNgayTao = ConvertDayOfWeekToThu(DateTime.UtcNow.DayOfWeek);
-
-        return
-            ngayTao >= lichHoc.NgayBatDau &&
-            ngayTao <= lichHoc.NgayKetThuc &&
-            thuCuaNgayTao == lichHoc.Thu;
+        return lichHoc != null;
     }
+
+    private async Task<bool> KhongTrungNgayTao(CreateBaiTapCommand command, CancellationToken cancellationToken)
+    {
+        var dto = command.CreateBaiTapDto;
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        var trung = await _context.BaiTaps.AnyAsync(bt =>
+            bt.LichHoc.TenLop == dto.TenLop &&
+            bt.NgayTao == today,
+            cancellationToken);
+
+        return !trung;
+    }
+
     private int ConvertDayOfWeekToThu(DayOfWeek dayOfWeek)
     {
         return dayOfWeek switch
