@@ -9,6 +9,7 @@ using StudyFlow.Application.BaiTaps.Queries.GetAllBaiTaps;
 using StudyFlow.Application.BaiTaps.Queries.GetListBaiTapChoGiaoVien;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Domain.Constants;
+using StudyFlow.Application.ChinhSachs.Commands.DeleteBaiKiemTra;
 
 namespace StudyFlow.Web.Endpoints;
 
@@ -43,28 +44,34 @@ public class BaiTaps : EndpointGroupBase
     }
 
     [Authorize(Roles = Roles.Teacher)]
-    public async Task<Output> GetBaiTapsForTeacher(
-        ISender sender,
-        [AsParameters] GetListBaiTapChoGiaoVienWithPaginationQuery query)
+    public async Task<Output> GetBaiTapsForTeacher(ISender sender,[AsParameters] GetListBaiTapChoGiaoVienWithPaginationQuery query)
     {
         return await sender.Send(query);
     }
 
     [Authorize(Roles =Roles.Teacher)]
-    public async Task<Output> CreateBaiTap(ISender sender, [FromBody] CreateBaiTapCommand command)
+    public async Task<Output> CreateBaiTap(ISender sender, [FromForm] CreateBaiTapCommand command)
     {
         return await sender.Send(command);
     }
 
     [Authorize(Roles =Roles.Teacher)]
-    public async Task<Output> UpdateBaiTap(ISender sender, [FromBody] UpdateBaiTapCommand command)
+    public async Task<Output> UpdateBaiTap(ISender sender, [FromForm] UpdateBaiTapCommand command)
     {
         return await sender.Send(command);
     }
 
     [Authorize(Roles = Roles.Teacher)]
-    public async Task<Output> DeleteBaiTap(ISender sender, Guid id)
+    public async Task<Output> DeleteBaiTap(ISender sender, string id)
     {
-        return await sender.Send(new DeleteBaiTapCommand(id));
+        try
+        {
+            Guid g_id = Guid.Parse(id);
+            return await sender.Send(new DeleteBaiTapCommand(g_id));
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 }
