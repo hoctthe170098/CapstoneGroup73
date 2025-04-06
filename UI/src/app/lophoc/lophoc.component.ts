@@ -250,6 +250,18 @@ editScheduleDayBu: any = {
     
       // Nếu người dùng nhập thêm lịch học bù
       if (this.newSchedule.ngay && this.newSchedule.phong && this.newSchedule.batDau && this.newSchedule.ketThuc) {
+        const [startHour, startMinute] = this.newSchedule.batDau.split(":").map(Number);
+        const [endHour, endMinute] = this.newSchedule.ketThuc.split(":").map(Number);
+    
+        const startTime = startHour * 60 + startMinute;
+        const endTime = endHour * 60 + endMinute;
+    
+        const diffMinutes = endTime - startTime;
+    
+        if (diffMinutes < 120) {
+          this.toastr.error("Thời lượng buổi học bù phải ít nhất 2 tiếng!");
+          return;
+        }
         payload.lichDayBu = {
           ngayHocBu: this.newSchedule.ngay,
           phongId: this.newSchedule.phong,
@@ -622,6 +634,23 @@ editScheduleDayBu: any = {
       return;
     }
   
+   
+    const start = this.editScheduleDayBu.batDau;
+    const end = this.editScheduleDayBu.ketThuc;
+  
+    const [startHour, startMinute] = start.split(":").map(Number);
+    const [endHour, endMinute] = end.split(":").map(Number);
+  
+    const startTime = startHour * 60 + startMinute;
+    const endTime = endHour * 60 + endMinute;
+  
+    const diffMinutes = endTime - startTime;
+  
+    if (diffMinutes < 120) {
+      this.toastr.error("Thời lượng buổi học phải ít nhất 2 tiếng!");
+      return;
+    }
+  
     const payload = {
       id: this.editScheduleDayBu.id,
       tenLop: this.editScheduleDayBu.tenLop,
@@ -645,11 +674,12 @@ editScheduleDayBu: any = {
         }
       },
       error: (err) => {
-        console.error('❌ Lỗi khi cập nhật lịch dạy bù:', err);
+        console.error(' Lỗi khi cập nhật lịch dạy bù:', err);
         this.toastr.error('Không thể cập nhật lịch dạy bù!');
       }
     });
   }
+  
   
   
   
