@@ -3,6 +3,7 @@ import { LopdangdayService } from '../shared/lopdangday.service';
 import { DanhSachHocSinh } from '../shared/lopdangday.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { el } from 'date-fns/locale';
+import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: "app-danhsachhocsinh",
   templateUrl: "./danhsachhocsinh.component.html",
@@ -16,24 +17,27 @@ export class DanhsachhocsinhComponent implements OnInit {
     private lopDangDayService: LopdangdayService,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
     this.tenLop = this.route.parent?.snapshot.paramMap.get("tenLop");
-    console.debug("Tên lớp:", this.tenLop);
     this.loadDanhSachHocSinh();
   }
 
   loadDanhSachHocSinh() {
     this.lopDangDayService.getDanhSachHocSinhLop(this.tenLop).subscribe(
       (response) => {
-        if (response.isError) {
+        if (!response.isError) {
           this.danhSachHocSinh = response.data;
-          this.cdr.detectChanges(); // Cập nhật view nếu cần thiết
+          this.cdr.detectChanges();
           console.debug("Danh sách học sinh:", this.danhSachHocSinh);
         } else {
-          if(response.code === 404)
+          if (response.message === 'Dữ liệu không tồn tại!'){
+            this.toastr.error('Giáo viên id không hợp lê!', 'Lỗi');
+          }
+          else(response.code === 404)
             this.router.navigate(['/pages/error'])
         }
       },
