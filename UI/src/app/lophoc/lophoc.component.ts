@@ -38,9 +38,36 @@ export class LophocComponent implements OnInit {
   filteredGiaoVienOptions: { code: string; codeTen: string }[] = [];
   selectedGiaoVien: string = "";
   isGiaoVienDropdownOpen: boolean = false;
-
+  phongOptions: { id: string; ten: string }[] = [];
+  popupGiaoVienOptions: { code: string; codeTen: string }[] = [];
+  popupFilteredGiaoVienOptions: { code: string; codeTen: string }[] = [];
+  popupGiaoVienSearch: string = "";
+  isPopupGiaoVienDropdownOpen: boolean = false;
   isAddScheduleModalOpen: boolean = false;
+  showExtraFields: boolean = false;
+  isEditScheduleModalOpen: boolean = false;
+editingLichDayThay: any = null; 
+isPopupGiaoVienDropdownOpen_Edit: boolean = false;
+popupFilteredGiaoVienOptions_Edit: { code: string, codeTen: string }[] = [];
+newScheduleEdit: any = {
+  tenLop: '',
+  giaoVienCode: '',
+  ngayBatDau: ''
+};
+isEditGiaoVienDropdownOpen = false;
+editGiaoVienSearch = '';
+editSelectedGiaoVien: any = null;
+editFilteredGiaoVienOptions: any[] = [];
 
+isEditDayBuModalOpen = false;
+editScheduleDayBu: any = {
+  tenLop: '',
+  ngayNghi: '',
+  ngay: '',
+  phong: '',
+  batDau: '',
+  ketThuc: ''
+};
   constructor(
     private lophocService: LophocService,
     private cdr: ChangeDetectorRef,
@@ -53,12 +80,20 @@ export class LophocComponent implements OnInit {
     this.getChuongTrinhs();
     this.loadLopHocs();
     this.getGiaoVienOptions();
+    this.loadPhongs(); 
     document.addEventListener("click", (event: any) => {
       const isInside = event.target.closest(".action-plus-wrapper");
       if (!isInside) {
         this.closeAllActionMenus();
       }
     });
+    document.addEventListener("click", this.handleClickOutsideEditDropdown.bind(this));
+  }
+  handleClickOutsideEditDropdown(event: any) {
+    const dropdown = document.querySelector('.edit-giaovien-dropdown-wrapper');
+    if (dropdown && !dropdown.contains(event.target as Node)) {
+      this.isEditGiaoVienDropdownOpen = false;
+    }
   }
   toggleActionMenu(index: number, event: MouseEvent) {
     event.stopPropagation();
@@ -84,34 +119,34 @@ export class LophocComponent implements OnInit {
   }
 
   newSchedule = {
-    loaiLich: "", // "Dạy thay" | "Dạy bù"
+    loaiLich: "",
     ngay: "",
+    ngayNghi: "", 
     phong: "",
     batDau: "",
     ketThuc: "",
     giaoVienCode: "",
     lop: null,
   };
-
-  phongOptions: { id: string; ten: string }[] = [];
-  popupGiaoVienOptions: { code: string; codeTen: string }[] = [];
-  popupFilteredGiaoVienOptions: { code: string; codeTen: string }[] = [];
-  popupGiaoVienSearch: string = "";
-  isPopupGiaoVienDropdownOpen: boolean = false;
-
   openAddScheduleModal(lop: any, loai: string) {
     this.newSchedule = {
       loaiLich: loai,
-      ngay: "",
-      phong: "",
-      batDau: "",
-      ketThuc: "",
-      giaoVienCode: "",
       lop: lop,
+      ngay: '',
+      ngayNghi: '',
+      phong: '',
+      batDau: '',
+      ketThuc: '',
+       giaoVienCode: ''
     };
     this.isAddScheduleModalOpen = true;
-    this.loadPhongs();
-    if (loai === "Dạy thay") this.loadPopupGiaoViens();
+    this.showExtraFields = false;
+  
+    if (loai === 'Dạy bù') {
+      this.loadPhongs();
+    } else if (loai === 'Dạy thay') {
+      this.loadPopupGiaoViens(); 
+    }
   }
 
   closeAddScheduleModal() {
@@ -146,6 +181,10 @@ export class LophocComponent implements OnInit {
     event.stopPropagation();
     this.isPopupGiaoVienDropdownOpen = !this.isPopupGiaoVienDropdownOpen;
   }
+  togglePopupGiaoVienDropdown_Edit(event: Event) {
+    event.stopPropagation();
+    this.isPopupGiaoVienDropdownOpen_Edit = !this.isPopupGiaoVienDropdownOpen_Edit;
+  }
 
   getSelectedPopupGiaoVienText(): string {
     const selected = this.popupGiaoVienOptions.find(
@@ -160,7 +199,18 @@ export class LophocComponent implements OnInit {
       gv.codeTen.toLowerCase().includes(search)
     );
   }
-
+  onPopupGiaoVienSearch_Edit() {
+    const search = this.popupGiaoVienSearch.toLowerCase();
+    this.popupFilteredGiaoVienOptions_Edit = this.giaoVienOptions.filter(gv =>
+      gv.codeTen.toLowerCase().includes(search)
+    );
+  }
+  selectPopupGiaoVien_Edit(gv: { code: string, codeTen: string }) {
+    this.editingLichDayThay.giaoVienCode = gv.code;
+    this.popupGiaoVienSearch = '';
+    this.popupFilteredGiaoVienOptions_Edit = this.giaoVienOptions.slice();
+    this.isPopupGiaoVienDropdownOpen_Edit = false;
+  }
   selectPopupGiaoVien(gv: { code: string, codeTen: string }) {
     this.newSchedule.giaoVienCode = gv.code;
     this.popupGiaoVienSearch = ''; 
@@ -170,9 +220,72 @@ export class LophocComponent implements OnInit {
   
 
   submitNewSchedule() {
-    console.log(" Thêm lịch:", this.newSchedule);
-    this.toastr.success("Đã thêm lịch mới!");
-    this.closeAddScheduleModal();
+    if (this.newSchedule.loaiLich === 'Dạy thay') {
+      const payload = {
+        tenLop: this.newSchedule.lop?.tenLop,
+        ngayDay: this.newSchedule.ngay,
+        giaoVienCode: this.newSchedule.giaoVienCode
+      };
+  
+      this.lophocService.createLichDayThay(payload).subscribe({
+        next: (res) => {
+          if (!res.isError) {
+            this.toastr.success(res.message || 'Thêm lịch dạy thay thành công!');
+            this.closeAddScheduleModal();
+            this.loadLopHocs(); 
+          } else {
+            this.toastr.error(res.message || 'Thêm lịch dạy thay thất bại!');
+          }
+        },
+        error: (err) => {
+          console.error('Lỗi khi tạo lịch dạy thay:', err);
+          this.toastr.error('Không thể tạo lịch dạy thay!');
+        }
+      });
+    } else if (this.newSchedule.loaiLich === 'Dạy bù') {
+      const payload: any = {
+        tenLop: this.newSchedule.lop?.tenLop,
+        ngayNghi: this.newSchedule.ngayNghi
+      };
+    
+      // Nếu người dùng nhập thêm lịch học bù
+      if (this.newSchedule.ngay && this.newSchedule.phong && this.newSchedule.batDau && this.newSchedule.ketThuc) {
+        const [startHour, startMinute] = this.newSchedule.batDau.split(":").map(Number);
+        const [endHour, endMinute] = this.newSchedule.ketThuc.split(":").map(Number);
+    
+        const startTime = startHour * 60 + startMinute;
+        const endTime = endHour * 60 + endMinute;
+    
+        const diffMinutes = endTime - startTime;
+    
+        if (diffMinutes < 120) {
+          this.toastr.error("Thời lượng buổi học bù phải ít nhất 2 tiếng!");
+          return;
+        }
+        payload.lichDayBu = {
+          ngayHocBu: this.newSchedule.ngay,
+          phongId: this.newSchedule.phong,
+          gioBatDau: this.newSchedule.batDau,
+          gioKetThuc: this.newSchedule.ketThuc
+        };
+      }
+    
+      this.lophocService.createLichDayBu(payload).subscribe({
+        next: (res) => {
+          if (!res.isError) {
+            this.toastr.success(res.message || 'Tạo lịch dạy bù thành công!');
+            this.closeAddScheduleModal();
+            this.loadLopHocs();
+          } else {
+            this.toastr.error(res.message || 'Tạo lịch dạy bù thất bại!');
+          }
+        },
+        error: (err) => {
+          console.error('Lỗi khi tạo lịch dạy bù:', err);
+          this.toastr.error('Không thể tạo lịch dạy bù!');
+        }
+      });
+    }
   }
 
   getChuongTrinhs(): void {
@@ -262,8 +375,8 @@ export class LophocComponent implements OnInit {
     if (this.thuTrongTuan.thu5) thus.push(5);
     if (this.thuTrongTuan.thu6) thus.push(6);
     if (this.thuTrongTuan.thu7) thus.push(7);
-    if (this.thuTrongTuan.cn) thus.push(8);
-    
+    if (this.thuTrongTuan.cn)  thus.push(8);
+  
     const payload = {
       pageNumber: page,
       pageSize: this.pageSize,
@@ -278,40 +391,43 @@ export class LophocComponent implements OnInit {
       ngayBatDau: this.dateStart || "0001-01-01",
       ngayKetThuc: this.dateEnd || "0001-01-01",
     };
+  
     this.spinner.show();
     this.lophocService.getDanhSachLopHoc(payload).subscribe({
       next: (response) => {
         this.spinner.hide();
         if (!response.isError && response.data) {
           const data = response.data;
-
+  
           this.lophocs = data.lopHocs.map((item: any) => {
-            const lichCoDinh =
-              item.loaiLichHocs.find((l: any) => l.trangThai === "Cố định")
-                ?.lichHocs || [];
-            const firstLich = lichCoDinh[0];
-
+            const coDinh = item.loaiLichHocs.find((l: any) => l.trangThai === 'Cố định')?.lichHocs || [];
+            const dayBu = item.loaiLichHocs.find((l: any) => l.trangThai === 'Dạy bù')?.lichHocs || [];
+            const dayThay = item.loaiLichHocs.find((l: any) => l.trangThai === 'Dạy thay')?.lichHocs || [];
+            const daNghi = item.loaiLichHocs.find((l: any) => l.trangThai === 'Đã nghỉ')?.lichHocs || [];
+            const firstLich = coDinh[0];
+  
             return {
               ...item,
               chuongTrinh: item.tenChuongTrinh,
-              phong: firstLich?.tenPhong || "",
+              phong: "",
               giaoVien: item.tenGiaoVien,
               ngayBatDau: firstLich?.ngayBatDau,
               ngayKetThuc: firstLich?.ngayKetThuc,
               hocPhi: item.hocPhi,
-              trangThai:
-                item.loaiLichHocs.find((l: any) => l.lichHocs.length > 0)
-                  ?.trangThai || "Không xác định",
-
-              lichHocChiTiet: lichCoDinh.map((lh: any) => ({
-                thu: lh.thu,
-                gioBatDau: lh.gioBatDau?.substring(0, 5),
-                gioKetThuc: lh.gioKetThuc?.substring(0, 5),
-                tenPhong: lh.tenPhong || "",
+              trangThai: item.loaiLichHocs.find((l: any) => l.lichHocs.length > 0)?.trangThai || "Không xác định",
+  
+              lichCoDinh: coDinh.map((lh: any) => ({ ...lh })), 
+              lichDayBu: dayBu.map((lh: any) => ({ ...lh })),
+              lichDayThay: dayThay.map((lh: any) => ({
+                ...lh,
+                giaoVienCode: lh.giaoVienCode || '',
+                tenGiaoVien: lh.tenGiaoVien || ''
               })),
+              lichNghi: daNghi.map((lh: any) => ({ ...lh })),
+  ngayNghis: item.ngayNghis || []
             };
           });
-
+  
           this.currentPage = data.pageNumber;
           this.totalPages = Math.ceil(data.totalCount / this.pageSize);
           this.cdr.detectChanges();
@@ -328,6 +444,7 @@ export class LophocComponent implements OnInit {
       },
     });
   }
+  
 
   goToPage(page: number) {
     if (page < 1 || page > this.totalPages) return;
@@ -360,4 +477,210 @@ export class LophocComponent implements OnInit {
     this.currentPage = 1;
     this.loadLopHocs();
   }
+  
+  
+  onDeleteLichDayThay(lich: any) {
+    if (!lich?.id) {
+      this.toastr.error("Không tìm thấy ID của lịch học để xóa!");
+      return;
+    }
+  
+    if (!confirm("Bạn có chắc chắn muốn xóa lịch dạy thay này?")) {
+      return;
+    }
+  
+    this.lophocService.deleteLichDayThay(lich.id).subscribe({
+      next: (res) => {
+        if (!res.isError) {
+          this.toastr.success(res.message || 'Xóa lịch dạy thay thành công!');
+          this.loadLopHocs(); 
+        } else {
+          this.toastr.error(res.message || 'Xóa lịch dạy thay thất bại!');
+        }
+      },
+      error: (err) => {
+        console.error("Lỗi khi xóa lịch dạy thay:", err);
+        this.toastr.error("Đã xảy ra lỗi khi xóa lịch dạy thay.");
+      }
+    });
+  }
+  
+  onEditLichDayThay(lich: any, lop: any) {
+    console.log('GVCODE:', lich.giaoVienCode);
+  
+    this.newScheduleEdit = {
+      ...lich,
+      tenLop: lop.tenLop,
+      giaoVienCode: lich.giaoVienCode || ''
+    };
+  
+    this.editGiaoVienSearch = '';
+    this.editFilteredGiaoVienOptions = this.giaoVienOptions.slice();
+  
+    this.isEditScheduleModalOpen = true;
+  }
+ 
+  toggleEditGiaoVienDropdown(event: Event) {
+    event.stopPropagation();
+    this.isEditGiaoVienDropdownOpen = !this.isEditGiaoVienDropdownOpen;
+  }
+  
+  onEditGiaoVienSearch() {
+    const search = this.editGiaoVienSearch.toLowerCase();
+    this.editFilteredGiaoVienOptions = this.giaoVienOptions.filter(
+      (gv: any) =>
+        gv.code?.toLowerCase().includes(search) ||
+        gv.ten?.toLowerCase().includes(search) ||
+        gv.codeTen?.toLowerCase().includes(search)
+    );
+  }
+  
+  getSelectedEditGiaoVienText(): string {
+    const gvCode = this.newScheduleEdit?.giaoVienCode;
+    const selected = this.giaoVienOptions.find(gv => gv.code === gvCode);
+    return selected ? selected.codeTen : '';
+  }
+  
+  selectEditGiaoVien(gv: any) {
+    this.editSelectedGiaoVien = gv;
+    this.newScheduleEdit.giaoVienCode = gv.code;
+    this.isEditGiaoVienDropdownOpen = false;
+  }
+  
+  closeEditScheduleModal() {
+    this.isEditScheduleModalOpen = false;
+    this.editingLichDayThay = null;
+  }
+  submitEditLichDayThay() {
+    const payload = {
+      id: this.newScheduleEdit.id,
+      tenLop: this.newScheduleEdit.tenLop,
+      ngayDay: this.newScheduleEdit.ngayBatDau,
+      giaoVienCode: this.newScheduleEdit.giaoVienCode
+    };
+  
+    this.lophocService.updateLichDayThay(payload).subscribe({
+      next: (res) => {
+        if (!res.isError) {
+          this.toastr.success(res.message || 'Cập nhật lịch dạy thay thành công!');
+          this.closeEditScheduleModal();
+          this.loadLopHocs();
+        } else {
+          this.toastr.error(res.message || 'Cập nhật thất bại!');
+        }
+      },
+      error: (err) => {
+        console.error('Lỗi khi cập nhật lịch dạy thay:', err);
+        this.toastr.error('Không thể cập nhật lịch dạy thay!');
+      }
+    });
+  }
+  
+  formatDateForInput(dateStr: string): string {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    const year = d.getFullYear();
+    const month = ('0' + (d.getMonth() + 1)).slice(-2);
+    const day = ('0' + d.getDate()).slice(-2);
+    return `${year}-${month}-${day}`;
+  }
+  onDeleteLichDayBu(lich: any) {
+    if (!lich?.id) {
+      this.toastr.error('Lịch học không hợp lệ!');
+      return;
+    }
+  
+    const confirmed = confirm('Bạn có chắc chắn muốn xóa lịch dạy bù này?');
+    if (!confirmed) return;
+  
+    this.lophocService.deleteLichDayBu(lich.id).subscribe({
+      next: (res) => {
+        if (!res.isError) {
+          this.toastr.success(res.message || 'Xóa lịch dạy bù thành công!');
+          this.loadLopHocs(); 
+        } else {
+          this.toastr.error(res.message || 'Xóa thất bại!');
+        }
+      },
+      error: (err) => {
+        console.error("Lỗi khi xóa lịch dạy bù:", err);
+        this.toastr.error("Không thể xóa lịch dạy bù!");
+      }
+    });
+  }
+  onEditLichDayBu(lich: any, lop: any) {
+    console.log('📋 Lịch dạy bù được chọn để sửa:', lich);
+    console.log('🏫 Lớp:', lop.tenLop);
+  
+    // Dùng phongOptions đã load sẵn ở ngOnInit
+    const matchedPhong = this.phongOptions.find(p => p.ten === lich.tenPhong);
+  
+    this.editScheduleDayBu = {
+      id: lich.id,
+      tenLop: lop.tenLop,
+      ngayNghi: lich.ngayGoc || '',
+      ngay: lich.ngayBatDau || '',
+      phong: matchedPhong?.id || '', // lấy đúng id phòng từ tên
+      batDau: lich.gioBatDau?.substring(0,5),
+      ketThuc: lich.gioKetThuc?.substring(0,5)
+    };
+  
+    
+    this.isEditDayBuModalOpen = true;
+  }
+  submitEditLichDayBu() {
+    if (!this.editScheduleDayBu?.id) {
+      this.toastr.error("Không tìm thấy ID lịch học!");
+      return;
+    }
+  
+   
+    const start = this.editScheduleDayBu.batDau;
+    const end = this.editScheduleDayBu.ketThuc;
+  
+    const [startHour, startMinute] = start.split(":").map(Number);
+    const [endHour, endMinute] = end.split(":").map(Number);
+  
+    const startTime = startHour * 60 + startMinute;
+    const endTime = endHour * 60 + endMinute;
+  
+    const diffMinutes = endTime - startTime;
+  
+    if (diffMinutes < 120) {
+      this.toastr.error("Thời lượng buổi học phải ít nhất 2 tiếng!");
+      return;
+    }
+  
+    const payload = {
+      id: this.editScheduleDayBu.id,
+      tenLop: this.editScheduleDayBu.tenLop,
+      ngayNghi: this.editScheduleDayBu.ngayNghi,
+      lichDayBu: {
+        ngayHocBu: this.editScheduleDayBu.ngay,
+        phongId: this.editScheduleDayBu.phong,
+        gioBatDau: this.editScheduleDayBu.batDau,
+        gioKetThuc: this.editScheduleDayBu.ketThuc
+      }
+    };
+  
+    this.lophocService.updateLichDayBu(payload).subscribe({
+      next: (res) => {
+        if (!res.isError) {
+          this.toastr.success(res.message || 'Cập nhật lịch dạy bù thành công!');
+          this.isEditDayBuModalOpen = false;
+          this.loadLopHocs();
+        } else {
+          this.toastr.error(res.message || 'Cập nhật lịch dạy bù thất bại!');
+        }
+      },
+      error: (err) => {
+        console.error(' Lỗi khi cập nhật lịch dạy bù:', err);
+        this.toastr.error('Không thể cập nhật lịch dạy bù!');
+      }
+    });
+  }
+  
+  
+  
+  
 }

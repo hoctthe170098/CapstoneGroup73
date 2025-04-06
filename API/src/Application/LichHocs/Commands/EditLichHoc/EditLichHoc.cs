@@ -32,17 +32,17 @@ public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Out
     public async Task<Output> Handle(EditLichHocCommand request, CancellationToken cancellationToken)
     {
         var daBatDau = await _context.LichHocs
-            .AnyAsync(lh => lh.NgayBatDau >= DateOnly.FromDateTime(DateTime.Now));
+            .AnyAsync(lh => lh.TenLop == request.LopHocDto.TenLop && lh.TrangThai == "Cố định" && lh.NgayBatDau <= DateOnly.FromDateTime(DateTime.Now));
         if(daBatDau)
         {
             var lichHocCu = _context.LichHocs
             .Where(lh => lh.TenLop == request.LopHocDto.TenLop 
-            && lh.NgayKetThuc != DateOnly.MinValue
+            && lh.TrangThai !="Dạy bù"
             && lh.TrangThai != "Dạy thay")
             .ToList();
             foreach (var lh in lichHocCu)
             {
-                var lichHocData = request.LopHocDto.LichHocs.First(lh=>lh.Id==lh.Id);
+                var lichHocData = request.LopHocDto.LichHocs.First(l=>l.Id==lh.Id);
                 lh.PhongId = lichHocData.PhongId;
                 var thamGiaCanXoaOrUpdate = _context.ThamGiaLopHocs
                    .Where(tg => tg.LichHocId == lh.Id && !request.LopHocDto.HocSinhCodes

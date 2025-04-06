@@ -9,22 +9,30 @@ h2 {
 
 .filters {
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
     gap: 10px;
     margin-bottom: 30px;
+    justify-content: flex-start;
 }
 
-.filters input {
+.filters input[type="date"] {
+    width: 200px;
     padding: 10px;
-    flex: 1 1 200px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.filters .search {
+    width: 400px;
+    padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
 
 .class-grid {
     display: grid;
-    //grid-template-columns: repeat(3, 1fr);
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
+    //grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
 }
 
@@ -66,6 +74,10 @@ h2 {
 
 .class-card p span.inactive {
     color: red !important;
+}
+
+.class-card p span.pending {
+    color: #007BFF !important;
 }
 
 .class-card a {

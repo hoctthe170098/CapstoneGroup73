@@ -563,7 +563,8 @@ public class IdentityService : IIdentityService
 
         var jwtToken = (JwtSecurityToken)validatedToken;
         var campusIdString = jwtToken.Claims
-            .First(x => x.Type == ClaimTypes.Locality).Value;
+            .FirstOrDefault(x => x.Type == ClaimTypes.Locality)!.Value;
+        if(campusIdString==null) return Guid.Empty;
         var chuyendoi = Guid.TryParse(campusIdString, out var campusId);
         if (chuyendoi) return campusId;
         else return Guid.Empty;

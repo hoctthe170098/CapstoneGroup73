@@ -1,96 +1,39 @@
-import { Component } from '@angular/core';
-
+import { Component, OnInit } from '@angular/core';
+import { LichHocService } from './shared/lichday.service';
+import { LichHocTrongNgay } from './shared/lichday.model';
+import { ChangeDetectorRef } from '@angular/core';
 @Component({
   selector: 'app-lichday',
   templateUrl: './lichday.component.html',
   styleUrls: ['./lichday.component.scss']
 })
-export class LichDayComponent {
-  // Danh sách giờ trong ngày (8h đến 22h)
-  hours = Array.from({ length: 15 }, (_, i) => i + 8); // [8, 9, ..., 20]
+export class LichDayComponent implements OnInit {
+  hours = Array.from({ length: 15 }, (_, i) => i + 8); // 8h - 22h
+  weeks = Array.from({ length: 52 }, (_, i) => `Tuần ${i + 1}`);
+  years = [2023, 2024, 2025];
 
-  // Dropdown Tuần & Năm
-  weeks = ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'];
-  years = [2024, 2025, 2026];
+  selectedWeek = new Date().getWeekNumber();
+  selectedYear = new Date().getFullYear();
 
-  selectedWeek = 'Tuần 1';
-  selectedYear = 2024;
+  schedule: LichHocTrongNgay[] = [];
 
-  // Lịch mẫu cho mỗi tuần
-  allSchedules: Record<string, any[]> = {
-    'Tuần 1': [
-      {
-        label: 'Th 2 24/3',
-        lessons: [
-          { title: 'Toán 9 - Ôn tập', room: 'Phòng DE.102', time: '8:30 - 10:30' },
-          { title: 'Toán 9 - Ôn tập', room: 'Phòng DE.102', time: '14:30 - 16:30' }
-        ]
-      },
-      {
-        label: 'Th 3 25/3',
-        lessons: [
-          { title: 'Toán 9 - Ôn tập', room: 'Phòng DE.102', time: '9:00 - 10:00' },
-          { title: 'Toán 9 - Ôn tập', room: 'Phòng DE.102', time: '17:00 - 18:00' }
-        ]
-      },
-      {
-        label: 'Th 4 26/3',
-        lessons: [
-          { title: 'Toán 9 - Ôn tập', room: 'Phòng DE.102', time: '10:00 - 12:00' }
-        ]
-      },
-      { label: 'Th 5 27/3', lessons: [] },
-      {
-        label: 'Th 6 28/3',
-        lessons: [
-          { title: 'Toán 9 - Ôn tập', room: 'Phòng DE.102', time: '8:00 - 9:30' },
-          { title: 'Toán 9 - Ôn tập', room: 'Phòng DE.102', time: '15:00 - 16:30' }
-        ]
-      },
-      {
-        label: 'Th 7 29/3',
-        lessons: [
-          { title: 'Toán 9 - Ôn tập', room: 'Phòng DE.102', time: '8:00 - 10:00' }
-        ]
-      },
-      {
-        label: 'CN 30/3',
-        lessons: [
-          { title: 'Toán 9 - Ôn tập', room: 'Phòng DE.102', time: '10:30 - 12:00' }
-        ]
-      }
-    ],
-    'Tuần 2': [
-      // Tuần 2 dữ liệu khác nếu muốn
-      { label: 'Th 2 31/3', lessons: [] },
-      { label: 'Th 3 1/4', lessons: [] },
-      { label: 'Th 4 2/4', lessons: [] },
-      { label: 'Th 5 3/4', lessons: [] },
-      { label: 'Th 6 4/4', lessons: [] },
-      { label: 'Th 7 5/4', lessons: [] },
-      { label: 'CN 6/4', lessons: [] }
-    ]
-  };
-
-  // Lịch được hiển thị theo tuần
-  schedule = this.allSchedules[this.selectedWeek];
-  
-  constructor() {}
+  constructor(private lichHocService: LichHocService,private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.loadSchedule();
   }
 
-  // Load lại lịch khi chọn tuần/năm
   loadSchedule() {
-    this.schedule = this.allSchedules[this.selectedWeek] || [];
-    // Nếu fetch từ API: gọi API tại đây với selectedWeek, selectedYear
+    this.lichHocService.getLichHocGiaoVien(this.selectedWeek, this.selectedYear).subscribe(res => {
+      if (!res.isError) {
+        this.schedule = res.data.lichHocCaTuans;
+        this.cdr.detectChanges();
+      }
+    });
   }
-  
 
-  // Tự động load lại nếu chọn thay đổi
-  onWeekChange(week: string) {
-    this.selectedWeek = week;
+  onWeekChange(weekLabel: string) {
+    this.selectedWeek = parseInt(weekLabel.replace('Tuần ', ''), 10);
     this.loadSchedule();
   }
 
@@ -99,14 +42,16 @@ export class LichDayComponent {
     this.loadSchedule();
   }
 
-  // Tính style (top, height) cho mỗi buổi học dựa trên giờ
-  getLessonStyle(lesson: { time: string }) {
-    const [start, end] = lesson.time.split(' - ').map(t => {
+  getLessonStyle(lesson: { gioBatDau: string; gioKetThuc: string }) {
+    const parseTime = (t: string) => {
       const [h, m] = t.split(':').map(Number);
       return h + m / 60;
-    });
+    };
 
-    const top = (start - 8) * 60; // Bắt đầu từ 8h, mỗi giờ 60px
+    const start = parseTime(lesson.gioBatDau);
+    const end = parseTime(lesson.gioKetThuc);
+
+    const top = (start - 8) * 60;
     const height = (end - start) * 60;
 
     return {
@@ -114,4 +59,27 @@ export class LichDayComponent {
       height: `${height}px`
     };
   }
+  formatTime(timeStr: string): string {
+    const date = new Date(`1970-01-01T${timeStr}`);
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+  
 }
+
+// Utility: Thêm method getWeekNumber vào Date prototype
+declare global {
+  interface Date {
+    getWeekNumber(): number;
+  }
+}
+
+Date.prototype.getWeekNumber = function () {
+  const date = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
+  const dayNum = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  return Math.ceil((((date.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+};
+

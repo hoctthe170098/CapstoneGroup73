@@ -15,6 +15,9 @@ using StudyFlow.Application.LichHocs.Commands.CreateLichDayThay;
 using StudyFlow.Application.LichHocs.Commands.UpdateLichDayThay;
 using StudyFlow.Application.ChinhSachs.Commands.DeleteLichDayThay;
 using StudyFlow.Application.LichHocs.Commands.CreateLichDayBu;
+using StudyFlow.Application.LichHocs.Commands.UpdateLichDayBu;
+using StudyFlow.Application.ChinhSachs.Commands.DeleteLichDayBu;
+using StudyFlow.Application.LichHocs.Queries.GetLichHocGiaoVien;
 
 namespace StudyFlow.Web.Endpoints;
 
@@ -32,7 +35,10 @@ public class LichHocs : EndpointGroupBase
             .MapPost(CreateLichHocDayThay,"createlichdaythay")
             .MapPut(UpdateLichHocDayThay,"updatelichdaythay")
             .MapDelete(DeleteLichHocDayThay,"deletelichdaythay")
-            .MapPost(CreateLichHocDayBu,"createlichdaybu");
+            .MapPost(CreateLichHocDayBu,"createlichdaybu")
+            .MapPut(UpdateLichHocDayBu, "updatelichdaybu")
+            .MapDelete(DeleteLichHocDayBu, "deletelichdaybu")
+            .MapGet(GetLichHocGiaoVien,"getlichhocgiaovien");
     }
     [Authorize(Roles =Roles.CampusManager)]
     public async Task<Output> CreateLichHocCoDinh(ISender sender, [FromBody] CreateLichHocCommand command)
@@ -83,5 +89,20 @@ public class LichHocs : EndpointGroupBase
     public async Task<Output> CreateLichHocDayBu(ISender sender, CreateLichDayBuCommand command)
     {
         return await sender.Send(command);
+    }
+    [Authorize(Roles = Roles.CampusManager)]
+    public async Task<Output> UpdateLichHocDayBu(ISender sender, UpdateLichDayBuCommand command)
+    {
+        return await sender.Send(command);
+    }
+    [Authorize(Roles = Roles.CampusManager)]
+    public async Task<Output> DeleteLichHocDayBu(ISender sender, Guid lichHocId)
+    {
+        return await sender.Send(new DeleteLichDayBuCommand(lichHocId));
+    }
+    [Authorize(Roles = Roles.Teacher)]
+    public async Task<Output> GetLichHocGiaoVien(ISender sender, [AsParameters] GetLichHocGiaoVienQuery query)
+    {
+        return await sender.Send(query);
     }
 }

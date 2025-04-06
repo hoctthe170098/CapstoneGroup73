@@ -77,7 +77,13 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
     this.username = this.authService.getUserName();
     this.rolename = this.authService.getRoleNames()[0];
   }
-
+  getRoleName(role: string){
+    if(role =="CampusManager") return "Quản lý cơ sở"
+    else if(role == "LearningManager") return "Quản lý chương trình học";
+    else if(role == "Student") return "Học sinh";
+    else if (role == "Teacher") return "Giáo viên";
+    else return role;
+  }
   ngAfterViewInit() {
 
     this.configSub = this.configService.templateConf$.subscribe((templateConf) => {

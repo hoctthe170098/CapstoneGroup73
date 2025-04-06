@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { LopDangDay } from './shared/lopdangday.model';
 import { LopdangdayService } from './shared/lopdangday.service';
 import { ChangeDetectorRef } from '@angular/core';
-import { is } from 'core-js/core/object';
+
 @Component({
   selector: "app-lopdangday",
   templateUrl: "./lopdangday.component.html",
@@ -44,12 +44,24 @@ export class LopdangdayComponent implements OnInit {
 
         // Giả sử response có các thuộc tính 'classes' và 'totalItems'
         this.classes = response.data.items.map((lop: any) =>{
+          const ngayBatDau = this.parseDate(lop.ngayBatDau);
+          const ngayKetThuc = this.parseDate(lop.ngayKetThuc);
+          let status = '';
+        
+          if (this.today < ngayBatDau) {
+            status = 'Chưa bắt đầu';
+          } else if (this.today >= ngayBatDau && this.today <= ngayKetThuc) {
+            status = 'Đang hoạt động';
+          } else {
+            status = 'Kết thúc';
+          }
+        
           return {
             ...lop,
-            isActive: this.parseDate(lop.ngayKetThuc) >= this.today
+            status
           };
         });
-        console.debug("endDate", this.classes);
+        
         this.totalItems = response.data.totalCount;
         this.cdr.detectChanges(); // Cập nhật view nếu cần thiết
       },
@@ -67,8 +79,8 @@ export class LopdangdayComponent implements OnInit {
     this.loadLopdangday();
   }
 
-  goToDetail(lopId: string) {
-    this.router.navigate(['/lopdangday', 'chi-tiet', lopId]);
+  goToDetail(tenLop: string) {
+    this.router.navigate(['/lopdangday', 'chi-tiet', tenLop]);
   }
 
   // Phân trang

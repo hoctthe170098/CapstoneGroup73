@@ -1,46 +1,41 @@
 <div class="calendar-container">
   <h2 class="calendar-title">Lịch dạy</h2>
 
-  <!-- Bộ lọc tuần / năm -->
   <div class="filter-bar">
-    <select [(ngModel)]="selectedWeek" (change)="onWeekChange(selectedWeek)">
-      <option *ngFor="let week of weeks" [value]="week">{{ week }}</option>
+    <select [(ngModel)]="selectedWeek" (change)="onWeekChange('Tuần ' + selectedWeek)">
+      <option *ngFor="let week of weeks" [value]="week.replace('Tuần ', '')">{{ week }}</option>
     </select>
+
     <select [(ngModel)]="selectedYear" (change)="onYearChange(selectedYear)">
       <option *ngFor="let year of years" [value]="year">Năm {{ year }}</option>
     </select>
   </div>
 
-  <!-- Bọc toàn bảng bằng .calendar-table để thêm viền -->
   <div class="calendar-table">
-    <!-- Header: Thứ + Ngày -->
     <div class="calendar-header">
       <div class="time-column-header">Giờ</div>
       <div class="day-column-header" *ngFor="let day of schedule">
-        {{ day.label }}
+        {{ day.ngay | date: 'EEE dd/MM' }}
       </div>
     </div>
 
-    <!-- Thân bảng -->
     <div class="calendar-body">
-      <!-- Cột giờ -->
       <div class="time-column">
         <div class="time-slot" *ngFor="let hour of hours">{{ hour }}:00</div>
       </div>
 
-      <!-- Các cột ngày -->
       <div class="day-column" *ngFor="let day of schedule">
         <div class="time-blocks">
-          <!-- Dòng chia theo giờ -->
           <div class="hour-line" *ngFor="let hour of hours"></div>
 
-          <!-- Các buổi học -->
-          <div *ngFor="let lesson of day.lessons"
+          <div *ngFor="let lesson of day.lops"
                class="lesson-block"
                [ngStyle]="getLessonStyle(lesson)">
-            <div class="title">{{ lesson.title }}</div>
-            <div class="room">{{ lesson.room }}</div>
-            <div class="time">{{ lesson.time }}</div>
+            <div class="title">{{ lesson.tenLop }} - {{ lesson.tenChuongTrinh }}</div>
+            <div class="room">{{ lesson.tenPhong }}</div>
+            <div class="time">
+              ({{ formatTime(lesson.gioBatDau) }} - {{ formatTime(lesson.gioKetThuc) }})
+            </div>
           </div>
         </div>
       </div>
