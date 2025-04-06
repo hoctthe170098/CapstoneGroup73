@@ -6,8 +6,7 @@
                 <th>Code</th>
                 <th>Họ và Tên</th>
                 <th class="text-center">Giới Tính</th>
-                <th>Email</th>
-                <th>Số Điện Thoại</th>
+                <th>Ngày Sinh</th>
             </tr>
         </thead>
         <tbody>
@@ -18,8 +17,7 @@
                 <td>{{hs.code}}</td>
                 <td>{{hs.ten}}</td>
                 <td class="text-center">{{hs.gioiTinh}}</td>
-                <td>{{hs.email}}</td>
-                <td>{{hs.soDienThoai}}</td>
+                <td>{{ hs.ngaySinh | date:'dd-MM-yyyy' }}</td>
               </tr>
         </tbody>
     </table>
