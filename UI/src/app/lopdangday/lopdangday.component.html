@@ -1,8 +1,8 @@
 <h2>DANH SÁCH LỚP</h2>
 <div class="filters">
-  <input type="date" placeholder="Ngày bắt đầu" [(ngModel)]="startDate" >
-  <input type="date" placeholder="Ngày kết thúc" [(ngModel)]="endDate" >
-  <input type="text" placeholder="Tìm tên lớp..." [(ngModel)]="searchClass" (change)="searchClasses()">
+  <input type="date" placeholder="Ngày bắt đầu" [(ngModel)]="startDate">
+  <input type="date" placeholder="Ngày kết thúc" [(ngModel)]="endDate">
+  <input class="search" type="text" placeholder="Tìm tên lớp..." [(ngModel)]="searchClass" (change)="searchClasses()">
 </div>
 <div class="class-grid">
   <div class="class-card" *ngFor="let lop of classes">
@@ -12,13 +12,21 @@
       {{ lop.ngayBatDau | date:'dd/MM/yyyy' }} - {{ lop.ngayKetThuc | date:'dd/MM/yyyy' }}
     </p>
     <p>
+      <i class="fas fa-layer-group mr-1"></i>
+      {{ lop.trangThai }} 
+    </p>
+    <p>
       <i class="fas fa-stream mr-1"></i>
-      <span [ngClass]="{'active': lop.isActive, 'inactive': !lop.isActive}">
-        {{ lop.isActive ? 'Đang hoạt động' : 'Kết thúc' }}
+      <span [ngClass]="{
+            'pending': lop.status === 'Chưa bắt đầu', 
+            'active': lop.status === 'Đang hoạt động', 
+            'inactive': lop.status === 'Kết thúc'
+          }">
+        {{ lop.status }}
       </span>
     </p>
-    <a (click)="goToDetail(lop.id)" >
-      Chi tiết <i class="fas fa-arrow-right"></i>
+    <a (click)="goToDetail(lop.tenLop)" >
+      Chi tiết <i class="fas fa-sign-out-alt"></i>
     </a>
   </div>
 </div>

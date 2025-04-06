@@ -1,56 +1,29 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { GetLichHocGiaoVienResponse } from './lichday.model';
 import { environment } from 'environments/environment';
-
 @Injectable({
   providedIn: 'root'
 })
-export class AccountmanagerService {
-  private provinceApiUrl = 'https://provinces.open-api.vn/api/?depth=2';
-  private baseUrl = `${environment.apiURL}/NhanViens`;
-  private cosoUrl = `${environment.apiURL}/Cosos`;
+export class LichHocService {
+  private lichhocUrl = `${environment.apiURL}/Lichhocs`;
 
   constructor(private http: HttpClient) {}
 
-  getProvinces(): Observable<any> {
-    return this.http.get<any>(this.provinceApiUrl);
+  getLichHocGiaoVien(tuan?: number, nam?: number): Observable<GetLichHocGiaoVienResponse> {
+    let params = new HttpParams();
+    if (tuan !== undefined) {
+      params = params.set('Tuan', tuan.toString());
+    }
+    if (nam !== undefined) {
+      params = params.set('Nam', nam.toString());
+    }
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${localStorage.getItem('token') || ''}` // tùy theo cách bạn lưu token
+    });
+
+    return this.http.get<GetLichHocGiaoVienResponse>(`${this.lichhocUrl}/getlichhocgiaovien`, { headers, params });
   }
-
-  getDanhSachNhanVien(pageNumber: number , pageSize: number , searchTen: string = '',filterTenCoSo:string='',filterTenVaiTro:string='', sortBy: string = '', isActive: boolean = null
-  ): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    const body = { pageNumber, pageSize, searchTen,filterTenCoSo,filterTenVaiTro, sortBy, isActive };
-
-    return this.http.post<any>(`${this.baseUrl}/getnhanvienswithpagination`, body, { headers });
-  }
-
-  createNhanVien(nhanVienData: any): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${token}`)
-      .set('Content-Type', 'application/json');
-
-    return this.http.post<any>(`${this.baseUrl}/createnhanvien`, nhanVienData, { headers });
-  }
-  getDanhSachCoSo(): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-
-    // Tạo URL với query parameters
-    const url = `${this.cosoUrl}/getallcosos`;
-
-    // Gửi yêu cầu GET với headers và query parameters
-    return this.http.get<any>(url, { headers: headers });
-}
-updateNhanVien(nhanVienData: any): Observable<any> {
-  const token = localStorage.getItem('token');
-  const headers = new HttpHeaders()
-    .set('Authorization', `Bearer ${token}`)
-    .set('Content-Type', 'application/json');
-
-  return this.http.put<any>(`${this.baseUrl}/editnhanvien`, nhanVienData, { headers });
-}
-
 }

@@ -49,7 +49,7 @@ public class GetGiaoVienAssignedClassWithPaginationCommandHandler
             throw new Exception("Không tìm thấy giáo viên tương ứng với tài khoản.");
 
         var query = _context.LichHocs
-            .Where(lh => lh.GiaoVienCode == giaoVien.Code)
+            .Where(lh => lh.GiaoVienCode == giaoVien.Code && lh.TrangThai != "Dạy thay")
             .GroupBy(lh => lh.TenLop)
             .Select(g => new LichHoc
             {

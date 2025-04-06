@@ -78,7 +78,7 @@
           <div class="form-group row align-items-center" *ngFor="let schedule of lichHoc.controls; let i = index" [formGroupName]="i">
             <div class="col-md-3 mb-2">
               <label>Thứ trong tuần</label>
-              <select class="form-control" formControlName="thu" [disabled]="!canEditAll">
+              <select class="form-control" formControlName="thu" [disabled]="!canEditAll" (change)="onThuChange()">
                 <option value="">Chọn thứ trong tuần</option>
                 <option value="2">Thứ hai</option>
                 <option value="3">Thứ ba</option>
@@ -92,7 +92,11 @@
                 *ngIf="schedule.get('thu').touched && schedule.get('thu').hasError('required')">
                 Vui lòng chọn thứ trong tuần!
               </small>
+              <small class="text-danger mt-1" *ngIf="lichHoc.hasError('duplicateDays') && (lichHoc.dirty || lichHoc.touched)">
+                Không được chọn trùng thứ trong tuần!
+              </small>
             </div>
+            
 
             <div class="col-md-2 mb-2">
               <label>Giờ bắt đầu</label>
@@ -116,6 +120,9 @@
             <small class="text-danger" *ngIf="schedule.get('gioKetThuc').hasError('invalidEndTime')">
               Giờ kết thúc không được sau 10:00 tối!
             </small>
+            <small class="text-danger" *ngIf="schedule.errors?.invalidTimeRange && (schedule.get('gioKetThuc')?.touched || schedule.get('gioBatDau')?.touched)">
+              Giờ kết thúc phải sau giờ bắt đầu ít nhất 1 tiếng!
+            </small>
             </div>
 
             <div class="col-md-3 mb-2">
@@ -134,23 +141,52 @@
               <button type="button" class="btn btn-danger" (click)="removeSchedule(i)">-</button>
             </div>
           </div>
+          
 
           <button type="button" class="btn btn-primary mt-2" (click)="addSchedule()" *ngIf="canEditAll">+</button>
         </div>
 
         <!-- Danh sách học viên -->
         <div class="mt-4">
-          <div class="hoc-vien-header d-flex align-items-center gap-3">
+          <div class="hoc-vien-header d-flex align-items-center gap-3 flex-wrap">
+            <!-- Label -->
             <label class="form-label fw-bold mb-0">Danh Sách Học Viên</label>
-            <div class="hoc-vien-dropdown" *ngIf="hocSinhDropdownList.length > 0">
-              <select id="hocSinhDropdown" class="form-control" (change)="onSelectHocSinh($event.target.value)">
-                <option [value]="''" disabled selected>Chọn học viên để thêm</option>
-                <option *ngFor="let hs of hocSinhDropdownList" [value]="hs.code">
-                  {{ hs.code }} - {{ hs.ten }}
-                </option>
-              </select>
+          
+            <!-- Dropdown -->
+            <div class="hoc-sinh-dropdown-wrapper position-relative">
+              <div class="lop-select-display" (click)="toggleHocSinhDropdown()">
+                <span *ngIf="!selectedHocSinh">Chọn học sinh</span>
+                <span *ngIf="selectedHocSinh">{{ selectedHocSinh.code }} - {{ selectedHocSinh.ten }}</span>
+                <i class="fa fa-caret-down caret-icon"></i>
+              </div>
+          
+              <div *ngIf="hocSinhDropdownOpen" class="lop-select-dropdown">
+                <div class="search-box">
+                  <input
+                    type="text"
+                    class="form-control"
+                    [(ngModel)]="hocSinhSearchTerm"
+                    [ngModelOptions]="{ standalone: true }"
+                    (input)="onHocSinhSearchTermChange()"
+                    placeholder="Tìm học sinh theo mã hoặc tên" />
+                </div>
+          
+                <ul class="select-options list-group list-group-flush mb-0">
+                  <li class="list-group-item list-group-item-action"
+                      *ngFor="let hs of filteredHocSinhList"
+                      (click)="selectHocSinh(hs)">
+                    {{ hs.code }} - {{ hs.ten }}
+                  </li>
+                  <li *ngIf="filteredHocSinhList.length === 0" class="list-group-item text-muted">
+                    Không tìm thấy học sinh
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
+        
+        
+          
           <table class="table table-bordered table-hover mt-2">
             <thead class="table-light">
               <tr>
@@ -181,7 +217,8 @@
 
         <!-- Buttons -->
         <div class="d-flex justify-content-end mt-4">
-          <button class="btn btn-secondary me-2" type="button" (click)="onCancel()">Hủy</button>
+          <button class="btn btn-danger me-2" type="button" (click)="onCancel()">Hủy</button>
+
           <button type="submit" class="btn btn-success" [disabled]="!isEditable">Xác nhận</button>
 
         </div>

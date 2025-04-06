@@ -12,7 +12,7 @@ using StudyFlow.Domain.Entities;
 namespace StudyFlow.Application.ThamGiaLopHocs.GetHocSinhsInClass;
 public record GetHocSinhsInClassQueries : IRequest<Output>
 {
-    public required string Id { get; init; }
+    public required string TenLop { get; init; }
 }
 
 public class GetHocSinhsInClassQueriesHandler : IRequestHandler<GetHocSinhsInClassQueries, Output>
@@ -32,15 +32,10 @@ public class GetHocSinhsInClassQueriesHandler : IRequestHandler<GetHocSinhsInCla
     {
         try
         {
-            var LichHocId = Guid.TryParse(request.Id, out var hocId);
-            if(LichHocId == false)
-            {
-                throw new WrongInputException("Id nhập sai kiểu dữ liệu");
-            }
-
             var list = await _context.ThamGiaLopHocs
-                .Where(lh => lh.LichHocId == hocId)
-                .Select(lh => lh.HocSinh)
+                .Include(t => t.LichHoc)
+                .Where(t => t.LichHoc.TenLop == request.TenLop)
+                .Select(t => t.HocSinh)
                 .OrderByDescending(hs => hs.Ten)
                 .ToListAsync(cancellationToken);
 
