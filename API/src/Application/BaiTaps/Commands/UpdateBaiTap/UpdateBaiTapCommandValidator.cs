@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using System.IO;
 
 namespace StudyFlow.Application.BaiTaps.Commands.UpdateBaiTap;
@@ -20,30 +21,18 @@ public class UpdateBaiTapCommandValidator : AbstractValidator<UpdateBaiTapComman
 
         RuleFor(x => x.UpdateBaiTapDto.TrangThai)
             .NotEmpty().WithMessage("Trạng thái không được để trống.")
-            .MaximumLength(10).WithMessage("Trạng thái tối đa 10 ký tự.")
             .Must(BeAllowedStatus)
-            .WithMessage("Trạng thái không hợp lệ (chỉ chấp nhận: 'Đang mở', 'Đã đóng', 'Tạm dừng').");
+            .WithMessage("Trạng thái không hợp lệ. Chỉ được phép 'Đang mở' hoặc 'Chưa mở'.");
 
-        RuleFor(x => x.UpdateBaiTapDto.UrlFile)
-            .MaximumLength(200).WithMessage("Đường dẫn file tối đa 200 ký tự.")
-            .Must(BeValidFileType)
-            .When(x => !string.IsNullOrWhiteSpace(x.UpdateBaiTapDto.UrlFile))
-            .WithMessage("Tệp phải có định dạng .pdf, .doc hoặc .docx");
+        RuleFor(x => x.UpdateBaiTapDto.TaiLieu)
+            .Must(BeValidFile)
+            .When(x => x.UpdateBaiTapDto.TaiLieu != null)
+            .WithMessage("Tệp phải có định dạng .pdf, .doc hoặc .docx và kích thước tối đa 5MB.");
 
         RuleFor(x => x.UpdateBaiTapDto.ThoiGianKetThuc)
             .NotNull().WithMessage("Thời gian kết thúc không được để trống.")
             .Must(BeFutureTime)
             .WithMessage("Thời gian kết thúc phải sau thời điểm hiện tại.");
-    }
-
-    private bool BeValidFileType(string? url)
-    {
-        if (string.IsNullOrWhiteSpace(url)) return true;
-
-        var allowedExtensions = new[] { ".pdf", ".doc", ".docx" };
-        var ext = Path.GetExtension(url).ToLowerInvariant();
-
-        return allowedExtensions.Contains(ext);
     }
 
     private bool BeFutureTime(DateTime? time)
@@ -53,7 +42,18 @@ public class UpdateBaiTapCommandValidator : AbstractValidator<UpdateBaiTapComman
 
     private bool BeAllowedStatus(string trangThai)
     {
-        var allowed = new[] { "Chưa mở", "Đang Mở", "Kết Thúc" };
+        var allowed = new[] { "Chưa mở", "Đang mở" };
         return allowed.Contains(trangThai.Trim(), StringComparer.OrdinalIgnoreCase);
+    }
+
+    private bool BeValidFile(IFormFile? file)
+    {
+        if (file == null) return true;
+
+        var allowedExtensions = new[] { ".pdf", ".doc", ".docx" };
+        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+        var maxSizeInMB = 10;
+
+        return allowedExtensions.Contains(ext) && file.Length <= maxSizeInMB * 1024 * 1024;
     }
 }

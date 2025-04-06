@@ -1,10 +1,11 @@
-﻿using System.Security.Claims;
-using MediatR;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using StudyFlow.Application.Common.Exceptions;
 using StudyFlow.Application.Common.Interfaces;
 using StudyFlow.Application.Common.Models;
+using StudyFlow.Domain.Entities;
 
 namespace StudyFlow.Application.BaiTaps.Commands.UpdateBaiTap;
 
@@ -16,79 +17,101 @@ public record UpdateBaiTapCommand : IRequest<Output>
 public class UpdateBaiTapCommandHandler : IRequestHandler<UpdateBaiTapCommand, Output>
 {
     private readonly IApplicationDbContext _context;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IIdentityService _identityService;
+    private readonly IWebHostEnvironment _webHostEnvironment;
+    private readonly ILogger<UpdateBaiTapCommandHandler> _logger;
+    private readonly string _folderPath;
 
     public UpdateBaiTapCommandHandler(
         IApplicationDbContext context,
-        IHttpContextAccessor httpContextAccessor,
-        IIdentityService identityService)
+        IWebHostEnvironment webHostEnvironment,
+        ILogger<UpdateBaiTapCommandHandler> logger)
     {
         _context = context;
-        _httpContextAccessor = httpContextAccessor;
-        _identityService = identityService;
+        _webHostEnvironment = webHostEnvironment;
+        _logger = logger;
+        _folderPath = Path.Combine(_webHostEnvironment.ContentRootPath, "baitaps");
+
+        if (!Directory.Exists(_folderPath))
+        {
+            Directory.CreateDirectory(_folderPath);
+        }
     }
 
     public async Task<Output> Handle(UpdateBaiTapCommand request, CancellationToken cancellationToken)
     {
-        //  Lấy token
-        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-        if (string.IsNullOrEmpty(token))
-            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
-
-        var giaoVienId = _identityService.GetUserId(token);
         var dto = request.UpdateBaiTapDto;
 
-        //  Tìm bài tập và kiểm tra quyền sở hữu
         var baiTap = await _context.BaiTaps
             .Include(bt => bt.LichHoc)
-            .ThenInclude(lh => lh.GiaoVien)
             .FirstOrDefaultAsync(bt => bt.Id == dto.Id, cancellationToken);
 
         if (baiTap == null)
             throw new NotFoundDataException("Không tìm thấy bài tập.");
 
-        if (baiTap.LichHoc.GiaoVien.UserId != giaoVienId.ToString())
-            throw new UnauthorizedAccessException("Bạn không có quyền chỉnh sửa bài tập này.");
-
-        //  Trạng thái chỉ được phép: "Đang mở" hoặc "Chưa mở"
+        //  Validate trạng thái
         var allowedStatuses = new[] { "Đang mở", "Chưa mở" };
         if (!string.IsNullOrWhiteSpace(dto.TrangThai) &&
             !allowedStatuses.Contains(dto.TrangThai.Trim(), StringComparer.OrdinalIgnoreCase))
         {
-            throw new WrongInputException("Trạng thái không hợp lệ. Chỉ được phép 'Đang mở' hoặc 'Chưa mở'.");
+            throw new WrongInputException("Trạng thái không hợp lệ. Chỉ cho phép 'Đang mở' hoặc 'Chưa mở'.");
         }
 
+        //  Cập nhật thông tin bài tập
         baiTap.TieuDe = dto.TieuDe;
         baiTap.NoiDung = dto.NoiDung;
         baiTap.ThoiGianKetThuc = dto.ThoiGianKetThuc;
-        baiTap.UrlFile = dto.UrlFile;
         baiTap.TrangThai = dto.TrangThai;
 
-        await _context.SaveChangesAsync(cancellationToken);
-
-        var lichHocs = await _context.LichHocs
-            .AsNoTracking()
-            .Where(lh => lh.GiaoVien.UserId == giaoVienId.ToString())
-            .Select(lh => new LichHocDropdownDto
-            {
-                Id = lh.Id,
-                TenLop = lh.TenLop
-            })
-            .ToListAsync(cancellationToken);
-
-        var response = new
+        //  Xử lý file nếu có upload mới
+        if (dto.TaiLieu != null)
         {
-            BaiTap = baiTap,
-            LichHocs = lichHocs
-        };
+            DeleteFile(baiTap.UrlFile); // xóa file cũ nếu có
+            baiTap.UrlFile = await UploadFileAsync(dto.TaiLieu, cancellationToken);
+        }
+
+        await _context.SaveChangesAsync(cancellationToken);
 
         return new Output
         {
             isError = false,
             code = 200,
-            data = response,
-            message = "Cập nhật bài tập thành công."
+            data = baiTap,
+            message = "Cập nhật bài tập thành công"
         };
+    }
+
+    private async Task<string> UploadFileAsync(IFormFile file, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+            var savePath = Path.Combine(_folderPath, fileName);
+
+            await using var stream = new FileStream(savePath, FileMode.Create);
+            await file.CopyToAsync(stream, cancellationToken);
+
+            return $"/baitaps/{fileName}";
+        }
+        catch (IOException ex)
+        {
+            _logger.LogError(ex, "Lỗi khi upload file {FileName}", file.FileName);
+            throw new Exception($"Không thể upload file {file.FileName}: {ex.Message}");
+        }
+    }
+
+    private void DeleteFile(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url)) return;
+
+        try
+        {
+            var fullPath = Path.Combine(_webHostEnvironment.ContentRootPath, url.TrimStart('/'));
+            if (File.Exists(fullPath))
+                File.Delete(fullPath);
+        }
+        catch (IOException ex)
+        {
+            _logger.LogError(ex, "Lỗi khi xóa file {Url}", url);
+        }
     }
 }
