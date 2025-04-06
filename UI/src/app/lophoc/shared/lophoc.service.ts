@@ -79,10 +79,59 @@ export class LophocService {
     const url = `${this.baseUrl}/getlophocbyten?TenLop=${encodeURIComponent(tenLop)}`;
     return this.http.get<any>(url, { headers });
   }
+
+  createLichDayThay(payload: { tenLop: string; ngayDay: string; giaoVienCode: string }): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<any>(`${this.baseUrl}/createlichdaythay`, payload, { headers });
+  }
+  updateLichDayThay(payload: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+      .set('Content-Type', 'application/json');
+  
+    return this.http.put<any>(
+      `${this.baseUrl}/updatelichdaythay`,
+      payload,
+      { headers }
+    );
+  }
+  createLichDayBu(payload: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+      .set('Content-Type', 'application/json');
+  
+    return this.http.post(`${environment.apiURL}/LichHocs/createlichdaybu`, payload, { headers });
+  }
+  deleteLichDayThay(lichHocId: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  
+    return this.http.delete(`${environment.apiURL}/LichHocs/deletelichdaythay?lichHocId=${lichHocId}`, {
+      headers
+    });
+  }
+
   searchHocSinh(payload: { searchTen: string }): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.post<any>(`${this.hocSinhUrl}/gethocsinhbycodeorname`,payload,{ headers });
   }
- 
+  deleteLichDayBu(lichHocId: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const url = `${this.baseUrl}/deletelichdaybu?lichHocId=${lichHocId}`;
+    return this.http.delete<any>(url, { headers });
+  }  
+  updateLichDayBu(payload: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+      .set('Content-Type', 'application/json');
+  
+    return this.http.put<any>(`${this.baseUrl}/updatelichdaybu`, payload, { headers });
+  }
+  
 }
