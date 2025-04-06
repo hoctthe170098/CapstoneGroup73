@@ -27,7 +27,7 @@ public class CreateBaiTapCommandValidator : AbstractValidator<CreateBaiTapComman
             .WithMessage("Thời gian kết thúc phải sau thời điểm hiện tại.");
 
         RuleFor(x => x.CreateBaiTapDto.TaiLieu)
-            .Must(BeValidFileType)
+            .Must(ValidTaiLieu)
             .When(x => x.CreateBaiTapDto.TaiLieu != null)
             .WithMessage("Tệp phải có định dạng .pdf, .doc hoặc .docx.");
 
@@ -40,12 +40,17 @@ public class CreateBaiTapCommandValidator : AbstractValidator<CreateBaiTapComman
             .WithMessage("Đã tồn tại bài tập được tạo hôm nay cho lớp học này.");
     }
 
-    private bool BeValidFileType(IFormFile? file)
+    private bool ValidTaiLieu(IFormFile file)
     {
         if (file == null) return true;
-        var allowedExtensions = new[] { ".pdf", ".doc", ".docx" };
+
+        var allowedExtensions = new[] { ".doc", ".docx", ".pdf" };
         var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-        return allowedExtensions.Contains(extension);
+
+        bool isValidExtension = allowedExtensions.Contains(extension);
+        bool isValidSize = file.Length <= 10 * 1024 * 1024; // <= 10MB
+
+        return isValidExtension && isValidSize;
     }
 
     private bool BeFutureTime(DateTime? dateTime)

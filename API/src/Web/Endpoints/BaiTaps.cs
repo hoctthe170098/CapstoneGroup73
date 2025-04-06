@@ -19,7 +19,7 @@ public class BaiTaps : EndpointGroupBase
     {
         app.MapGroup(this)
            .DisableAntiforgery()
-           .MapGet(GetTeacherAssignmentList, "getteacherassignments")
+           .MapGet(GetTeacherAssignmentList, "getbaitapsforstudent")
            .MapGet(GetAllBaiTaps, "getallbaitaps")
            .MapGet(GetBaiTapsForTeacher, "getbaitapsforteacher")
            .MapPost(CreateBaiTap, "createbaitap")

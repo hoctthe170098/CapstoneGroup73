@@ -22,15 +22,19 @@ public class TeacherAssignmentListWithPaginationQueryHandler : IRequestHandler<T
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IIdentityService _identityService;
 
     public TeacherAssignmentListWithPaginationQueryHandler(
         IApplicationDbContext context,
         IMapper mapper,
-        IHttpContextAccessor httpContextAccessor)
+        IHttpContextAccessor httpContextAccessor,
+        IIdentityService identityService)
     {
         _context = context;
         _mapper = mapper;
         _httpContextAccessor = httpContextAccessor;
+        _identityService = identityService;
+
     }
 
     public async Task<Output> Handle(TeacherAssignmentListWithPaginationQuery request, CancellationToken cancellationToken)
@@ -38,21 +42,25 @@ public class TeacherAssignmentListWithPaginationQueryHandler : IRequestHandler<T
         if (request.PageNumber < 1 || request.PageSize < 1)
             throw new WrongInputException("Số trang hoặc kích thước trang không hợp lệ!");
 
-        // Lấy studentCode từ token
-        var user = _httpContextAccessor.HttpContext?.User;
-        if (user == null || !user.Identity?.IsAuthenticated == true)
-            throw new UnauthorizedAccessException("Người dùng chưa xác thực.");
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"]
+            .ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
 
-        var studentCode = user.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                       ?? user.FindFirst("sub")?.Value;
+        var userId = _identityService.GetUserId(token).ToString();
 
-        if (string.IsNullOrWhiteSpace(studentCode))
-            throw new UnauthorizedAccessException("Không tìm thấy mã học sinh trong token.");
+        var hocSinh = await _context.HocSinhs
+            .AsNoTracking()
+            .FirstOrDefaultAsync(hs => hs.UserId == userId, cancellationToken);
 
-        // Truy vấn bài tập thuộc lớp học mà học sinh tham gia
+        if (hocSinh == null)
+            throw new NotFoundDataException("Không tìm thấy học sinh tương ứng.");
+
+        var hocSinhCode = hocSinh.Code;
+
         var query = _context.BaiTaps
             .AsNoTracking()
-            .Where(bt => bt.LichHoc.ThamGiaLopHocs.Any(tg => tg.HocSinhCode == studentCode))
+            .Where(bt => bt.LichHoc.ThamGiaLopHocs.Any(tg => tg.HocSinhCode == hocSinhCode))
             .OrderByDescending(bt => bt.NgayTao)
             .ProjectTo<BaiTapDto>(_mapper.ConfigurationProvider);
 
