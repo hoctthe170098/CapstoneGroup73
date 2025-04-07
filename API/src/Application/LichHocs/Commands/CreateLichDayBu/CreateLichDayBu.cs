@@ -30,15 +30,24 @@ public record CreateLichDayBuCommand : IRequest<Output>
         }
         public async Task<Output> Handle(CreateLichDayBuCommand request, CancellationToken cancellationToken)
         {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
         var thu = ((int)request.NgayNghi.DayOfWeek > 0)
         ? (int)request.NgayNghi.DayOfWeek + 1
         : (int)request.NgayNghi.DayOfWeek + 8;
         var lichDayThem = _context.LichHocs
-            .FirstOrDefault(lh => lh.NgayHocGoc == request.NgayNghi && lh.TrangThai == "Dạy thay");
+            .FirstOrDefault(lh => lh.NgayHocGoc == request.NgayNghi
+            && lh.TrangThai == "Dạy thay"
+            && lh.Phong.CoSoId == coSoId);
         if (lichDayThem != null)
         _context.LichHocs.Remove(lichDayThem);
         var lichHoc = await _context.LichHocs
-            .FirstAsync(lh=>lh.Thu == thu&&lh.TenLop==request.TenLop&&lh.TrangThai=="Cố định");
+            .FirstAsync(lh=>lh.Thu == thu 
+            && lh.TenLop == request.TenLop 
+            && lh.TrangThai == "Cố định" 
+            && lh.Phong.CoSoId == coSoId);
         if (request.LichDayBu == null)
         {
             var lichDayBu = new LichHoc
@@ -77,7 +86,8 @@ public record CreateLichDayBuCommand : IRequest<Output>
                 .FirstOrDefault(lh => lh.TenLop == request.TenLop
                 && lh.TrangThai == "Dạy bù"
                 && lh.NgayHocGoc == request.NgayNghi
-                && lh.NgayKetThuc == DateOnly.MinValue);
+                && lh.NgayKetThuc == DateOnly.MinValue
+                 && lh.Phong.CoSoId == coSoId);
             if(lichDayBu != null)
             {
                 lichDayBu.Thu = thuHocBu;
@@ -109,7 +119,7 @@ public record CreateLichDayBuCommand : IRequest<Output>
                 _context.LichHocs.Add(lichDayBu);
             }
             var lichCoDinh = _context.LichHocs
-            .Where(lh => lh.TenLop == request.TenLop && lh.TrangThai == "Cố định")
+            .Where(lh => lh.TenLop == request.TenLop && lh.TrangThai == "Cố định" && lh.Phong.CoSoId == coSoId)
             .Select(lh => lh.Id)
             .ToList();
             var hocSinhCodes = _context.ThamGiaLopHocs

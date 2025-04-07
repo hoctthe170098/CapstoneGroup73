@@ -29,15 +29,15 @@ internal sealed class GlobalExceptionHandler : IExceptionHandler
         switch (exception)
         {
             case NotFoundDataException:
-                output.code = 404;
+                output.code = 500;
                 output.message = "Thiếu dữ liệu đầu vào, vui lòng nhập đầy đủ";
                 break;
             case WrongInputException:
-                output.code = 404;
+                output.code = 500;
                 output.message = "Dữ liệu nhập sai,vui lòng nhập lại!";
                 break;
             case FormatException:
-                output.code = 404;
+                output.code = 500;
                 output.message = "Định dạng dữ liệu không hợp lệ!";
                 break;
             case NotFoundIDException:
