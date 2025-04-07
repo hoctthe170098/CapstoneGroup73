@@ -48,18 +48,11 @@ public class UpdateBaiTapCommandHandler : IRequestHandler<UpdateBaiTapCommand, O
         if (baiTap == null)
             throw new NotFoundDataException("Không tìm thấy bài tập.");
 
-        //  Validate trạng thái
-        var allowedStatuses = new[] { "Đang mở", "Chưa mở" };
-        if (!string.IsNullOrWhiteSpace(dto.TrangThai) &&
-            !allowedStatuses.Contains(dto.TrangThai.Trim(), StringComparer.OrdinalIgnoreCase))
-        {
-            throw new WrongInputException("Trạng thái không hợp lệ. Chỉ cho phép 'Đang mở' hoặc 'Chưa mở'.");
-        }
 
         //  Cập nhật thông tin bài tập
         baiTap.TieuDe = dto.TieuDe;
         baiTap.NoiDung = dto.NoiDung;
-        baiTap.ThoiGianKetThuc = dto.ThoiGianKetThuc;
+        baiTap.ThoiGianKetThuc = dto.ThoiGianHetHan;
         baiTap.TrangThai = dto.TrangThai;
 
         //  Xử lý file nếu có upload mới
