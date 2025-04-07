@@ -2,16 +2,21 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 using StudyFlow.Application.BaiTaps.Commands.CreateBaiTap;
 using StudyFlow.Application.Common.Interfaces;
 
 public class CreateBaiTapCommandValidator : AbstractValidator<CreateBaiTapCommand>
 {
     private readonly IApplicationDbContext _context;
+    private readonly IIdentityService _identityService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public CreateBaiTapCommandValidator(IApplicationDbContext context)
+    public CreateBaiTapCommandValidator(IApplicationDbContext context, IIdentityService identityService, IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
+        _identityService = identityService;
+        _httpContextAccessor = httpContextAccessor;
 
         RuleFor(x => x.CreateBaiTapDto.TieuDe)
             .NotEmpty().WithMessage("Tiêu đề không được để trống.")
@@ -29,11 +34,11 @@ public class CreateBaiTapCommandValidator : AbstractValidator<CreateBaiTapComman
         RuleFor(x => x.CreateBaiTapDto.TaiLieu)
             .Must(ValidTaiLieu)
             .When(x => x.CreateBaiTapDto.TaiLieu != null)
-            .WithMessage("Tệp phải có định dạng .pdf, .doc hoặc .docx.");
+            .WithMessage("Tệp phải là .pdf, .doc hoặc .docx và không vượt quá 10MB.");
 
         RuleFor(x => x)
             .MustAsync(NgayTaoValidWithLichHoc)
-            .WithMessage("Hôm nay không có lịch học của lớp hoặc ngày tạo không hợp lệ.");
+            .WithMessage("Hôm nay không có lịch học của lớp hoặc Bạn không thể tạo bài tập trong buổi dạy thay.");
 
         RuleFor(x => x)
             .MustAsync(KhongTrungNgayTao)
@@ -55,14 +60,14 @@ public class CreateBaiTapCommandValidator : AbstractValidator<CreateBaiTapComman
 
     private bool BeFutureTime(DateTime? dateTime)
     {
-        return dateTime.HasValue && dateTime.Value > DateTime.UtcNow;
+        return dateTime.HasValue && dateTime.Value > DateTime.Now;
     }
 
     private async Task<bool> NgayTaoValidWithLichHoc(CreateBaiTapCommand command, CancellationToken cancellationToken)
     {
         var dto = command.CreateBaiTapDto;
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
-        var thu = ConvertDayOfWeekToThu(DateTime.UtcNow.DayOfWeek);
+        var today = DateOnly.FromDateTime(DateTime.Now);
+        var thu = ConvertDayOfWeekToThu(DateTime.Now.DayOfWeek);
 
         var lichHoc = await _context.LichHocs
             .FirstOrDefaultAsync(lh =>
@@ -72,16 +77,29 @@ public class CreateBaiTapCommandValidator : AbstractValidator<CreateBaiTapComman
                 today <= lh.NgayKetThuc,
                 cancellationToken);
 
-        return lichHoc != null;
+        if (lichHoc == null) return false;
+
+        // Không cho phép tạo nếu là lịch học dạy thay
+        if (lichHoc.TrangThai != null && lichHoc.TrangThai.Trim().Equals("Dạy thay", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        return true;
     }
+
 
     private async Task<bool> KhongTrungNgayTao(CreateBaiTapCommand command, CancellationToken cancellationToken)
     {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
         var dto = command.CreateBaiTapDto;
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
-
+        var today = DateOnly.FromDateTime(DateTime.Now);
+        var coSoId = _identityService.GetCampusId(token);
         var trung = await _context.BaiTaps.AnyAsync(bt =>
             bt.LichHoc.TenLop == dto.TenLop &&
+            bt.LichHoc.Phong.CoSoId == coSoId &&
             bt.NgayTao == today,
             cancellationToken);
 

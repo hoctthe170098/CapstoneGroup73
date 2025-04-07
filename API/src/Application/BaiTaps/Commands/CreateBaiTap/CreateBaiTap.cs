@@ -52,7 +52,6 @@ public class CreateBaiTapCommandHandler : IRequestHandler<CreateBaiTapCommand, O
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
         var thuHienTai = (int)DateTime.UtcNow.DayOfWeek;
         thuHienTai = thuHienTai == 0 ? 8 : thuHienTai + 1;
-
         //  Lấy GiaoVienCode từ UserId
         var giaoVien = await _context.GiaoViens
             .FirstOrDefaultAsync(gv => gv.UserId == giaoVienId.ToString(), cancellationToken);
