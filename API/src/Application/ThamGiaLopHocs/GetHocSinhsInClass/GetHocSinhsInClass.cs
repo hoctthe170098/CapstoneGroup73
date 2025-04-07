@@ -30,25 +30,34 @@ public class GetHocSinhsInClassQueriesHandler : IRequestHandler<GetHocSinhsInCla
 
     public async Task<Output> Handle(GetHocSinhsInClassQueries request, CancellationToken cancellationToken)
     {
-        try
-        {
-            var list = await _context.ThamGiaLopHocs
-                .Include(t => t.LichHoc)
-                .Where(t => t.LichHoc.TenLop == request.TenLop)
-                .Select(t => t.HocSinh)
-                .OrderByDescending(hs => hs.Ten)
-                .ToListAsync(cancellationToken);
 
-            return new Output
-            {
-                isError = false,
-                data = list,
-                message = "Lấy danh sách học sinh thành công"
-            };
-        }
-        catch
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var userId = _identityService.GetUserId(token);
+
+        var giaoVien = await _context.GiaoViens
+            .FirstOrDefaultAsync(gv => gv.UserId == userId.ToString(), cancellationToken);
+
+        if (giaoVien == null)
+            throw new Exception("Không tìm thấy giáo viên tương ứng với tài khoản.");
+
+        var list = await _context.ThamGiaLopHocs
+            .Include(t => t.LichHoc)
+            .Where(t => t.LichHoc.TenLop == request.TenLop && t.LichHoc.GiaoVienCode == giaoVien.Code)
+            .Select(t => t.HocSinh)
+            .OrderByDescending(hs => hs.Ten)
+            .ToListAsync(cancellationToken);
+
+        if (list == null || !list.Any())
+            throw new NotFoundIDException();
+
+        return new Output
         {
-            throw new NotImplementedException();
-        }
+            isError = false,
+            data = list,
+            message = "Lấy danh sách học sinh thành công"
+        };
+
     }
 }

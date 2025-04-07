@@ -31,12 +31,20 @@ public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Out
 
     public async Task<Output> Handle(EditLichHocCommand request, CancellationToken cancellationToken)
     {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
         var daBatDau = await _context.LichHocs
-            .AnyAsync(lh => lh.TenLop == request.LopHocDto.TenLop && lh.TrangThai == "Cố định" && lh.NgayBatDau <= DateOnly.FromDateTime(DateTime.Now));
+            .AnyAsync(lh => lh.TenLop == request.LopHocDto.TenLop 
+            && lh.Phong.CoSoId == coSoId
+            && lh.TrangThai == "Cố định" 
+            && lh.NgayBatDau <= DateOnly.FromDateTime(DateTime.Now));
         if(daBatDau)
         {
             var lichHocCu = _context.LichHocs
-            .Where(lh => lh.TenLop == request.LopHocDto.TenLop 
+            .Where(lh => lh.TenLop == request.LopHocDto.TenLop
+            && lh.Phong.CoSoId == coSoId
             && lh.TrangThai !="Dạy bù"
             && lh.TrangThai != "Dạy thay")
             .ToList();
@@ -94,7 +102,8 @@ public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Out
         else
         {
             var lichHocData = await _context.LichHocs
-                .Where(lh => lh.TenLop == request.LopHocDto.TenLop)
+                .Where(lh => lh.TenLop == request.LopHocDto.TenLop 
+                && lh.Phong.CoSoId == coSoId)
                 .ToListAsync();
             var lichHocCanUpDate = request.LopHocDto.LichHocs
                 .Where(l => l.Id != null)
@@ -105,7 +114,8 @@ public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Out
             var lichHocCanThem = request.LopHocDto.LichHocs.Where(lh=>lh.Id==null).ToList();
             foreach(var lh in lichHocCanUpDate)
             {
-                var lichHoc = _context.LichHocs.Where(l=>l.Id==lh.Id).First();
+                var lichHoc = _context.LichHocs
+                    .Where(l=>l.Id==lh.Id && l.Phong.CoSoId == coSoId).First();
                 lichHoc.Thu = lh.Thu;
                 lichHoc.GioBatDau = TimeOnly.Parse(lh.GioBatDau);
                 lichHoc.GioKetThuc = TimeOnly.Parse(lh.GioKetThuc);
@@ -134,7 +144,8 @@ public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Out
                 await _context.SaveChangesAsync(cancellationToken);
             }
             var lichHocSauUpdate = await _context.LichHocs
-                .Where(lh=>lh.TenLop==request.LopHocDto.TenLop)
+                .Where(lh=>lh.TenLop == request.LopHocDto.TenLop 
+                && lh.Phong.CoSoId == coSoId)
                 .ToListAsync();
             foreach(var lh in lichHocSauUpdate)
             {

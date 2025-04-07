@@ -45,18 +45,25 @@ public class EditLichHocCommandValidator : AbstractValidator<EditLichHocCommand>
     private bool ValidLichHocHocSinh(EditLichHocCommand command
         , List<string> hocSinhCodes)
     {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
         List<string> invalidCodes = new List<string>();
         var lichHocMois = command.LopHocDto.LichHocs;
         var lichHocCu = _context.LichHocs
             .Where(lh=>lh.TenLop == command.LopHocDto.TenLop 
             && lh.NgayKetThuc!= DateOnly.MinValue 
-            && lh.TrangThai!="Dạy thay")
+            && lh.TrangThai!="Dạy thay"
+            && lh.Phong.CoSoId == coSoId)
             .Select(lh=>lh.Id)
             .ToList();
         foreach(var hs in command.LopHocDto.HocSinhCodes )
         {
             var lichHocHocSinhHienTai = _context.ThamGiaLopHocs
-                .Where(tg => tg.HocSinhCode == hs && !lichHocCu.Contains(tg.LichHoc.Id))
+                .Where(tg => tg.HocSinhCode == hs 
+                && !lichHocCu.Contains(tg.LichHoc.Id) 
+                && tg.LichHoc.Phong.CoSoId == coSoId)
                 .Select(tg => tg.LichHoc)
                 .Distinct()
                 .ToList();
@@ -86,7 +93,8 @@ public class EditLichHocCommandValidator : AbstractValidator<EditLichHocCommand>
         var coSoId = _identityService.GetCampusId(token);
         foreach (var item in list)
         {
-            var hocSinh = await _context.HocSinhs.FirstOrDefaultAsync(hs => hs.Code == item && hs.CoSoId == coSoId);
+            var hocSinh = await _context.HocSinhs
+                .FirstOrDefaultAsync(hs => hs.Code == item && hs.CoSoId == coSoId);
             if (hocSinh==null) return false;
             var active = await _identityService.IsUserActiveAsync(hocSinh.UserId!);
             if(!active) return false;
@@ -100,14 +108,18 @@ public class EditLichHocCommandValidator : AbstractValidator<EditLichHocCommand>
     }
 
     private async Task<bool> ChuaBatDau(EditLichHocCommand command, 
-        List<LichHocDto> lichHocs, CancellationToken token)
+        List<LichHocDto> lichHocs, CancellationToken cToken)
     {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
         var daBatDau = await _context.LichHocs
                     .AnyAsync(lh => lh.TenLop == command.LopHocDto.TenLop && lh.TrangThai == "Cố định"
-                  && lh.NgayBatDau <= DateOnly.FromDateTime(DateTime.Now));
+                  && lh.NgayBatDau <= DateOnly.FromDateTime(DateTime.Now)&&lh.Phong.CoSoId==coSoId);
 
         var lichHocHienTais = await _context.LichHocs
-                 .Where(lh => lh.TenLop == command.LopHocDto.TenLop)
+                 .Where(lh => lh.TenLop == command.LopHocDto.TenLop && lh.Phong.CoSoId == coSoId)
                  .ToListAsync();
         if (daBatDau)
         {
@@ -132,7 +144,7 @@ public class EditLichHocCommandValidator : AbstractValidator<EditLichHocCommand>
             throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
         var coSoId = _identityService.GetCampusId(token);
         var lichHocHienTais = await _context.LichHocs
-                 .Where(lh => lh.TenLop == command.LopHocDto.TenLop)
+                 .Where(lh => lh.TenLop == command.LopHocDto.TenLop && lh.Phong.CoSoId == coSoId)
                  .Select(lh => lh.Id)
                  .ToListAsync();
             if (lichHocs == null || lichHocs.Count == 0)

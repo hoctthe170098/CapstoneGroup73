@@ -21,12 +21,18 @@ public class CreateBaiKiemTraCommandHandler : IRequestHandler<CreateBaiKiemTraCo
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly string _baikiemtraFolderPath;
     private readonly ILogger<CreateBaiKiemTraCommandHandler> _logger;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IIdentityService _identityService;
 
     public CreateBaiKiemTraCommandHandler(IApplicationDbContext context
         , IWebHostEnvironment webHostEnvironment
+        , IHttpContextAccessor httpContextAccessor
+        , IIdentityService identityService
         , ILogger<CreateBaiKiemTraCommandHandler> logger)
     {
         _context = Guard.Against.Null(context);
+        _httpContextAccessor = httpContextAccessor;
+        _identityService = identityService;
         _webHostEnvironment = Guard.Against.Null(webHostEnvironment);
         _logger = Guard.Against.Null(logger);
         _baikiemtraFolderPath = Path.Combine(_webHostEnvironment.ContentRootPath, "baikiemtras");
@@ -38,6 +44,10 @@ public class CreateBaiKiemTraCommandHandler : IRequestHandler<CreateBaiKiemTraCo
 
     public async Task<Output> Handle(CreateBaiKiemTraCommand request, CancellationToken cancellationToken)
     {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
         string urlTaiLieu = await UploadDeThi(request.BaiKiemTraDto.TaiLieu, cancellationToken);
         BaiKiemTra baiKiemTra = new BaiKiemTra
         {
@@ -53,7 +63,7 @@ public class CreateBaiKiemTraCommandHandler : IRequestHandler<CreateBaiKiemTraCo
             : (int)request.BaiKiemTraDto.NgayKiemTra.DayOfWeek;
         var lichHoc = await _context.LichHocs
             .Where(lh => lh.TenLop == request.BaiKiemTraDto.TenLop
-            && lh.Thu == thu && lh.TrangThai == "Cố định").FirstAsync();
+            && lh.Thu == thu && lh.TrangThai == "Cố định"&&lh.Phong.CoSoId==coSoId).FirstAsync();
         baiKiemTra.LichHocId = lichHoc.Id;
         await _context.BaiKiemTras.AddAsync(baiKiemTra, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);

@@ -160,7 +160,7 @@
         <ul class="class-schedule">
           <li *ngIf="selectedClassSchedule.length === 0">Không có lịch</li>
           <li *ngFor="let lich of selectedClassSchedule">
-            Thứ {{ lich.thu }} – {{ lich.tenPhong }}<br />
+            {{ getThuText(lich.thu) }} – {{ lich.tenPhong }}<br />
             <small>
               Từ {{ lich.ngayBatDau | date: 'dd/MM/yyyy' }} đến {{ lich.ngayKetThuc | date: 'dd/MM/yyyy' }}
             </small>
@@ -232,7 +232,7 @@
         <ul class="class-schedule">
           <li *ngIf="selectedClassSchedule.length === 0">Không có lịch</li>
           <li *ngFor="let lich of selectedClassSchedule">
-            Thứ {{ lich.thu }} – {{ lich.tenPhong }}<br />
+            {{ getThuText(lich.thu) }} – {{ lich.tenPhong }}<br />
             <small>
               Từ {{ lich.ngayBatDau | date: 'dd/MM/yyyy' }} đến {{ lich.ngayKetThuc | date: 'dd/MM/yyyy' }}
             </small>

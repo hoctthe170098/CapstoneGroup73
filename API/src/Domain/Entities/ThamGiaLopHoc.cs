@@ -18,4 +18,6 @@ public class ThamGiaLopHoc
     public required Guid LichHocId { get; set; }//u
     [JsonIgnore]
     public LichHoc LichHoc { get; set; } = null!;
+    [JsonIgnore]
+    public IList<DiemDanh> DiemDanhs { get; private set; } = new List<DiemDanh>();
 }
