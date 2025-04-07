@@ -31,8 +31,8 @@ public class DeleteLichDayThayCommandHandler : IRequestHandler<DeleteLichDayThay
         if (string.IsNullOrEmpty(token))
             throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
         var coSoId = _identityService.GetCampusId(token);
-        var lichDayThay = await _context.LichHocs
-            .FirstOrDefaultAsync(lh => lh.Id == request.lichHocId 
+        var lichDayThay =  _context.LichHocs
+            .FirstOrDefault(lh => lh.Id == request.lichHocId 
             && lh.TrangThai == "Dạy thay"
             && lh.Phong.CoSoId == coSoId 
             && lh.NgayKetThuc > DateOnly.FromDateTime(DateTime.Now));
