@@ -75,23 +75,33 @@ public class UpdateBaiKiemTraCommandValidator : AbstractValidator<UpdateBaiKiemT
     }
 
     private async Task<bool> NotDuplicatedLichThi(UpdateBaiKiemTraCommand command,
-        DateOnly ngayKiemTra, CancellationToken token)
+        DateOnly ngayKiemTra, CancellationToken cToken)
     {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"]
+    .ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
         var baiKiemTra = await _context.BaiKiemTras.FirstAsync(b => b.Id == command.BaiKiemTraDto.Id);
         if (ngayKiemTra == baiKiemTra.NgayKiemTra) return true;
         return !await _context.BaiKiemTras.AnyAsync(b => b.NgayKiemTra == ngayKiemTra
-        && b.LichHoc.TenLop == command.BaiKiemTraDto.TenLop);
+        && b.LichHoc.TenLop == command.BaiKiemTraDto.TenLop&&b.LichHoc.Phong.CoSoId==coSoId);
     }
 
     private async Task<bool> ValidLichKiemTraCoDinh(UpdateBaiKiemTraCommand command
-        , DateOnly ngayKiemTra, CancellationToken token)
+        , DateOnly ngayKiemTra, CancellationToken cToken)
     {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"]
+    .ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
         var baiKiemTra = await _context.BaiKiemTras.FirstAsync(b => b.Id == command.BaiKiemTraDto.Id);
         if (ngayKiemTra == baiKiemTra.NgayKiemTra) return true;
         var thu = ((int)ngayKiemTra.DayOfWeek > 0) ? (int)ngayKiemTra.DayOfWeek + 1 : (int)ngayKiemTra.DayOfWeek + 8;
         return !await _context.LichHocs.AnyAsync(lh => lh.TenLop == command.BaiKiemTraDto.TenLop
         && lh.Thu == thu && lh.NgayKetThuc == ngayKiemTra 
-        && (lh.TrangThai == "Dạy bù"||lh.TrangThai=="Dạy thay"));
+        && (lh.TrangThai == "Dạy bù"||lh.TrangThai=="Dạy thay")&&lh.Phong.CoSoId==coSoId);
     }
 
     private bool ValidTaiLieu(IFormFile? file)
@@ -110,13 +120,18 @@ public class UpdateBaiKiemTraCommandValidator : AbstractValidator<UpdateBaiKiemT
         return true; // File hợp lệ
     }
 
-    private async Task<bool> ValidNgayKiemTra(UpdateBaiKiemTraCommand command,DateOnly ngayKiemTra, CancellationToken token)
+    private async Task<bool> ValidNgayKiemTra(UpdateBaiKiemTraCommand command,DateOnly ngayKiemTra, CancellationToken cToken)
     {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"]
+    .ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
         var baiKiemTra = await _context.BaiKiemTras.FirstAsync(b => b.Id == command.BaiKiemTraDto.Id);
         if (ngayKiemTra == baiKiemTra.NgayKiemTra) return true;
         if(ngayKiemTra < DateOnly.FromDateTime(DateTime.Now).AddDays(7)) return false;
         var thu = ((int)ngayKiemTra.DayOfWeek >0) ? (int)ngayKiemTra.DayOfWeek + 1 : (int)ngayKiemTra.DayOfWeek + 8;
         return await _context.LichHocs.AnyAsync(lh => lh.TenLop == command.BaiKiemTraDto.TenLop
-        && lh.Thu == thu&&lh.NgayKetThuc>=ngayKiemTra&&lh.TrangThai=="Cố định");
+        && lh.Thu == thu&&lh.NgayKetThuc>=ngayKiemTra&&lh.TrangThai=="Cố định" && lh.Phong.CoSoId == coSoId);
     }
 }
