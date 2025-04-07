@@ -13,8 +13,8 @@ public record GetListBaiTapChoGiaoVienWithPaginationQuery : IRequest<Output>
     public int PageNumber { get; init; } = 1;
     public int PageSize { get; init; } = 10;
     public required string TenLop { get; init; }
-    public string? TrangThai { get; init; }
-    public DateTime? ThoiGianKetThuc { get; init; }
+    public string? TrangThai { get; init; } = "all";
+    public DateTime? ThoiGianKetThuc { get; init; } = DateTime.MinValue;
 }
 
 public class GetListBaiTapChoGiaoVienWithPaginationQueryHandler
