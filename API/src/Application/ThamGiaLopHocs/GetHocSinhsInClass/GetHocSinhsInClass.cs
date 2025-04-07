@@ -46,6 +46,7 @@ public class GetHocSinhsInClassQueriesHandler : IRequestHandler<GetHocSinhsInCla
             .Include(t => t.LichHoc)
             .Where(t => t.LichHoc.TenLop == request.TenLop && t.LichHoc.GiaoVienCode == giaoVien.Code)
             .Select(t => t.HocSinh)
+            .Distinct()
             .OrderByDescending(hs => hs.Ten)
             .ToListAsync(cancellationToken);
 

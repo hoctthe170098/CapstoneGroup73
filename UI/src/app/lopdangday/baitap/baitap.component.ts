@@ -39,9 +39,6 @@ export class BaitapComponent implements OnInit {
       data = data.filter(bt => bt.trangThai === this.trangThaiFilter);
     }
 
-    if (this.ngayFilter) {
-      data = data.filter(bt => bt.ngay === this.ngayFilter);
-    }
 
     this.filteredBaiTaps = data;
     this.currentPage = 1;
