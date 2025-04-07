@@ -13,5 +13,6 @@ public class CreateBaiTapDto
     public string NoiDung { get; set; } = string.Empty;
     public DateTime? ThoiGianKetThuc { get; set; }  
     public required IFormFile TaiLieu { get; set; }
+
 }
 
