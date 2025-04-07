@@ -2,12 +2,15 @@
   <h2 class="calendar-title">Lịch dạy</h2>
 
   <div class="filter-bar">
-    <select [(ngModel)]="selectedWeek" (change)="onWeekChange('Tuần ' + selectedWeek)">
-      <option *ngFor="let week of weeks" [value]="week.replace('Tuần ', '')">{{ week }}</option>
+    <label>Tuần :</label>
+    <select [(ngModel)]="selectedWeek" (change)="onWeekChange()">
+      <option *ngFor="let week of weeks" [value]="week.value">
+        {{ week.label }}
+      </option>
     </select>
-
+    <label>Năm :</label>
     <select [(ngModel)]="selectedYear" (change)="onYearChange(selectedYear)">
-      <option *ngFor="let year of years" [value]="year">Năm {{ year }}</option>
+      <option *ngFor="let year of years" [value]="year">{{ year }}</option>
     </select>
   </div>
 
@@ -15,7 +18,7 @@
     <div class="calendar-header">
       <div class="time-column-header">Giờ</div>
       <div class="day-column-header" *ngFor="let day of schedule">
-        {{ day.ngay | date: 'EEE dd/MM' }}
+        {{ day.thuRutGon }}
       </div>
     </div>
 
