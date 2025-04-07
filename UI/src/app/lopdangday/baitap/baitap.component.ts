@@ -10,10 +10,15 @@ export class BaitapComponent implements OnInit {
   filteredBaiTaps: any[] = [];
   currentPage: number = 1;
   pageSize: number = 6;
-
+  isAddModalOpen: boolean = false;
   trangThaiFilter: string = '';
   ngayFilter: string = '';
-
+  newBaiTap: any = {
+    tieuDe: '',
+    noiDung: '',
+    gioHetHan: '',
+    files: [] as File[]
+  };
   ngOnInit(): void {
     this.baiTaps = [
       { ten: 'Bài tập ôn tập hệ số góc', ngay: '2024-04-20', gio: '17h - 23h', trangThai: 'DangMo' },
@@ -56,4 +61,33 @@ export class BaitapComponent implements OnInit {
       this.currentPage = page;
     }
   }
+  openAddModal(): void {
+    this.isAddModalOpen = true;
+    this.newBaiTap = {
+      tieuDe: '',
+      noiDung: '',
+      gioHetHan: '',
+      files: []
+    };
+  }
+  
+  closeAddModal(): void {
+    this.isAddModalOpen = false;
+  }
+  
+  handleFileInput(event: any): void {
+    const selectedFiles = Array.from(event.target.files) as File[];
+    this.newBaiTap.files = this.newBaiTap.files.concat(selectedFiles);
+
+  }
+  
+  removeFile(index: number): void {
+    this.newBaiTap.files.splice(index, 1);
+  }
+  
+  submitNewBaiTap(): void {
+    console.log('📩 Dữ liệu gửi đi:', this.newBaiTap);
+    this.closeAddModal();
+  }
+  
 }
