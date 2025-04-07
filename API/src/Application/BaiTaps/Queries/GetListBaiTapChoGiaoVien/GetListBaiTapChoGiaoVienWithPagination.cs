@@ -13,8 +13,7 @@ public record GetListBaiTapChoGiaoVienWithPaginationQuery : IRequest<Output>
     public int PageNumber { get; init; } = 1;
     public int PageSize { get; init; } = 10;
     public required string TenLop { get; init; }
-    public string? TrangThai { get; init; } = "all";
-    public DateTime? ThoiGianKetThuc { get; init; } = DateTime.MinValue;
+    public string? TrangThai { get; init; } 
 }
 
 public class GetListBaiTapChoGiaoVienWithPaginationQueryHandler
@@ -110,21 +109,11 @@ public class GetListBaiTapChoGiaoVienWithPaginationQueryHandler
             }
 
             // Áp dụng filter theo trạng thái
-            if (!string.IsNullOrWhiteSpace(request.TrangThai))
+            if (!string.IsNullOrWhiteSpace(request.TrangThai) && request.TrangThai?.ToLower() != "all")
             {
-                baiTapQuery = baiTapQuery.Where(bt =>
-                    bt.TrangThai == request.TrangThai);
+                baiTapQuery = baiTapQuery.Where(bt => bt.TrangThai == request.TrangThai);
             }
 
-            // Áp dụng filter theo ngày kết thúc (bỏ qua phần giờ phút)
-            if (request.ThoiGianKetThuc.HasValue)
-            {
-                var ngayFilter = request.ThoiGianKetThuc.Value.Date;
-
-                baiTapQuery = baiTapQuery.Where(bt =>
-                    bt.ThoiGianKetThuc.HasValue &&
-                    bt.ThoiGianKetThuc.Value.Date == ngayFilter);
-            }
             var baiTaps = await baiTapQuery
                 .OrderByDescending(bt => bt.NgayTao)
                 .ProjectTo<BaiTapGiaoVienDto>(_mapper.ConfigurationProvider)
