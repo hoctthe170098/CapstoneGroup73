@@ -21,7 +21,7 @@ public class BaiTaps : EndpointGroupBase
            .DisableAntiforgery()
            .MapGet(GetTeacherAssignmentList, "getbaitapsforstudent")
            .MapGet(GetAllBaiTaps, "getallbaitaps")
-           .MapGet(GetBaiTapsForTeacher, "getbaitapsforteacher")
+           .MapPost(GetBaiTapsForTeacher, "getbaitapsforteacher")
            .MapPost(CreateBaiTap, "createbaitap")
            .MapPut(UpdateBaiTap, "updatebaitap")
            .MapDelete(DeleteBaiTap, "deletebaitap");
@@ -44,7 +44,7 @@ public class BaiTaps : EndpointGroupBase
     }
 
     [Authorize(Roles = Roles.Teacher)]
-    public async Task<Output> GetBaiTapsForTeacher(ISender sender,[AsParameters] GetListBaiTapChoGiaoVienWithPaginationQuery query)
+    public async Task<Output> GetBaiTapsForTeacher(ISender sender,[FromBody] GetListBaiTapChoGiaoVienWithPaginationQuery query)
     {
         return await sender.Send(query);
     }
