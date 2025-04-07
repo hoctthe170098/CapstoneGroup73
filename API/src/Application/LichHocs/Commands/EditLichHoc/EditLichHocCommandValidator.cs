@@ -137,7 +137,7 @@ public class EditLichHocCommandValidator : AbstractValidator<EditLichHocCommand>
                  .ToListAsync();
             if (lichHocs == null || lichHocs.Count == 0)
             {
-                return false; // Danh sách rỗng hoặc null thì không cần validate
+                return false; 
             }
             var listThu = lichHocs.Select(lh => lh.Thu).Distinct()
                 .ToList();
