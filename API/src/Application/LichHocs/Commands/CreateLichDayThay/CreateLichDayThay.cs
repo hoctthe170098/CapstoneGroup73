@@ -28,11 +28,18 @@ public record CreateLichDayThayCommand : IRequest<Output>
         }
         public async Task<Output> Handle(CreateLichDayThayCommand request, CancellationToken cancellationToken)
         {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
         var thu = ((int)request.NgayDay.DayOfWeek > 0)
         ? (int)request.NgayDay.DayOfWeek + 1
         : (int)request.NgayDay.DayOfWeek + 8;
         var lichHoc = await _context.LichHocs
-            .FirstAsync(lh=>lh.Thu == thu&&lh.TenLop==request.TenLop&&lh.TrangThai=="Cố định");
+            .FirstAsync(lh=>lh.Thu == thu 
+            && lh.TenLop == request.TenLop 
+            && lh.TrangThai == "Cố định" 
+            && lh.Phong.CoSoId == coSoId);
         var lichDayThay = new LichHoc
         {
             Id = Guid.NewGuid(),

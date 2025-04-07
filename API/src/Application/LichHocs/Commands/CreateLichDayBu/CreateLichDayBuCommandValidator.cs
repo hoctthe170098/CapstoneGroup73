@@ -52,14 +52,18 @@ public class UpdateLichDayBuCommandValidator : AbstractValidator<CreateLichDayBu
     }
 
     private async Task<bool> KhongTrungLichVoiHocSinh(CreateLichDayBuCommand command, 
-        LichDayBuDto? lichDayBu, CancellationToken token)
+        LichDayBuDto? lichDayBu, CancellationToken cToken)
     {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
         if (lichDayBu == null) return true;
         var thu = ((int)lichDayBu.NgayHocBu.DayOfWeek > 0)
     ? (int)lichDayBu.NgayHocBu.DayOfWeek + 1
     : (int)lichDayBu.NgayHocBu.DayOfWeek + 8;
         var lichCoDinh =  _context.LichHocs
-            .Where(lh=>lh.TenLop==command.TenLop && lh.TrangThai=="Cố định")
+            .Where(lh=>lh.TenLop == command.TenLop && lh.TrangThai == "Cố định" && lh.Phong.CoSoId == coSoId)
             .Select(lh=>lh.Id)
             .ToList();
         var hocSinhCodes = _context.ThamGiaLopHocs
@@ -71,6 +75,7 @@ public class UpdateLichDayBuCommandValidator : AbstractValidator<CreateLichDayBu
         {
             var lichHocSinhVien = await _context.LichHocs
                 .Where(lh => lh.ThamGiaLopHocs.Select(tg => tg.HocSinhCode).Contains(code)
+                && lh.Phong.CoSoId == coSoId
                 && lh.NgayKetThuc != DateOnly.MinValue
                 && lh.Thu == thu
                 && !(lh.GioKetThuc <= TimeOnly.Parse(lichDayBu.GioBatDau).AddMinutes(-15)
@@ -86,22 +91,32 @@ public class UpdateLichDayBuCommandValidator : AbstractValidator<CreateLichDayBu
     }
     private DateOnly? ngayNghi(Guid lichHocId)
     {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
         var ngayNghi = _context.LichHocs
             .Where(lh => lh.LichHocGocId == lichHocId && lh.NgayKetThuc == DateOnly.MinValue
+            && lh.Phong.CoSoId == coSoId
             && lh.TrangThai == "Học bù")
             .Select(lh => lh.NgayHocGoc)
             .FirstOrDefault();
         return ngayNghi;
     }
     private async Task<bool> KhongTrungLichDayCoDinh(CreateLichDayBuCommand command, 
-        LichDayBuDto? lichDayBu, CancellationToken token)
+        LichDayBuDto? lichDayBu, CancellationToken cToken)
     {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
         if (lichDayBu == null) return true;
         var thu = ((int)lichDayBu.NgayHocBu.DayOfWeek > 0)
     ? (int)lichDayBu.NgayHocBu.DayOfWeek + 1
     : (int)lichDayBu.NgayHocBu.DayOfWeek + 8;
         var lichCoDinh = await _context.LichHocs
-            .Where(lh => lh.TenLop == command.TenLop && lh.TrangThai == "Cố định"
+            .Where(lh => lh.TenLop == command.TenLop && lh.TrangThai == "Cố định" 
+            && lh.Phong.CoSoId == coSoId
             && lh.Thu == thu
             && !(lh.GioKetThuc <= TimeOnly.Parse(lichDayBu.GioBatDau).AddMinutes(-15)
                 || lh.GioBatDau >= TimeOnly.Parse(lichDayBu.GioKetThuc).AddMinutes(15))).ToListAsync();
@@ -145,14 +160,21 @@ public class UpdateLichDayBuCommandValidator : AbstractValidator<CreateLichDayBu
     }
 
     private async Task<bool> KhongTrungPhong(CreateLichDayBuCommand command, 
-        LichDayBuDto? lichDayBu, CancellationToken token)
+        LichDayBuDto? lichDayBu, CancellationToken cToken)
     {
+        if (lichDayBu == null) return true;
+        if (lichDayBu.NgayHocBu < DateOnly.FromDateTime(DateTime.Now)) return false;
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
         if (lichDayBu == null) return true;
         var thu = ((int)lichDayBu.NgayHocBu.DayOfWeek > 0)
     ? (int)lichDayBu.NgayHocBu.DayOfWeek + 1
     : (int)lichDayBu.NgayHocBu.DayOfWeek + 8;
         var lichHocPhong = await _context.LichHocs
             .Where(lh => lh.TenLop != command.TenLop
+            && lh.Phong.CoSoId == coSoId
             && lh.Thu == thu
             && lh.PhongId == lichDayBu.PhongId
             && !(lh.GioKetThuc <= TimeOnly.Parse(lichDayBu.GioBatDau).AddMinutes(-15)
@@ -167,19 +189,26 @@ public class UpdateLichDayBuCommandValidator : AbstractValidator<CreateLichDayBu
     }
 
     private async Task<bool> KhongTrungLichDayGiaoVien(CreateLichDayBuCommand command,
-        LichDayBuDto? lichDayBu, CancellationToken token)
+        LichDayBuDto? lichDayBu, CancellationToken cToken)
     {
+        if (lichDayBu == null) return true;
+        if (lichDayBu.NgayHocBu < DateOnly.FromDateTime(DateTime.Now)) return false;
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
         if (lichDayBu == null) return true;
         var thu = ((int)lichDayBu.NgayHocBu.DayOfWeek > 0)
     ? (int)lichDayBu.NgayHocBu.DayOfWeek + 1
     : (int)lichDayBu.NgayHocBu.DayOfWeek + 8;
         var giaoVienCode = _context.LichHocs
-            .Where(lh=>lh.TenLop==command.TenLop && lh.TrangThai=="Cố định")
+            .Where(lh=>lh.TenLop==command.TenLop && lh.TrangThai=="Cố định" && lh.Phong.CoSoId == coSoId)
             .Select(lh=>lh.GiaoVienCode)
             .FirstOrDefault();
         if(giaoVienCode==null) return false;
         var lichDayGiaoVien = await _context.LichHocs
-            .Where(lh => lh.TenLop != command.TenLop 
+            .Where(lh => lh.TenLop != command.TenLop
+            && lh.Phong.CoSoId == coSoId
             && lh.NgayKetThuc != DateOnly.MinValue
             && lh.Thu == thu
             && lh.GiaoVienCode == giaoVienCode
@@ -212,38 +241,57 @@ public class UpdateLichDayBuCommandValidator : AbstractValidator<CreateLichDayBu
     }
 
     private async Task<bool> KhongTrungNgayKiemTra(CreateLichDayBuCommand command,
-        DateOnly ngayDay,CancellationToken token)
+        DateOnly ngayDay,CancellationToken cToken)
     {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
         return ! await _context.BaiKiemTras
-            .AnyAsync(b => b.NgayKiemTra == ngayDay && b.LichHoc.TenLop == command.TenLop);
+            .AnyAsync(b => b.NgayKiemTra == ngayDay && b.LichHoc.TenLop == command.TenLop && b.LichHoc.Phong.CoSoId == coSoId);
     }
     private async Task<bool> ChuaDuocNghi(CreateLichDayBuCommand command, 
-        DateOnly ngayDay, CancellationToken token)
+        DateOnly ngayDay, CancellationToken cToken)
     {
-        if(command.LichDayBu==null) return !await _context.LichHocs.AnyAsync(lh => lh.TenLop == command.TenLop
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
+        if (command.LichDayBu==null) return !await _context.LichHocs.AnyAsync(lh => lh.TenLop == command.TenLop
+      && lh.Phong.CoSoId == coSoId
       && lh.NgayHocGoc == ngayDay
       && lh.TrangThai == "Dạy bù");
         else return !await _context.LichHocs.AnyAsync(lh => lh.TenLop == command.TenLop
+        && lh.Phong.CoSoId == coSoId
       && lh.NgayHocGoc == ngayDay
       && lh.TrangThai == "Dạy bù"
       && lh.NgayKetThuc!=DateOnly.MinValue);
     }
     private async Task<bool> SauNgayBatDau(CreateLichDayBuCommand command, 
-        DateOnly ngayDay,CancellationToken token)
+        DateOnly ngayDay,CancellationToken cToken)
     {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
         var lichHoc =  await _context.LichHocs
-           .FirstOrDefaultAsync(lh => lh.TenLop == command.TenLop && lh.TrangThai == "Cố định");
+           .FirstOrDefaultAsync(lh => lh.TenLop == command.TenLop && lh.TrangThai == "Cố định" && lh.Phong.CoSoId == coSoId);
         if (lichHoc == null) return false;
         if (lichHoc.NgayBatDau > ngayDay || lichHoc.NgayKetThuc < ngayDay) return false;
         return true;
     }
     private async Task<bool> TrungLichHocCoDinh(CreateLichDayBuCommand command, 
-        DateOnly ngayDay,CancellationToken token)
+        DateOnly ngayDay,CancellationToken cToken)
     {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
         var thu = ((int)ngayDay.DayOfWeek > 0)
             ? (int)ngayDay.DayOfWeek + 1
             : (int)ngayDay.DayOfWeek + 8;
         return await _context.LichHocs.AnyAsync(lh => lh.TenLop == command.TenLop
+        && lh.Phong.CoSoId == coSoId
         && lh.Thu == thu && lh.TrangThai == "Cố định");
     }
     private async Task<bool> ExistClassName(string name,CancellationToken cToken)
