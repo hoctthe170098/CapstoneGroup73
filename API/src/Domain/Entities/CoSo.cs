@@ -15,6 +15,7 @@ public class CoSo
     public required string SoDienThoai { get; set; }
     public required string TrangThai { get; set; }
     public required bool Default { get; set; }
+    public string? MaCoSo {  get; set; }
     [JsonIgnore]
     public IList<NhanVien> NhanViens { get; private set; } = new List<NhanVien>();
     [JsonIgnore]

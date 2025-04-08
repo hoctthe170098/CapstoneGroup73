@@ -123,7 +123,7 @@ public record CreateLichDayBuCommand : IRequest<Output>
             .Select(lh => lh.Id)
             .ToList();
             var hocSinhCodes = _context.ThamGiaLopHocs
-            .Where(tg => lichCoDinh.Contains(tg.LichHocId))
+            .Where(tg => lichCoDinh.Contains(tg.LichHocId)&&tg.NgayKetThuc>= DateOnly.FromDateTime(DateTime.Now))
             .Select(tg => tg.HocSinhCode)
             .Distinct()
             .ToList();
