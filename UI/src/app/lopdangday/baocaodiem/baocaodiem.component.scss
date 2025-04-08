@@ -1,0 +1,29 @@
+.table-container {
+    padding: 16px;
+  }
+  
+  .table-scroll-wrapper {
+    overflow-x: auto;
+    max-width: 100%;
+    border: 1px solid #ddd;
+    background-color: #fff;
+  }
+  
+  table {
+    border-collapse: collapse;
+    width: max-content;
+    min-width: 100%;
+  }
+  
+  th, td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ccc;
+    white-space: nowrap;
+    font-size: 14px;
+  }
+  
+  td div {
+    line-height: 1.4;
+  }
+  
