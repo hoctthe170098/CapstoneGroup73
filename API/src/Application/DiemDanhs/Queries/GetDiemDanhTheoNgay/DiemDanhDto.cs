@@ -16,7 +16,6 @@ namespace StudyFlow.Application.DiemDanhs.Queries.GetDiemDanhTheoNgay
         public float? DiemBTVN { get; set; }
         public float? DiemTrenLop { get; set; }
         public string? NhanXet { get; set; }
-        public required Guid ThamGiaLopHocId { get; set; }
         private class Mapping : Profile
         {
             public Mapping()
