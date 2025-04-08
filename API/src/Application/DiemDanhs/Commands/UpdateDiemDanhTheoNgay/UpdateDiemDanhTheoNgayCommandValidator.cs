@@ -50,9 +50,13 @@ public class UpdateLichDayBuCommandValidator : AbstractValidator<UpdateDiemDanhT
     private async Task<bool> ChuaHetHan(List<UpdateDiemDanhDto> diemDanhs, CancellationToken token)
     {
         var idDiemDanh = diemDanhs.Select(d => d.Id).ToList();
-        return await _context.DiemDanhs
-            .AllAsync(dd => idDiemDanh.Contains(dd.Id) 
-            && dd.Ngay == DateOnly.FromDateTime(DateTime.Now));
+        foreach(var item in idDiemDanh)
+        {
+            var diemDanh = await _context.DiemDanhs.FirstOrDefaultAsync(d => d.Id == item);
+            if(diemDanh == null) return false;
+            if(diemDanh.Ngay!=DateOnly.FromDateTime(DateTime.Now)) return false;
+        }
+        return true;
     }
 
     private async Task<bool> CungChungMotLopVaNgay(List<UpdateDiemDanhDto> diemDanhs, CancellationToken token)
@@ -88,9 +92,14 @@ public class UpdateLichDayBuCommandValidator : AbstractValidator<UpdateDiemDanhT
             .FirstOrDefaultAsync(gv => gv.UserId == UserId.ToString());
         if (giaoVien == null) throw new NotFoundIDException();
         var idDiemDanh = diemDanhs.Select(d => d.Id).ToList();
-        return await _context.DiemDanhs
-            .AllAsync(dd => idDiemDanh.Contains(dd.Id) 
+        foreach(var id in idDiemDanh)
+        {
+            var diemDanh = await _context.DiemDanhs
+            .FirstOrDefaultAsync(dd => dd.Id == id
             && (dd.ThamGiaLopHoc.LichHoc.GiaoVienCode == giaoVien.Code
-            ||_context.LichHocs.Any(lh=>lh.GiaoVienCode==giaoVien.Code&&lh.LichHocGocId==dd.ThamGiaLopHoc.LichHocId)));
+            || _context.LichHocs.Any(lh => lh.GiaoVienCode == giaoVien.Code && lh.LichHocGocId == dd.ThamGiaLopHoc.LichHocId)));
+            if (diemDanh == null) return false;
+        }
+        return true;
     }
 }
