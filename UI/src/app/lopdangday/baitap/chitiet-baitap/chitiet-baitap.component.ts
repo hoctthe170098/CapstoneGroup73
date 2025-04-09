@@ -176,61 +176,130 @@ downloadFile(): void {
     const date = new Date(dateString);
     const offset = date.getTimezoneOffset();
     const localDate = new Date(date.getTime() - offset * 60000);
-    return localDate.toISOString().slice(0, 16); // yyyy-MM-ddTHH:mm
+    return localDate.toISOString().slice(0, 16); 
   }
   
   closeEditModal() {
     this.isEditModalOpen = false;
   }
   
-  onEditFileSelected(event: any): void {
+  onEditFileSelected(event: any, fileInput: HTMLInputElement): void {
     const file = event.target.files[0];
     if (file) {
+      const validTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      ];
+      const isValidType = validTypes.includes(file.type);
+      const isValidSize = file.size <= 10 * 1024 * 1024;
+  
+      if (!isValidType) {
+        this.toastr.error('Tệp không hợp lệ. Chỉ chấp nhận PDF, DOC hoặc DOCX.');
+        return;
+      }
+  
+      if (!isValidSize) {
+        this.toastr.error('Tệp vượt quá dung lượng cho phép (tối đa 10MB).');
+        return;
+      }
+  
       this.editBaiTap.file = {
         name: file.name,
         size: `${Math.round(file.size / 1024)} KB`,
-        
+        rawFile: file,
       };
+  
+      // Clear lỗi nếu có
+      this.formErrorsEdit.file = '';
+    }
+  
+    // Reset input để cho phép chọn lại cùng file
+    if (fileInput) {
+      fileInput.value = '';
     }
   }
+  
   
   removeEditFile(): void {
     this.editBaiTap.file = null;
   }
   
+  formErrorsEdit = {
+    tieuDe: '',
+    noiDung: '',
+    thoiGianKetThuc: '',
+    trangThai: '',
+    file: ''
+  };
+
   confirmEdit(): void {
-    const formData = new FormData();
-  
-    formData.append('updateBaiTapDto.id', this.baiTapId);
-    formData.append('updateBaiTapDto.tenLop', this.tenLop);
-    formData.append('updateBaiTapDto.tieuDe', this.editBaiTap.tieuDe);
-    formData.append('updateBaiTapDto.noiDung', this.editBaiTap.noiDung);
-    formData.append('updateBaiTapDto.thoiGianKetThuc', this.editBaiTap.gio);
-  
-    if (this.editBaiTap.trangThai) {
-      formData.append('updateBaiTapDto.trangThai', this.editBaiTap.trangThai);
-    }
-  
-    if (this.editBaiTap.file instanceof File) {
-      formData.append('updateBaiTapDto.taiLieu', this.editBaiTap.file);
-    }
-  
-    this.lopdangdayService.updateBaiTap(formData).subscribe({
-      next: (res) => {
-        if (!res.isError) {
-          this.toastr.success(res.message || 'Cập nhật bài tập thành công!');
-          this.loadBaiTapDetail(); 
-          this.cdr.detectChanges(); 
-          this.closeEditModal();
-        } else {
-          this.toastr.error(res.message || 'Cập nhật thất bại!');
-        }
-      },
-      error: (err) => {
-        this.toastr.error(err?.error?.message || 'Đã xảy ra lỗi khi cập nhật!');
-      }
-    });
+  // Reset lỗi
+  this.formErrorsEdit = { tieuDe: '', noiDung: '', thoiGianKetThuc: '', trangThai: '', file: '' };
+
+  const { tieuDe, noiDung, gio, trangThai, file } = this.editBaiTap;
+
+  // Validate
+  if (!tieuDe?.trim()) {
+    this.formErrorsEdit.tieuDe = 'Tiêu đề không được để trống.';
+  } else if (tieuDe.length > 50) {
+    this.formErrorsEdit.tieuDe = 'Tiêu đề tối đa 50 ký tự.';
   }
+
+  if (!noiDung?.trim()) {
+    this.formErrorsEdit.noiDung = 'Nội dung không được để trống.';
+  } else if (noiDung.length > 750) {
+    this.formErrorsEdit.noiDung = 'Nội dung tối đa 750 ký tự.';
+  }
+
+  if (!gio) {
+    this.formErrorsEdit.thoiGianKetThuc = 'Thời gian kết thúc không được để trống.';
+  } else if (new Date(gio) <= new Date()) {
+    this.formErrorsEdit.thoiGianKetThuc = 'Thời gian kết thúc phải sau thời điểm hiện tại.';
+  }
+
+  const allowedStatus = ['Đang mở', 'Chưa mở', 'Kết thúc'];
+  if (!trangThai) {
+    this.formErrorsEdit.trangThai = 'Trạng thái không được để trống.';
+  } else if (!allowedStatus.includes(trangThai)) {
+    this.formErrorsEdit.trangThai = 'Trạng thái không hợp lệ.';
+  }
+
+  
+
+  const hasError = Object.values(this.formErrorsEdit).some(e => e !== '');
+  if (hasError) return;
+
+  // Gửi form nếu hợp lệ
+  const formData = new FormData();
+  formData.append('updateBaiTapDto.id', this.baiTapId);
+  formData.append('updateBaiTapDto.tieuDe', tieuDe);
+  formData.append('updateBaiTapDto.noiDung', noiDung);
+  formData.append('updateBaiTapDto.thoiGianKetThuc', gio);
+  formData.append('updateBaiTapDto.trangThai', trangThai);
+  formData.append('updateBaiTapDto.tenLop', this.tenLop);
+
+  if (file && file.rawFile) {
+    formData.append('updateBaiTapDto.taiLieu', file.rawFile);
+  }
+  console.log('📦 File raw:', this.editBaiTap.file?.rawFile);
+ 
+  this.lopdangdayService.updateBaiTap(formData).subscribe({
+    next: (res) => {
+      if (!res.isError) {
+        this.toastr.success(res.message || 'Cập nhật bài tập thành công!');
+        this.closeEditModal();
+        this.loadBaiTapDetail();
+        this.cdr.detectChanges();
+      } else {
+        this.toastr.error(res.message || 'Cập nhật thất bại!');
+      }
+    },
+    error: (err) => {
+      this.toastr.error(err?.error?.message || 'Đã xảy ra lỗi khi cập nhật!');
+    }
+  });
+}
   
   
 }
