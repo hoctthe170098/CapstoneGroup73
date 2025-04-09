@@ -57,7 +57,7 @@ public class GetBaiTapDetailQueryHandler : IRequestHandler<GetBaiTapDetailQuery,
         int secondsLeft = 0;
         if (baiTap.ThoiGianKetThuc.HasValue)
         {
-            var now = DateTime.UtcNow;
+            var now = DateTime.Now;
             var timeLeft = baiTap.ThoiGianKetThuc.Value - now;
             secondsLeft = (int)Math.Max(timeLeft.TotalSeconds, 0);
         }
@@ -72,6 +72,7 @@ public class GetBaiTapDetailQueryHandler : IRequestHandler<GetBaiTapDetailQuery,
             ThoiGianKetThuc = baiTap.ThoiGianKetThuc?.ToString("yyyy-MM-ddTHH:mm:ss"),
             SecondsUntilDeadline = secondsLeft,
             UrlFile = baiTap.UrlFile,
+            TrangThai = baiTap.TrangThai
             
         };
 
