@@ -37,7 +37,7 @@ public class UpdateBaiTapCommandValidator : AbstractValidator<UpdateBaiTapComman
 
     private bool BeFutureTime(DateTime? time)
     {
-        return time.HasValue && time.Value > DateTime.UtcNow;
+        return time.HasValue && time.Value > DateTime.Now;
     }
 
     private bool BeAllowedStatus(string trangThai)

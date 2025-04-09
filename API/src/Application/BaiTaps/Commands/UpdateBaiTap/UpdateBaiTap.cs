@@ -55,11 +55,26 @@ public class UpdateBaiTapCommandHandler : IRequestHandler<UpdateBaiTapCommand, O
         baiTap.ThoiGianKetThuc = dto.ThoiGianKetThuc;
         baiTap.TrangThai = dto.TrangThai;
 
-        //  Xử lý file nếu có upload mới
+        // Nếu trạng thái chuyển sang "Kết thúc" thì cập nhật ThoiGianKetThuc là thời điểm hiện tại
+        if (dto.TrangThai?.ToLower() == "Kết thúc")
+        {
+            baiTap.ThoiGianKetThuc = DateTime.Now;
+        }
+        else
+        {
+            baiTap.ThoiGianKetThuc = dto.ThoiGianKetThuc;
+        }
+
+        // Xử lý file nếu có upload mới, hoặc xóa nếu không có file mới
         if (dto.TaiLieu != null)
         {
             DeleteFile(baiTap.UrlFile); // xóa file cũ nếu có
-            baiTap.UrlFile = await UploadFileAsync(dto.TaiLieu, cancellationToken);
+            baiTap.UrlFile = await UploadFileAsync(dto.TaiLieu, cancellationToken); // cập nhật file mới
+        }
+        else if (!string.IsNullOrEmpty(baiTap.UrlFile))
+        {
+            DeleteFile(baiTap.UrlFile); // xóa file cũ
+            baiTap.UrlFile = null;      // bỏ liên kết file
         }
 
         await _context.SaveChangesAsync(cancellationToken);
