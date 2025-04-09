@@ -44,4 +44,32 @@ export class LopdangdayService {
       { headers }
     );
   }
+  getBaiTapsForTeacher(payload: { pageNumber: number, pageSize: number, tenLop: string, trangThai: string }): Observable<any> {
+    const token = localStorage.getItem("token");
+    const headers = new HttpHeaders().set("Authorization", `Bearer ${token}`);
+
+    return this.http.post<any>(
+      `${this.baseUrl}/BaiTaps/getbaitapsforteacher`,
+      payload,
+      { headers }
+    );
+  }
+  deleteBaiTap(id: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.delete<any>(`${this.baseUrl}/BaiTaps/deletebaitap?id=${id}`, { headers });
+  }
+  createBaiTap(formData: FormData): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+  
+    return this.http.post(
+      `${this.baseUrl}/BaiTaps/createbaitap`,
+      formData,
+      { headers }
+    );
+  }
+  
 }

@@ -8,6 +8,7 @@ import { BaitapComponent } from './baitap/baitap.component';
 import { LichkiemtraComponent } from './lichkiemtra/lichkiemtra.component';
 import { ChiTietComponent } from './chi-tiet/chi-tiet.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ChitietBaitapComponent } from './baitap/chitiet-baitap/chitiet-baitap.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     DanhsachhocsinhComponent,
     BaitapComponent,
     LichkiemtraComponent,
-    ChiTietComponent
+    ChiTietComponent,
+    ChitietBaitapComponent
   ],
   imports: [
     CommonModule,
