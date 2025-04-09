@@ -27,7 +27,7 @@ public class UpdateBaiTapCommandValidator : AbstractValidator<UpdateBaiTapComman
         RuleFor(x => x.UpdateBaiTapDto.TaiLieu)
             .Must(BeValidFile)
             .When(x => x.UpdateBaiTapDto.TaiLieu != null)
-            .WithMessage("Tệp phải có định dạng .pdf, .doc hoặc .docx và kích thước tối đa 5MB.");
+            .WithMessage("Tệp phải có định dạng .pdf, .doc hoặc .docx và kích thước tối đa 10MB.");
 
         RuleFor(x => x.UpdateBaiTapDto.ThoiGianKetThuc)
             .NotNull().WithMessage("Thời gian kết thúc không được để trống.")
