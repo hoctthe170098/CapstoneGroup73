@@ -1,26 +1,28 @@
 <div class="chitiet-baitap-wrapper">
-    <div class="header">
-      <h2>ÔN TẬP ĐỀ KIỂM TRA CUỐI NĂM</h2>
-      <div class="icons">
-        <i class="ft-edit" (click)="openEditModal()"></i>
+  <div class="header">
+    <h2>{{ baiTapDetail.tieuDe }}</h2>
+    <div class="icons">
+      <i class="ft-edit" title="Chỉnh sửa" (click)="openEditModal(baiTapDetail)"></i>
+    </div>
+  </div>
+  
+  <div class="meta">
+    <p><i class="ft-calendar"></i> Ngày tạo: {{ baiTapDetail.ngayTao | date: 'dd/MM/yyyy' }}</p>
+    <p><i class="ft-clock"></i> Còn lại: {{ countdownDisplay }}</p>
+  </div>
+  
+  <div class="noidung">
+    <p><strong>Nội dung bài tập:</strong></p>
+    <p>{{ baiTapDetail.noiDung }}</p>
+
+    <div class="attached-file" *ngIf="baiTapDetail.urlFile">
+      <i class="ft-paperclip"></i>
+      <div class="file-info file-link" (click)="downloadFile()">
+        {{ baiTapDetail.urlFile.split('/').pop() }}
       </div>
     </div>
-  
-    <div class="meta">
-      <p><i class="ft-calendar"></i> 16/10/2023</p>
-      <p><i class="ft-clock"></i> 1:30:13</p>
-    </div>
-  
-    <div class="noidung">
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.
-      </p>
-      <div class="attached-file">
-        <i class="ft-file"></i>
-        <span>File Title.pdf</span>
-        <span class="file-info">313 KB</span>
-      </div>
-    </div>
+    
+  </div>
   
     <div class="answers-section">
       <h4>Trả lời của học sinh</h4>
@@ -39,7 +41,7 @@
     </div>
   </div>
   <!-- Modal sửa bài tập -->
-<!-- Modal sửa bài tập -->
+
 <div class="modal-overlay" *ngIf="isEditModalOpen" (click)="closeEditModal()"></div>
 <div class="modal-content" *ngIf="isEditModalOpen" (click)="$event.stopPropagation()">
   <div class="modal-header">

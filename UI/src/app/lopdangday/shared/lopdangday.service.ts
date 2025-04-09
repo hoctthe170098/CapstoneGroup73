@@ -71,6 +71,36 @@ export class LopdangdayService {
       { headers }
     );
   }
+  getBaiTapDetail(baiTapId: string): Observable<any> {
+    const token = localStorage.getItem("token");
+    const headers = new HttpHeaders().set("Authorization", `Bearer ${token}`);
+    const url = `${this.baseUrl}/BaiTaps/getbaitapdetailforteacher?baiTapId=${baiTapId}`;
+    return this.http.post<any>(url, {}, { headers });
+  }
+  downloadBaiTapFile(filePath: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+    return this.http.post<any>(
+      `${this.baseUrl}/BaiTaps/downloadbaitap?filePath=${encodeURIComponent(filePath)}`,
+      {}, 
+      { headers }
+    );
+  }
+  updateBaiTap(formData: FormData): Observable<any> {
+    const token = localStorage.getItem("token");
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+  
+    return this.http.put<any>(
+      `${this.baseUrl}/BaiTaps/updatebaitap`,
+      formData,
+      { headers }
+    );
+  }
   
   getDiemDanhTheoNgay(tenLop: string): Observable<any> {
     const token = localStorage.getItem("token");
@@ -89,4 +119,5 @@ export class LopdangdayService {
     const url = `${this.baseUrl}/DiemDanhs/updatediemdanhtheongay`;
     return this.http.post<any>(url, payload, { headers });
   }
+  
 }
