@@ -3,6 +3,20 @@ using StudyFlow.Domain.Entities;
 
 namespace StudyFlow.Application.BaiTaps.Queries.TeacherAssignmentList;
 
+public class BaiTapWithPaginationDTO
+{
+    public int PageNumber { get; set; }
+    public int TotalCount { get; set; }
+    public int TotalPages { get; set; }
+    public List<BaiTapGroupByTenLopDto> Items { get; set; } = new();
+}
+
+public class BaiTapGroupByTenLopDto
+{
+    public string TenLop { get; set; } = string.Empty;
+    public List<BaiTapDto> BaiTaps { get; set; } = new();
+}
+
 public class BaiTapDto
 {
     public Guid Id { get; set; }

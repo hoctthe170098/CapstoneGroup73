@@ -22,14 +22,14 @@ public class UpdateBaiTapCommandValidator : AbstractValidator<UpdateBaiTapComman
         RuleFor(x => x.UpdateBaiTapDto.TrangThai)
             .NotEmpty().WithMessage("Trạng thái không được để trống.")
             .Must(BeAllowedStatus)
-            .WithMessage("Trạng thái không hợp lệ. Chỉ được phép 'Đang mở' hoặc 'Chưa mở'.");
+            .WithMessage("Trạng thái không hợp lệ. Chỉ được phép 'Đang mở', 'Chưa mở' Hoặc 'Kết Thúc'.");
 
         RuleFor(x => x.UpdateBaiTapDto.TaiLieu)
             .Must(BeValidFile)
             .When(x => x.UpdateBaiTapDto.TaiLieu != null)
             .WithMessage("Tệp phải có định dạng .pdf, .doc hoặc .docx và kích thước tối đa 5MB.");
 
-        RuleFor(x => x.UpdateBaiTapDto.ThoiGianKetThuc)
+        RuleFor(x => x.UpdateBaiTapDto.ThoiGianHetHan)
             .NotNull().WithMessage("Thời gian kết thúc không được để trống.")
             .Must(BeFutureTime)
             .WithMessage("Thời gian kết thúc phải sau thời điểm hiện tại.");
@@ -42,7 +42,7 @@ public class UpdateBaiTapCommandValidator : AbstractValidator<UpdateBaiTapComman
 
     private bool BeAllowedStatus(string trangThai)
     {
-        var allowed = new[] { "Chưa mở", "Đang mở" };
+        var allowed = new[] { "Chưa mở", "Đang mở" , "Kết thúc"};
         return allowed.Contains(trangThai.Trim(), StringComparer.OrdinalIgnoreCase);
     }
 

@@ -7,9 +7,11 @@ using StudyFlow.Application.BaiTaps.Commands.DeleteBaiTap;
 using StudyFlow.Application.BaiTaps.Queries.TeacherAssignmentList;
 using StudyFlow.Application.BaiTaps.Queries.GetAllBaiTaps;
 using StudyFlow.Application.BaiTaps.Queries.GetListBaiTapChoGiaoVien;
+using StudyFlow.Application.BaiTaps.Queries.GetDetailBaiTapChoGiaoVien;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Domain.Constants;
 using StudyFlow.Application.ChinhSachs.Commands.DeleteBaiKiemTra;
+using StudyFlow.Application.BaiTaps.Commands.DownloadBaiTap;
 
 namespace StudyFlow.Web.Endpoints;
 
@@ -19,18 +21,20 @@ public class BaiTaps : EndpointGroupBase
     {
         app.MapGroup(this)
            .DisableAntiforgery()
-           .MapGet(GetTeacherAssignmentList, "getbaitapsforstudent")
+           .MapPost(GetTeacherAssignmentList, "getbaitapsforstudent")
            .MapGet(GetAllBaiTaps, "getallbaitaps")
            .MapPost(GetBaiTapsForTeacher, "getbaitapsforteacher")
            .MapPost(CreateBaiTap, "createbaitap")
            .MapPut(UpdateBaiTap, "updatebaitap")
-           .MapDelete(DeleteBaiTap, "deletebaitap");
+           .MapDelete(DeleteBaiTap, "deletebaitap")
+           .MapPost(GetBaiTapDetail, "getbaitapdetailforteacher")
+           .MapPost(DownloadBaiTapFile, "downloadbaitap");
     }
 
     [Authorize(Roles = Roles.Student)]
     public async Task<Output> GetTeacherAssignmentList(
         ISender sender,
-        [AsParameters] TeacherAssignmentListWithPaginationQuery query)
+        [FromBody] TeacherAssignmentListWithPaginationQuery query)
     {
         return await sender.Send(query);
     }
@@ -73,5 +77,15 @@ public class BaiTaps : EndpointGroupBase
         {
             throw;
         }
+    }
+    [Authorize(Roles = Roles.Teacher)]
+    public async Task<Output> GetBaiTapDetail(ISender sender, [FromQuery] Guid baiTapId)
+    {
+        return await sender.Send(new GetBaiTapDetailQuery { BaiTapId = baiTapId });
+    }
+    [Authorize(Roles = Roles.Teacher + "," + Roles.Student)]
+    public async Task<Output> DownloadBaiTapFile(ISender sender, [FromQuery] string filePath)
+    {
+        return await sender.Send(new DownloadBaiTapCommand { FilePath = filePath });
     }
 }

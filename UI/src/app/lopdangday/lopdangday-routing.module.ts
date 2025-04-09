@@ -7,6 +7,8 @@ import { DiemdanhComponent } from './diemdanh/diemdanh.component';
 import { LichkiemtraComponent } from './lichkiemtra/lichkiemtra.component';
 import { ChiTietComponent } from './chi-tiet/chi-tiet.component';
 import { ChitietBaitapComponent } from './baitap/chitiet-baitap/chitiet-baitap.component';
+import { BaocaodiemdanhComponent } from './baocaodiemdanh/baocaodiemdanh.component';
+import { BaocaodiemComponent } from './baocaodiem/baocaodiem.component';
 const routes: Routes = [
   {
     path: '',
@@ -22,6 +24,9 @@ const routes: Routes = [
   { path: "lichkiemtra", component: LichkiemtraComponent },
   
   
+  { path: "baocaodiemdanh", component: BaocaodiemdanhComponent },
+  { path: "baocaodiem", component: BaocaodiemComponent },
+
   {
     path: "chi-tiet/:tenLop",
     component: ChiTietComponent,
@@ -32,6 +37,8 @@ const routes: Routes = [
       { path: "danhsachhocsinh", component: DanhsachhocsinhComponent },
       { path: "diemdanh", component: DiemdanhComponent },
       { path: "lichkiemtra", component: LichkiemtraComponent },
+      { path: "baocaodiemdanh", component: BaocaodiemdanhComponent },
+      { path: "baocaodiem", component: BaocaodiemComponent },
     ],
   },
 ];

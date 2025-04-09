@@ -111,7 +111,8 @@ public class GetDiemDanhTheoNgayQueryHandler : IRequestHandler<GetDiemDanhTheoNg
         if (!tonTaiDiemDanh)
         {
             var thamGiaLopHoc = _context.ThamGiaLopHocs
-                .Where(tg => tg.LichHocId == lichHocHomNay.Id)
+                .Where(tg => tg.LichHocId == lichHocHomNay.Id
+                &&tg.NgayKetThuc>= DateOnly.FromDateTime(DateTime.Now))
                 .Select(tg => tg.Id)
                 .ToList();
             var listDiemDanhTaoMoi = new List<DiemDanh>();
