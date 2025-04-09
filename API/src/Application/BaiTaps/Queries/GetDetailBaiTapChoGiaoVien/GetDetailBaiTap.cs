@@ -72,6 +72,7 @@ public class GetBaiTapDetailQueryHandler : IRequestHandler<GetBaiTapDetailQuery,
             ThoiGianKetThuc = baiTap.ThoiGianKetThuc?.ToString("yyyy-MM-ddTHH:mm:ss"),
             SecondsUntilDeadline = secondsLeft,
             UrlFile = baiTap.UrlFile,
+            TrangThai = baiTap.TrangThai
             
         };
 
