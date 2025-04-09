@@ -20,6 +20,7 @@ using StudyFlow.Application.ChinhSachs.Commands.DeleteLichDayBu;
 using StudyFlow.Application.LichHocs.Queries.GetLichHocGiaoVien;
 using StudyFlow.Application.Cosos.Queries.GetDiemDanhTheoNgay;
 using StudyFlow.Application.DiemDanhs.Commands.UpdateDiemDanhTheoNgay;
+using StudyFlow.Application.Cosos.Queries.GetBaoCaoDiemDanh;
 
 namespace StudyFlow.Web.Endpoints;
 
@@ -29,7 +30,8 @@ public class DiemDanhs : EndpointGroupBase
     {
         app.MapGroup(this)
             .MapGet(GetDiemDanhTheoNgay, "getdiemdanhtheongay")
-            .MapPost(UpdateDiemDanhTheoNgay,"updatediemdanhtheongay");
+            .MapPost(UpdateDiemDanhTheoNgay,"updatediemdanhtheongay")
+            .MapGet(GetBaoCaoDiemDanh,"getbaocaodiemdanh");
     }
     [Authorize(Roles = Roles.Teacher)]
     public async Task<Output> GetDiemDanhTheoNgay(ISender sender, [AsParameters] GetDiemDanhTheoNgayQuery query)
@@ -40,5 +42,10 @@ public class DiemDanhs : EndpointGroupBase
     public async Task<Output> UpdateDiemDanhTheoNgay(ISender sender, UpdateDiemDanhTheoNgayCommand command)
     {
         return await sender.Send(command);
+    }
+    [Authorize(Roles = Roles.Teacher)]
+    public async Task<Output> GetBaoCaoDiemDanh(ISender sender, [AsParameters] GetBaoCaoDiemDanhQuery query)
+    {
+        return await sender.Send(query);
     }
 }
