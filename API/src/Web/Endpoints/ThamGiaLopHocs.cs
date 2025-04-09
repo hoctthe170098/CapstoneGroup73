@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Application.GiaoViens.Commands.CreateGiaoVien;
-using StudyFlow.Application.ThamGiaLopHocs.GetHocSinhsInClass;
+using StudyFlow.Application.ThamGiaLopHocs.Queries.GetHocSinhAssignedClass;
+using StudyFlow.Application.ThamGiaLopHocs.Queries.GetHocSinhsInClass;
 using StudyFlow.Domain.Constants;
 
 namespace StudyFlow.Web.Endpoints;
@@ -12,11 +13,18 @@ public class ThamGiaLopHocs : EndpointGroupBase
     {
         app.MapGroup(this)
            .DisableAntiforgery()
-           .MapPost(GetHocSinhsInClass, "gethocsinhsinclass");
+           .MapPost(GetHocSinhsInClass, "gethocsinhsinclass")
+           .MapPost(GetHocSinhAssignedClass, "gethocsinhassignedclass");
     }
 
     [Authorize(Roles = Roles.Teacher)]
     public async Task<Output> GetHocSinhsInClass(ISender sender, GetHocSinhsInClassQueries query)
+    {
+        return await sender.Send(query);
+    }
+
+    [Authorize(Roles = Roles.Student)]
+    public async Task<Output> GetHocSinhAssignedClass(ISender sender, GetHocSinhAssignedClassWithPaginationQuery query)
     {
         return await sender.Send(query);
     }
