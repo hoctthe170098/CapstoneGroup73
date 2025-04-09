@@ -129,7 +129,7 @@ public class UpdateLichDayBuCommandValidator : AbstractValidator<CreateLichDayBu
     private async Task<bool> ValidLichHocBu(LichDayBuDto? lichDayBu, CancellationToken cToken)
     {
         if (lichDayBu == null) return true;
-        if(lichDayBu.NgayHocBu < DateOnly.FromDateTime(DateTime.Now)) return false;
+        if(lichDayBu.NgayHocBu <= DateOnly.FromDateTime(DateTime.Now)) return false;
         var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
         if (string.IsNullOrEmpty(token))
             throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");

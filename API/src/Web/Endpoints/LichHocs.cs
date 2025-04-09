@@ -39,8 +39,7 @@ public class LichHocs : EndpointGroupBase
             .MapPost(CreateLichHocDayBu,"createlichdaybu")
             .MapPut(UpdateLichHocDayBu, "updatelichdaybu")
             .MapDelete(DeleteLichHocDayBu, "deletelichdaybu")
-            .MapGet(GetLichHocGiaoVien,"getlichhocgiaovien")
-            .MapGet(GetDiemDanhTheoNgay,"getdiemdanhtheongay");
+            .MapGet(GetLichHocGiaoVien,"getlichhocgiaovien");
     }
     [Authorize(Roles =Roles.CampusManager)]
     public async Task<Output> CreateLichHocCoDinh(ISender sender, [FromBody] CreateLichHocCommand command)
@@ -104,11 +103,6 @@ public class LichHocs : EndpointGroupBase
     }
     [Authorize(Roles = Roles.Teacher)]
     public async Task<Output> GetLichHocGiaoVien(ISender sender, [AsParameters] GetLichHocGiaoVienQuery query)
-    {
-        return await sender.Send(query);
-    }
-    [Authorize(Roles = Roles.Teacher)]
-    public async Task<Output> GetDiemDanhTheoNgay(ISender sender, [AsParameters] GetDiemDanhTheoNgayQuery query)
     {
         return await sender.Send(query);
     }

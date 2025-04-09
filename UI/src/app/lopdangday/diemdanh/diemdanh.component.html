@@ -1,52 +1,68 @@
 <div class="attendance-container">
-    <h3>ĐIỂM DANH VÀ NHẬN XÉT HỌC SINH</h3>
-  
-    <table>
-      <thead>
-        <tr>
-          <th>CODE</th>
-          <th>Họ và Tên</th>
-          <th>Điểm Danh</th>
-          <th>Điểm BTVN</th>
-          <th>Điểm Trên Lớp</th>
-          <th>Nhận Xét Buổi Học</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let student of students">
-          <td>{{ student.code }}</td>
-          <td>{{ student.name }}</td>
-          <td>
-            <label>
-              <input type="radio" [(ngModel)]="student.diemDanh" value="coMat" />
-              Có mặt
-            </label>
-            <label style="margin-left: 10px;">
-              <input type="radio" [(ngModel)]="student.diemDanh" value="vang" />
-              Vắng
-            </label>
-          </td>
-          <td>
-            <div class="score-input">
-              <input type="text" [(ngModel)]="student.diemBTVN" />
-              <span>/ 10</span>
-            </div>
-          </td>
-          <td>
-            <div class="score-input">
-              <input type="text" [(ngModel)]="student.diemTrenLop" />
-              <span>/ 10</span>
-            </div>
-          </td>
-          <td>
-            <input type="text" [(ngModel)]="student.nhanXet" placeholder="..." />
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  
-    <div class="submit-area">
-      <button (click)="onSubmit()">LƯU</button>
+  <h3>ĐIỂM DANH VÀ NHẬN XÉT HỌC SINH - {{ tenLop }}</h3>
+
+  <table *ngIf="students.length > 0; else loadingOrEmpty">
+    <thead>
+      <tr>
+        <th>CODE</th>
+        <th>Họ và Tên</th>
+        <th>Điểm Danh</th>
+        <th>Điểm BTVN</th>
+        <th>Điểm Trên Lớp</th>
+        <th>Nhận Xét Buổi Học</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let student of students">
+        <td>{{ student.code }}</td>
+        <td>{{ student.name }}</td>
+        <td>
+          <label>
+            <input
+              type="radio"
+              name="diemDanh_{{ student.code }}"
+              [(ngModel)]="student.diemDanh"
+              value="coMat"
+            />
+            Có mặt
+          </label>
+          <label style="margin-left: 10px;">
+            <input
+              type="radio"
+              name="diemDanh_{{ student.code }}"
+              [(ngModel)]="student.diemDanh"
+              value="vang"
+            />
+            Vắng
+          </label>
+        </td>
+        <td>
+          <div class="score-input">
+            <input type="text" [(ngModel)]="student.diemBTVN" />
+            <span>/ 10</span>
+          </div>
+        </td>
+        <td>
+          <div class="score-input">
+            <input type="text" [(ngModel)]="student.diemTrenLop" />
+            <span>/ 10</span>
+          </div>
+        </td>
+        <td>
+          <input type="text" [(ngModel)]="student.nhanXet" placeholder="..." />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Khi không có dữ liệu -->
+  <ng-template #loadingOrEmpty>
+    <div class="no-class-info">
+      <p>{{ thongBao }}</p>
     </div>
+  </ng-template>
+
+  <div class="submit-area" *ngIf="students.length > 0">
+    <button (click)="onSubmit()">LƯU</button>
   </div>
-  
+</div>

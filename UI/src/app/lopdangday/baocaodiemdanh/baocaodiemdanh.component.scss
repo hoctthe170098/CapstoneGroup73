@@ -1,0 +1,31 @@
+.table-container {
+    padding: 16px;
+  }
+  
+  .table-scroll-wrapper {
+    overflow-x: auto;
+    max-width: 100%;
+    border: 1px solid #ddd;
+  }
+  
+  table {
+    border-collapse: collapse;
+    width: max-content; // Quan trọng để bảng có thể rộng hơn khung
+    min-width: 100%;
+  }
+  
+  th, td {
+    padding: 8px 12px;
+    text-align: center;
+    border: 1px solid #ddd;
+    white-space: nowrap; // Không cho nội dung tự xuống dòng
+  }
+  
+  .present {
+    color: green;
+  }
+  
+  .absent {
+    color: red;
+  }
+  
