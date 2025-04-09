@@ -11,7 +11,7 @@ public class UpdateBaiTapDto
     public Guid Id { get; set; }
     public required string TieuDe { get; set; }
     public required string NoiDung { get; set; }
-    public DateTime? ThoiGianHetHan { get; set; }
+    public DateTime? ThoiGianKetThuc { get; set; }
     public IFormFile? TaiLieu { get; set; }
     public required string TrangThai { get; set; }
 }

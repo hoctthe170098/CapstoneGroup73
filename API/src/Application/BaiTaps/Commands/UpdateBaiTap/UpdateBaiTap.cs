@@ -52,7 +52,7 @@ public class UpdateBaiTapCommandHandler : IRequestHandler<UpdateBaiTapCommand, O
         //  Cập nhật thông tin bài tập
         baiTap.TieuDe = dto.TieuDe;
         baiTap.NoiDung = dto.NoiDung;
-        baiTap.ThoiGianKetThuc = dto.ThoiGianHetHan;
+        baiTap.ThoiGianKetThuc = dto.ThoiGianKetThuc;
         baiTap.TrangThai = dto.TrangThai;
 
         //  Xử lý file nếu có upload mới
