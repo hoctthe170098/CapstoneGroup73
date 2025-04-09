@@ -29,7 +29,7 @@ public class UpdateBaiTapCommandValidator : AbstractValidator<UpdateBaiTapComman
             .When(x => x.UpdateBaiTapDto.TaiLieu != null)
             .WithMessage("Tệp phải có định dạng .pdf, .doc hoặc .docx và kích thước tối đa 5MB.");
 
-        RuleFor(x => x.UpdateBaiTapDto.ThoiGianHetHan)
+        RuleFor(x => x.UpdateBaiTapDto.ThoiGianKetThuc)
             .NotNull().WithMessage("Thời gian kết thúc không được để trống.")
             .Must(BeFutureTime)
             .WithMessage("Thời gian kết thúc phải sau thời điểm hiện tại.");
