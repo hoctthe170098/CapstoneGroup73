@@ -1,6 +1,6 @@
 <h2>DANH SÁCH LỚP</h2>
 <div class="filters">
-  <input class="search" type="text" placeholder="Tìm tên lớp..." [(ngModel)]='searchClass' (input)="searchClasses()">
+  <input class="search" type="text" placeholder="Tìm tên lớp..." [(ngModel)]="searchClass" (input)="searchClasses()">
 </div>
 <div class="class-grid">
   <div class="class-card" *ngFor="let lop of classes">
