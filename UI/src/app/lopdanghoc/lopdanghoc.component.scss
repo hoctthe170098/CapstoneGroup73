@@ -1,0 +1,132 @@
+h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.filters {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 30px;
+    justify-content: flex-start;
+}
+
+.filters input[type="date"] {
+    width: 200px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.filters .search {
+    width: 400px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.class-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    //grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.class-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 200px;
+}
+
+.class-card h3 {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #222;
+}
+
+.class-card p {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    margin: 5px 0;
+    color: #333;
+}
+
+.class-card i {
+    margin-right: 8px;
+    width: 16px;
+    text-align: center;
+}
+
+.class-card p span.active {
+    color: green;
+}
+
+.class-card p span.inactive {
+    color: red !important;
+}
+
+.class-card p span.pending {
+    color: #007BFF !important;
+}
+
+.class-card a {
+    margin-top: auto;
+    font-weight: bold;
+    text-decoration: none;
+    color: #007bff;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s;
+}
+
+.class-card a:hover {
+    color: #0056b3;
+}
+
+// .pagination {
+//     display: flex;
+//     justify-content: center;
+//     margin-top: 30px;
+//     gap: 10px;
+//     list-style: none;
+// }
+
+// .pagination .page-item {
+//     list-style: none;
+// }
+
+// .pagination .page-link {
+//     border: none !important;
+//     border-radius: 50% !important;
+//     background: #eee !important;
+//     color: #000 !important;
+//     padding: 8px 14px !important;
+//     cursor: pointer !important;
+//     text-decoration: none !important;
+//     display: inline-flex;
+//     align-items: center;
+//     justify-content: center;
+// }
+
+// .pagination .page-item.active .page-link {
+//     background-color: #007bff !important;
+//     color: #fff !important;
+// }
+
+// .pagination .page-item.disabled .page-link {
+//     opacity: 0.4 !important;
+//     cursor: not-allowed !important;
+// }
+
+// .pagination .page-link:hover {
+//     background: #ccc !important;
+//     color: #000 !important;
+// }
