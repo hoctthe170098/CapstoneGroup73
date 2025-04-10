@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { LopdanghocRoutingModule } from './lopdanghoc-routing.module';
 import { LopdanghocComponent } from './lopdanghoc.component';
-
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -11,6 +11,7 @@ import { LopdanghocComponent } from './lopdanghoc.component';
   ],
   imports: [
     CommonModule,
+    FormsModule,
     LopdanghocRoutingModule
   ]
 })
