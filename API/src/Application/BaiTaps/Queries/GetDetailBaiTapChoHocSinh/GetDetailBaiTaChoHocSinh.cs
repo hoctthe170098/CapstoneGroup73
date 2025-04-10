@@ -4,20 +4,20 @@ using StudyFlow.Application.Common.Exceptions;
 using StudyFlow.Application.Common.Interfaces;
 using StudyFlow.Application.Common.Models;
 
-namespace StudyFlow.Application.BaiTaps.Queries.GetDetailBaiTapChoGiaoVien;
+namespace StudyFlow.Application.BaiTaps.Queries.GetDetailBaiTapChoHocSinh;
 
-public record GetBaiTapDetailQuery : IRequest<Output>
+public record GetDetailBaiTapChoHocSinhQuery : IRequest<Output>
 {
     public Guid BaiTapId { get; init; }
 }
 
-public class GetBaiTapDetailQueryHandler : IRequestHandler<GetBaiTapDetailQuery, Output>
+public class GetDetailBaiTapChoHocSinhQueryHandler : IRequestHandler<GetDetailBaiTapChoHocSinhQuery, Output>
 {
     private readonly IApplicationDbContext _context;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IIdentityService _identityService;
 
-    public GetBaiTapDetailQueryHandler(
+    public GetDetailBaiTapChoHocSinhQueryHandler(
         IApplicationDbContext context,
         IHttpContextAccessor httpContextAccessor,
         IIdentityService identityService)
@@ -27,7 +27,7 @@ public class GetBaiTapDetailQueryHandler : IRequestHandler<GetBaiTapDetailQuery,
         _identityService = identityService;
     }
 
-    public async Task<Output> Handle(GetBaiTapDetailQuery request, CancellationToken cancellationToken)
+    public async Task<Output> Handle(GetDetailBaiTapChoHocSinhQuery request, CancellationToken cancellationToken)
     {
         var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"]
             .ToString().Replace("Bearer ", "");
@@ -42,11 +42,13 @@ public class GetBaiTapDetailQueryHandler : IRequestHandler<GetBaiTapDetailQuery,
             .FirstOrDefaultAsync(bt => bt.Id == request.BaiTapId, cancellationToken)
             ?? throw new NotFoundDataException("Không tìm thấy bài tập.");
 
-        var isGiaoVien = await _context.GiaoViens
-            .AnyAsync(gv => gv.UserId == userId && gv.Code == baiTap.LichHoc.GiaoVienCode, cancellationToken);
+        var isHocSinh = await _context.HocSinhs
+            .AnyAsync(hs => hs.UserId == userId &&
+                            baiTap.LichHoc.ThamGiaLopHocs.Any(tg => tg.HocSinhCode == hs.Code),
+                            cancellationToken);
 
-        if (!isGiaoVien)
-            throw new UnauthorizedAccessException("Bạn không có quyền xem bài tập này.");
+        if (!isHocSinh)
+            throw new UnauthorizedAccessException("Bạn không có quyền truy cập bài tập này.");
 
         int secondsLeft = 0;
 
@@ -55,12 +57,6 @@ public class GetBaiTapDetailQueryHandler : IRequestHandler<GetBaiTapDetailQuery,
             var now = DateTime.Now;
             var timeLeft = baiTap.ThoiGianKetThuc.Value - now;
             secondsLeft = (int)Math.Max(timeLeft.TotalSeconds, 0);
-
-            if (secondsLeft == 0 && baiTap.TrangThai != "Kết thúc")
-            {
-                baiTap.TrangThai = "Kết thúc";
-                await _context.SaveChangesAsync(cancellationToken);
-            }
         }
 
         var result = new
