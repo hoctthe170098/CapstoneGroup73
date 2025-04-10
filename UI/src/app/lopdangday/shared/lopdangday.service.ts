@@ -119,5 +119,11 @@ export class LopdangdayService {
     const url = `${this.baseUrl}/DiemDanhs/updatediemdanhtheongay`;
     return this.http.post<any>(url, payload, { headers });
   }
+  getBaoCaoDiemDanh(tenLop: string): Observable<any> {
+    const token = localStorage.getItem("token");
+    const headers = new HttpHeaders().set("Authorization", `Bearer ${token}`);
+    const url = `${this.baseUrl}/DiemDanhs/getbaocaodiemdanh?TenLop=${encodeURIComponent(tenLop)}`;
+    return this.http.get<any>(url, { headers });
+  }
   
 }

@@ -23,9 +23,15 @@
   
   .present {
     color: green;
+    font-weight: bold;
   }
   
   .absent {
     color: red;
+    font-weight: bold;
+  }
+  
+  .unknown {
+    color: #999;
   }
   
