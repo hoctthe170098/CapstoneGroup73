@@ -57,7 +57,7 @@ public class GetDiemDanhTheoNgayQueryHandler : IRequestHandler<GetDiemDanhTheoNg
         var lichHocCoDinh = _context.LichHocs
             .Where(lh => lh.TenLop == request.TenLop
             && lh.GiaoVienCode == giaoVien.Code
-            && lh.TrangThai == "Cố định");
+            && lh.TrangThai == "Cố định").ToList();
         if (lichHocCoDinh.Any())
         {
             var lichHocHomNay = lichHocCoDinh.FirstOrDefault(lh => lh.Thu == thu);
@@ -93,9 +93,10 @@ public class GetDiemDanhTheoNgayQueryHandler : IRequestHandler<GetDiemDanhTheoNg
                 .FirstOrDefault(lh => lh.TrangThai == "Dạy thay"
                 && lh.TenLop == request.TenLop
                 && lh.GiaoVienCode == giaoVien.Code
-                && lh.NgayBatDau == ngayHienTai
                 && lh.Phong.CoSoId == coSoId);
-            if (lichDayThay != null) throw new NotFoundIDException();
+            if (lichDayThay == null) throw new NotFoundIDException();
+            if (lichDayThay.NgayBatDau != DateOnly.FromDateTime(DateTime.Now)) 
+                throw new Exception("Hôm nay không phải ngày dạy thay của bạn, không thể điểm danh.");
             var lichHocHomNay = _context.LichHocs.First(lh => lh.Id == lichDayThay!.LichHocGocId);
             output = getDiemDanh(output, lichHocHomNay, ngayHienTai,cancellationToken);
         }

@@ -44,7 +44,8 @@ namespace StudyFlow.Application.ApplicationUsers.Commands.ChangePassword;
         }
 
         // Kiểm tra chữ hoa, chữ thường, chữ số và ký tự đặc biệt
-        if (!password.Any(char.IsUpper) || !password.Any(char.IsLower) || !password.Any(char.IsDigit) || !password.Any(ch => !char.IsLetterOrDigit(ch)))
+        if (!password.Any(char.IsUpper) || !password.Any(char.IsLower) 
+            || !password.Any(char.IsDigit) || !password.Any(ch => !char.IsLetterOrDigit(ch)))
         {
             return false;
         }

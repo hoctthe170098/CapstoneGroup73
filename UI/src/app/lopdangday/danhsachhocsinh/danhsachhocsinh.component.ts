@@ -34,11 +34,8 @@ export class DanhsachhocsinhComponent implements OnInit {
           this.cdr.detectChanges();
           console.debug("Danh sách học sinh:", this.danhSachHocSinh);
         } else {
-          if (response.message === 'Dữ liệu không tồn tại!'){ 
-            this.toastr.error('Giáo viên id không hợp lê!', 'Lỗi');
-          }
-          else(response.code === 404)
-            this.router.navigate(['/pages/error'])
+          if(response.code === 404)
+            this.router.navigate(['/pages/error']); else this.toastr.error(response.message)
         }
       },
       (error) => {
