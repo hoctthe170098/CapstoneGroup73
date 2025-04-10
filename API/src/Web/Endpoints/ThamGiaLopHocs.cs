@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using StudyFlow.Application.Common.Models;
-using StudyFlow.Application.GiaoViens.Commands.CreateGiaoVien;
 using StudyFlow.Application.ThamGiaLopHocs.Queries.GetHocSinhAssignedClass;
 using StudyFlow.Application.ThamGiaLopHocs.Queries.GetHocSinhsInClass;
 using StudyFlow.Domain.Constants;
