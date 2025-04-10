@@ -276,15 +276,9 @@ addTest() {
   });
 }
 
-
-
-
-
-  
-
   openModal() {
     this.showCreateForm = true;
-    this.showEditForm = false; // tắt modal sửa khi mở modal tạo
+    this.showEditForm = false; 
   }
   
 

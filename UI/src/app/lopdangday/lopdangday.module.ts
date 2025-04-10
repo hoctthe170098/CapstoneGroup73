@@ -8,6 +8,7 @@ import { BaitapComponent } from './baitap/baitap.component';
 import { LichkiemtraComponent } from './lichkiemtra/lichkiemtra.component';
 import { ChiTietComponent } from './chi-tiet/chi-tiet.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ChitietBaitapComponent } from './baitap/chitiet-baitap/chitiet-baitap.component';
 import { BaocaodiemdanhComponent } from './baocaodiemdanh/baocaodiemdanh.component';
 import { BaocaodiemComponent } from './baocaodiem/baocaodiem.component';
 
@@ -19,6 +20,7 @@ import { BaocaodiemComponent } from './baocaodiem/baocaodiem.component';
     BaitapComponent,
     LichkiemtraComponent,
     ChiTietComponent,
+    ChitietBaitapComponent,
     BaocaodiemdanhComponent,
     BaocaodiemComponent
   ],

@@ -9,7 +9,7 @@ using StudyFlow.Application.Common.Interfaces;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Domain.Entities;
 
-namespace StudyFlow.Application.ThamGiaLopHocs.GetHocSinhsInClass;
+namespace StudyFlow.Application.ThamGiaLopHocs.Queries.GetHocSinhsInClass;
 public record GetHocSinhsInClassQueries : IRequest<Output>
 {
     public required string TenLop { get; init; }
@@ -42,15 +42,20 @@ public class GetHocSinhsInClassQueriesHandler : IRequestHandler<GetHocSinhsInCla
         if (giaoVien == null)
             throw new Exception("Không tìm thấy giáo viên tương ứng với tài khoản.");
 
+        var isTeachingClass = await _context.LichHocs
+            .AnyAsync(ld => ld.GiaoVienCode == giaoVien.Code && ld.TenLop == request.TenLop, cancellationToken);
+
+        if (!isTeachingClass)
+            throw new NotFoundIDException();
+
         var list = await _context.ThamGiaLopHocs
             .Include(t => t.LichHoc)
-            .Where(t => t.LichHoc.TenLop == request.TenLop && t.LichHoc.GiaoVienCode == giaoVien.Code)
+            .Where(t => t.LichHoc.TenLop == request.TenLop)
             .Select(t => t.HocSinh)
+            .Distinct()
             .OrderByDescending(hs => hs.Ten)
             .ToListAsync(cancellationToken);
 
-        if (list == null || !list.Any())
-            throw new NotFoundIDException();
 
         return new Output
         {

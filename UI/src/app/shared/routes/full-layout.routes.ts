@@ -45,6 +45,14 @@ export const Full_ROUTES: Routes = [
     loadChildren: () => import('../../lophoc/lophoc.module').then(m => m.LophocModule)
   },
   {
+    path: 'lopdangday',
+    loadChildren: () => import('../../lopdangday/lopdangday.module').then(m => m.LopdangdayModule)
+  },
+  {
+    path: 'lopdanghoc',
+    loadChildren: () => import('../../lopdanghoc/lopdanghoc.module').then(m => m.LopdanghocModule)
+  },
+  {
     path: 'coso',
     loadChildren: () => import('../../coso/coso.module').then(m => m.CosoModule)
   },
@@ -112,8 +120,5 @@ export const Full_ROUTES: Routes = [
     path: 'taskboard-ngrx',
     loadChildren: () => import('../../taskboard-ngrx/taskboard-ngrx.module').then(m => m.TaskboardNGRXModule)
   },
-  {
-    path: 'lopdangday',
-    loadChildren: () => import('../../lopdangday/lopdangday.module').then(m => m.LopdangdayModule)
-  },
+
 ];

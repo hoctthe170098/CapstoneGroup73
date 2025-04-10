@@ -6,6 +6,7 @@ import { DanhsachhocsinhComponent } from './danhsachhocsinh/danhsachhocsinh.comp
 import { DiemdanhComponent } from './diemdanh/diemdanh.component';
 import { LichkiemtraComponent } from './lichkiemtra/lichkiemtra.component';
 import { ChiTietComponent } from './chi-tiet/chi-tiet.component';
+import { ChitietBaitapComponent } from './baitap/chitiet-baitap/chitiet-baitap.component';
 import { BaocaodiemdanhComponent } from './baocaodiemdanh/baocaodiemdanh.component';
 import { BaocaodiemComponent } from './baocaodiem/baocaodiem.component';
 const routes: Routes = [
@@ -21,6 +22,8 @@ const routes: Routes = [
   { path: "danhsachhocsinh", component: DanhsachhocsinhComponent },
   { path: "diemdanh", component: DiemdanhComponent },
   { path: "lichkiemtra", component: LichkiemtraComponent },
+  
+  
   { path: "baocaodiemdanh", component: BaocaodiemdanhComponent },
   { path: "baocaodiem", component: BaocaodiemComponent },
 
@@ -30,6 +33,7 @@ const routes: Routes = [
     children: [
       { path: "", redirectTo: "danhsachhocsinh", pathMatch: "full" },
       { path: "baitap", component: BaitapComponent },
+      { path: "baitap/:baiTapId", component: ChitietBaitapComponent },
       { path: "danhsachhocsinh", component: DanhsachhocsinhComponent },
       { path: "diemdanh", component: DiemdanhComponent },
       { path: "lichkiemtra", component: LichkiemtraComponent },

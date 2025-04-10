@@ -1,28 +1,33 @@
 <div class="table-container">
-    <h2>BÁO CÁO ĐIỂM DANH</h2>
-    
-    <div class="table-scroll-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Học Sinh</th>
-            <th *ngFor="let date of attendanceDates">{{ date }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let student of students">
-            <td>{{ student.name }}</td>
-            <td *ngFor="let date of attendanceDates">
-              <span [ngClass]="{
-                'present': student.attendance[date] === true,
-                'absent': student.attendance[date] === false
-              }">
-                {{ student.attendance[date] === true ? '✔️' : student.attendance[date] === false ? '❌' : '-' }}
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+  <h2>BÁO CÁO ĐIỂM DANH - {{ tenLop }}</h2>
+
+  <div class="table-scroll-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Học Sinh</th>
+          <th *ngFor="let ngay of danhSachNgay">{{ ngay | date: 'dd/MM' }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let hs of danhSachHocSinh">
+          <td>{{ hs.ten }}</td>
+          <td *ngFor="let ngay of danhSachNgay">
+            <span [ngClass]="{
+              'present': hs.trangThai[ngay] === 'Có mặt',
+              'absent': hs.trangThai[ngay] === 'Vắng',
+              'unknown': !hs.trangThai[ngay] || hs.trangThai[ngay] === 'Không điểm danh'
+            }">
+              <ng-container [ngSwitch]="hs.trangThai[ngay]">
+                <i *ngSwitchCase="'Có mặt'" class="ft-check"></i>
+                <i *ngSwitchCase="'Vắng'" class="ft-x"></i>
+                <span *ngSwitchDefault class="ft-minus"></span>
+              </ng-container>
+            </span>
+          </td>
+          
+        </tr>
+      </tbody>
+    </table>
   </div>
-  
+</div>
