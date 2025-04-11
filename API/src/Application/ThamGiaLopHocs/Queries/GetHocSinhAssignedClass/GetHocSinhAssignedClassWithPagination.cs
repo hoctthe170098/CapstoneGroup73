@@ -46,7 +46,7 @@ public class GetHocSinhAssignedClassWithPaginationHandler
             throw new Exception("Không tìm thấy giáo viên tương ứng với tài khoản.");
 
         var query = _context.ThamGiaLopHocs
-            .Where(t => t.HocSinhCode == hocSinh.Code)
+            .Where(t => t.HocSinhCode == hocSinh.Code && t.LichHoc.TrangThai == "Cố định")
             .Select(t => t.LichHoc)
             .GroupBy(l => l.TenLop)
             .Select(g => new LichHoc

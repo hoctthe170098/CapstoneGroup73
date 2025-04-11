@@ -26,6 +26,7 @@ import { QuillModule } from 'ngx-quill';
     CommonModule,
     FormsModule,
     QuillModule.forRoot(),
+    
     LopdanghocRoutingModule
   ]
 })
