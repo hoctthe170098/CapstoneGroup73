@@ -11,14 +11,17 @@ using StudyFlow.Application.Common.Exceptions;
 using StudyFlow.Application.Common.Interfaces;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace StudyFlow.Application.TraLois.Commands.CreateTraLoi;
+
 public record CreateTraLoiCommand : IRequest<Output>
 {
-     public Guid BaiTapId { get; init; }
-     public string NoiDung { get; init; } = default!;
-     public IFormFile? TepDinhKem { get; init; }
+    public Guid BaiTapId { get; init; }
+    public string NoiDung { get; init; } = default!;
+    public IFormFile? TepDinhKem { get; init; }
 }
+
 public class CreateTraLoiCommandHandler : IRequestHandler<CreateTraLoiCommand, Output>
 {
     private readonly IApplicationDbContext _context;
@@ -27,7 +30,12 @@ public class CreateTraLoiCommandHandler : IRequestHandler<CreateTraLoiCommand, O
     private readonly IWebHostEnvironment _env;
     private readonly ILogger<CreateTraLoiCommandHandler> _logger;
 
-    public CreateTraLoiCommandHandler(IApplicationDbContext context,IHttpContextAccessor httpContextAccessor,IIdentityService identityService,IWebHostEnvironment env,ILogger<CreateTraLoiCommandHandler> logger)
+    public CreateTraLoiCommandHandler(
+        IApplicationDbContext context,
+        IHttpContextAccessor httpContextAccessor,
+        IIdentityService identityService,
+        IWebHostEnvironment env,
+        ILogger<CreateTraLoiCommandHandler> logger)
     {
         _context = context;
         _httpContextAccessor = httpContextAccessor;
@@ -38,7 +46,6 @@ public class CreateTraLoiCommandHandler : IRequestHandler<CreateTraLoiCommand, O
 
     public async Task<Output> Handle(CreateTraLoiCommand request, CancellationToken cancellationToken)
     {
-        // Lấy mã học sinh từ token
         var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
         if (string.IsNullOrEmpty(token))
             throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
@@ -52,14 +59,30 @@ public class CreateTraLoiCommandHandler : IRequestHandler<CreateTraLoiCommand, O
         if (hocSinh == null)
             throw new NotFoundDataException("Không tìm thấy học sinh tương ứng.");
 
-        // Kiểm tra bài tập tồn tại
-        var baiTap = await _context.BaiTaps.FindAsync(new object[] { request.BaiTapId }, cancellationToken);
+        var hocSinhCode = hocSinh.Code;
+
+        // Kiểm tra bài tập tồn tại 
+        var baiTap = await _context.BaiTaps
+            .Include(bt => bt.LichHoc)
+            .FirstOrDefaultAsync(bt => bt.Id == request.BaiTapId, cancellationToken);
+
         if (baiTap == null)
             throw new NotFoundDataException("Không tìm thấy bài tập.");
 
+        // ❗ Kiểm tra trạng thái bài tập
+        if (baiTap.TrangThai == "Kết thúc")
+            throw new InvalidOperationException("Bài tập đã kết thúc, bạn không thể gửi câu trả lời.");
+
+        // Kiểm tra học sinh có học lớp này không
+        var isThamGiaLop = await _context.ThamGiaLopHocs
+            .AnyAsync(tg => tg.LichHocId == baiTap.LichHocId && tg.HocSinhCode == hocSinhCode, cancellationToken);
+
+        if (!isThamGiaLop)
+            throw new UnauthorizedAccessException("Bạn không có quyền trả lời bài tập này vì không thuộc lớp học tương ứng.");
+
         // Kiểm tra học sinh đã trả lời chưa
         var daTraLoi = await _context.TraLois
-            .AnyAsync(t => t.BaiTapId == request.BaiTapId && t.HocSinhCode == hocSinh.Code, cancellationToken);
+            .AnyAsync(t => t.BaiTapId == request.BaiTapId && t.HocSinhCode == hocSinhCode, cancellationToken);
 
         if (daTraLoi)
             throw new Exception("Bạn đã gửi câu trả lời cho bài tập này rồi.");
@@ -71,14 +94,13 @@ public class CreateTraLoiCommandHandler : IRequestHandler<CreateTraLoiCommand, O
             fileUrl = await SaveFileAsync(request.TepDinhKem, cancellationToken);
         }
 
-        // Tạo bản ghi trả lời
         var traLoi = new TraLoi
         {
             Id = Guid.NewGuid(),
             ThoiGian = DateTime.UtcNow,
             NoiDung = request.NoiDung,
             UrlFile = fileUrl,
-            HocSinhCode = hocSinh.Code,
+            HocSinhCode = hocSinhCode,
             BaiTapId = request.BaiTapId
         };
 
