@@ -10,10 +10,6 @@
       {{ lop.ngayBatDau | date:'dd/MM/yyyy' }} - {{ lop.ngayKetThuc | date:'dd/MM/yyyy' }}
     </p>
     <p>
-      <i class="fas fa-layer-group mr-1"></i>
-      {{ lop.trangThai }} 
-    </p>
-    <p>
       <i class="fas fa-stream mr-1"></i>
       <span [ngClass]="{
             'pending': lop.status === 'Chưa bắt đầu', 
