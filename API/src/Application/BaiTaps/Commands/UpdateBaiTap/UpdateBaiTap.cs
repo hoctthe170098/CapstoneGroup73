@@ -56,7 +56,7 @@ public class UpdateBaiTapCommandHandler : IRequestHandler<UpdateBaiTapCommand, O
         baiTap.TrangThai = dto.TrangThai;
 
         // Nếu trạng thái chuyển sang "Kết thúc" thì cập nhật ThoiGianKetThuc là thời điểm hiện tại
-        if (dto.TrangThai?.ToLower() == "Kết thúc")
+        if (string.Equals(dto.TrangThai?.Trim(), "Kết thúc", StringComparison.OrdinalIgnoreCase))
         {
             baiTap.ThoiGianKetThuc = DateTime.Now;
         }
