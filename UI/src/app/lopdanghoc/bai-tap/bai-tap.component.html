@@ -1,1 +1,57 @@
-<p>bai-tap works!</p>
+<!-- baitap.component.html for lopdanghoc -->
+<div class="baitap-wrapper">
+    <div class="header-bar">
+      <h3>DANH SÁCH BÀI TẬP</h3>
+    </div>
+  
+    <!-- Filter -->
+    <div class="filter-bar">
+      <select [(ngModel)]="trangThaiFilter" (change)="applyFilter()">
+        <option value="">Tất cả trạng thái</option>
+        <option value="Chưa mở">Chưa mở</option>
+        <option value="Đang mở">Đang mở</option>
+        <option value="Kết thúc">Kết thúc</option>
+      </select>
+    </div>
+  
+    <!-- Danh sách bài tập -->
+    <div class="list-container">
+      <div class="baitap-item" *ngFor="let bt of paginatedBaiTaps">
+        <div class="left-icon ft-book-open"></div>
+        <div class="info">
+            <h4 class="clickable-title"
+    [routerLink]="[bt.id]">
+  {{ bt.tieuDe }}
+</h4>
+
+          <p>
+            <i class="ft-calendar"></i> {{ bt.ngayTao | date:'dd/MM/yyyy' }} &nbsp;&nbsp;
+            <i class="ft-clock"></i> {{ bt.thoiGianKetThuc | date:'HH:mm' }}
+          </p>
+        </div>
+        <div class="status">
+          <span>Trạng thái</span><br />
+          <span [ngClass]="{
+                'open': bt.trangThai === 'Đang mở',
+                'closed': bt.trangThai === 'Kết thúc',
+                'pending': bt.trangThai === 'Chưa mở'
+              }">
+            {{ bt.trangThai }}
+          </span>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Pagination -->
+    <div class="pagination">
+      <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">&lt;</button>
+      <button
+        *ngFor="let page of [].constructor(totalPages); let i = index"
+        [class.active]="currentPage === i + 1"
+        (click)="goToPage(i + 1)">
+        {{ i + 1 }}
+      </button>
+      <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">&gt;</button>
+    </div>
+  </div>
+  

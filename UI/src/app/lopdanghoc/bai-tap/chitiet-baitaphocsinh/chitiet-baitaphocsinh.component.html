@@ -1,0 +1,85 @@
+<div class="chitiet-baitap-wrapper">
+    <!-- Tiêu đề và thông tin chung -->
+    <div class="header">
+      <h2>{{ baiTapDetail.tieuDe }}</h2>
+    </div>
+  
+    <div class="meta">
+      <p>
+        <i class="ft-calendar"></i> Ngày tạo:
+        {{ baiTapDetail.ngayTao | date: 'dd/MM/yyyy' }}
+      </p>
+      <p>
+        <i class="ft-clock"></i> Còn lại: {{ countdownDisplay }}
+      </p>
+    </div>
+  
+    <!-- Nội dung bài tập -->
+    <div class="noidung">
+      <p><strong>Nội dung bài tập:</strong></p>
+      <p>{{ baiTapDetail.noiDung }}</p>
+  
+      <div class="attached-file" *ngIf="baiTapDetail.urlFile" (click)="downloadFile()">
+        <i class="ft-paperclip"></i>
+        <div class="file-info file-link">
+          Download file bài tập
+        </div>
+      </div>
+    </div>
+<!-- Form trả lời bài tập -->
+<div class="answer-form">
+  <label><strong>Nội dung</strong><span class="field-required-asterisk">(*)</span></label>
+  <div class="custom-editor">
+    <quill-editor
+      [(ngModel)]="newAnswer.noiDung"
+      [styles]="{height: '150px'}"
+      [modules]="quillModules"
+      [placeholder]="'Nhập nội dung trả lời...'">
+    </quill-editor>
+  </div>
+
+  <!-- File đính kèm (hiển thị bên dưới nội dung) -->
+  <div class="attached-file mt-2" *ngIf="newAnswer.file">
+    <i class="ft-paperclip"></i>
+    <div class="file-info">
+      {{ newAnswer.file.name }} ({{ (newAnswer.file.size / 1024) | number:'1.0-0' }} KB)
+    </div>
+  </div>
+
+  <!-- Upload file -->
+  <label class="upload-label mt-3">
+    <i class="ft-upload-cloud"></i> Đính kèm tệp
+    <input type="file" hidden (change)="handleFileUpload($event)">
+  </label>
+
+  <!-- Nút gửi/hủy -->
+  <div class="form-actions justify-end">
+
+    <button class="btn btn-cancel" (click)="cancelAnswer()">
+      <i class="fa fa-times"></i> Hủy
+    </button>
+    <button class="btn btn-submit" (click)="submitAnswer()">
+        <i class="fa fa-paper-plane"></i> Trả lời
+      </button>
+  </div>
+</div>
+
+  
+    <!-- Trả lời -->
+    <div class="answers-section">
+     
+      <div class="answer-box" *ngFor="let ans of answers">
+        <div class="top-bar">
+          <strong>{{ ans.tenHocSinh }}</strong>
+          <span>{{ ans.thoiGianNop }}</span>
+        </div>
+        <p>{{ ans.noiDung }}</p>
+        <div class="attached-file">
+          <i class="ft-file"></i>
+          <span>{{ ans.file.ten }}</span>
+          <span class="file-info">{{ ans.file.kichThuoc }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  

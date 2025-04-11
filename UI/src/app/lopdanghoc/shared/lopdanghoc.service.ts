@@ -31,4 +31,36 @@ export class LopdanghocService {
       { headers }
     );
   }
+  getBaiTapsForStudent(payload: { pageNumber: number; pageSize: number; trangThai: string }): Observable<any> {
+    const token = localStorage.getItem("token");
+    const headers = new HttpHeaders().set("Authorization", `Bearer ${token}`);
+  
+    return this.http.post<any>(
+      `${this.baseUrl}/BaiTaps/getbaitapsforstudent`,
+      payload,
+      { headers }
+    );
+  }
+  getBaiTapDetailForStudent(baiTapId: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  
+    return this.http.post<any>(
+      `${this.baseUrl}/BaiTaps/getbaitapdetailforstudent?BaiTapId=${baiTapId}`,
+      {},
+      { headers }
+    );
+  }
+  
+  downloadBaiTapFile(filePath: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  
+    return this.http.post<any>(
+      `${this.baseUrl}/BaiTaps/downloadbaitap`,
+      { filePath },
+      { headers }
+    );
+  }
+  
 }
