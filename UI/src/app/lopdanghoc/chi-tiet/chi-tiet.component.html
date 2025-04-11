@@ -1,0 +1,11 @@
+<div class="tab-nav">
+    <a routerLink="bai-tap" routerLinkActive="active">Bài tập</a>
+    <a routerLink="lich-thi" routerLinkActive="active">Lịch thi</a>
+    <a routerLink="baocao-diem" routerLinkActive="active">Báo cáo điểm</a>
+    <a routerLink="baocao-diemdanh" routerLinkActive="active">Báo cáo điểm danh</a>
+  </div>
+  
+  <div class="tab-content" [@routeAnimations]="getRouteAnimation(outlet)">
+    <router-outlet #outlet="outlet"></router-outlet>
+  </div>
+  

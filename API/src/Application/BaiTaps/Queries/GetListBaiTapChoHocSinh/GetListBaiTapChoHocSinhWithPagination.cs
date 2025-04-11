@@ -15,6 +15,7 @@ public record TeacherAssignmentListWithPaginationQuery : IRequest<Output>
 {
     public int PageNumber { get; init; } = 1;
     public int PageSize { get; init; } = 10;
+    public string? TenLop { get; init; }
     public string? TrangThai { get; init; }
 }
 
@@ -35,13 +36,15 @@ public class TeacherAssignmentListWithPaginationQueryHandler : IRequestHandler<T
         _mapper = mapper;
         _httpContextAccessor = httpContextAccessor;
         _identityService = identityService;
-
     }
 
     public async Task<Output> Handle(TeacherAssignmentListWithPaginationQuery request, CancellationToken cancellationToken)
     {
         if (request.PageNumber < 1 || request.PageSize < 1)
             throw new WrongInputException("Số trang hoặc kích thước trang không hợp lệ!");
+
+        if (string.IsNullOrWhiteSpace(request.TenLop))
+            throw new WrongInputException("Tên lớp không được bỏ trống!");
 
         var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"]
             .ToString().Replace("Bearer ", "");
@@ -57,65 +60,57 @@ public class TeacherAssignmentListWithPaginationQueryHandler : IRequestHandler<T
             ?? throw new NotFoundDataException("Không tìm thấy học sinh tương ứng.");
 
         var hocSinhCode = hocSinh.Code;
+        var tenLop = request.TenLop.Trim();
 
-        // Lấy tất cả lớp học học sinh đang tham gia
-        var allClassesQuery = _context.ThamGiaLopHocs
-            .Where(tg => tg.HocSinhCode == hocSinhCode)
-            .Select(tg => tg.LichHoc.TenLop)
-            .Distinct();
+        // Kiểm tra học sinh có tham gia lớp này không
+        var isInClass = await _context.ThamGiaLopHocs
+            .AnyAsync(tg => tg.HocSinhCode == hocSinhCode && tg.LichHoc.TenLop == tenLop, cancellationToken);
 
-        var allClasses = await allClassesQuery.ToListAsync(cancellationToken);
+        if (!isInClass)
+            throw new UnauthorizedAccessException("Học sinh không tham gia lớp này.");
 
-        var totalCount = allClasses.Count;
-        var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+        var baiTapQuery = _context.BaiTaps
+            .AsNoTracking()
+            .Where(bt =>
+                bt.LichHoc.TenLop == tenLop &&
+                bt.LichHoc.ThamGiaLopHocs.Any(tg => tg.HocSinhCode == hocSinhCode));
 
-        var paginatedClasses = allClasses
+        if (!string.IsNullOrWhiteSpace(request.TrangThai) && request.TrangThai.ToLower() != "all")
+        {
+            baiTapQuery = baiTapQuery.Where(bt => bt.TrangThai == request.TrangThai);
+        }
+
+        var totalCount = await baiTapQuery.CountAsync(cancellationToken);
+
+        var baiTaps = await baiTapQuery
+            .OrderByDescending(bt => bt.NgayTao)
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
-            .ToList();
-
-        var groupedResults = new List<BaiTapGroupByTenLopDto>();
-
-        foreach (var tenLop in paginatedClasses)
-        {
-            var baiTapQuery = _context.BaiTaps
-                .AsNoTracking()
-                .Where(bt =>
-                    bt.LichHoc.TenLop == tenLop &&
-                    bt.LichHoc.ThamGiaLopHocs.Any(tg => tg.HocSinhCode == hocSinhCode));
-
-            //  Filter theo trạng thái (nếu không phải "all")
-            if (!string.IsNullOrWhiteSpace(request.TrangThai) && request.TrangThai.ToLower() != "all")
-            {
-                baiTapQuery = baiTapQuery.Where(bt => bt.TrangThai == request.TrangThai);
-            }
-
-            var baiTaps = await baiTapQuery
-                .OrderByDescending(bt => bt.NgayTao)
-                .ProjectTo<BaiTapDto>(_mapper.ConfigurationProvider)
-                .ToListAsync(cancellationToken);
-
-            groupedResults.Add(new BaiTapGroupByTenLopDto
-            {
-                TenLop = tenLop,
-                BaiTaps = baiTaps
-            });
-        }
+            .ProjectTo<BaiTapDto>(_mapper.ConfigurationProvider)
+            .ToListAsync(cancellationToken);
 
         var result = new BaiTapWithPaginationDTO
         {
             PageNumber = request.PageNumber,
             TotalCount = totalCount,
-            TotalPages = totalPages,
-            Items = groupedResults
+            TotalPages = (int)Math.Ceiling((double)totalCount / request.PageSize),
+            Items = new List<BaiTapGroupByTenLopDto>
+            {
+                new BaiTapGroupByTenLopDto
+                {
+                    TenLop = tenLop,
+                    BaiTaps = baiTaps
+                }
+            }
         };
 
         return new Output
         {
             isError = false,
-            data = result,
             code = 200,
-            message = "Lấy danh sách bài tập của học sinh thành công"
+            data = result,
+            message = "Lấy danh sách bài tập theo lớp thành công"
         };
     }
 }
+

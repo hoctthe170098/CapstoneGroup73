@@ -9,6 +9,8 @@ namespace StudyFlow.Application.TraLois.Queries.GetBaiTapByTraLoi;
 public class GetTraLoiByBaiTapQuery : IRequest<Output>
 {
     public required Guid BaiTapId { get; init; }
+    public int PageNumber { get; init; } = 1;
+    public int PageSize { get; init; } = 10;
 }
 
 public class GetTraLoiByBaiTapQueryHandler : IRequestHandler<GetTraLoiByBaiTapQuery, Output>
@@ -42,6 +44,9 @@ public class GetTraLoiByBaiTapQueryHandler : IRequestHandler<GetTraLoiByBaiTapQu
             };
         }
 
+        if (request.PageNumber < 1 || request.PageSize < 1)
+            throw new Exception("Số trang hoặc kích thước không hợp lệ!");
+
         // Lấy token và userId
         var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"]
             .ToString().Replace("Bearer ", "");
@@ -50,38 +55,31 @@ public class GetTraLoiByBaiTapQueryHandler : IRequestHandler<GetTraLoiByBaiTapQu
 
         var userId = _identityService.GetUserId(token).ToString();
 
-        // Kiểm tra xem là giáo viên hay học sinh
+        // Chỉ cho giáo viên truy cập
         var isTeacher = await _context.GiaoViens.AnyAsync(gv => gv.UserId == userId, cancellationToken);
-        var isStudent = !isTeacher;
-
-        // Query cơ bản
-        var query = _context.TraLois
-        .AsNoTracking()
-        .Include(t => t.HocSinh)
-        .Where(t => t.BaiTapId == request.BaiTapId);
-
-        if (isStudent)
+        if (!isTeacher)
         {
-            var hocSinh = await _context.HocSinhs
-                .AsNoTracking()
-                .FirstOrDefaultAsync(h => h.UserId == userId, cancellationToken);
-
-            if (hocSinh == null)
+            return new Output
             {
-                return new Output
-                {
-                    isError = true,
-                    code = 404,
-                    message = "Không tìm thấy thông tin học sinh."
-                };
-            }
-
-            query = query.Where(t => t.HocSinhCode == hocSinh.Code);
+                isError = true,
+                code = 403,
+                message = "Bạn không có quyền truy cập thông tin này."
+            };
         }
 
-        // Thêm sắp xếp sau khi đã filter xong
+        // Query trả lời
+        var query = _context.TraLois
+            .AsNoTracking()
+            .Include(t => t.HocSinh)
+            .Where(t => t.BaiTapId == request.BaiTapId);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+        var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+
         var data = await query
             .OrderByDescending(t => t.ThoiGian)
+            .Skip((request.PageNumber - 1) * request.PageSize)
+            .Take(request.PageSize)
             .Select(t => new TraLoiDto
             {
                 Id = t.Id,
@@ -92,11 +90,20 @@ public class GetTraLoiByBaiTapQueryHandler : IRequestHandler<GetTraLoiByBaiTapQu
             })
             .ToListAsync(cancellationToken);
 
+        var result = new
+        {
+            PageNumber = request.PageNumber,
+            PageSize = request.PageSize,
+            TotalCount = totalCount,
+            TotalPages = totalPages,
+            Items = data
+        };
+
         return new Output
         {
             isError = false,
             code = 200,
-            data = data,
+            data = result,
             message = "Lấy danh sách trả lời thành công"
         };
     }

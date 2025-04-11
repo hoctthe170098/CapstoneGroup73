@@ -27,7 +27,7 @@ public class UpdateBaiTapCommandValidator : AbstractValidator<UpdateBaiTapComman
         RuleFor(x => x.UpdateBaiTapDto.TaiLieu)
             .Must(BeValidFile)
             .When(x => x.UpdateBaiTapDto.TaiLieu != null)
-            .WithMessage("Tệp phải có định dạng .pdf, .doc hoặc .docx và kích thước tối đa 5MB.");
+            .WithMessage("Tệp phải có định dạng .pdf, .doc hoặc .docx và kích thước tối đa 10MB.");
 
         RuleFor(x => x.UpdateBaiTapDto.ThoiGianKetThuc)
             .NotNull().WithMessage("Thời gian kết thúc không được để trống.")
@@ -37,7 +37,7 @@ public class UpdateBaiTapCommandValidator : AbstractValidator<UpdateBaiTapComman
 
     private bool BeFutureTime(DateTime? time)
     {
-        return time.HasValue && time.Value > DateTime.UtcNow;
+        return time.HasValue && time.Value > DateTime.Now;
     }
 
     private bool BeAllowedStatus(string trangThai)
