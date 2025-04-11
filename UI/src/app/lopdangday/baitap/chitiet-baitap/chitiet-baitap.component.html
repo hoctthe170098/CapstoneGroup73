@@ -2,15 +2,22 @@
   <div class="header">
     <h2>{{ baiTapDetail.tieuDe }}</h2>
     <div class="icons">
-      <i class="ft-edit" title="Chỉnh sửa" (click)="openEditModal(baiTapDetail)"></i>
+      <i
+        class="ft-edit"
+        title="Chỉnh sửa"
+        (click)="openEditModal(baiTapDetail)"
+      ></i>
     </div>
   </div>
-  
+
   <div class="meta">
-    <p><i class="ft-calendar"></i> Ngày tạo: {{ baiTapDetail.ngayTao | date: 'dd/MM/yyyy' }}</p>
+    <p>
+      <i class="ft-calendar"></i> Ngày tạo:
+      {{ baiTapDetail.ngayTao | date : "dd/MM/yyyy" }}
+    </p>
     <p><i class="ft-clock"></i> Còn lại: {{ countdownDisplay }}</p>
   </div>
-  
+
   <div class="noidung">
     <p><strong>Nội dung bài tập:</strong></p>
     <p>{{ baiTapDetail.noiDung }}</p>
@@ -18,60 +25,103 @@
     <div class="attached-file" *ngIf="baiTapDetail.urlFile">
       <i class="ft-paperclip"></i>
       <div class="file-info file-link" (click)="downloadFile()">
-        {{ baiTapDetail.urlFile.split('/').pop() }}
-      </div>
-    </div>
-    
-  </div>
-  
-    <div class="answers-section">
-      <h4>Trả lời của học sinh</h4>
-      <div class="answer-box" *ngFor="let ans of answers">
-        <div class="top-bar">
-          <strong>{{ ans.tenHocSinh }}</strong>
-          <span>{{ ans.thoiGianNop }}</span>
-        </div>
-        <p>{{ ans.noiDung }}</p>
-        <div class="attached-file">
-          <i class="ft-file"></i>
-          <span>{{ ans.file.ten }}</span>
-          <span class="file-info">{{ ans.file.kichThuoc }}</span>
-        </div>
+        Download file bài tập
       </div>
     </div>
   </div>
-  <!-- Modal sửa bài tập -->
 
-<div class="modal-overlay" *ngIf="isEditModalOpen" (click)="closeEditModal()"></div>
-<div class="modal-content" *ngIf="isEditModalOpen" (click)="$event.stopPropagation()">
+  <div class="answers-section">
+    <h4>Trả lời của học sinh</h4>
+    <div class="answer-box" *ngFor="let ans of answers">
+      <div class="top-bar">
+        <strong>{{ ans.tenHocSinh }}</strong>
+        <span>{{ ans.thoiGianNop }}</span>
+      </div>
+      <p>{{ ans.noiDung }}</p>
+      <div class="attached-file">
+        <i class="ft-file"></i>
+        <span>{{ ans.file.ten }}</span>
+        <span class="file-info">{{ ans.file.kichThuoc }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal sửa bài tập -->
+
+<div
+  class="modal-overlay"
+  *ngIf="isEditModalOpen"
+  (click)="closeEditModal()"
+></div>
+<div
+  class="modal-content"
+  *ngIf="isEditModalOpen"
+  (click)="$event.stopPropagation()"
+>
   <div class="modal-header">
     <h3>Sửa bài tập</h3>
-    <button class="close-btn" (click)="closeEditModal()"><i class="ft-x"></i></button>
+    <button class="close-btn" (click)="closeEditModal()">
+      <i class="ft-x"></i>
+    </button>
   </div>
 
   <div class="modal-body scrollable-body">
     <label>Thời gian hết hạn</label>
-    <input type="datetime-local" [(ngModel)]="editBaiTap.gio" class="form-control" />
-
+    <input
+      type="datetime-local"
+      [(ngModel)]="editBaiTap.gio"
+      (ngModelChange)="formErrorsEdit.thoiGianKetThuc = ''"
+      class="form-control"
+    />
+    <div class="error-text" *ngIf="formErrorsEdit.thoiGianKetThuc">
+      {{ formErrorsEdit.thoiGianKetThuc }}
+    </div>
     <label>Tiêu đề</label>
-    <input type="text" [(ngModel)]="editBaiTap.tieuDe" class="form-control" />
-
+    <input
+      type="text"
+      [(ngModel)]="editBaiTap.tieuDe"
+      (ngModelChange)="formErrorsEdit.tieuDe = ''"
+      class="form-control"
+    />
+    <div class="error-text" *ngIf="formErrorsEdit.tieuDe">
+      {{ formErrorsEdit.tieuDe }}
+    </div>
     <label>Nội dung</label>
-    <textarea [(ngModel)]="editBaiTap.noiDung" class="form-control" rows="5"></textarea>
-
+    <textarea
+      [(ngModel)]="editBaiTap.noiDung"
+      (ngModelChange)="formErrorsEdit.noiDung = ''"
+      class="form-control"
+    ></textarea>
+    <div class="error-text" *ngIf="formErrorsEdit.noiDung">
+      {{ formErrorsEdit.noiDung }}
+    </div>
     <label>Trạng thái</label>
-    <select [(ngModel)]="editBaiTap.trangThai" class="form-control">
+    <select
+      [(ngModel)]="editBaiTap.trangThai"
+      (ngModelChange)="formErrorsEdit.trangThai = ''"
+      class="form-control"
+    >
       <option value="Chưa mở">Chưa mở</option>
       <option value="Đang mở">Đang mở</option>
       <option value="Kết thúc">Kết thúc</option>
     </select>
-
+    <div class="error-text" *ngIf="formErrorsEdit.trangThai">
+      {{ formErrorsEdit.trangThai }}
+    </div>
     <label>File tải lên</label>
     <div class="attached-file" *ngIf="editBaiTap.file">
       <i class="ft-file"></i>
       <span>{{ editBaiTap.file.name }}</span>
-      <span class="file-info">{{ editBaiTap.file.size }}, {{ editBaiTap.file.ngay }}</span>
-      <i class="ft-trash-2 text-danger delete-icon" (click)="removeEditFile()"></i>
+      <span class="file-info"
+        >{{ editBaiTap.file.size }}, {{ editBaiTap.file.ngay }}</span
+      >
+      <i
+        class="ft-trash-2 text-danger delete-icon"
+        (click)="removeEditFile()"
+      ></i>
+    </div>
+    <div class="error-text" *ngIf="formErrorsEdit.file">
+      {{ formErrorsEdit.file }}
     </div>
   </div>
 
@@ -87,6 +137,3 @@
     </div>
   </div>
 </div>
-
-
-  

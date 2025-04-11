@@ -44,6 +44,8 @@
   
       p {
         margin-bottom: 12px;
+        font-size: 20px;
+        line-height: 1.6;
       }
   
       .attached-file {
@@ -55,8 +57,8 @@
         gap: 10px;
   
         .file-info {
-          font-size: 12px;
-          color: gray;
+          font-size: 16px;
+          color: #007bff;
         }
       }
     }
