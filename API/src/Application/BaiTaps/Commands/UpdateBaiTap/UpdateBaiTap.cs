@@ -71,11 +71,7 @@ public class UpdateBaiTapCommandHandler : IRequestHandler<UpdateBaiTapCommand, O
             DeleteFile(baiTap.UrlFile); // xóa file cũ nếu có
             baiTap.UrlFile = await UploadFileAsync(dto.TaiLieu, cancellationToken); // cập nhật file mới
         }
-        else if (!string.IsNullOrEmpty(baiTap.UrlFile))
-        {
-            DeleteFile(baiTap.UrlFile); // xóa file cũ
-            baiTap.UrlFile = null;      // bỏ liên kết file
-        }
+        
 
         await _context.SaveChangesAsync(cancellationToken);
 
