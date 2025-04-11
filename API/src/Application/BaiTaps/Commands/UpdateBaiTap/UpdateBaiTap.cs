@@ -20,27 +20,40 @@ public class UpdateBaiTapCommandHandler : IRequestHandler<UpdateBaiTapCommand, O
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly ILogger<UpdateBaiTapCommandHandler> _logger;
     private readonly string _folderPath;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IIdentityService _identityService;
 
     public UpdateBaiTapCommandHandler(
-        IApplicationDbContext context,
-        IWebHostEnvironment webHostEnvironment,
-        ILogger<UpdateBaiTapCommandHandler> logger)
+    IApplicationDbContext context,
+    IWebHostEnvironment webHostEnvironment,
+    ILogger<UpdateBaiTapCommandHandler> logger,
+    IHttpContextAccessor httpContextAccessor,
+    IIdentityService identityService)
     {
         _context = context;
         _webHostEnvironment = webHostEnvironment;
         _logger = logger;
+        _httpContextAccessor = httpContextAccessor;
+        _identityService = identityService;
         _folderPath = Path.Combine(_webHostEnvironment.ContentRootPath, "baitaps");
 
         if (!Directory.Exists(_folderPath))
-        {
             Directory.CreateDirectory(_folderPath);
-        }
     }
 
     public async Task<Output> Handle(UpdateBaiTapCommand request, CancellationToken cancellationToken)
     {
         var dto = request.UpdateBaiTapDto;
 
+        // Lấy token từ request header
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"]
+            .ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+
+        var userId = _identityService.GetUserId(token).ToString();
+
+        // Lấy bài tập
         var baiTap = await _context.BaiTaps
             .Include(bt => bt.LichHoc)
             .FirstOrDefaultAsync(bt => bt.Id == dto.Id, cancellationToken);
@@ -48,14 +61,21 @@ public class UpdateBaiTapCommandHandler : IRequestHandler<UpdateBaiTapCommand, O
         if (baiTap == null)
             throw new NotFoundDataException("Không tìm thấy bài tập.");
 
+        // Lấy giáo viên
+        var giaoVien = await _context.GiaoViens
+            .AsNoTracking()
+            .FirstOrDefaultAsync(gv => gv.UserId == userId, cancellationToken)
+            ?? throw new UnauthorizedAccessException("Không tìm thấy giáo viên tương ứng.");
 
-        //  Cập nhật thông tin bài tập
+        // Kiểm tra quyền cập nhật
+        if (baiTap.LichHoc.GiaoVienCode != giaoVien.Code)
+            throw new UnauthorizedAccessException("Bạn không có quyền cập nhật bài tập này.");
+
+        // Cập nhật thông tin
         baiTap.TieuDe = dto.TieuDe;
         baiTap.NoiDung = dto.NoiDung;
-        baiTap.ThoiGianKetThuc = dto.ThoiGianKetThuc;
         baiTap.TrangThai = dto.TrangThai;
 
-        // Nếu trạng thái chuyển sang "Kết thúc" thì cập nhật ThoiGianKetThuc là thời điểm hiện tại
         if (string.Equals(dto.TrangThai?.Trim(), "Kết thúc", StringComparison.OrdinalIgnoreCase))
         {
             baiTap.ThoiGianKetThuc = DateTime.Now;
@@ -65,13 +85,11 @@ public class UpdateBaiTapCommandHandler : IRequestHandler<UpdateBaiTapCommand, O
             baiTap.ThoiGianKetThuc = dto.ThoiGianKetThuc;
         }
 
-        // Xử lý file nếu có upload mới, hoặc xóa nếu không có file mới
         if (dto.TaiLieu != null)
         {
-            DeleteFile(baiTap.UrlFile); // xóa file cũ nếu có
-            baiTap.UrlFile = await UploadFileAsync(dto.TaiLieu, cancellationToken); // cập nhật file mới
+            DeleteFile(baiTap.UrlFile);
+            baiTap.UrlFile = await UploadFileAsync(dto.TaiLieu, cancellationToken);
         }
-        
 
         await _context.SaveChangesAsync(cancellationToken);
 
