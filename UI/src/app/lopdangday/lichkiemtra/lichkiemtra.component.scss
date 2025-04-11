@@ -1,0 +1,56 @@
+.schedule-container {
+    padding: 20px;
+    background: #f7f8fc;
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+  
+    h2 {
+      margin-bottom: 16px;
+      color: #333;
+    }
+  
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+  
+      th, td {
+        padding: 12px 16px;
+        text-align: left;
+      }
+  
+      thead {
+        background-color: #f0f2f5;
+        font-weight: bold;
+      }
+  
+      tbody tr:nth-child(even) {
+        background-color: #fafafa;
+      }
+  
+      a {
+        color: #007bff;
+        text-decoration: none;
+      }
+  
+      .status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #555;
+      }
+  
+      input[type="checkbox"] {
+        accent-color: #6f42c1;
+      }
+    }
+    .empty-message {
+        text-align: center;
+        color: red;
+        font-weight: 500;
+        margin-top: 20px;
+      }
+  }
+  
