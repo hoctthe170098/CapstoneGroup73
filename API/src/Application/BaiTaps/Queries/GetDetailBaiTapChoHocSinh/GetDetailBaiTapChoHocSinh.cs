@@ -37,15 +37,19 @@ public class GetDetailBaiTapChoHocSinhQueryHandler : IRequestHandler<GetDetailBa
 
         var userId = _identityService.GetUserId(token).ToString();
 
+        var hocSinh = await _context.HocSinhs
+            .AsNoTracking()
+            .FirstOrDefaultAsync(h => h.UserId == userId, cancellationToken)
+            ?? throw new NotFoundDataException("Không tìm thấy học sinh tương ứng.");
+
         var baiTap = await _context.BaiTaps
             .Include(bt => bt.LichHoc)
+                .ThenInclude(lh => lh.ThamGiaLopHocs)
             .FirstOrDefaultAsync(bt => bt.Id == request.BaiTapId, cancellationToken)
             ?? throw new NotFoundDataException("Không tìm thấy bài tập.");
 
-        var isHocSinh = await _context.HocSinhs
-            .AnyAsync(hs => hs.UserId == userId &&
-                            baiTap.LichHoc.ThamGiaLopHocs.Any(tg => tg.HocSinhCode == hs.Code),
-                            cancellationToken);
+        var isHocSinh = baiTap.LichHoc.ThamGiaLopHocs
+            .Any(tg => tg.HocSinhCode == hocSinh.Code);
 
         if (!isHocSinh)
             throw new UnauthorizedAccessException("Bạn không có quyền truy cập bài tập này.");
@@ -80,3 +84,5 @@ public class GetDetailBaiTapChoHocSinhQueryHandler : IRequestHandler<GetDetailBa
         };
     }
 }
+
+
