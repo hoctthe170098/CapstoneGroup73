@@ -11,6 +11,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ChitietBaitapComponent } from './baitap/chitiet-baitap/chitiet-baitap.component';
 import { BaocaodiemdanhComponent } from './baocaodiemdanh/baocaodiemdanh.component';
 import { BaocaodiemComponent } from './baocaodiem/baocaodiem.component';
+import { DiemkiemtraComponent } from './diemkiemtra/diemkiemtra.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { BaocaodiemComponent } from './baocaodiem/baocaodiem.component';
     ChiTietComponent,
     ChitietBaitapComponent,
     BaocaodiemdanhComponent,
-    BaocaodiemComponent
+    BaocaodiemComponent,
+    DiemkiemtraComponent
   ],
   imports: [
     CommonModule,

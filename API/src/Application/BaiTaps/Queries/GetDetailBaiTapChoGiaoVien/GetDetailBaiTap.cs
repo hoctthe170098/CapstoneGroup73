@@ -46,7 +46,7 @@ public class GetBaiTapDetailQueryHandler : IRequestHandler<GetBaiTapDetailQuery,
             .AnyAsync(gv => gv.UserId == userId && gv.Code == baiTap.LichHoc.GiaoVienCode, cancellationToken);
 
         if (!isGiaoVien)
-            throw new UnauthorizedAccessException("Bạn không có quyền xem bài tập này.");
+            throw new NotFoundIDException();
 
         int secondsLeft = 0;
 

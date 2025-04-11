@@ -44,7 +44,7 @@ public class GetListBaiTapChoGiaoVienWithPaginationQueryHandler
         var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"]
             .ToString().Replace("Bearer ", "");
         if (string.IsNullOrEmpty(token))
-            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+            throw new Exception("Token không hợp lệ hoặc bị thiếu.");
 
         var userId = _identityService.GetUserId(token).ToString();
 

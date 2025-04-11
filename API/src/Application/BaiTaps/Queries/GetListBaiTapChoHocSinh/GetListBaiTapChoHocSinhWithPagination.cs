@@ -50,7 +50,7 @@ public class TeacherAssignmentListWithPaginationQueryHandler : IRequestHandler<T
             .ToString().Replace("Bearer ", "");
 
         if (string.IsNullOrEmpty(token))
-            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+            throw new Exception("Token không hợp lệ hoặc bị thiếu.");
 
         var userId = _identityService.GetUserId(token).ToString();
 
@@ -67,7 +67,7 @@ public class TeacherAssignmentListWithPaginationQueryHandler : IRequestHandler<T
             .AnyAsync(tg => tg.HocSinhCode == hocSinhCode && tg.LichHoc.TenLop == tenLop, cancellationToken);
 
         if (!isInClass)
-            throw new UnauthorizedAccessException("Học sinh không tham gia lớp này.");
+            throw new NotFoundIDException();
 
         var baiTapQuery = _context.BaiTaps
             .AsNoTracking()
