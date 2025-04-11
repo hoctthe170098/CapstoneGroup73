@@ -125,5 +125,19 @@ export class LopdangdayService {
     const url = `${this.baseUrl}/DiemDanhs/getbaocaodiemdanh?TenLop=${encodeURIComponent(tenLop)}`;
     return this.http.get<any>(url, { headers });
   }
+  getLichKiemTraChoGiaoVien(tenLop: string): Observable<any> {
+    const token = localStorage.getItem("token");
+    const headers = new HttpHeaders().set("Authorization", `Bearer ${token}`);
+  
+    const url = `${this.baseUrl}/BaiKiemTras/getlichkiemtrachogiaovien?TenLop=${encodeURIComponent(tenLop)}`;
+    return this.http.get<any>(url, { headers });
+  }
+  getKetQuaBaiKiemTraChoGiaoVien(baiKiemTraId: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  
+    const url = `${this.baseUrl}/BaiKiemTras/getdiembaikiemtrachogiaovien?BaiKiemTraId=${baiKiemTraId}`;
+    return this.http.get<any>(url, { headers });
+  }
   
 }
