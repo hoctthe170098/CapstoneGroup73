@@ -25,17 +25,20 @@
           Download file bài tập
         </div>
       </div>
+      
     </div>
 <!-- Form trả lời bài tập -->
 <div class="answer-form">
   <label><strong>Nội dung</strong><span class="field-required-asterisk">(*)</span></label>
   <div class="custom-editor">
     <quill-editor
-      [(ngModel)]="newAnswer.noiDung"
-      [styles]="{height: '150px'}"
-      [modules]="quillModules"
-      [placeholder]="'Nhập nội dung trả lời...'">
-    </quill-editor>
+  #quillEditor
+  [(ngModel)]="newAnswer.noiDung"
+  [styles]="{height: '150px'}"
+  [modules]="quillModules"
+  [placeholder]="'Nhập nội dung trả lời...'">
+</quill-editor>
+
   </div>
 
   <!-- File đính kèm (hiển thị bên dưới nội dung) -->
@@ -66,20 +69,24 @@
 
   
     <!-- Trả lời -->
-    <div class="answers-section">
-     
-      <div class="answer-box" *ngFor="let ans of answers">
-        <div class="top-bar">
-          <strong>{{ ans.tenHocSinh }}</strong>
-          <span>{{ ans.thoiGianNop }}</span>
-        </div>
-        <p>{{ ans.noiDung }}</p>
-        <div class="attached-file">
-          <i class="ft-file"></i>
-          <span>{{ ans.file.ten }}</span>
-          <span class="file-info">{{ ans.file.kichThuoc }}</span>
-        </div>
-      </div>
+<div class="answers-section" *ngIf="answers.length > 0">
+  <h4>Trả lời của học sinh</h4>
+  <div class="answer-box" *ngFor="let ans of answers">
+    <div class="top-bar">
+      <strong>{{ ans.tenHocSinh }}</strong>
+      <span>{{ ans.thoiGianNop }}</span>
     </div>
+    <p [innerHTML]="ans.noiDung"></p>
+    <div
+  class="attached-file file-link"
+  *ngIf="ans.file?.url"
+  (click)="downloadFile(ans.file.url)">
+  <i class="ft-paperclip"></i>
+  <div class="file-info">File</div>
+</div>
+
+  </div>
+</div>
+
   </div>
   

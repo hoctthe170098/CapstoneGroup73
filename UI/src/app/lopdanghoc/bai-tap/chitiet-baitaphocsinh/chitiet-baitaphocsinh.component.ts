@@ -2,6 +2,9 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { saveAs } from 'file-saver';
 import { LopdanghocService } from 'app/lopdanghoc/shared/lopdanghoc.service';
+import { ToastrService } from 'ngx-toastr';
+import { ViewChild } from '@angular/core';
+import { QuillEditorComponent } from 'ngx-quill';
 
 @Component({
   selector: 'app-chitiet-baitaphocsinh',
@@ -15,22 +18,14 @@ export class ChitietBaitaphocsinhComponent implements OnInit, OnDestroy {
   intervalId: any;
   newAnswer = { noiDung: '', file: null };
   currentUserName = 'Nguyễn Văn A';
-  answers: any[] = [
-    {
-      tenHocSinh: 'Nguyễn Văn A',
-      thoiGianNop: '13:00',
-      noiDung: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit...',
-      file: {
-        ten: 'File Title.pdf',
-        kichThuoc: '313 KB'
-      }
-    }
-  ];
+  @ViewChild('quillEditor') quillEditor!: QuillEditorComponent;
 
+  answers: any[] ;
   constructor(
     private route: ActivatedRoute,
     private lopdanghocService: LopdanghocService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef, 
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -38,6 +33,7 @@ export class ChitietBaitaphocsinhComponent implements OnInit, OnDestroy {
       this.baiTapId = params.get('baiTapId') || '';
       if (this.baiTapId) {
         this.loadBaiTapDetail();
+        this.loadTraLoi();
       }
     });
   }
@@ -77,15 +73,30 @@ export class ChitietBaitaphocsinhComponent implements OnInit, OnDestroy {
 
   startCountdown(seconds: number): void {
     if (this.intervalId) clearInterval(this.intervalId);
+  
     let remaining = seconds;
     this.updateCountdownDisplay(remaining);
+  
     this.intervalId = setInterval(() => {
       remaining--;
+  
+      if (remaining < 0) {
+        clearInterval(this.intervalId);
+        this.intervalId = null;
+  
+        
+        this.loadBaiTapDetail();
+        this.loadTraLoi();
+        
+        return;
+      }
+  
       this.updateCountdownDisplay(remaining);
-      if (remaining <= 0) clearInterval(this.intervalId);
       this.cdr.detectChanges();
     }, 1000);
   }
+  
+  
 
   updateCountdownDisplay(seconds: number): void {
     const days = Math.floor(seconds / (3600 * 24));
@@ -99,27 +110,36 @@ export class ChitietBaitaphocsinhComponent implements OnInit, OnDestroy {
     return n.toString().padStart(2, '0');
   }
 
-  downloadFile(): void {
-    if (!this.baiTapDetail?.urlFile) return;
-    const filePath = this.baiTapDetail.urlFile;
-    this.lopdanghocService.downloadBaiTapFile(filePath).subscribe({
+  downloadFile(filePath?: string): void {
+    const path = filePath || this.baiTapDetail?.urlFile;
+    if (!path) return;
+  
+  
+    this.lopdanghocService.downloadBaiTapFile(path).subscribe({
       next: (res) => {
+  
         if (res?.data?.fileContents) {
-          const byteArray = new Uint8Array(atob(res.data.fileContents).split('').map(char => char.charCodeAt(0)));
+          const byteArray = new Uint8Array(
+            atob(res.data.fileContents).split('').map(char => char.charCodeAt(0))
+          );
           const blob = new Blob([byteArray], { type: res.data.contentType });
-          const fileName = res.data.fileDownloadName || 'baitap.pdf';
+          const fileName = res.data.fileDownloadName || 'file_taive';
           saveAs(blob, fileName);
+        } else {
+          console.warn('Không có fileContents trong response');
         }
       },
       error: (err) => {
-        console.error('Lỗi khi tải file:', err);
+        console.error(' Lỗi khi gọi API tải file:', err);
       }
     });
   }
+  
+  
 
   getFileName(path: string): string {
     return path.split('/').pop() || 'Tệp đính kèm';
-  }
+  }  
 
   handleFileUpload(event: any): void {
     const file = event.target.files[0];
@@ -130,30 +150,81 @@ export class ChitietBaitaphocsinhComponent implements OnInit, OnDestroy {
 
  
   submitAnswer(): void {
-    if (!this.newAnswer.noiDung.trim()) {
-      alert('Nội dung không được để trống.');
+    const plainText = this.quillEditor.quillEditor.getText().trim();
+  
+    if (!plainText) {
+      this.toastr.warning('Vui lòng nhập nội dung trước khi gửi.');
       return;
     }
   
-    console.log('📝 Submitting answer:', this.newAnswer);
-    // TODO: Gửi về API ở đây
+    const formData = new FormData();
+    formData.append('baiTapId', this.baiTapId);
+    formData.append('noiDung', plainText); // Gửi văn bản thuần, không gửi HTML
+    if (this.newAnswer.file) {
+      formData.append('tepDinhKem', this.newAnswer.file);
+    }
   
-    // Giả lập thêm vào danh sách (sau khi gửi thành công)
-    this.answers.unshift({
-      tenHocSinh: this.currentUserName,
-      thoiGianNop: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      noiDung: this.newAnswer.noiDung,
-      file: this.newAnswer.file
-        ? {
-            ten: this.newAnswer.file.name,
-            kichThuoc: `${Math.round(this.newAnswer.file.size / 1024)} KB`
-          }
-        : null
+    this.lopdanghocService.createTraLoi(formData).subscribe({
+      next: (res) => {
+        if (!res.isError) {
+          this.toastr.success(res.message || 'Gửi câu trả lời thành công!');
+  
+          const newTraLoi = res.data;
+  
+          this.answers.unshift({
+            tenHocSinh: this.currentUserName,
+            thoiGianNop: new Date(newTraLoi.thoiGian).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            }),
+            noiDung: plainText,
+            file: newTraLoi.urlFile
+              ? {
+                  ten: this.getFileName(newTraLoi.urlFile),
+                  kichThuoc: '---',
+                }
+              : null,
+          });
+  
+          // Reset
+          this.quillEditor.quillEditor.setText('');
+          this.newAnswer = { noiDung: '', file: null };
+          this.cdr.detectChanges();
+        } else {
+          this.toastr.error(res.message || 'Gửi thất bại!');
+        }
+      },
+      error: (err) => {
+        console.error(' Lỗi gửi trả lời:', err);
+        this.toastr.error('Đã xảy ra lỗi khi gửi câu trả lời!');
+      }
     });
-  
-    // Reset form
-    this.newAnswer = { noiDung: '', file: null };
   }
+  loadTraLoi(): void {
+    this.lopdanghocService.getTraLoiByBaiTapForStudent(this.baiTapId).subscribe({
+      next: (res) => {
+        if (!res.isError) {
+          this.answers = res.data.map((item: any) => ({
+            tenHocSinh: item.hocSinhTen,
+            thoiGianNop: new Date(item.thoiGian).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            noiDung: item.noiDung,
+            file: item.urlFile
+              ? {
+                  ten: this.getFileName(item.urlFile),
+                  url: item.urlFile
+                }
+              : null
+          }));
+        }
+      },
+      error: (err) => {
+        console.error(' Lỗi lấy danh sách trả lời:', err);
+      }
+    });
+  }
+  
+  
+  
   
   cancelAnswer(): void {
     this.newAnswer = { noiDung: '', file: null };
