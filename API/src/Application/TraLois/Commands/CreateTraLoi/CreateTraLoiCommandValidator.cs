@@ -21,6 +21,9 @@ public class CreateTraLoiCommandValidator : AbstractValidator<CreateTraLoiComman
             .When(x => x.TepDinhKem != null)
             .WithMessage("Tệp đính kèm phải là .doc, .docx, hoặc .pdf và không được vượt quá 10MB.");
 
+        RuleFor(x => x.BaiTapId)
+            .MustAsync(BeBeforeDeadline)
+            .WithMessage("Bài tập này đã quá hạn, bạn không thể nộp trả lời.");
     }
 
     private bool BeValidFile(IFormFile? file)
@@ -35,5 +38,15 @@ public class CreateTraLoiCommandValidator : AbstractValidator<CreateTraLoiComman
         return isExtensionValid && isSizeValid;
     }
 
+    private async Task<bool> BeBeforeDeadline(Guid baiTapId, CancellationToken cancellationToken)
+    {
+        var baiTap = await _context.BaiTaps
+            .AsNoTracking()
+            .FirstOrDefaultAsync(bt => bt.Id == baiTapId, cancellationToken);
 
+        if (baiTap == null || baiTap.ThoiGianKetThuc == null)
+            return true; 
+
+        return DateTime.Now < baiTap.ThoiGianKetThuc;
+    }
 }
