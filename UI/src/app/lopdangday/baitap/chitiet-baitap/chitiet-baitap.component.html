@@ -38,14 +38,12 @@
         <span>{{ ans.thoiGianNop }}</span>
       </div>
       <p>{{ ans.noiDung }}</p>
-      <div class="attached-file">
+      <div class="attached-file file-link" *ngIf="ans.file" (click)="downloadFile(ans.file.url)">
         <i class="ft-file"></i>
         <span>{{ ans.file.ten }}</span>
-        <span class="file-info">{{ ans.file.kichThuoc }}</span>
       </div>
     </div>
-  </div>
-</div>
+  </div>  
 <!-- Modal sửa bài tập -->
 
 <div

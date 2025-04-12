@@ -20,7 +20,10 @@ export class ChitietBaitapComponent implements OnInit {
 
   intervalId: any;
 countdownDisplay: string = '';
-
+answers: any[] = [];
+currentPage = 1;
+pageSize = 3;
+editBaiTap: any;
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -29,6 +32,7 @@ countdownDisplay: string = '';
 
       if (this.baiTapId) {
         this.loadBaiTapDetail();
+        this.loadTraLoiCuaHocSinh(); 
       }
     });
   }
@@ -72,24 +76,30 @@ countdownDisplay: string = '';
     return `${days}N ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
   }
   
-  startCountdown(seconds: number) {
-   
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-    }
+  startCountdown(seconds: number): void {
+    if (this.intervalId) clearInterval(this.intervalId);
   
     let remaining = seconds;
     this.updateCountdownDisplay(remaining);
   
     this.intervalId = setInterval(() => {
       remaining--;
+  
+      if (remaining < 0) {
+        clearInterval(this.intervalId);
+        this.intervalId = null;
+  
+       
+        this.loadBaiTapDetail();
+        
+        return;
+      }
+  
       this.updateCountdownDisplay(remaining);
       this.cdr.detectChanges();
-      if (remaining <= 0) {
-        clearInterval(this.intervalId);
-      }
     }, 1000);
   }
+  
   
 
 updateCountdownDisplay(seconds: number) {
@@ -115,44 +125,13 @@ downloadFile(): void {
       }
     },
     error: (err) => {
-      console.error('❌ Lỗi khi tải file:', err);
+      console.error(' Lỗi khi tải file:', err);
     }
   });
 }
 
-  answers = [
-    {
-      tenHocSinh: 'Bùi Ngọc Dũng',
-      thoiGianNop: '18:30',
-      noiDung: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit...',
-      file: {
-        ten: 'File Title.pdf',
-        kichThuoc: '313 KB',
-       
-      }
-    },
-    {
-      tenHocSinh: 'Ngô Minh Kiên',
-      thoiGianNop: '18:30',
-      noiDung: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit...',
-      file: {
-        ten: 'File Title.pdf',
-        kichThuoc: '313 KB',
-        
-      }
-    },
-    {
-      tenHocSinh: 'Nguyễn Tuấn Anh',
-      thoiGianNop: '18:30',
-      noiDung: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit...',
-      file: {
-        ten: 'File Title.pdf',
-        kichThuoc: '313 KB',
-        
-      }
-    }
-  ];
-  editBaiTap: any;
+  
+  
   
   openEditModal(bt: any): void {
     console.log('🛠️ Dữ liệu bài tập cần sửa:', bt);
@@ -270,7 +249,7 @@ downloadFile(): void {
   const hasError = Object.values(this.formErrorsEdit).some(e => e !== '');
   if (hasError) return;
 
-  // Gửi form nếu hợp lệ
+
   const formData = new FormData();
   formData.append('updateBaiTapDto.id', this.baiTapId);
   formData.append('updateBaiTapDto.tieuDe', tieuDe);
@@ -282,7 +261,7 @@ downloadFile(): void {
   if (file && file.rawFile) {
     formData.append('updateBaiTapDto.taiLieu', file.rawFile);
   }
-  console.log('📦 File raw:', this.editBaiTap.file?.rawFile);
+  
  
   this.lopdangdayService.updateBaiTap(formData).subscribe({
     next: (res) => {
@@ -300,6 +279,36 @@ downloadFile(): void {
     }
   });
 }
-  
+loadTraLoiCuaHocSinh(): void {
+  const payload = {
+    baiTapId: this.baiTapId,
+    pageNumber: this.currentPage,
+    pageSize: this.pageSize,
+  };
+
+  this.lopdangdayService.getTraLoiByBaiTapForTeacher(payload).subscribe({
+    next: (res) => {
+      if (!res.isError) {
+        const items = res.data?.items || [];
+        this.answers = items.map((item: any) => ({
+          tenHocSinh: item.hocSinhTen,
+          thoiGianNop: new Date(item.thoiGian).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          noiDung: item.noiDung,
+          file: item.urlFile
+            ? {
+                ten: 'File',
+                url: item.urlFile,
+              }
+            : null
+        }));
+      } else {
+        this.toastr.error(res.message || 'Không thể lấy danh sách trả lời.');
+      }
+    },
+    error: (err) => {
+      console.error(' Lỗi khi gọi API lấy trả lời học sinh:', err);
+    }
+  });
+}
   
 }

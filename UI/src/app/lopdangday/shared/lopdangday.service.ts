@@ -139,5 +139,15 @@ export class LopdangdayService {
     const url = `${this.baseUrl}/BaiKiemTras/getdiembaikiemtrachogiaovien?BaiKiemTraId=${baiKiemTraId}`;
     return this.http.get<any>(url, { headers });
   }
+  getTraLoiByBaiTapForTeacher(payload: { baiTapId: string; pageNumber: number; pageSize: number }): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  
+    return this.http.post<any>(
+      `${this.baseUrl}/TraLois/gettraloibybaitapforteacher`,
+      payload,
+      { headers }
+    );
+  }
   
 }
