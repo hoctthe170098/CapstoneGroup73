@@ -97,7 +97,7 @@ public class CreateTraLoiCommandHandler : IRequestHandler<CreateTraLoiCommand, O
         var traLoi = new TraLoi
         {
             Id = Guid.NewGuid(),
-            ThoiGian = DateTime.UtcNow,
+            ThoiGian = DateTime.Now,
             NoiDung = request.NoiDung,
             UrlFile = fileUrl,
             HocSinhCode = hocSinhCode,
