@@ -68,6 +68,26 @@ public class GetListBaiTapChoGiaoVienWithPaginationQueryHandler
 
         var listClass = await queryLop.ToListAsync(cancellationToken);
 
+        // Tự động cập nhật trạng thái nếu bài tập đã hết hạn
+        var now = DateTime.Now;
+        var expiredAssignments = await _context.BaiTaps
+            .Where(bt =>
+                bt.ThoiGianKetThuc.HasValue &&
+                bt.ThoiGianKetThuc.Value <= now &&
+                bt.TrangThai != "Kết thúc" &&
+                listClass.Contains(bt.LichHoc.TenLop))
+            .ToListAsync(cancellationToken);
+
+        foreach (var baiTap in expiredAssignments)
+        {
+            baiTap.TrangThai = "Kết thúc";
+        }
+
+        if (expiredAssignments.Any())
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
         var totalCount = listClass.Count;
         var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
 
@@ -76,8 +96,8 @@ public class GetListBaiTapChoGiaoVienWithPaginationQueryHandler
             .Take(request.PageSize)
             .ToList();
 
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
-        var thu = (int)DateTime.UtcNow.DayOfWeek;
+        var today = DateOnly.FromDateTime(DateTime.Now);
+        var thu = (int)DateTime.Now.DayOfWeek;
         thu = thu == 0 ? 8 : thu + 1;
 
         var baiTapGroupList = new List<BaiTapGroupByTenLopDto>();
@@ -143,3 +163,4 @@ public class GetListBaiTapChoGiaoVienWithPaginationQueryHandler
         };
     }
 }
+

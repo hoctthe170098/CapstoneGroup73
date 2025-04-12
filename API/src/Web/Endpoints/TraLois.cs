@@ -7,6 +7,7 @@ using StudyFlow.Application.TraLois.Commands.UpdateTraLoi;
 using StudyFlow.Application.TraLois.Queries.GetBaiTapByTraLoi;
 using StudyFlow.Application.TraLois.Queries.GetTraLoiByBaiTapForHocSinh;
 using StudyFlow.Domain.Constants;
+using StudyFlow.Application.TraLois.Commands.DeleteTraLoi;
 
 namespace StudyFlow.Web.Endpoints;
 
@@ -18,6 +19,7 @@ public class TraLois : EndpointGroupBase
            .DisableAntiforgery()
            .MapPost(CreateTraLoi, "create")
            .MapPut(UpdateTraLoi, "update")
+           .MapDelete(DeleteTraLoi, "delete")
            .MapPost(GetTraLoiByBaiTapIdForTeacher, "gettraloibybaitapforteacher") 
            .MapGet(GetTraLoiByBaiTapIdForStudent, "gettraloibybaitapforstudent"); 
     }
@@ -44,5 +46,10 @@ public class TraLois : EndpointGroupBase
     public async Task<Output> GetTraLoiByBaiTapIdForStudent(ISender sender, [AsParameters] GetTraLoiByBaiTapForHocSinh query)
     {
         return await sender.Send(query);
+    }
+    [Authorize(Roles = Roles.Student)]
+    public async Task<Output> DeleteTraLoi(ISender sender, [FromQuery] Guid traLoiId)
+    {
+        return await sender.Send(new DeleteTraLoiCommand(traLoiId));
     }
 }
