@@ -23,7 +23,9 @@ public class CreateLichDayThayCommandValidator : AbstractValidator<CreateLichDay
         _identityService = identityService;
         RuleFor(x => x.TenLop)
             .MustAsync(ExistClassName)
-            .WithMessage("Lớp không tồn tại trong cơ sở này");
+            .WithMessage("Lớp không tồn tại trong cơ sở này")
+            .MustAsync(DaBatDau)
+            .WithMessage("Lớp này chưa bắt đầu, không thể tạo lịch.");
         RuleFor(x => x.GiaoVienCode)
             .MustAsync(ExistGiaoVien)
             .WithMessage("Giáo viên không tồn tại trong cơ sở này.")
@@ -45,6 +47,18 @@ public class CreateLichDayThayCommandValidator : AbstractValidator<CreateLichDay
             .MustAsync(KhongTrungLichGiaoVien)
             .WithMessage("Giáo viên dạy thay bị trùng lịch" +
             "(lưu ý: giữa 2 slot của lớp phải có ít nhất 15 phút nghỉ).");
+    }
+
+    private async Task<bool> DaBatDau(string name, CancellationToken cToken)
+    {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
+        var lichHocCoDinh = await _context.LichHocs
+            .FirstOrDefaultAsync(lh => lh.TenLop == name && lh.Phong.CoSoId == coSoId && lh.TrangThai == "Cố định");
+        if (lichHocCoDinh == null || lichHocCoDinh.NgayBatDau > DateOnly.FromDateTime(DateTime.Now)) return false;
+        return true;
     }
 
     private async Task<bool> KhongTrungNgayNghi(CreateLichDayThayCommand command,
