@@ -2,6 +2,8 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LopdangdayService } from '../shared/lopdangday.service';
+import { saveAs } from 'file-saver';
+import { ToastrService } from 'ngx-toastr';
 interface BaiKiemTraDto {
   id: string;
   ten: string;
@@ -24,7 +26,8 @@ export class LichkiemtraComponent implements OnInit {
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private lopdangdayService: LopdangdayService,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -53,4 +56,27 @@ export class LichkiemtraComponent implements OnInit {
       }
     });
   }
+  downloadFile(filePath: string): void {
+    if (!filePath) {
+      this.toastr.warning('Không có tài liệu để tải!');
+      return;
+    }
+  
+    const fileName = this.extractFileName(filePath);
+  
+    this.lopdangdayService.downloadBaiKiemTra(filePath).subscribe({
+      next: (blob: Blob) => {
+        saveAs(blob, fileName);
+      },
+      error: (err) => {
+        console.error('Lỗi tải file:', err);
+        this.toastr.error('Tải tài liệu thất bại!');
+      }
+    });
+  }
+  
+  extractFileName(path: string): string {
+    return path.split(/[/\\]/).pop() || 'file';
+  }
+  
 }

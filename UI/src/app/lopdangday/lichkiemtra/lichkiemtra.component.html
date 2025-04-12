@@ -17,7 +17,11 @@
                   {{ item.ten }}
                 </a>
             </td>
-          <td><a [href]="item.urlFile" target="_blank">Download</a></td>
+            <td>
+              <a href="#" (click)="downloadFile(item.urlFile); $event.preventDefault()">Download</a>
+            </td>
+            
+            
           <td>{{ item.ngayKiemTra | date: 'dd/MM/yyyy' }}</td>
           <td>{{ item.trangThai }}</td>
         </tr>
