@@ -10,12 +10,12 @@ using System.Xml.Linq;
 
 namespace StudyFlow.Application.LichHocs.Commands.UpdateDiemDanhTheoNgay;
 
-public class UpdateLichDayBuCommandValidator : AbstractValidator<UpdateDiemDanhTheoNgayCommand>
+public class UpdateDiemDanhTheoNgayCommandValidator : AbstractValidator<UpdateDiemDanhTheoNgayCommand>
 {
     private readonly IApplicationDbContext _context;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IIdentityService _identityService;
-    public UpdateLichDayBuCommandValidator(IApplicationDbContext context
+    public UpdateDiemDanhTheoNgayCommandValidator(IApplicationDbContext context
         , IHttpContextAccessor httpContextAccessor
         , IIdentityService identityService)
     {

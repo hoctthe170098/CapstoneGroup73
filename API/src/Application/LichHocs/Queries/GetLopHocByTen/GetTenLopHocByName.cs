@@ -76,7 +76,9 @@ public class GetLopHocByTenQueryHandler : IRequestHandler<GetLopHocByTenQuery, O
             lopHoc.LichHocs.Add(lichhoc);
         }
         var listHocSinh = _context.HocSinhs
-            .Where(hs=>hs.ThamGiaLopHocs.Any(tg=>tg.LichHoc.TenLop==request.TenLop)).Distinct();
+            .Where(hs=>hs.ThamGiaLopHocs
+            .Any(tg=>tg.LichHoc.TenLop==request.TenLop&&tg.NgayKetThuc>DateOnly.FromDateTime(DateTime.Now)&&tg.LichHoc.TrangThai=="Cố định"))
+            .Distinct();
         if (listHocSinh.Any())
         {
             var hocSinh = _mapper.Map<List<HocSinhDto>>(listHocSinh);

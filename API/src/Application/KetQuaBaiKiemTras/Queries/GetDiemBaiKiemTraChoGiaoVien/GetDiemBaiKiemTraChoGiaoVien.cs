@@ -9,8 +9,9 @@ using StudyFlow.Application.Common.Interfaces;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Application.Cosos.Queries.GetCososWithPagination;
 using StudyFlow.Application.LichHocs.Queries.GetLopHocWithPagination;
+using StudyFlow.Domain.Entities;
 
-namespace StudyFlow.Application.BaiKiemTras.Queries.GetDiemBaiKiemTraChoGiaoVien;
+namespace StudyFlow.Application.KetQuaBaiKiemTras.Queries.GetDiemBaiKiemTraChoGiaoVien;
 public record GetDiemBaiKiemTraChoGiaoVienQuery : IRequest<Output>
 {
     public required string BaiKiemTraId { get; init; }
@@ -48,38 +49,42 @@ public class GetDiemBaiKiemTraChoGiaoVienQueryHandler : IRequestHandler<GetDiemB
         var giaoVien = await _context.GiaoViens
             .FirstOrDefaultAsync(gv => gv.UserId == UserId.ToString());
         if (giaoVien == null) throw new NotFoundIDException();
+        var HomNay = DateOnly.FromDateTime(DateTime.Now);
         var BaiKiemTra = _context.BaiKiemTras
             .Include(kt=>kt.LichHoc)
             .FirstOrDefault(kt=>kt.Id.ToString()==request.BaiKiemTraId);
         if (BaiKiemTra == null) throw new NotFoundIDException();
         if(BaiKiemTra.LichHoc.GiaoVienCode!=giaoVien.Code) throw new NotFoundIDException();
+        var checkKetQua = _context.KetQuaBaiKiemTras.Any(kq=>kq.BaiKiemTraId==BaiKiemTra.Id);
+        if (!checkKetQua)
+        {
+            var HocSinhCodes = _context.ThamGiaLopHocs
+                .Where(tg=>tg.NgayKetThuc>=BaiKiemTra.NgayKiemTra&&tg.LichHocId==BaiKiemTra.LichHocId)
+                .Select(tg=>tg.HocSinhCode).ToList();
+            foreach(var code in HocSinhCodes)
+            {
+                var ketQua = new KetQuaBaiKiemTra
+                {
+                    BaiKiemTraId = BaiKiemTra.Id,
+                    Id = Guid.NewGuid(),
+                    HocSinhCode = code,
+                };
+                _context.KetQuaBaiKiemTras.Add(ketQua);
+            }
+            BaiKiemTra.TrangThai = "Đã kiểm tra";
+        }
+        await _context.SaveChangesAsync(cancellationToken);
         var KetQua = await _context.KetQuaBaiKiemTras
             .Where(kq => kq.BaiKiemTraId == BaiKiemTra.Id)
             .ProjectTo<KetQuaBaiKiemTraDto>(_mapper.ConfigurationProvider)
             .ToListAsync();
-        if(KetQua.Any()) output.data = KetQua;
-        else 
-        { 
-            var HocSinhCode = await _context.ThamGiaLopHocs
-                .Where(tg=>tg.LichHocId==BaiKiemTra.LichHocId&&tg.NgayKetThuc>=BaiKiemTra.NgayKiemTra)
-                .Select(tg => new
-                {
-                    tg.HocSinhCode,
-                    tg.HocSinh.Ten
-                })
-                .ToListAsync();
-            List<KetQuaBaiKiemTraDto> listKetQua = new List<KetQuaBaiKiemTraDto> ();
-            foreach(var item in HocSinhCode)
-            {
-                var ketQua = new KetQuaBaiKiemTraDto
-                {
-                    HocSinhCode = item.HocSinhCode,
-                    TenHocSinh = item.Ten
-                };
-                listKetQua .Add(ketQua);
-            }
-            output.data = listKetQua;
-        }
-            return output;
+        var data = new
+        {
+            TenBaiKiemTra = BaiKiemTra.Ten,
+            BaiKiemTra.NgayKiemTra,
+            KetQuaBaiKiemTra = KetQua
+        };
+        output.data = data;
+        return output;
     }
 }
