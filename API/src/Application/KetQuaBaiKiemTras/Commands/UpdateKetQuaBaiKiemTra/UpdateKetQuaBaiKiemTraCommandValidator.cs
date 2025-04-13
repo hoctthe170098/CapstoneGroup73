@@ -56,6 +56,7 @@ public class UpdateKetQuaBaiKiemTraCommandValidator : AbstractValidator<UpdateKe
         var ketQuaBaiKiemTras = await _context.KetQuaBaiKiemTras
             .Where(d=> ketQuas.Select(dd=>dd.Id).ToList().Contains(d.Id))
             .Select(d=>d.BaiKiemTraId)
+            .Distinct()
             .ToListAsync();
         return ketQuaBaiKiemTras.Count() == 1;
     }

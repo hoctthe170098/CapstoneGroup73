@@ -1,35 +1,38 @@
 <div class="result-container">
-    <h3>KẾT QUẢ KIỂM TRA </h3>
-    <table *ngIf="danhSachHocSinh.length > 0">
-      <thead>
-        <tr>
-          <th>CODE</th>
-          <th>Họ và Tên</th>
-          <th>Điểm Bài Kiểm Tra</th>
-          <th>Nhận Xét</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let hs of danhSachHocSinh">
-          <td>{{ hs.hocSinhCode }}</td>
-          <td>{{ hs.tenHocSinh }}</td>
-          <td>
-            <div class="score-input">
-              <input type="text" [(ngModel)]="hs.diem" />
-              <span>/ 10</span>
-            </div>
-          </td>
-          <td>
-            <input type="text" [(ngModel)]="hs.nhanXet" placeholder="..." />
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  
-    
-  
-    <div class="submit-area" *ngIf="danhSachHocSinh.length > 0">
-      <button (click)="luuKetQua()">LƯU</button>
-    </div>
+  <h3>KẾT QUẢ KIỂM TRA - {{ tenBaiKiemTra }} ({{ ngayKiemTra }})</h3>
+  <table *ngIf="danhSachHocSinh.length > 0">
+    <thead>
+      <tr>
+        <th>CODE</th>
+        <th>Họ và Tên</th>
+        <th>Điểm Bài Kiểm Tra</th>
+        <th>Nhận Xét</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let hs of danhSachHocSinh">
+        <td>{{ hs.hocSinhCode }}</td>
+        <td>{{ hs.tenHocSinh }}</td>
+        <td>
+          <div class="score-input">
+            <input type="text" [(ngModel)]="hs.diem" placeholder="0 - 10" />
+            <span>/ 10</span>
+          </div>
+          <div class="error-text" *ngIf="validationErrors[hs.hocSinhCode]?.diem">
+            {{ validationErrors[hs.hocSinhCode].diem }}
+          </div>
+        </td>
+        <td>
+          <input type="text" [(ngModel)]="hs.nhanXet" maxlength="200" placeholder="..." />
+          <div class="error-text" *ngIf="validationErrors[hs.hocSinhCode]?.nhanXet">
+            {{ validationErrors[hs.hocSinhCode].nhanXet }}
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="submit-area" *ngIf="danhSachHocSinh.length > 0">
+    <button (click)="luuKetQua()">LƯU</button>
   </div>
-  
+</div>

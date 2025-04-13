@@ -136,7 +136,7 @@ export class LopdangdayService {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
   
-    const url = `${this.baseUrl}/BaiKiemTras/getdiembaikiemtrachogiaovien?BaiKiemTraId=${baiKiemTraId}`;
+    const url = `${this.baseUrl}/KetQuaBaiKiemTras/getdiembaikiemtrachogiaovien?BaiKiemTraId=${baiKiemTraId}`;
     return this.http.get<any>(url, { headers });
   }
   downloadBaiKiemTra(filePath: string): Observable<Blob> {
@@ -168,5 +168,22 @@ export class LopdangdayService {
       { headers }
     );
   }
+  updateKetQuaBaiKiemTra(payload: any): Observable<any> {
+    const token = localStorage.getItem("token");
+    const headers = new HttpHeaders()
+      .set("Authorization", `Bearer ${token}`)
+      .set("Content-Type", "application/json");
+  
+    const url = `${this.baseUrl}/KetQuaBaiKiemTras/updateketquabaikiemtra`;
+    return this.http.post<any>(url, payload, { headers });
+  }
+  
+  
+  
+  
+  
+  
+  
+  
   
 }

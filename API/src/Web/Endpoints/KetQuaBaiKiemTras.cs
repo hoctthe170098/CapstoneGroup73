@@ -12,6 +12,7 @@ public class KetQuaBaiKiemTras :EndpointGroupBase
     public override void Map(WebApplication app)
     {
         app.MapGroup(this)
+            .DisableAntiforgery()
             .MapGet(GetDiemBaiKiemTraChoGiaoVien, "getdiembaikiemtrachogiaovien")
             .MapPost(UpdateKetQuaBaiKiemTra,"updateketquabaikiemtra");
     }
@@ -21,7 +22,7 @@ public class KetQuaBaiKiemTras :EndpointGroupBase
         return await sender.Send(query);
     }
     [Authorize(Roles = Roles.Teacher)]
-    public async Task<Output> UpdateKetQuaBaiKiemTra(ISender sender, [FromForm] UpdateKetQuaBaiKiemTraCommand command)
+    public async Task<Output> UpdateKetQuaBaiKiemTra(ISender sender, [FromBody] UpdateKetQuaBaiKiemTraCommand command)
     {
         return await sender.Send(command);
     }
