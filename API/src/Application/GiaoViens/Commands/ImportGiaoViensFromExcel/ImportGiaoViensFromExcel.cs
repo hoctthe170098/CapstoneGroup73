@@ -34,6 +34,11 @@ public class ImportGiaoViensFromExcelCommandHandler : IRequestHandler<ImportGiao
             if (request.File == null || request.File.Length == 0)
                 throw new NotFoundDataException("File không được để trống");
 
+            if (!Path.GetExtension(request.File.FileName).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new WrongInputException("Import thất bại: File tải lên không phải là file Excel (.xlsx).");
+            }
+
             var giaoVienList = new List<GiaoVienDto>();
 
             using (var stream = new MemoryStream())
@@ -87,12 +92,17 @@ public class ImportGiaoViensFromExcelCommandHandler : IRequestHandler<ImportGiao
             {
                 isError = false,
                 data = giaoVienList,
-                code = 200
+                code = 200,
+                message = "Import thành công"
             };
         }
-        catch
+        catch (WrongInputException)
         {
-            throw new WrongInputException();
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Một lỗi không xác định xảy ra khi import dữ liệu.", ex);
         }
     }
 }
