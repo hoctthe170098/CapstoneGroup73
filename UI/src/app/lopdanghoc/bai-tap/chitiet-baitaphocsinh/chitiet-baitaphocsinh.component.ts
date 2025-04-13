@@ -17,9 +17,16 @@ export class ChitietBaitaphocsinhComponent implements OnInit, OnDestroy {
   countdownDisplay: string = '';
   intervalId: any;
   newAnswer = { noiDung: '', file: null };
-  currentUserName = 'Nguyễn Văn A';
+  currentUserName = '';
+  editingAnswerId: string | null = null;
+  editAnswerData = {
+    noiDung: '',
+    file: null as null | { ten: string; url?: string; kichThuoc?: string; rawFile?: File }
+  };
   @ViewChild('quillEditor') quillEditor!: QuillEditorComponent;
-
+  @ViewChild('createFileInput') createFileInput!: HTMLInputElement;
+  @ViewChild('editFileInput') editFileInput!: HTMLInputElement;
+  @ViewChild('quillEditorEdit') quillEditorEdit!: QuillEditorComponent;
   answers: any[] ;
   constructor(
     private route: ActivatedRoute,
@@ -147,19 +154,31 @@ export class ChitietBaitaphocsinhComponent implements OnInit, OnDestroy {
       this.newAnswer.file = file;
     }
   }
+  handleEditFileUpload(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.editAnswerData.file = {
+        ten: file.name,
+        kichThuoc: `${Math.round(file.size / 1024)} KB`,
+        rawFile: file
+      };
+      
+    }
+  }
+  
 
  
   submitAnswer(): void {
-    const plainText = this.quillEditor.quillEditor.getText().trim();
-  
-    if (!plainText) {
+    const htmlContent = this.quillEditor.quillEditor.root.innerHTML.trim();
+    if (!htmlContent || htmlContent === '<p><br></p>') {
       this.toastr.warning('Vui lòng nhập nội dung trước khi gửi.');
       return;
     }
+    
   
     const formData = new FormData();
     formData.append('baiTapId', this.baiTapId);
-    formData.append('noiDung', plainText); // Gửi văn bản thuần, không gửi HTML
+    formData.append('noiDung', htmlContent); 
     if (this.newAnswer.file) {
       formData.append('tepDinhKem', this.newAnswer.file);
     }
@@ -177,19 +196,21 @@ export class ChitietBaitaphocsinhComponent implements OnInit, OnDestroy {
               hour: '2-digit',
               minute: '2-digit',
             }),
-            noiDung: plainText,
+            noiDung: htmlContent,
             file: newTraLoi.urlFile
               ? {
                   ten: this.getFileName(newTraLoi.urlFile),
                   kichThuoc: '---',
                 }
               : null,
+              isEditing: false 
           });
   
           // Reset
           this.quillEditor.quillEditor.setText('');
           this.newAnswer = { noiDung: '', file: null };
           this.cdr.detectChanges();
+          this.loadTraLoi();
         } else {
           this.toastr.error(res.message || 'Gửi thất bại!');
         }
@@ -205,6 +226,7 @@ export class ChitietBaitaphocsinhComponent implements OnInit, OnDestroy {
       next: (res) => {
         if (!res.isError) {
           this.answers = res.data.map((item: any) => ({
+            id: item.id,
             tenHocSinh: item.hocSinhTen,
             thoiGianNop: new Date(item.thoiGian).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             noiDung: item.noiDung,
@@ -213,7 +235,8 @@ export class ChitietBaitaphocsinhComponent implements OnInit, OnDestroy {
                   ten: this.getFileName(item.urlFile),
                   url: item.urlFile
                 }
-              : null
+              : null,
+              isEditing: false 
           }));
         }
       },
@@ -222,6 +245,46 @@ export class ChitietBaitaphocsinhComponent implements OnInit, OnDestroy {
       }
     });
   }
+  deleteAnswer(ans: any): void {
+    if (!ans.id) {
+      this.toastr.error('Không xác định được câu trả lời để xoá.');
+      return;
+    }
+  
+    if (!confirm('Bạn có chắc muốn xoá câu trả lời này?')) return;
+  
+    this.lopdanghocService.deleteTraLoi(ans.id).subscribe({
+      next: (res) => {
+        if (!res.isError) {
+          this.toastr.success(res.message || 'Xoá câu trả lời thành công!');
+          // Gỡ câu trả lời ra khỏi danh sách hiện tại
+          this.answers = this.answers.filter(item => item.id !== ans.id);
+          this.cdr.detectChanges();
+        } else {
+          this.toastr.error(res.message || 'Xoá thất bại!');
+        }
+      },
+      error: (err) => {
+        console.error(' Lỗi xoá câu trả lời:', err);
+        this.toastr.error('Đã xảy ra lỗi khi xoá câu trả lời!');
+      }
+    });
+  }
+  editAnswer(ans: any): void {
+    this.editingAnswerId = ans.id;
+    this.editAnswerData = {
+      noiDung: ans.noiDung,
+      file: ans.file
+        ? {
+            ten: ans.file.ten,
+            url: ans.file.url,
+            kichThuoc: ans.file.kichThuoc
+          }
+        : null
+    };
+  }
+  
+  
   
   
   
@@ -229,6 +292,61 @@ export class ChitietBaitaphocsinhComponent implements OnInit, OnDestroy {
   cancelAnswer(): void {
     this.newAnswer = { noiDung: '', file: null };
   }
+  removeCreateFile(): void {
+    this.newAnswer.file = null;
+    if (this.createFileInput) {
+      this.createFileInput.value = '';
+    }
+  }
+  
+  removeEditFile(): void {
+    this.editAnswerData.file = null;
+    if (this.editFileInput) {
+      this.editFileInput.value = '';
+    }
+  }
+  cancelEdit(): void {
+    this.editingAnswerId = null;
+    this.editAnswerData = {
+      noiDung: '',
+      file: null
+    };
+  }
+  submitEditedAnswer(traLoiId: string): void {
+    const htmlContent = this.editAnswerData.noiDung?.trim();
+  
+    if (!htmlContent || htmlContent === '<p><br></p>') {
+      this.toastr.warning('Vui lòng nhập nội dung trước khi lưu.');
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append('traLoiId', traLoiId);
+    formData.append('noiDung', htmlContent);
+  
+  
+    if (this.editAnswerData.file?.rawFile) {
+      formData.append('tepDinhKemMoi', this.editAnswerData.file.rawFile);
+    }
+  
+    this.lopdanghocService.updateTraLoi(formData).subscribe({
+      next: (res) => {
+        if (!res.isError) {
+          this.toastr.success(res.message || 'Cập nhật câu trả lời thành công!');
+          this.editingAnswerId = null;
+          this.editAnswerData = { noiDung: '', file: null };
+          this.loadTraLoi(); // Load lại để lấy đúng dữ liệu từ BE
+        } else {
+          this.toastr.error(res.message || 'Cập nhật thất bại!');
+        }
+      },
+      error: (err) => {
+        console.error('❌ Lỗi cập nhật:', err);
+        this.toastr.error('Đã xảy ra lỗi khi cập nhật!');
+      }
+    });
+  }
+  
   
   
 }

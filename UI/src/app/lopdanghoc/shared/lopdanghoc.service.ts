@@ -83,5 +83,26 @@ export class LopdanghocService {
       { headers }
     );
   }
+  deleteTraLoi(traLoiId: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  
+    return this.http.delete<any>(
+      `${this.baseUrl}/TraLois/delete?traLoiId=${traLoiId}`,
+      { headers }
+    );
+  }
+  updateTraLoi(formData: FormData): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+  
+    return this.http.put<any>(
+      `${this.baseUrl}/TraLois/update`,
+      formData,
+      { headers }
+    );
+  }
   
 }
