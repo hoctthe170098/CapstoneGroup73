@@ -79,7 +79,7 @@ export class LopdanghocComponent implements OnInit {
   }
 
   goToDetail(tenLop: string) {
-    this.router.navigate(['/lopdanghoc', 'chi-tiet', tenLop]);
+    this.router.navigate(['/lopdanghoc', 'chi-tiet', tenLop, 'bai-tap']);
   }
 
   // Phân trang

@@ -3,13 +3,15 @@ import { CommonModule } from '@angular/common';
 
 import { LopdanghocRoutingModule } from './lopdanghoc-routing.module';
 import { LopdanghocComponent } from './lopdanghoc.component';
-import { FormsModule } from '@angular/forms';
+
 import { ChiTietComponent } from './chi-tiet/chi-tiet.component';
 import { BaiTapComponent } from './bai-tap/bai-tap.component';
 import { LichThiComponent } from './lich-thi/lich-thi.component';
 import { BaocaoDiemComponent } from './baocao-diem/baocao-diem.component';
 import { BaocaoDiemdanhComponent } from './baocao-diemdanh/baocao-diemdanh.component';
-
+import { ChitietBaitaphocsinhComponent } from './bai-tap/chitiet-baitaphocsinh/chitiet-baitaphocsinh.component';
+import { FormsModule } from '@angular/forms';
+import { QuillModule } from 'ngx-quill';
 @NgModule({
   declarations: [
     LopdanghocComponent,
@@ -17,11 +19,13 @@ import { BaocaoDiemdanhComponent } from './baocao-diemdanh/baocao-diemdanh.compo
     BaiTapComponent,
     LichThiComponent,
     BaocaoDiemComponent,
-    BaocaoDiemdanhComponent
+    BaocaoDiemdanhComponent,
+    ChitietBaitaphocsinhComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
+    QuillModule.forRoot(),
     
     LopdanghocRoutingModule
   ]

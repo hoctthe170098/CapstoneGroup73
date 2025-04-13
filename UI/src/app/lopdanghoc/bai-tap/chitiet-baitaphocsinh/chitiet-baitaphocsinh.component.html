@@ -1,0 +1,137 @@
+<div class="chitiet-baitap-wrapper">
+  <!-- Tiêu đề và thông tin chung -->
+  <div class="header">
+    <h2>{{ baiTapDetail.tieuDe }}</h2>
+  </div>
+
+  <div class="meta">
+    <p>
+      <i class="ft-calendar"></i> Ngày tạo:
+      {{ baiTapDetail.ngayTao | date : "dd/MM/yyyy" }}
+    </p>
+    <p><i class="ft-clock"></i> Còn lại: {{ countdownDisplay }}</p>
+  </div>
+
+  <!-- Nội dung bài tập -->
+  <div class="noidung">
+    <p><strong>Nội dung bài tập:</strong></p>
+    <p>{{ baiTapDetail.noiDung }}</p>
+
+    <div
+      class="attached-file"
+      *ngIf="baiTapDetail.urlFile"
+      (click)="downloadFile()"
+    >
+      <i class="ft-paperclip"></i>
+      <div class="file-info file-link">Download file bài tập</div>
+    </div>
+  </div>
+  <!-- Form trả lời bài tập -->
+  <div class="answer-form">
+    <label
+      ><strong>Nội dung</strong
+      ><span class="field-required-asterisk">(*)</span></label
+    >
+    <div class="custom-editor">
+      <quill-editor
+        #quillEditor
+        [(ngModel)]="newAnswer.noiDung"
+        [styles]="{ height: '150px' }"
+        [modules]="quillModules"
+        [placeholder]="'Nhập nội dung trả lời...'"
+      >
+      </quill-editor>
+    </div>
+
+    <!-- File đính kèm (hiển thị bên dưới nội dung) -->
+    <div class="attached-file mt-2" *ngIf="newAnswer.file">
+      <i class="ft-paperclip"></i>
+      <div class="file-info">
+            {{ newAnswer.file.name }} ({{
+              newAnswer.file.size / 1024 | number : "1.0-0"
+            }}
+            KB)
+          </div>
+      <i class="ft-x remove-icon" (click)="removeCreateFile()"></i>
+    </div>
+
+    <!-- Upload file -->
+    <label class="upload-label mt-3">
+      <i class="ft-upload-cloud"></i> Đính kèm tệp
+      <input type="file" hidden #createFileInput (change)="handleFileUpload($event)" />
+    </label>
+
+    <!-- Nút gửi/hủy -->
+    <div class="form-actions justify-end">
+      <button class="btn btn-cancel" (click)="cancelAnswer()">
+        <i class="fa fa-times"></i> Hủy
+      </button>
+      <button class="btn btn-submit" (click)="submitAnswer()">
+        <i class="fa fa-paper-plane"></i> Trả lời
+      </button>
+    </div>
+  </div>
+
+  <!-- Trả lời -->
+  <div class="answers-section" *ngIf="answers.length > 0">
+    <h4>Trả lời của học sinh</h4>
+    <div class="answer-box" *ngFor="let ans of answers">
+      <div class="top-bar">
+        <strong>{{ ans.tenHocSinh }}</strong>
+        <div class="time-and-menu">
+          <span>{{ ans.thoiGianNop }}</span>
+          <div class="menu-wrapper" (click)="ans.showMenu = !ans.showMenu">
+            <i class="ft-more-vertical menu-icon"></i>
+            <div class="menu-actions" *ngIf="ans.showMenu">
+              <button (click)="editAnswer(ans)">Chỉnh sửa</button>
+              <button (click)="deleteAnswer(ans)">Xóa</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+      <!-- Nếu đang chỉnh sửa -->
+      <ng-container *ngIf="editingAnswerId === ans.id; else showAnswer">
+        <label><strong>Nội dung</strong></label>
+        <quill-editor
+          [(ngModel)]="editAnswerData.noiDung"
+          [styles]="{height: '150px'}"
+          [modules]="quillModules"
+          [placeholder]="'Nhập nội dung chỉnh sửa...'">
+        </quill-editor>
+    
+        <div *ngIf="editAnswerData.file" class="attached-file file-link mt-2">
+          <i class="ft-paperclip"></i>
+          <div class="file-info" (click)="downloadFile(editAnswerData.file.url)">
+            {{ editAnswerData.file.ten }}
+            <span *ngIf="editAnswerData.file.kichThuoc">
+              ({{ editAnswerData.file.kichThuoc }})
+            </span>
+          </div>
+          <i class="ft-x remove-icon" (click)="removeEditFile()"></i>
+        </div>
+    
+        <label class="upload-label mt-2">
+          <i class="ft-upload-cloud"></i> Thay đổi tệp
+          <input type="file" hidden #editFileInput (change)="handleEditFileUpload($event)" />
+        </label>
+    
+        <div class="form-actions justify-end mt-2">
+          <button class="btn btn-cancel" (click)="cancelEdit()">Hủy</button>
+          <button class="btn btn-submit" (click)="submitEditedAnswer(ans.id)">Lưu</button>
+        </div>
+      </ng-container>
+    
+      <!-- Nếu không chỉnh sửa -->
+      <ng-template #showAnswer>
+        <p [innerHTML]="ans.noiDung"></p>
+        <div class="attached-file" *ngIf="ans.file" (click)="downloadFile(ans.file.url)">
+          <i class="ft-paperclip"></i>
+          <span>File</span>
+        </div>
+      </ng-template>
+    </div>
+    
+    
+  </div>
+</div>

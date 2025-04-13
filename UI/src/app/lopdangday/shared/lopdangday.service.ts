@@ -158,5 +158,15 @@ export class LopdangdayService {
     );
   }
   
+  getTraLoiByBaiTapForTeacher(payload: { baiTapId: string; pageNumber: number; pageSize: number }): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  
+    return this.http.post<any>(
+      `${this.baseUrl}/TraLois/gettraloibybaitapforteacher`,
+      payload,
+      { headers }
+    );
+  }
   
 }
