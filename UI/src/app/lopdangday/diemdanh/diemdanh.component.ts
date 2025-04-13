@@ -53,7 +53,8 @@ export class DiemdanhComponent implements OnInit {
         if (!res.data || res.data.length === 0) {
           this.students = [];
           this.isError = false;
-          this.thongBao = 'Không có học sinh nào được điểm danh hôm nay.';
+          this.thongBao = 'Lớp không có học sinh';
+          this.cdr.detectChanges();
           return;
         }
 
@@ -106,7 +107,7 @@ export class DiemdanhComponent implements OnInit {
     this.lopService.updateDiemDanhTheoNgay(payload).subscribe({
       next: (res) => {
         this.toastr.success('Lưu thành công!');
-        this.loadDiemDanh(this.tenLop); // reload để đồng bộ
+        this.loadDiemDanh(this.tenLop); 
       },
       error: (err) => {
        

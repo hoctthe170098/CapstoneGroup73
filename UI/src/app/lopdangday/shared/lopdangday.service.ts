@@ -125,5 +125,65 @@ export class LopdangdayService {
     const url = `${this.baseUrl}/DiemDanhs/getbaocaodiemdanh?TenLop=${encodeURIComponent(tenLop)}`;
     return this.http.get<any>(url, { headers });
   }
+  getLichKiemTraChoGiaoVien(tenLop: string): Observable<any> {
+    const token = localStorage.getItem("token");
+    const headers = new HttpHeaders().set("Authorization", `Bearer ${token}`);
+  
+    const url = `${this.baseUrl}/BaiKiemTras/getlichkiemtrachogiaovien?TenLop=${encodeURIComponent(tenLop)}`;
+    return this.http.get<any>(url, { headers });
+  }
+  getKetQuaBaiKiemTraChoGiaoVien(baiKiemTraId: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  
+    const url = `${this.baseUrl}/KetQuaBaiKiemTras/getdiembaikiemtrachogiaovien?BaiKiemTraId=${baiKiemTraId}`;
+    return this.http.get<any>(url, { headers });
+  }
+  downloadBaiKiemTra(filePath: string): Observable<Blob> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+  
+    const body = { filePath };
+  
+    return this.http.post(
+      `${this.baseUrl}/BaiKiemTras/downloadbaikiemtra`,
+      body,
+      {
+        headers,
+        responseType: 'blob' 
+      }
+    );
+  }
+  
+  getTraLoiByBaiTapForTeacher(payload: { baiTapId: string; pageNumber: number; pageSize: number }): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  
+    return this.http.post<any>(
+      `${this.baseUrl}/TraLois/gettraloibybaitapforteacher`,
+      payload,
+      { headers }
+    );
+  }
+  updateKetQuaBaiKiemTra(payload: any): Observable<any> {
+    const token = localStorage.getItem("token");
+    const headers = new HttpHeaders()
+      .set("Authorization", `Bearer ${token}`)
+      .set("Content-Type", "application/json");
+  
+    const url = `${this.baseUrl}/KetQuaBaiKiemTras/updateketquabaikiemtra`;
+    return this.http.post<any>(url, payload, { headers });
+  }
+  
+  
+  
+  
+  
+  
+  
+  
   
 }

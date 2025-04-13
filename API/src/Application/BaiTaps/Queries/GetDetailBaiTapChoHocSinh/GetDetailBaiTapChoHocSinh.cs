@@ -61,6 +61,11 @@ public class GetDetailBaiTapChoHocSinhQueryHandler : IRequestHandler<GetDetailBa
             var now = DateTime.Now;
             var timeLeft = baiTap.ThoiGianKetThuc.Value - now;
             secondsLeft = (int)Math.Max(timeLeft.TotalSeconds, 0);
+            if (secondsLeft == 0 && baiTap.TrangThai != "Kết thúc")
+            {
+                baiTap.TrangThai = "Kết thúc";
+                await _context.SaveChangesAsync(cancellationToken);
+            }
         }
 
         var result = new

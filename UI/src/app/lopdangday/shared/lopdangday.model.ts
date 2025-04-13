@@ -24,3 +24,10 @@ export class DanhSachHocSinh {
   email?: string;
   soDienThoai?: string;
 }
+export class KetQuaBaiKiemTra {
+  id?: string;
+  hocSinhCode: string = '';
+  tenHocSinh?: string;
+  diem?: number;
+  nhanXet?: string;
+}

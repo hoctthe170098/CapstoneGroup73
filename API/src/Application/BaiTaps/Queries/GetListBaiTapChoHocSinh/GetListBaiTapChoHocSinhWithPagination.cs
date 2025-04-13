@@ -50,7 +50,7 @@ public class TeacherAssignmentListWithPaginationQueryHandler : IRequestHandler<T
             .ToString().Replace("Bearer ", "");
 
         if (string.IsNullOrEmpty(token))
-            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+            throw new Exception("Token không hợp lệ hoặc bị thiếu.");
 
         var userId = _identityService.GetUserId(token).ToString();
 
@@ -67,8 +67,28 @@ public class TeacherAssignmentListWithPaginationQueryHandler : IRequestHandler<T
             .AnyAsync(tg => tg.HocSinhCode == hocSinhCode && tg.LichHoc.TenLop == tenLop, cancellationToken);
 
         if (!isInClass)
-            throw new UnauthorizedAccessException("Học sinh không tham gia lớp này.");
+            throw new NotFoundIDException();
 
+        // CẬP NHẬT TRẠNG THÁI CỦA NHỮNG BÀI TẬP HẾT HẠN TRƯỚC KHI TRUY VẤN
+        var now = DateTime.Now;
+        var expiredAssignments = await _context.BaiTaps
+            .Where(bt => bt.LichHoc.TenLop == tenLop &&
+                         bt.ThoiGianKetThuc.HasValue &&
+                         bt.ThoiGianKetThuc.Value <= now &&
+                         bt.TrangThai != "Kết thúc")
+            .ToListAsync(cancellationToken);
+
+        foreach (var baiTap in expiredAssignments)
+        {
+            baiTap.TrangThai = "Kết thúc";
+        }
+
+        if (expiredAssignments.Any())
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        // TRUY VẤN DANH SÁCH BÀI TẬP
         var baiTapQuery = _context.BaiTaps
             .AsNoTracking()
             .Where(bt =>
@@ -113,4 +133,5 @@ public class TeacherAssignmentListWithPaginationQueryHandler : IRequestHandler<T
         };
     }
 }
+
 

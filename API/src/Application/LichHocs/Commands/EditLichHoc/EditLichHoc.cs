@@ -35,42 +35,61 @@ public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Out
         if (string.IsNullOrEmpty(token))
             throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
         var coSoId = _identityService.GetCampusId(token);
+        var ngayHienTai = DateOnly.FromDateTime(DateTime.Now);
         var daBatDau = await _context.LichHocs
             .AnyAsync(lh => lh.TenLop == request.LopHocDto.TenLop 
             && lh.Phong.CoSoId == coSoId
             && lh.TrangThai == "Cố định" 
-            && lh.NgayBatDau <= DateOnly.FromDateTime(DateTime.Now));
+            && lh.NgayBatDau <= ngayHienTai);
         if(daBatDau)
         {
             var lichHocCu = _context.LichHocs
             .Where(lh => lh.TenLop == request.LopHocDto.TenLop
             && lh.Phong.CoSoId == coSoId
-            && lh.TrangThai !="Dạy bù"
-            && lh.TrangThai != "Dạy thay")
+            && lh.TrangThai=="Cố định")
             .ToList();
             foreach (var lh in lichHocCu)
             {
                 var lichHocData = request.LopHocDto.LichHocs.First(l=>l.Id==lh.Id);
                 lh.PhongId = lichHocData.PhongId;
                 var thamGiaCanXoaOrUpdate = _context.ThamGiaLopHocs
-                   .Where(tg => tg.LichHocId == lh.Id && !request.LopHocDto.HocSinhCodes
-                                                                     .Contains(tg.HocSinhCode))
+                   .Where(tg => (tg.LichHocId == lh.Id
+                   ||(tg.LichHoc.LichHocGocId==lh.Id&&tg.LichHoc.TrangThai=="Dạy bù")) 
+                   && !request.LopHocDto.HocSinhCodes.Contains(tg.HocSinhCode))
+                   .Include(tg=>tg.LichHoc)
                    .ToList();
                 foreach(var thamGia in thamGiaCanXoaOrUpdate)
                 {
-                    if(await _context.DiemDanhs.AnyAsync(dh => dh.ThamGiaLopHocId == thamGia.Id))
+                    if (thamGia.LichHoc.NgayBatDau <= ngayHienTai 
+                        && thamGia.LichHoc.NgayKetThuc >= ngayHienTai 
+                        && thamGia.LichHoc.TrangThai=="Cố định")
                     {
                         thamGia.NgayKetThuc = DateOnly.FromDateTime(DateTime.Now);
-                        thamGia.TrangThai = lh.TrangThai;
+                    }else if(thamGia.LichHoc.TrangThai=="Dạy bù")
+                    {
+                        if (thamGia.NgayKetThuc > ngayHienTai)
+                        {
+                            _context.ThamGiaLopHocs.Remove(thamGia);
+                        }
                     }
                     else
                     {
                         _context.ThamGiaLopHocs.Remove(thamGia);
                     }
+                    //if (await _context.DiemDanhs.AnyAsync(dh => dh.ThamGiaLopHocId == thamGia.Id
+                    //&& dh.ThamGiaLopHoc.LichHoc.TrangThai == "Cố định"))
+                    //{
+                    //    thamGia.NgayKetThuc = DateOnly.FromDateTime(DateTime.Now);
+                    //    thamGia.TrangThai = lh.TrangThai;
+                    //}
+                    //else
+                    //{
+                    //    _context.ThamGiaLopHocs.Remove(thamGia);
+                    //}
                 }
                 var codeHocSinhCanThem = request.LopHocDto.HocSinhCodes
                     .Where(hs => !_context.ThamGiaLopHocs
-                                         .Where(tg => tg.LichHocId == lh.Id)
+                                         .Where(tg => tg.LichHocId == lh.Id&&tg.LichHoc.TrangThai=="Cố định"&&tg.NgayKetThuc>ngayHienTai)
                                          .Select(tg => tg.HocSinhCode)
                                          .Contains(hs))
                     .ToList();
@@ -94,6 +113,24 @@ public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Out
                             TrangThai = lh.TrangThai
                         };
                         _context.ThamGiaLopHocs.Add(thamGiaLopHoc);
+                    }
+                    var lichHocBuTuongLai = await _context.LichHocs
+                        .Where(l=>l.LichHocGocId==lh.Id
+                        &&l.TrangThai=="Dạy bù"
+                        &&l.NgayKetThuc>ngayHienTai)
+                        .ToListAsync();
+                    foreach(var hocBu in lichHocBuTuongLai)
+                    {
+                        var thamGiaLopHocBu = new ThamGiaLopHoc
+                        {
+                            Id = Guid.NewGuid(),
+                            HocSinhCode = code,
+                            LichHocId = (Guid)hocBu.Id,
+                            NgayBatDau = hocBu.NgayBatDau,
+                            NgayKetThuc = hocBu.NgayKetThuc,
+                            TrangThai = hocBu.TrangThai
+                        };
+                        _context.ThamGiaLopHocs.Add(thamGiaLopHocBu);
                     }
                 }
             }

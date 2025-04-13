@@ -37,15 +37,13 @@
         <strong>{{ ans.tenHocSinh }}</strong>
         <span>{{ ans.thoiGianNop }}</span>
       </div>
-      <p>{{ ans.noiDung }}</p>
-      <div class="attached-file">
-        <i class="ft-file"></i>
+      <p [innerHTML]="ans.noiDung"></p>
+      <div class="attached-file file-link" *ngIf="ans.file" (click)="downloadFile(ans.file.url)">
+        <i class="ft-paperclip"></i>
         <span>{{ ans.file.ten }}</span>
-        <span class="file-info">{{ ans.file.kichThuoc }}</span>
       </div>
     </div>
-  </div>
-</div>
+  </div>  
 <!-- Modal sửa bài tập -->
 
 <div
