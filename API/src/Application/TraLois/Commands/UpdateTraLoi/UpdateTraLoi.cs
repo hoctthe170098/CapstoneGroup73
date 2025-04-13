@@ -67,15 +67,8 @@ public class UpdateTraLoiCommandHandler : IRequestHandler<UpdateTraLoiCommand, O
 
             traLoi.UrlFile = await UploadFile(request.TepDinhKemMoi, cancellationToken);
         }
-        else
-        {
-            // Không có file mới  XÓA file cũ nếu đang tồn tại
-            if (!string.IsNullOrEmpty(traLoi.UrlFile))
-            {
-                DeleteFile(traLoi.UrlFile);
-                traLoi.UrlFile = null;
-            }
-        }
+        
+        
 
         await _context.SaveChangesAsync(cancellationToken);
 
