@@ -25,7 +25,9 @@ public class EditLichHocCommandValidator : AbstractValidator<EditLichHocCommand>
         _identityService = identityService;
         RuleFor(x => x.LopHocDto.TenLop)
             .MustAsync(ExistClassName)
-            .WithMessage("Lớp đã kết thúc và không thể chỉnh sửa");
+            .WithMessage("Lớp đã kết thúc và không thể chỉnh sửa")
+            .MustAsync(KhongTrungLichHoc)
+            .WithMessage("Lớp có lịch học hôm nay, không thể chỉnh sửa.");
         RuleFor(x => x.LopHocDto.LichHocs)
             .NotEmpty().WithMessage("Danh sách Lịch Học không được để trống")
             .MustAsync(ChuaBatDau)
@@ -40,6 +42,20 @@ public class EditLichHocCommandValidator : AbstractValidator<EditLichHocCommand>
             .WithMessage("Có học sinh không tồn tại trong cơ sở này")
             .Must(ValidLichHocHocSinh)
             .WithMessage("Có học sinh bị trùng lịch, vui lòng kiểm tra lại (bao gồm cả lịch học bù)");
+    }
+
+    private async Task<bool> KhongTrungLichHoc(string tenLop, CancellationToken cToken)
+    {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
+        var HomNay = DateOnly.FromDateTime(DateTime.Now);
+        var ThuHomNay = (int)HomNay.DayOfWeek>0?(int)(HomNay.DayOfWeek)+1:8;
+        return !await _context.LichHocs
+            .AnyAsync(lh => lh.Phong.CoSoId == coSoId && lh.TenLop == tenLop 
+            && ((lh.Thu == ThuHomNay&&lh.TrangThai=="Cố định")
+            ||(lh.TrangThai=="Dạy bù"&&lh.NgayKetThuc==HomNay)));
     }
 
     private bool ValidLichHocHocSinh(EditLichHocCommand command
@@ -104,7 +120,7 @@ public class EditLichHocCommandValidator : AbstractValidator<EditLichHocCommand>
 
     private bool EnoughHocSinh(List<string> list)
     {
-        return list.Count >= 3;
+        return list.Count >= 1;
     }
 
     private async Task<bool> ChuaBatDau(EditLichHocCommand command, 

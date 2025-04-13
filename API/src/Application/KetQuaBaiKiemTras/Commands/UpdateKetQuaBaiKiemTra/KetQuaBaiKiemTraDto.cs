@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using StudyFlow.Domain.Entities;
 
-namespace StudyFlow.Application.BaiKiemTras.Queries.GetDiemBaiKiemTraChoGiaoVien;
+namespace StudyFlow.Application.KetQuaBaiKiemTras.Commands.UpdateKetQuaBaiKiemTra;
 public class KetQuaBaiKiemTraDto
 {
     public Guid Id { get; set; }
@@ -13,12 +13,4 @@ public class KetQuaBaiKiemTraDto
     public string? TenHocSinh {  get; set; }
     public float? Diem { get; set; }
     public string? NhanXet { get; set; }
-    private class Mapping : Profile
-    {
-        public Mapping()
-        {
-            CreateMap<KetQuaBaiKiemTra, KetQuaBaiKiemTraDto>()
-                .ForMember(dest => dest.TenHocSinh, opt => opt.MapFrom(src => src.HocSinh.Ten));
-        }
-    }
 }

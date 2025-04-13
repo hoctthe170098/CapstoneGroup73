@@ -32,7 +32,7 @@ public class LichHocs : EndpointGroupBase
             .MapPut(EditLichHocCoDinh, "editlichhoccodinh")
             .MapGet(GetTenLopHocByName,"gettenlophocbyname")
             .MapGet(GetLopHocByTen,"getlophocbyten")
-            .MapDelete(DeleteLichHocCoDinh,"deletelophoc")
+            .MapDelete(DeleteLichHocCoDinh,"deletelophoccodinh")
             .MapPost(CreateLichHocDayThay,"createlichdaythay")
             .MapPut(UpdateLichHocDayThay,"updatelichdaythay")
             .MapDelete(DeleteLichHocDayThay,"deletelichdaythay")

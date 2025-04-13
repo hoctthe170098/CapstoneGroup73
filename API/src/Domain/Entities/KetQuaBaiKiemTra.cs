@@ -15,6 +15,6 @@ public class KetQuaBaiKiemTra
     public required Guid BaiKiemTraId { get; set; }
     [JsonIgnore]
     public BaiKiemTra BaiKiemTra { get; set; } = null!;
-    public required float Diem { get; set; }
+    public float? Diem { get; set; }
     public string? NhanXet  { get; set; }
 }
