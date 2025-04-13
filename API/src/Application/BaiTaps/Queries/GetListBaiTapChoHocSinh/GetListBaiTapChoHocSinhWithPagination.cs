@@ -69,6 +69,26 @@ public class TeacherAssignmentListWithPaginationQueryHandler : IRequestHandler<T
         if (!isInClass)
             throw new NotFoundIDException();
 
+        // CẬP NHẬT TRẠNG THÁI CỦA NHỮNG BÀI TẬP HẾT HẠN TRƯỚC KHI TRUY VẤN
+        var now = DateTime.Now;
+        var expiredAssignments = await _context.BaiTaps
+            .Where(bt => bt.LichHoc.TenLop == tenLop &&
+                         bt.ThoiGianKetThuc.HasValue &&
+                         bt.ThoiGianKetThuc.Value <= now &&
+                         bt.TrangThai != "Kết thúc")
+            .ToListAsync(cancellationToken);
+
+        foreach (var baiTap in expiredAssignments)
+        {
+            baiTap.TrangThai = "Kết thúc";
+        }
+
+        if (expiredAssignments.Any())
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        // TRUY VẤN DANH SÁCH BÀI TẬP
         var baiTapQuery = _context.BaiTaps
             .AsNoTracking()
             .Where(bt =>
@@ -113,4 +133,5 @@ public class TeacherAssignmentListWithPaginationQueryHandler : IRequestHandler<T
         };
     }
 }
+
 

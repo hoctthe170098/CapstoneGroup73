@@ -40,6 +40,12 @@ public record UpdateLichDayBuCommand : IRequest<Output>
         lichHocBu.GioKetThuc = TimeOnly.Parse(request.LichDayBu.GioKetThuc);
         lichHocBu.NgayBatDau = request.LichDayBu.NgayHocBu;
         lichHocBu.NgayKetThuc = request.LichDayBu.NgayHocBu;
+        var thamGiaLichHocBu = _context.ThamGiaLopHocs.Where(tg=>tg.LichHocId==request.Id).ToList();
+        foreach(var tg in thamGiaLichHocBu)
+        {
+            tg.NgayBatDau = lichHocBu.NgayBatDau;
+            tg.NgayKetThuc = lichHocBu.NgayKetThuc;
+        }
         await _context.SaveChangesAsync(cancellationToken);
         return new Output
         {
