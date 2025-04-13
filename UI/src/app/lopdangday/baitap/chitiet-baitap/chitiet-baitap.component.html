@@ -37,9 +37,9 @@
         <strong>{{ ans.tenHocSinh }}</strong>
         <span>{{ ans.thoiGianNop }}</span>
       </div>
-      <p>{{ ans.noiDung }}</p>
+      <p [innerHTML]="ans.noiDung"></p>
       <div class="attached-file file-link" *ngIf="ans.file" (click)="downloadFile(ans.file.url)">
-        <i class="ft-file"></i>
+        <i class="ft-paperclip"></i>
         <span>{{ ans.file.ten }}</span>
       </div>
     </div>

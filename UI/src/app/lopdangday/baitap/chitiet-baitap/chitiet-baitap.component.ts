@@ -105,11 +105,11 @@ editBaiTap: any;
 updateCountdownDisplay(seconds: number) {
   this.countdownDisplay = this.formatSecondsToTime(seconds);
 }
-downloadFile(): void {
-  if (!this.baiTapDetail?.urlFile) return;
+downloadFile(filePath?: string): void {
+  const path = filePath || this.baiTapDetail?.urlFile;
+  if (!path) return;
 
-  const filePath = this.baiTapDetail.urlFile;
-  this.lopdangdayService.downloadBaiTapFile(filePath).subscribe({
+  this.lopdangdayService.downloadBaiTapFile(path).subscribe({
     next: (res) => {
       if (res && res.data?.fileContents) {
         const byteCharacters = atob(res.data.fileContents);
@@ -120,8 +120,8 @@ downloadFile(): void {
         const byteArray = new Uint8Array(byteNumbers);
         const blob = new Blob([byteArray], { type: res.data.contentType });
 
-        const fileName = res.data.fileDownloadName || 'baitap.pdf';
-        saveAs(blob, fileName); 
+        const fileName = res.data.fileDownloadName || 'tep_dinh_kem.pdf';
+        saveAs(blob, fileName);
       }
     },
     error: (err) => {
@@ -130,11 +130,11 @@ downloadFile(): void {
   });
 }
 
+
   
   
   
   openEditModal(bt: any): void {
-    console.log('🛠️ Dữ liệu bài tập cần sửa:', bt);
     this.editBaiTap = {
       tieuDe: bt.tieuDe,
       noiDung: bt.noiDung,
