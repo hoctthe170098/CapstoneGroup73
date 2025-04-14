@@ -13,6 +13,8 @@ public class TraLoi
     public required string NoiDung { get; set; }
     public string? UrlFile { get; set; }
     public required string HocSinhCode { get; set; }
+    public int? Diem {  get; set; }
+    public string? NhanXet {  get; set; }
     [JsonIgnore]
     public HocSinh HocSinh { get; set; } = null!;
     public required Guid BaiTapId { get; set; }

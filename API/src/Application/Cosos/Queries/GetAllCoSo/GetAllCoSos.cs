@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using StudyFlow.Application.Common.Interfaces;
 using StudyFlow.Application.Common.Models;
-using StudyFlow.Application.TodoLists.Queries.GetTodos;
 using StudyFlow.Domain.Enums;
 
 namespace StudyFlow.Application.Cosos.Queries.GetAllCoSo;

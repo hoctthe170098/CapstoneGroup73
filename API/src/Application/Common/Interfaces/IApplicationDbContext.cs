@@ -4,9 +4,6 @@ namespace StudyFlow.Application.Common.Interfaces;
 
 public interface IApplicationDbContext
 {
-    DbSet<TodoList> TodoLists { get; }
-
-    DbSet<TodoItem> TodoItems { get; }
     public DbSet<CoSo> CoSos {  get; }
     public DbSet<ChinhSach> ChinhSaches {  get; }
     public DbSet<HocSinh> HocSinhs {  get; }
@@ -23,6 +20,6 @@ public interface IApplicationDbContext
     public DbSet<KetQuaBaiKiemTra> KetQuaBaiKiemTras { get; }
     public DbSet<NoiDungBaiHoc> NoiDungBaiHocs {  get; }
     public DbSet<TaiLieuHocTap> TaiLieuHocTaps {  get; }
-
+    public DbSet<NhanXetDinhKy> NhanXetDinhKys {  get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

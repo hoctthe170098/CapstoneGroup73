@@ -18,5 +18,7 @@ public class TraLoiConfiguration : IEntityTypeConfiguration<TraLoi>
           .HasMaxLength(750);
         builder.Property(x => x.UrlFile)
           .HasMaxLength(200);
+        builder.Property(x=>x.NhanXet)
+          .HasMaxLength(200);
     }
 }
