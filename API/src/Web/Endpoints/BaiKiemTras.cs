@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using StudyFlow.Application.BaiKiemTras.Queries.GetBaiKiemTrasWithPagination;
 using StudyFlow.Application.BaiKiemTras.Queries.GetLichKiemTraChoGiaoVien;
+using StudyFlow.Application.BaiKiemTras.Queries.GetLichKiemTraVaKetQuaChoHocSinh;
 using StudyFlow.Application.ChinhSachs.Commands.DeleteBaiKiemTra;
 using StudyFlow.Application.ChinhSachs.Commands.DeleteChinhSach;
 using StudyFlow.Application.ChuongTrinhs.Commands.CreateBaiKiemTra;
@@ -26,7 +27,8 @@ public class BaiKiemTras : EndpointGroupBase
             .MapPut(UpdateBaiKiemTra,"updatebaikiemtra")
             .MapDelete(DeleteBaiKiemTra,"deletebaikiemtra")
             .MapPost(DownloadBaiKiemTra, "downloadbaikiemtra")
-            .MapGet(GetLichKiemTraChoGiaoVien,"getlichkiemtrachogiaovien");
+            .MapGet(GetLichKiemTraChoGiaoVien,"getlichkiemtrachogiaovien")
+            .MapGet(GetLichKiemTraVaKetQuaChoHocSinh,"getlichkiemtravaketquachohocsinh");
     }
 
     [Authorize(Roles = Roles.LearningManager)]
@@ -36,6 +38,11 @@ public class BaiKiemTras : EndpointGroupBase
     }
     [Authorize(Roles = Roles.Teacher)]
     public async Task<Output> GetLichKiemTraChoGiaoVien(ISender sender,[AsParameters] GetLichKiemTraChoGiaoVienQuery query)
+    {
+        return await sender.Send(query);
+    }
+    [Authorize(Roles = Roles.Student)]
+    public async Task<Output> GetLichKiemTraVaKetQuaChoHocSinh(ISender sender, [AsParameters] GetLichKiemTraVaKetQuaChoHocSinhQuery query)
     {
         return await sender.Send(query);
     }

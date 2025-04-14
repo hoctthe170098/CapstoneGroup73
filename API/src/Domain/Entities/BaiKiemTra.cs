@@ -14,7 +14,7 @@ public class BaiKiemTra
     public required DateOnly NgayTao { get; set; }
     public DateOnly? NgayKiemTra { get; set; }
     public required string TrangThai {  get; set; }
-    public Guid? LichHocId { get; set; }
+    public required Guid LichHocId { get; set; }
     [JsonIgnore]
     public LichHoc LichHoc { get; set; } = null!;
     [JsonIgnore]

@@ -56,7 +56,8 @@ public class CreateBaiKiemTraCommandHandler : IRequestHandler<CreateBaiKiemTraCo
             Ten = request.BaiKiemTraDto.TenBaiKiemTra,
             TrangThai = "Chưa kiểm tra",
             UrlFile = urlTaiLieu,
-            NgayKiemTra = request.BaiKiemTraDto.NgayKiemTra
+            NgayKiemTra = request.BaiKiemTraDto.NgayKiemTra,
+            LichHocId = Guid.NewGuid()
         };
         var thu = ((int)request.BaiKiemTraDto.NgayKiemTra.DayOfWeek > 0)
             ? (int)request.BaiKiemTraDto.NgayKiemTra.DayOfWeek + 1
