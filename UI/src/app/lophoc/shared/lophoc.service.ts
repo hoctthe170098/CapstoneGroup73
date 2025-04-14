@@ -133,5 +133,11 @@ export class LophocService {
   
     return this.http.put<any>(`${this.baseUrl}/updatelichdaybu`, payload, { headers });
   }
+  deleteLopHocCoDinh(tenLopHoc: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const url = `${this.baseUrl}/deletelophoccodinh?tenLopHoc=${encodeURIComponent(tenLopHoc)}`;
+    return this.http.delete<any>(url, { headers });
+  }
   
 }
