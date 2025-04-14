@@ -679,6 +679,25 @@ editScheduleDayBu: any = {
       }
     });
   }
+  onDeleteLopHoc(tenLop: string): void {
+    if (!confirm(`Bạn có chắc chắn muốn xóa/đóng lớp "${tenLop}" không?`)) return;
+  
+    this.lophocService.deleteLopHocCoDinh(tenLop).subscribe({
+      next: (res) => {
+        if (!res.isError) {
+          this.toastr.success(res.message || 'Xóa/đóng lớp học thành công.');
+          this.loadLopHocs(); // gọi lại danh sách lớp học
+        } else {
+          this.toastr.error(res.message || 'Không thể xóa lớp học.');
+        }
+      },
+      error: (err) => {
+        console.error('Lỗi khi xóa lớp học:', err);
+        this.toastr.error(err?.error?.message || 'Đã xảy ra lỗi khi xóa lớp học.');
+      }
+    });
+  }
+  
   
   
   
