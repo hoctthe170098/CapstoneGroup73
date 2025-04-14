@@ -28,12 +28,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<KetQuaBaiKiemTra> KetQuaBaiKiemTras => Set<KetQuaBaiKiemTra>();
     public DbSet<NoiDungBaiHoc> NoiDungBaiHocs => Set<NoiDungBaiHoc>();
     public DbSet<TaiLieuHocTap> TaiLieuHocTaps => Set<TaiLieuHocTap>();
-
-    
-    public DbSet<TodoList> TodoLists => Set<TodoList>();
-
-    public DbSet<TodoItem> TodoItems => Set<TodoItem>();
-
+    public DbSet<NhanXetDinhKy> NhanXetDinhKys => Set<NhanXetDinhKy>();
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.Entity<GiaoVien>()

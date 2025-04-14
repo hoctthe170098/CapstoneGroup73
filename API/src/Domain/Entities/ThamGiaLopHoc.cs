@@ -20,4 +20,5 @@ public class ThamGiaLopHoc
     public LichHoc LichHoc { get; set; } = null!;
     [JsonIgnore]
     public IList<DiemDanh> DiemDanhs { get; private set; } = new List<DiemDanh>();
+    public IList<NhanXetDinhKy> NhanXetDinhKys { get; private set; } = new List<NhanXetDinhKy>();
 }

@@ -9,7 +9,6 @@ using StudyFlow.Application.Common.Exceptions;
 using StudyFlow.Application.Common.Interfaces;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Application.DiemDanhs.Queries.GetDiemDanhTheoNgay;
-using StudyFlow.Application.TodoLists.Queries.GetTodos;
 using StudyFlow.Domain.Entities;
 using StudyFlow.Domain.Enums;
 
