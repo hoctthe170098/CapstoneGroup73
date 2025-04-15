@@ -55,6 +55,8 @@ public class GetTraLoiByBaiTapForHocSinhHandler : IRequestHandler<GetTraLoiByBai
                 t.NoiDung,
                 t.UrlFile,
                 t.ThoiGian,
+                t.Diem,
+                t.NhanXet,
                 HocSinhTen = t.HocSinh.Ten
             })
             .ToListAsync(cancellationToken);
