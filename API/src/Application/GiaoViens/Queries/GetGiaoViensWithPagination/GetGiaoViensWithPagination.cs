@@ -10,6 +10,7 @@ using StudyFlow.Application.Common.Mappings;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Application.GiaoViens.Queries.GetGiaoViensWithPagination.GetGiaoViensWithPagination;
 using StudyFlow.Application.NhanViens.Queries.GetNhanViensWithPagination;
+using StudyFlow.Domain.Entities;
 
 namespace StudyFlow.Application.GiaoViens.Queries.GetGiaoViensWithPagination;
 public class GetGiaoViensWithPaginationQuery : IRequest<Output>
@@ -97,8 +98,22 @@ public class GetGiaoViensWithPaginationQueryHandler
                .ProjectTo<GiaoVienDto>(_mapper.ConfigurationProvider)
                .PaginatedListAsync(request.PageNumber, request.PageSize);
 
+
+            var giaoVienCodes = list.Items.Select(hs => hs.Code).ToList();
+            var lichHoc = await _context.LichHocs
+                .Where(lh => giaoVienCodes.Contains(lh.GiaoVienCode))
+                .ToListAsync();
+
             foreach (var giaoVienDto in list.Items)
             {
+                var tenLops = lichHoc
+                   .Where(tg => tg.GiaoVienCode == giaoVienDto.Code && tg.TrangThai == "Cố định")
+                   .Select(tg => tg.TenLop)
+                   .Distinct()
+                   .ToList();
+
+                giaoVienDto.TenLops = tenLops;
+
                 if (!string.IsNullOrEmpty(giaoVienDto.Code))
                 {
                     var user = await _context.GiaoViens
