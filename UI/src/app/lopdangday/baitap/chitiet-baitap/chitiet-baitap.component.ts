@@ -24,7 +24,7 @@ answers: any[] = [];
 currentPage = 1;
 pageSize = 3;
 editBaiTap: any;
-
+gradingAnswerId: string | null = null;
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       this.tenLop = decodeURIComponent(params.get('tenLop') || '');
@@ -310,5 +310,10 @@ loadTraLoiCuaHocSinh(): void {
     }
   });
 }
-  
+openChamDiemForm(ans: any): void {
+  this.gradingAnswerId = ans.id;
+}
+cancelGrading(): void {
+  this.gradingAnswerId = null;
+}
 }

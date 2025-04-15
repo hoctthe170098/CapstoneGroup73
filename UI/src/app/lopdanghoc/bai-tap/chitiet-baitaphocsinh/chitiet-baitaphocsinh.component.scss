@@ -349,5 +349,22 @@
       color: #a30000;
     }
   }
+  .answer-feedback {
+    margin-top: 12px;
+    padding: 10px;
+    background: #f9f9f9;
+    border-left: 4px solid #28a745;
+    border-radius: 4px;
+  
+    p {
+      margin: 4px 0;
+      font-size: 14px;
+      color: #333;
+  
+      strong {
+        color: #000;
+      }
+    }
+  }
   
   
