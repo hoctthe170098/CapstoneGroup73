@@ -177,7 +177,12 @@ export class LopdangdayService {
     const url = `${this.baseUrl}/KetQuaBaiKiemTras/updateketquabaikiemtra`;
     return this.http.post<any>(url, payload, { headers });
   }
-  
+  getBaoCaoDiemHangNgay(tenLop: string): Observable<any> {
+    const token = localStorage.getItem("token");
+    const headers = new HttpHeaders().set("Authorization", `Bearer ${token}`);
+    const url = `${this.baseUrl}/DiemDanhs/getbaocaodiemhangngaycuahocsinh?TenLop=${encodeURIComponent(tenLop)}`;
+    return this.http.get<any>(url, { headers });
+  }
   
   
   

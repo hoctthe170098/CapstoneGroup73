@@ -1,0 +1,58 @@
+<div class="diemdanh-wrapper">
+    <h2>BÁO CÁO ĐIỂM DANH</h2>
+  
+    <div class="content">
+      <div class="sidebar">
+        <ul>
+          <li *ngFor="let date of danhSachNgay" [class.active]="date === ngayDuocChon" (click)="chonNgay(date)">
+            {{ date }}
+          </li>
+        </ul>
+      </div>
+  
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Học Sinh</th>
+              <th>Tình Trạng Điểm Danh</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let hs of danhSachHocSinh; let i = index">
+              <td>{{ i + 1 | number: '2.0' }}</td>
+              <td>{{ hs.ten }}</td>
+              <td class="trang-thai">
+                <ng-container *ngIf="!dangSua; else formEdit">
+                  <span [ngClass]="{ 'co-mat': hs.trangThai === 'Có mặt', 'vang': hs.trangThai === 'Vắng' }">
+                    {{ hs.trangThai }}
+                  </span>
+                </ng-container>
+  
+                <ng-template #formEdit>
+                  <label>
+                    <input type="radio" name="status-{{ i }}" value="Có mặt" [(ngModel)]="hs.trangThai" />
+                    Có mặt
+                  </label>
+                  <label style="margin-left: 12px;">
+                    <input type="radio" name="status-{{ i }}" value="Vắng" [(ngModel)]="hs.trangThai" />
+                    Vắng
+                  </label>
+                </ng-template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+  
+        <div class="buttons">
+          <button *ngIf="!dangSua" class="btn-sua" (click)="dangSua = true">Sửa</button>
+          <div *ngIf="dangSua">
+            <button class="btn-huy" (click)="huySua()">Hủy</button>
+            <button class="btn-luu" (click)="luuDiemDanh()">Lưu</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

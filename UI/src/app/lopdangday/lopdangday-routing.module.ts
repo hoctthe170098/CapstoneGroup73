@@ -10,6 +10,7 @@ import { ChitietBaitapComponent } from './baitap/chitiet-baitap/chitiet-baitap.c
 import { BaocaodiemdanhComponent } from './baocaodiemdanh/baocaodiemdanh.component';
 import { BaocaodiemComponent } from './baocaodiem/baocaodiem.component';
 import { DiemkiemtraComponent } from './diemkiemtra/diemkiemtra.component';
+import { NhanxetdinhkiComponent } from './nhanxetdinhki/nhanxetdinhki.component';
 const routes: Routes = [
   {
     path: '',
@@ -40,7 +41,8 @@ const routes: Routes = [
       { path: "lichkiemtra", component: LichkiemtraComponent },
       { path: "baocaodiemdanh", component: BaocaodiemdanhComponent },
       { path: "baocaodiem", component: BaocaodiemComponent },
-      { path: "diemkiemtra/:baiKiemTraId", component: DiemkiemtraComponent }
+      { path: "diemkiemtra/:baiKiemTraId", component: DiemkiemtraComponent },
+      { path: "nhanxetdinhki/:hocSinhId", component: NhanxetdinhkiComponent }
     ],
   },
 ];

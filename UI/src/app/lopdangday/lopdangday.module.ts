@@ -12,6 +12,7 @@ import { ChitietBaitapComponent } from './baitap/chitiet-baitap/chitiet-baitap.c
 import { BaocaodiemdanhComponent } from './baocaodiemdanh/baocaodiemdanh.component';
 import { BaocaodiemComponent } from './baocaodiem/baocaodiem.component';
 import { DiemkiemtraComponent } from './diemkiemtra/diemkiemtra.component';
+import { NhanxetdinhkiComponent } from './nhanxetdinhki/nhanxetdinhki.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { DiemkiemtraComponent } from './diemkiemtra/diemkiemtra.component';
     ChitietBaitapComponent,
     BaocaodiemdanhComponent,
     BaocaodiemComponent,
-    DiemkiemtraComponent
+    DiemkiemtraComponent,
+    NhanxetdinhkiComponent
   ],
   imports: [
     CommonModule,

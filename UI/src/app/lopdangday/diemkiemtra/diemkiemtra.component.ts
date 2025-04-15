@@ -62,15 +62,18 @@ export class DiemkiemtraComponent implements OnInit {
 
       const diem = typeof hs.diem === 'string' ? parseFloat(hs.diem) : hs.diem;
 
-      if (diem !== null && (isNaN(diem) || diem < 0 || diem > 10)) {
+      if (diem !== null && (diem < 0 || diem > 10)) {
         errors.diem = 'Điểm phải từ 0 đến 10';
         hasError = true;
       }
-
-      if (hs.nhanXet && hs.nhanXet.length > 200) {
+      console.log("0123456789012345678asd2345678901234...1111".length);
+      console.log(`=> Nhận xét của ${hs.hocSinhCode}:`, hs.nhanXet);
+console.log(`=> Độ dài:`, (hs.nhanXet ?? '').toString().length);
+      if ((hs.nhanXet ?? '').toString().length > 200) {
         errors.nhanXet = 'Nhận xét không được vượt quá 200 ký tự';
         hasError = true;
       }
+      
 
       if (Object.keys(errors).length > 0) {
         this.validationErrors[hs.hocSinhCode] = errors;

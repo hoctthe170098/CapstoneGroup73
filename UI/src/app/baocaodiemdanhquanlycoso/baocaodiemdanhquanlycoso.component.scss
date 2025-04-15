@@ -1,0 +1,110 @@
+.diemdanh-wrapper {
+    padding: 20px;
+  
+    h2 {
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+  
+    .content {
+      display: flex;
+      gap: 24px;
+    }
+  
+    .sidebar {
+      width: 200px;
+      background: #f6f7fb;
+      border-radius: 8px;
+      padding: 12px;
+  
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+  
+        li {
+          padding: 8px 12px;
+          margin-bottom: 6px;
+          border-radius: 6px;
+          cursor: pointer;
+  
+          &.active {
+            background: #e0e7ff;
+            font-weight: bold;
+          }
+  
+          &:hover {
+            background: #e5e5e5;
+          }
+        }
+      }
+    }
+  
+    .table-container {
+      flex: 1;
+  
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 16px;
+  
+        th, td {
+          padding: 12px;
+          border: 1px solid #e0e0e0;
+          text-align: left;
+        }
+  
+        th {
+          background: #f0f2f5;
+          font-weight: 600;
+        }
+  
+        .trang-thai.co-mat {
+          color: green;
+          font-weight: 500;
+        }
+      }
+  
+      .btn-luu {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+  
+        &:hover {
+          background: #2563eb;
+        }
+      }
+    }
+    .buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 16px;
+      
+        button {
+          padding: 8px 16px;
+          border-radius: 6px;
+          border: none;
+          cursor: pointer;
+          font-weight: 500;
+        }
+      
+        .btn-sua {
+          background: #3b82f6;
+          color: white;
+        }
+      
+        .btn-huy {
+          background: #ef4444;
+          color: white;
+        }
+      
+        .btn-luu {
+          background: #10b981;
+          color: white;
+        }
+      }
+  }
+  

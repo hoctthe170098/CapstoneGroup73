@@ -43,4 +43,10 @@ export class DanhsachhocsinhComponent implements OnInit {
       }
     );
   }
+  chuyenTrangNhanXet(hs: DanhSachHocSinh) {
+    this.router.navigate(
+      [`/lopdangday/chi-tiet/${this.tenLop}/nhanxetdinhki`, hs.code],
+      { queryParams: { ten: hs.ten } }
+    );
+  }
 }

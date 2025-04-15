@@ -1,16 +1,17 @@
-.background{
-    background-color: #ffffff;
-    border-radius: 5px;
-    padding: 15px;
-}
-
-.title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 30px;
-    color: #465057;
-}
-
-.text-center {
-    text-align: center;
-}
+.nhan-xet-link {
+    color: #6c63ff;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+  
+    span {
+      font-size: 14px;
+      margin-left: 4px;
+    }
+  
+    &:hover {
+      text-decoration: underline;
+      color: #3f3dc1;
+    }
+  }
+  

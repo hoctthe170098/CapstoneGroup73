@@ -1,0 +1,30 @@
+<div class="fee-report">
+    <h2>BÁO CÁO HỌC PHÍ</h2>
+  
+    <div class="filter">
+      <label for="thang">Tháng</label>
+      <select id="thang">
+        <option>Tháng</option>
+      </select>
+    </div>
+  
+    <table>
+      <thead>
+        <tr>
+          <th>Học Sinh</th>
+          <th>Số Buổi</th>
+          <th>Học Phí</th>
+          <th>Trạng Thái</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of baoCaoHocPhi">
+          <td>{{ row.hocSinh }}</td>
+          <td>{{ row.soBuoi }}</td>
+          <td>{{ row.hocPhi }}</td>
+          <td>{{ row.trangThai }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  

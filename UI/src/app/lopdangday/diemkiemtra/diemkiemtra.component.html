@@ -23,7 +23,8 @@
           </div>
         </td>
         <td>
-          <input type="text" [(ngModel)]="hs.nhanXet" maxlength="200" placeholder="..." />
+          <input type="text" [(ngModel)]="hs.nhanXet" placeholder="..." />
+
           <div class="error-text" *ngIf="validationErrors[hs.hocSinhCode]?.nhanXet">
             {{ validationErrors[hs.hocSinhCode].nhanXet }}
           </div>
