@@ -1,1 +1,124 @@
-<p>baocao-diem works!</p>
+<div class="bao-cao-diem-wrapper container">
+  <!-- Điểm trung bình -->
+  <h5 class="section-title">Điểm Trung Bình</h5>
+  <div class="row text-center mb-4">
+    <div class="col-md-4">
+      <div class="score-box">
+        <div class="score-label">Điểm trên lớp</div>
+        <div class="score-value">10</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="score-box">
+        <div class="score-label">Điểm bài tập về nhà</div>
+        <div class="score-value">9</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="score-box">
+        <div class="score-label">Điểm kiểm tra</div>
+        <div class="score-value">8.5</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nhận xét định kỳ -->
+  <div class="mb-4">
+    <h5>Nhận xét định kỳ</h5>
+    <div class="table-scroll">
+      <table class="table table-hover">
+        <thead class="thead-light">
+          <tr>
+            <th>Ngày</th>
+            <th>Nhận xét</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of nhanXetDinhKy ">
+            <td>{{item.ngay}}</td>
+            <td>{{item.nhanXet}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <!-- BẢNG ĐIỂM CHI TIẾT -->
+  <div class="diem-chi-tiet-section">
+    <!-- Hàng trên: 2 bảng -->
+    <div class="top-tables">
+      <!-- Điểm trên lớp -->
+      <div class="score-table">
+        <h6>Điểm trên lớp</h6>
+        <div class="table-scroll">
+          <table class="table table-striped ">
+            <thead>
+              <tr>
+                <th>Ngày</th>
+                <th>Điểm</th>
+                <th>Nhận Xét</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of diemTrenLop">
+                <td>{{ item.ngay }}</td>
+                <td>{{ item.diem }}</td>
+                <td>{{ item.nhanXet }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Điểm bài tập -->
+      <div class="score-table">
+        <h6>Điểm bài tập về nhà</h6>
+        <div class="table-scroll">
+          <table class="table table-striped ">
+            <thead>
+              <tr>
+                <th>Ngày</th>
+                <th>Điểm</th>
+                <th>Nhận Xét</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of diemBaiTap">
+                <td>{{ item.ngay }}</td>
+                <td>{{ item.diem }}</td>
+                <td>{{ item.nhanXet }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bảng dưới: Điểm kiểm tra -->
+    <div class="full-table mt-4">
+        <h6>Điểm kiểm tra</h6>
+        <div class="table-scroll">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Tên</th>
+                <th>Ngày Kiểm Tra</th>
+                <th>Trạng Thái</th>
+                <th>Điểm</th>
+                <th>Nhận Xét</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of diemKiemTra">
+                <td>{{ item.ten }}</td>
+                <td>{{ item.ngay }}</td>
+                <td>{{ item.trangThai }}</td>
+                <td>{{ item.diem }}</td>
+                <td>{{ item.nhanXet }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+  </div>
+

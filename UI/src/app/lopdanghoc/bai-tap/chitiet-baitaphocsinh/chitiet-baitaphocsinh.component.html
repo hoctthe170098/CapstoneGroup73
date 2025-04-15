@@ -130,6 +130,11 @@
           <span>File</span>
         </div>
       </ng-template>
+      <div class="answer-feedback" *ngIf="ans.diem || ans.nhanXet">
+        <p><strong>Điểm:</strong> {{ ans.diem }}/10</p>
+        <p><strong>Nhận xét giáo viên:</strong></p>
+        <p>{{ ans.nhanXet }}</p>
+      </div>
     </div>
     
     
