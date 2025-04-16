@@ -23,7 +23,7 @@ export class VerticalMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('toggleIcon') toggleIcon: ElementRef;
   public menuItems: any[];
   level: number = 0;
-  logoUrl = 'assets/img/logo.png';
+  logoUrl = 'assets/img/SF_logo.png';
   public config: any = {};
   protected innerWidth: any;
   layoutSub: Subscription;
@@ -84,31 +84,32 @@ export class VerticalMenuComponent implements OnInit, AfterViewInit, OnDestroy {
 
   loadLayout() {
 
-    if (this.config.layout.menuPosition === "Top") { // Horizontal Menu
-      if (this.innerWidth < 1200) { // Screen size < 1200
-        this.menuItems = HROUTES;
-      }
-    }
-    else if (this.config.layout.menuPosition === "Side") { // Vertical Menu{
-      this.menuItems = ROUTES;
-    }
+    // if (this.config.layout.menuPosition === "Top") { // Horizontal Menu
+    //   if (this.innerWidth < 1200) { // Screen size < 1200
+    //     this.menuItems = HROUTES;
+    //   }
+    // }
+    // else if (this.config.layout.menuPosition === "Side") { // Vertical Menu{
+    //   this.menuItems = ROUTES;
+    // }
 
 
 
 
-    if (this.config.layout.sidebar.backgroundColor === 'white') {
-      this.logoUrl = 'assets/img/logo-dark.png';
-    }
-    else {
-      this.logoUrl = 'assets/img/logo.png';
-    }
+    // if (this.config.layout.sidebar.backgroundColor === 'white') {
+    //   this.logoUrl = 'assets/img/logo-dark.png';
+    // }
+    // else {
+    //   this.logoUrl = 'assets/img/logo.png';
+    // }
 
-    if(this.config.layout.sidebar.collapsed) {
-      this.collapseSidebar = true;
-    }
-    else {
-      this.collapseSidebar = false;
-    }
+    // if(this.config.layout.sidebar.collapsed) {
+    //   this.collapseSidebar = true;
+    // }
+    // else {
+    //   this.collapseSidebar = false;
+    // }
+    this.logoUrl = 'assets/img/studyflow_logo_icon.png';
   }
 
   toggleSidebar() {
