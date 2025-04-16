@@ -11,6 +11,8 @@ import { BaocaodiemdanhComponent } from './baocaodiemdanh/baocaodiemdanh.compone
 import { BaocaodiemComponent } from './baocaodiem/baocaodiem.component';
 import { DiemkiemtraComponent } from './diemkiemtra/diemkiemtra.component';
 import { NhanxetdinhkiComponent } from './nhanxetdinhki/nhanxetdinhki.component';
+import { ChuongtrinhhocComponent } from './chuongtrinhhoc/chuongtrinhhoc.component';
+
 const routes: Routes = [
   {
     path: '',
@@ -42,7 +44,8 @@ const routes: Routes = [
       { path: "baocaodiemdanh", component: BaocaodiemdanhComponent },
       { path: "baocaodiem", component: BaocaodiemComponent },
       { path: "diemkiemtra/:baiKiemTraId", component: DiemkiemtraComponent },
-      { path: "nhanxetdinhki/:hocSinhId", component: NhanxetdinhkiComponent }
+      { path: "nhanxetdinhki/:hocSinhId", component: NhanxetdinhkiComponent },
+      { path: "chuongtrinhoc", component: ChuongtrinhhocComponent }
     ],
   },
 ];

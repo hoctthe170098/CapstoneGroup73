@@ -12,6 +12,7 @@ import { BaocaoDiemdanhComponent } from './baocao-diemdanh/baocao-diemdanh.compo
 import { ChitietBaitaphocsinhComponent } from './bai-tap/chitiet-baitaphocsinh/chitiet-baitaphocsinh.component';
 import { FormsModule } from '@angular/forms';
 import { QuillModule } from 'ngx-quill';
+import { ChuongtrinhhocHocsinhComponent } from './chuongtrinhhoc-hocsinh/chuongtrinhhoc-hocsinh.component';
 @NgModule({
   declarations: [
     LopdanghocComponent,
@@ -20,7 +21,8 @@ import { QuillModule } from 'ngx-quill';
     LichThiComponent,
     BaocaoDiemComponent,
     BaocaoDiemdanhComponent,
-    ChitietBaitaphocsinhComponent
+    ChitietBaitaphocsinhComponent,
+    ChuongtrinhhocHocsinhComponent
   ],
   imports: [
     CommonModule,

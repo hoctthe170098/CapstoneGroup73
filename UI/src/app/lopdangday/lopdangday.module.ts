@@ -13,6 +13,7 @@ import { BaocaodiemdanhComponent } from './baocaodiemdanh/baocaodiemdanh.compone
 import { BaocaodiemComponent } from './baocaodiem/baocaodiem.component';
 import { DiemkiemtraComponent } from './diemkiemtra/diemkiemtra.component';
 import { NhanxetdinhkiComponent } from './nhanxetdinhki/nhanxetdinhki.component';
+import { ChuongtrinhhocComponent } from './chuongtrinhhoc/chuongtrinhhoc.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { NhanxetdinhkiComponent } from './nhanxetdinhki/nhanxetdinhki.component'
     BaocaodiemdanhComponent,
     BaocaodiemComponent,
     DiemkiemtraComponent,
-    NhanxetdinhkiComponent
+    NhanxetdinhkiComponent,
+    ChuongtrinhhocComponent
   ],
   imports: [
     CommonModule,
