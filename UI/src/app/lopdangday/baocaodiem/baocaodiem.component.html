@@ -1,26 +1,36 @@
 <div class="table-container">
-    <h2>BÁO CÁO ĐIỂM HỌC SINH</h2>
-  
-    <div class="table-scroll-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Học Sinh</th>
-            <th *ngFor="let date of reportDates">{{ date }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let student of students">
-            <td>{{ student.name }}</td>
-            <td *ngFor="let date of reportDates">
+  <h2>BÁO CÁO ĐIỂM HỌC SINH</h2>
+
+  <div class="table-scroll-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Học Sinh</th>
+          <th *ngFor="let date of reportDates">{{ date }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let student of students">
+          <td>{{ student.name }}</td>
+          <td *ngFor="let date of reportDates">
+            <div>
               <div>
-                <div>BTVN: {{ student.scores[date]?.homework || '-' }}/10</div>
-                <div>Trên lớp: {{ student.scores[date]?.classwork || '-' }}/10</div>
+                BTVN: 
+                <span [ngClass]="getDiemClass(student.scores[date]?.homework)">
+                  {{ student.scores[date]?.homework || '-' }}
+                </span>/10
               </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+              <div>
+                Trên lớp: 
+                <span [ngClass]="getDiemClass(student.scores[date]?.classwork)">
+                  {{ student.scores[date]?.classwork || '-' }}
+                </span>/10
+              </div>
+            </div>
+          </td>
+          
+        </tr>
+      </tbody>
+    </table>
   </div>
-  
+</div>

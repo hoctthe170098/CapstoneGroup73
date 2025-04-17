@@ -97,7 +97,7 @@ export class DiemdanhComponent implements OnInit {
           trangThai: student.diemDanh === 'coMat' ? 'Có mặt' : 'Vắng',
           diemBTVN: this.formatScore(student.diemBTVN),
           diemTrenLop: this.formatScore(student.diemTrenLop),
-          nhanXet: student.nhanXet?.toString().substring(0, 200) || ''
+         nhanXet: student.nhanXet?.toString().substring(0, 200) || ''
         };
       })
     };
@@ -116,10 +116,13 @@ export class DiemdanhComponent implements OnInit {
     });
   }
   
-  formatScore(score: any): number {
+  formatScore(score: any): number | null {
+    if (score === null || score === undefined || score.toString().trim() === '') {
+      return null;
+    }
+  
     const n = Number(score);
-    if (isNaN(n) || n < 0) return 0;
-    if (n > 10) return 10;
+    if (isNaN(n) || n < 0 || n > 10) return null;
     return Math.round(n * 10) / 10;
   }
 

@@ -47,35 +47,35 @@ export class CustomizerComponent implements OnInit, OnDestroy {
   }
 
 
-  changeSidebarWidth(value) {
-    this.size = value;
-    this.customizerService.changeSidebarWidth(value);
-  }
+  // changeSidebarWidth(value) {
+  //   this.size = value;
+  //   this.customizerService.changeSidebarWidth(value);
+  // }
 
-  toggleCustomizer() {
-    if (this.isOpen) {
-      this.renderer.removeClass(this.customizer.nativeElement, "open");
-      this.isOpen = false;
-    } else {
-      this.renderer.addClass(this.customizer.nativeElement, "open");
-      this.isOpen = true;
-    }
-  }
+  // toggleCustomizer() {
+  //   if (this.isOpen) {
+  //     this.renderer.removeClass(this.customizer.nativeElement, "open");
+  //     this.isOpen = false;
+  //   } else {
+  //     this.renderer.addClass(this.customizer.nativeElement, "open");
+  //     this.isOpen = true;
+  //   }
+  // }
 
-  closeCustomizer() {
-    this.renderer.removeClass(this.customizer.nativeElement, "open");
-    this.isOpen = false;
-  }
+  // closeCustomizer() {
+  //   this.renderer.removeClass(this.customizer.nativeElement, "open");
+  //   this.isOpen = false;
+  // }
 
-    bgImageDisplay(e) {
-    if (e.target.checked) {
-      this.isBgImageDisplay = true;
-    } else {
-      this.isBgImageDisplay = false;
-    }
-    //emit event to FUll Layout
-    this.customizerService.bgImageDisplay(e);
-  }
+  //   bgImageDisplay(e) {
+  //   if (e.target.checked) {
+  //     this.isBgImageDisplay = true;
+  //   } else {
+  //     this.isBgImageDisplay = false;
+  //   }
+  //   //emit event to FUll Layout
+  //   this.customizerService.bgImageDisplay(e);
+  // }
 
 
   ngOnDestroy() {

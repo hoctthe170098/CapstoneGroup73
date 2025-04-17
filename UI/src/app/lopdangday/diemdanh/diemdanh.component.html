@@ -38,13 +38,22 @@
         </td>
         <td>
           <div class="score-input">
-            <input type="text" [(ngModel)]="student.diemBTVN" />
+            <input
+              type="text"
+              [value]="student.diemBTVN !== null && student.diemBTVN !== undefined ? student.diemBTVN : ''"
+              (input)="updateScore($event.target.value, student, 'diemBTVN')"
+            />
             <span>/ 10</span>
           </div>
         </td>
+        
         <td>
           <div class="score-input">
-            <input type="text" [(ngModel)]="student.diemTrenLop" />
+            <input
+              type="text"
+              [value]="student.diemTrenLop !== null && student.diemTrenLop !== undefined ? student.diemTrenLop : ''"
+              (input)="updateScore($event.target.value, student, 'diemTrenLop')"
+            />
             <span>/ 10</span>
           </div>
         </td>

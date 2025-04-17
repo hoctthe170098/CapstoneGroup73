@@ -1,1 +1,29 @@
-<p>baocao-diemdanh works!</p>
+<div class="attendance-report">
+    <h2>BÁO CÁO ĐIỂM DANH</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Ngày</th>
+          <th>Thời Gian</th>
+          <th>Phòng</th>
+          <th>Giáo Viên</th>
+          <th>Tình Trạng Điểm Danh</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of baoCaoDiemDanh">
+          <td>{{ item.ngay }}</td>
+          <td>{{ item.thoiGian }}</td>
+          <td>{{ item.phong }}</td>
+          <td>{{ item.giaoVien }}</td>
+          <td [ngClass]="{
+                'co-mat': item.trangThai === 'Có mặt',
+                'vang': item.trangThai === 'Vắng'
+              }">
+            {{ item.trangThai }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  

@@ -1,1 +1,24 @@
-<p>lich-thi works!</p>
+<div class="exam-schedule">
+    <h2>LỊCH KIỂM TRA</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Tên</th>
+          <th>Ngày Kiểm Tra</th>
+          <th>Trạng Thái</th>
+          <th>Điểm</th>
+          <th>Nhận Xét</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of lichThi">
+          <td>{{ item.ten }}</td>
+          <td>{{ item.ngay }}</td>
+          <td>{{ item.trangThai }}</td>
+          <td>{{ item.diem }}</td>
+          <td>{{ item.nhanXet }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  

@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,ChangeDetectorRef } from '@angular/core';
+import { ActivatedRoute,Router} from '@angular/router';
+import { LopdangdayService } from '../shared/lopdangday.service';
 
 @Component({
   selector: 'app-baocaodiem',
@@ -6,156 +8,64 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./baocaodiem.component.scss']
 })
 export class BaocaodiemComponent implements OnInit {
+  reportDates: string[] = [];
+  students: any[] = [];
+  tenLop: string = '';
 
-  reportDates: string[] = [
-    '09/4', '11/4', '16/4', '18/4', '23/4',
-    '25/4', '30/4', '02/5', '04/5'
-  ];
+  constructor(private lopService: LopdangdayService,  private router: Router,private route: ActivatedRoute,private cdr: ChangeDetectorRef) {}
 
-  students = [
-    {
-      name: 'Bùi Ngọc Dũng',
-      scores: {
-        '09/4': { homework: 8, classwork: 9 },
-        '11/4': { homework: 8, classwork: 9 },
-        '16/4': { homework: 8, classwork: 9 },
-        '18/4': { homework: 8, classwork: 9 },
-        '23/4': { homework: 8, classwork: 9 },
-        '25/4': { homework: 8, classwork: 9 },
-        '30/4': { homework: 8, classwork: 9 },
-        '02/5': { homework: 8, classwork: 9 },
-        '04/5': { homework: 8, classwork: 9 }
+  ngOnInit(): void {
+    this.route.parent?.paramMap.subscribe(params => {
+      const tenLopParam = params.get('tenLop');
+      if (tenLopParam) {
+        this.tenLop = tenLopParam;
+        this.fetchBaoCaoDiem();
+        
       }
-    },
-    {
-      name: 'Nguyễn Văn A',
-      scores: {
-        '09/4': { homework: 9, classwork: 9 },
-        '11/4': { homework: 7, classwork: 8 },
-        '16/4': { homework: 10, classwork: 10 },
-        '18/4': { homework: 9, classwork: 10 },
-        '23/4': { homework: 9, classwork: 9 },
-        '25/4': { homework: 8, classwork: 9 },
-        '30/4': { homework: 7, classwork: 8 },
-        '02/5': { homework: 9, classwork: 9 },
-        '04/5': { homework: 8, classwork: 10 }
-      }
-    },
-    {
-      name: 'Trần Thị B',
-      scores: {
-        '09/4': { homework: 10, classwork: 9 },
-        '11/4': { homework: 9, classwork: 9 },
-        '16/4': { homework: 9, classwork: 8 },
-        '18/4': { homework: 9, classwork: 9 },
-        '23/4': { homework: 10, classwork: 10 },
-        '25/4': { homework: 9, classwork: 9 },
-        '30/4': { homework: 8, classwork: 7 },
-        '02/5': { homework: 9, classwork: 9 },
-        '04/5': { homework: 10, classwork: 10 }
-      }
-    },
-    {
-      name: 'Phạm Văn C',
-      scores: {
-        '09/4': { homework: 7, classwork: 8 },
-        '11/4': { homework: 6, classwork: 7 },
-        '16/4': { homework: 8, classwork: 8 },
-        '18/4': { homework: 7, classwork: 7 },
-        '23/4': { homework: 8, classwork: 8 },
-        '25/4': { homework: 8, classwork: 8 },
-        '30/4': { homework: 9, classwork: 9 },
-        '02/5': { homework: 9, classwork: 8 },
-        '04/5': { homework: 9, classwork: 9 }
-      }
-    },
-    {
-      name: 'Lê Thị D',
-      scores: {
-        '09/4': { homework: 9, classwork: 10 },
-        '11/4': { homework: 10, classwork: 10 },
-        '16/4': { homework: 9, classwork: 9 },
-        '18/4': { homework: 9, classwork: 9 },
-        '23/4': { homework: 8, classwork: 8 },
-        '25/4': { homework: 10, classwork: 10 },
-        '30/4': { homework: 9, classwork: 9 },
-        '02/5': { homework: 10, classwork: 10 },
-        '04/5': { homework: 9, classwork: 10 }
-      }
-    },
-    {
-      name: 'Đỗ Mạnh E',
-      scores: {
-        '09/4': { homework: 6, classwork: 7 },
-        '11/4': { homework: 7, classwork: 8 },
-        '16/4': { homework: 8, classwork: 7 },
-        '18/4': { homework: 6, classwork: 7 },
-        '23/4': { homework: 7, classwork: 7 },
-        '25/4': { homework: 8, classwork: 8 },
-        '30/4': { homework: 7, classwork: 6 },
-        '02/5': { homework: 8, classwork: 8 },
-        '04/5': { homework: 7, classwork: 7 }
-      }
-    },
-    {
-      name: 'Ngô Quỳnh F',
-      scores: {
-        '09/4': { homework: 10, classwork: 10 },
-        '11/4': { homework: 9, classwork: 10 },
-        '16/4': { homework: 10, classwork: 10 },
-        '18/4': { homework: 9, classwork: 10 },
-        '23/4': { homework: 10, classwork: 10 },
-        '25/4': { homework: 10, classwork: 10 },
-        '30/4': { homework: 9, classwork: 9 },
-        '02/5': { homework: 9, classwork: 9 },
-        '04/5': { homework: 10, classwork: 10 }
-      }
-    },
-    {
-      name: 'Vũ Đức G',
-      scores: {
-        '09/4': { homework: 8, classwork: 8 },
-        '11/4': { homework: 8, classwork: 9 },
-        '16/4': { homework: 8, classwork: 8 },
-        '18/4': { homework: 7, classwork: 7 },
-        '23/4': { homework: 7, classwork: 7 },
-        '25/4': { homework: 8, classwork: 8 },
-        '30/4': { homework: 9, classwork: 9 },
-        '02/5': { homework: 9, classwork: 8 },
-        '04/5': { homework: 9, classwork: 9 }
-      }
-    },
-    {
-      name: 'Lý Minh H',
-      scores: {
-        '09/4': { homework: 6, classwork: 7 },
-        '11/4': { homework: 7, classwork: 8 },
-        '16/4': { homework: 6, classwork: 7 },
-        '18/4': { homework: 6, classwork: 6 },
-        '23/4': { homework: 7, classwork: 6 },
-        '25/4': { homework: 8, classwork: 7 },
-        '30/4': { homework: 9, classwork: 9 },
-        '02/5': { homework: 8, classwork: 8 },
-        '04/5': { homework: 8, classwork: 9 }
-      }
-    },
-    {
-      name: 'Hoàng Văn I',
-      scores: {
-        '09/4': { homework: 9, classwork: 10 },
-        '11/4': { homework: 9, classwork: 10 },
-        '16/4': { homework: 9, classwork: 9 },
-        '18/4': { homework: 9, classwork: 10 },
-        '23/4': { homework: 10, classwork: 10 },
-        '25/4': { homework: 9, classwork: 9 },
-        '30/4': { homework: 10, classwork: 10 },
-        '02/5': { homework: 10, classwork: 9 },
-        '04/5': { homework: 10, classwork: 10 }
-      }
-    }
-  ];
+    });
+  }
 
-  constructor() {}
+  fetchBaoCaoDiem(): void {
+    this.lopService.getBaoCaoDiemHangNgay(this.tenLop).subscribe(res => {
+      if (res?.data && Array.isArray(res.data)) {
+        const diemData = res.data;
 
-  ngOnInit(): void {}
+        // lấy danh sách ngày
+        this.reportDates = diemData.map((item: any) => this.formatNgay(item.ngay));
+
+        // build student map
+        const studentMap: { [key: string]: any } = {};
+
+        diemData.forEach((entry: any) => {
+          entry.diemDanhs.forEach((diem: any) => {
+            if (!studentMap[diem.hocSinhCode]) {
+              studentMap[diem.hocSinhCode] = {
+                name: diem.tenHocSinh,
+                scores: {}
+              };
+            }
+
+            const dateKey = this.formatNgay(entry.ngay);
+            studentMap[diem.hocSinhCode].scores[dateKey] = {
+              homework: diem.diemBTVN ?? '-',
+              classwork: diem.diemTrenLop ?? '-'
+            };
+          });
+        });
+
+        // convert map to array
+        this.students = Object.values(studentMap);
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  formatNgay(ngay: string): string {
+    const dateObj = new Date(ngay);
+    return `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
+  }
+  getDiemClass(score: number): string {
+    if (score == null || isNaN(score)) return 'diem-chua-co';
+    return score > 6 ? 'diem-xanh' : 'diem-do';
+  }
 }

@@ -120,5 +120,13 @@ export const Full_ROUTES: Routes = [
     path: 'taskboard-ngrx',
     loadChildren: () => import('../../taskboard-ngrx/taskboard-ngrx.module').then(m => m.TaskboardNGRXModule)
   },
+  {
+    path: 'baocaohocphi',
+    loadChildren: () => import('../../baocaohocphi/baocaohocphi.module').then(m => m.BaocaohocphiModule)
+  },
+  {
+    path: 'baocaodiemdanhquanlycoso',
+    loadChildren: () => import('../../baocaodiemdanhquanlycoso/baocaodiemdanhquanlycoso.module').then(m => m.BaocaodiemdanhquanlycosoModule)
+  },
 
 ];

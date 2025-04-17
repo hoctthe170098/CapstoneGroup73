@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { UserService } from '../shared/user.service';
 import { ToastrService } from 'ngx-toastr';
-
+import { NgxSpinnerService } from 'ngx-spinner';
 @Component({
   selector: 'app-forgot-password-page',
   templateUrl: './forgot-password-page.component.html',
@@ -13,7 +13,7 @@ export class ForgotPasswordPageComponent {
   emailInvalid: boolean = false;
   message: string = '';
 
-  constructor(private authService: UserService, private toastr: ToastrService) {}
+  constructor(private authService: UserService, private toastr: ToastrService,private spinner: NgxSpinnerService) {}
 
   // Sử dụng regex yêu cầu email có phần mở rộng (TLD)
   validateEmail(email: string): boolean {
@@ -34,8 +34,10 @@ export class ForgotPasswordPageComponent {
     }
 
     this.emailInvalid = false;
+    this.spinner.show(); 
     this.authService.forgotPassword({ email: emailValue }).subscribe({
       next: (response) => {
+        this.spinner.hide();
         if (response.isError) {
           this.toastr.warning(response.message, 'Cảnh báo');
         } else {
@@ -44,6 +46,7 @@ export class ForgotPasswordPageComponent {
         }
       },
       error: () => {
+        this.spinner.hide();
         this.toastr.error('Có lỗi xảy ra, vui lòng thử lại!', 'Lỗi');
       }
     });

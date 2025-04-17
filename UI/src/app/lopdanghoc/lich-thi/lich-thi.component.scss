@@ -1,0 +1,30 @@
+.exam-schedule {
+    padding: 16px;
+  
+    h2 {
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+  
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+  
+      th, td {
+        padding: 12px;
+        border: 1px solid #ccc;
+        text-align: left;
+      }
+  
+      th {
+        background-color: #f0f2f5;
+        font-weight: 600;
+      }
+  
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+    }
+  }
+  

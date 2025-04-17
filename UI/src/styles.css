@@ -9,4 +9,37 @@
 .field-required-asterisk {
     color: #f55252;
 }
+.sidebar-header {
+    background-color: #294C60 !important;
+  }
+/* === Sidebar Background Color === */
+.main-menu,
+.sidebar-content,
+.nav-container {
+  background-color: #294C60 !important;
+}
+
+/* === Menu Item Text Color (Optional) === */
+.main-menu .navigation > li > a {
+  color: #ecf0f1 !important;
+}
+
+
+.main-menu .navigation > li.active > a {
+    background-color:rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    border-radius: 4px;
+  }
+  .main-menu .navigation > li > a:hover {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+  }
+.navigation li.active > a {
+  background-color: #34495e; 
+  color: #ffffff;
+}
+
+.navigation li.active > a .menu-title {
+  font-weight: 600;
+}
 

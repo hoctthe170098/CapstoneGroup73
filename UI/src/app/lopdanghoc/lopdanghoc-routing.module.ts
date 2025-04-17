@@ -7,6 +7,7 @@ import { LichThiComponent } from './lich-thi/lich-thi.component';
 import { BaocaoDiemComponent } from './baocao-diem/baocao-diem.component';
 import { BaocaoDiemdanhComponent } from './baocao-diemdanh/baocao-diemdanh.component';
 import { ChitietBaitaphocsinhComponent } from './bai-tap/chitiet-baitaphocsinh/chitiet-baitaphocsinh.component';
+import { ChuongtrinhhocHocsinhComponent } from './chuongtrinhhoc-hocsinh/chuongtrinhhoc-hocsinh.component';
 
 const routes: Routes = [
   {
@@ -33,6 +34,7 @@ const routes: Routes = [
       { path: 'lich-thi', component: LichThiComponent },
       { path: 'baocao-diem', component: BaocaoDiemComponent },
       { path: 'baocao-diemdanh', component: BaocaoDiemdanhComponent },
+      { path: 'chuongtrinhhoc-hocsinh', component: ChuongtrinhhocHocsinhComponent }
     ]
   }
 ];
