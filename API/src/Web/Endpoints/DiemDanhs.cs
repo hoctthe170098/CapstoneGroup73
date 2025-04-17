@@ -25,6 +25,8 @@ using StudyFlow.Application.Cosos.Queries.GetBaoCaoDiemHangNgayCuaHocSinh;
 using StudyFlow.Application.DiemDanhs.Queries.GetBaoCaoDiemHocSinh;
 using StudyFlow.Application.DiemDanhs.Queries.GetBaoCaoTatCaDiemChoHocSinh;
 using StudyFlow.Application.Cosos.Queries.GetBaoCaoDiemDanhHocSinh;
+using StudyFlow.Application.Cosos.Queries.GetBaoCaoDiemDanhChoTungLop;
+using StudyFlow.Application.DiemDanhs.Commands.UpdateDiemDanh;
 
 namespace StudyFlow.Web.Endpoints;
 
@@ -38,7 +40,9 @@ public class DiemDanhs : EndpointGroupBase
             .MapGet(GetBaoCaoDiemDanh,"getbaocaodiemdanh")
             .MapGet(GetBaoCaoDiemHangNgayCuaHocSinh,"getbaocaodiemhangngaycuahocsinh")
             .MapGet(GetBaoCaoDiemHocSinh, "getbaocaotatcacacdiem")
-            .MapGet(GetBaoCaoDiemDanhHocSinh,"getbaocaodiemdanhhocsinh");
+            .MapGet(GetBaoCaoDiemDanhHocSinh,"getbaocaodiemdanhhocsinh")
+            .MapGet(GetBaoCaoDiemDanhChoTungLop,"getbaocaodiemdanhchotunglop")
+            .MapPost(UpdateDiemDanh,"updatediemdanh");
     }
     [Authorize(Roles = Roles.Teacher)]
     public async Task<Output> GetDiemDanhTheoNgay(ISender sender, [AsParameters] GetDiemDanhTheoNgayQuery query)
@@ -50,8 +54,18 @@ public class DiemDanhs : EndpointGroupBase
     {
         return await sender.Send(command);
     }
+    [Authorize(Roles = Roles.CampusManager)]
+    public async Task<Output> UpdateDiemDanh(ISender sender, UpdateDiemDanhCommand command)
+    {
+        return await sender.Send(command);
+    }
     [Authorize(Roles = Roles.Teacher)]
     public async Task<Output> GetBaoCaoDiemDanh(ISender sender, [AsParameters] GetBaoCaoDiemDanhQuery query)
+    {
+        return await sender.Send(query);
+    }
+    [Authorize(Roles = Roles.CampusManager)]
+    public async Task<Output> GetBaoCaoDiemDanhChoTungLop(ISender sender, [AsParameters] GetBaoCaoDiemDanhChoTungLopQuery query)
     {
         return await sender.Send(query);
     }

@@ -48,10 +48,10 @@ public class GetLopHocWithPaginationQueryValidator : AbstractValidator<GetLopHoc
             .WithMessage("Phòng không tồn tại.");
         RuleFor(x => x.ThoiGianBatDau)
             .Must(ValidFormatTimeOnly)
-            .WithMessage("Thời gian bắt đầu không hợp lệ, thời gian bắt đầu sớm nhất là 8h sáng và muộn nhất là 8h tối.");
+            .WithMessage("Thời gian bắt đầu không hợp lệ");
         RuleFor(x => x.ThoiGianKetThuc)
             .Must(ValidFormatTimeOnlyKetThuc)
-            .WithMessage("Thời gian kết thúc không hợp lệ, thời gian kết thúc phải muộn hơn thời gian bắt đầu và sớm nhất là 10h sáng và muộn nhất là 10h tối.");
+            .WithMessage("Thời gian kết thúc không hợp lệ");
         RuleFor(x => x.NgayKetThuc)
             .Must(ValidNgayKetThuc)
             .WithMessage("Ngày kết thúc phải lớn hơn ngày bắt đầu.");
@@ -74,16 +74,6 @@ public class GetLopHocWithPaginationQueryValidator : AbstractValidator<GetLopHoc
         {
             var checkFormat = TimeOnly.TryParse(thoiGianKetThuc, out var ketThuc);
             if(!checkFormat)return false;
-            else
-            {
-                if (query.ThoiGianBatDau.Trim() == "") return true;
-                else
-                {
-                    var batDau = TimeOnly.Parse(query.ThoiGianBatDau);
-                    if(batDau>ketThuc) return false;
-                    if (ketThuc < new TimeOnly(10, 0) || ketThuc > new TimeOnly(22, 0)) return false;
-                }
-            }
         }
         return true;
     }
@@ -95,10 +85,6 @@ public class GetLopHocWithPaginationQueryValidator : AbstractValidator<GetLopHoc
         {
             var check = TimeOnly.TryParse(thoiGianBatDau,out var tg);
             if(!check) return false;
-            else
-            {
-                if(tg < new TimeOnly(8,0)||tg>new TimeOnly(20,0)) return false;
-            }
         }
         return true;
     }
