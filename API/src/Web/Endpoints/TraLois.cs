@@ -8,6 +8,8 @@ using StudyFlow.Application.TraLois.Queries.GetBaiTapByTraLoi;
 using StudyFlow.Application.TraLois.Queries.GetTraLoiByBaiTapForHocSinh;
 using StudyFlow.Domain.Constants;
 using StudyFlow.Application.TraLois.Commands.DeleteTraLoi;
+using StudyFlow.Application.TraLois.Commands.UpdateNhanXetTraLoi;
+using StudyFlow.Application.TraLois.Queries.GetBaoCaoNhanXetHocSinh;
 
 namespace StudyFlow.Web.Endpoints;
 
@@ -21,7 +23,9 @@ public class TraLois : EndpointGroupBase
            .MapPut(UpdateTraLoi, "update")
            .MapDelete(DeleteTraLoi, "delete")
            .MapPost(GetTraLoiByBaiTapIdForTeacher, "gettraloibybaitapforteacher") 
-           .MapGet(GetTraLoiByBaiTapIdForStudent, "gettraloibybaitapforstudent"); 
+           .MapGet(GetTraLoiByBaiTapIdForStudent, "gettraloibybaitapforstudent")
+           .MapPost(UpdateNhanXetTraLoi, "updatenhanxet")
+           .MapGet(GetBaoCaoNhanXetHocSinh, "baocaonhanxet");
     }
 
     [Authorize(Roles = Roles.Student)]
@@ -51,5 +55,15 @@ public class TraLois : EndpointGroupBase
     public async Task<Output> DeleteTraLoi(ISender sender, [FromQuery] Guid traLoiId)
     {
         return await sender.Send(new DeleteTraLoiCommand(traLoiId));
+    }
+    [Authorize(Roles = Roles.Teacher)]
+    public async Task<Output> UpdateNhanXetTraLoi(ISender sender, [FromBody] UpdateNhanXetTraLoiCommand command)
+    {
+        return await sender.Send(command);
+    }
+    [Authorize(Roles = Roles.Teacher)]
+    public async Task<Output> GetBaoCaoNhanXetHocSinh(ISender sender, [FromQuery] string hocSinhCode)
+    {
+        return await sender.Send(new GetBaoCaoNhanXetHocSinhQuery { HocSinhCode = hocSinhCode });
     }
 }
