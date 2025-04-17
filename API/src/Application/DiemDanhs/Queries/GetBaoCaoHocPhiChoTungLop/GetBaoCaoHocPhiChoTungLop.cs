@@ -33,7 +33,7 @@ public class GetBaoCaoHocPhiChoTungLopQueryHandler : IRequestHandler<GetBaoCaoHo
         {
             isError = false,
             code = 200,
-            message = "Lấy báo cáo điểm danh thành công"
+            message = "Lấy báo cáo học phí thành công"
         };
         var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
         if (string.IsNullOrEmpty(token))
@@ -47,6 +47,7 @@ public class GetBaoCaoHocPhiChoTungLopQueryHandler : IRequestHandler<GetBaoCaoHo
         if(!LichHocCoDinh.Any()) throw new NotFoundIDException();
         var Thus = LichHocCoDinh.Select(lh => lh.Thu).ToList();
         var NgayDaHoc = getNgayDaHoc(Thus, LichHocCoDinh[0].NgayBatDau,ngayHienTai);
+        var HocPhi1Buoi = LichHocCoDinh[0].HocPhi;
         var ListHocSinh = _context.ThamGiaLopHocs
             .Where(tg => LichHocCoDinh.Select(lh=>lh.Id).ToList().Contains(tg.LichHocId))
             .Select(tg => new
@@ -65,41 +66,52 @@ public class GetBaoCaoHocPhiChoTungLopQueryHandler : IRequestHandler<GetBaoCaoHo
             if (hocBu.NgayHocGoc < ngayHienTai) NgayDaHoc.Remove((DateOnly)hocBu.NgayHocGoc);
             if (hocBu.NgayBatDau < ngayHienTai) NgayDaHoc.Add(hocBu.NgayBatDau);
         }
-        NgayDaHoc = NgayDaHoc.OrderByDescending(ng=>ng).ToList();
-        DateOnly NgayCanLay = DateOnly.MinValue;
-        if (request.Ngay == null) NgayCanLay = NgayDaHoc[0];
-        else 
+        var ThangDaHoc = NgayDaHoc.Select(ng => ng.Month).Distinct().OrderBy(th => th).ToList();
+        int ThangCanLay = 0;
+        if (request.Thang == null) ThangCanLay = ThangDaHoc[0];
+        else
         {
-            if (!NgayDaHoc.Contains((DateOnly)request.Ngay)) throw new NotFoundIDException();
-            else NgayCanLay = (DateOnly)request.Ngay;
+            if (ThangDaHoc.Any(th => th == request.Thang)) ThangCanLay = (int)request.Thang;
+            else throw new NotFoundIDException();
         }
-        var data = new List<BaoCaoHocPhiDto>();
-        List<DiemDanhDto> diemDanhs = new List<DiemDanhDto>();
-        var BaoCao = new BaoCaoHocPhiDto
+        var NgayCanLays = NgayDaHoc.Where(ng=>ng.Month == ThangCanLay).ToList();
+        var data = new BaoCaoHocPhiDto
         {
-            Ngay = NgayCanLay
+            Thang = ThangCanLay,
+            ThangBatDau = ThangDaHoc[0],
+            ThangKetThuc = ThangDaHoc[ThangDaHoc.Count - 1],
+            HocPhis = new List<HocPhiDto>()
         };
+        List<HocPhiDto> hocPhis = new List<HocPhiDto>();
         foreach (var hs in ListHocSinh)
         {
-            var item = new DiemDanhDto
+            var hocPhi = new HocPhiDto
             {
                 HocSinhCode = hs.HocSinhCode,
-                TenHocSinh = hs.Ten
+                TenHocSinh = hs.Ten,
+                HocPhi1Buoi = HocPhi1Buoi
             };
-            var diemDanh = await _context.DiemDanhs
-                .FirstOrDefaultAsync(dd => dd.Ngay == NgayCanLay
+            var soBuoiHoc = 0;
+            var soBuoiNghi = 0;
+            foreach(var ngayHoc in NgayCanLays)
+            {
+                var diemDanh = await _context.DiemDanhs
+                .FirstOrDefaultAsync(dd => dd.Ngay == ngayHoc
                 && dd.ThamGiaLopHoc.HocSinhCode == hs.HocSinhCode
                 && dd.ThamGiaLopHoc.LichHoc.TenLop == request.TenLop);
-            if (diemDanh != null)
-            {
-                item.Id = diemDanh.Id;
-                item.TrangThai = diemDanh.TrangThai;
-                diemDanhs.Add(item);
+                if (diemDanh != null)
+                {
+                    if(diemDanh.TrangThai=="Vắng") soBuoiNghi++;
+                    else soBuoiHoc++;
+                }
             }
+            hocPhi.SoBuoiHoc = soBuoiHoc;
+            hocPhi.SoBuoiNghi = soBuoiNghi;
+            hocPhi.TongHocPhi = hocPhi.SoBuoiHoc * HocPhi1Buoi;
+            hocPhis.Add(hocPhi);
         }
-        BaoCao.DiemDanhs = diemDanhs.ToList();
-        BaoCao.Ngays = NgayDaHoc;
-        output.data = BaoCao;
+        data.HocPhis = hocPhis.ToList();
+        output.data = data;
         return output;
     }
     private List<DateOnly> getNgayDaHoc(List<int>Thus, DateOnly ngayBatDau, 
