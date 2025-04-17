@@ -85,6 +85,9 @@ public class GetTraLoiByBaiTapQueryHandler : IRequestHandler<GetTraLoiByBaiTapQu
                 Id = t.Id,
                 NoiDung = t.NoiDung,
                 UrlFile = t.UrlFile,
+                HocSinhCode = t.HocSinhCode,
+                Diem = t.Diem,
+                NhanXet = t.NhanXet,
                 ThoiGian = t.ThoiGian,
                 HocSinhTen = t.HocSinh.Ten
             })

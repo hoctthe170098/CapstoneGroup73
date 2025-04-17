@@ -10,6 +10,9 @@ public class TraLoiDto
     public Guid Id { get; set; }
     public string NoiDung { get; set; } = default!;
     public string? UrlFile { get; set; }
+    public required string HocSinhCode { get; set; }
+    public float? Diem { get; set; }
+    public string? NhanXet { get; set; }
     public DateTime ThoiGian { get; set; }
     public string HocSinhTen { get; set; } = default!;
 }
