@@ -94,6 +94,12 @@ public class UpdateLichDayBuCommandValidator : AbstractValidator<CreateLichDayBu
                 && lh.Thu == thu
                 && !(lh.GioKetThuc <= TimeOnly.Parse(lichDayBu.GioBatDau).AddMinutes(-15)
                 || lh.GioBatDau >= TimeOnly.Parse(lichDayBu.GioKetThuc).AddMinutes(15))).ToListAsync();
+            foreach(var lich in lichHocSinhVien)
+            {
+                var thamGia = _context.ThamGiaLopHocs
+                    .First(tg=>tg.LichHocId==tg.Id&&tg.HocSinhCode==code);
+                if (thamGia.NgayKetThuc < lichDayBu.NgayHocBu) lichHocSinhVien.Remove(lich);
+            }
             var checkLichSinhVien = lichHocSinhVien
                 .Any(lh => (TinhNgayBuoiHocCuoiCung(lh.NgayKetThuc, lh.Thu) >= lichDayBu.NgayHocBu 
                             && lh.TrangThai == "Cố định"

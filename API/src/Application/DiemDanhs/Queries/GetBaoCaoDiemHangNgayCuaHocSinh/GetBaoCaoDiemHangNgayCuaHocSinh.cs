@@ -69,11 +69,11 @@ public class GetBaoCaoDiemHangNgayCuaHocSinhQueryHandler : IRequestHandler<GetBa
             if (hocBu.NgayHocGoc < ngayHienTai) NgayDaHoc.Remove((DateOnly)hocBu.NgayHocGoc);
             if (hocBu.NgayBatDau < ngayHienTai) NgayDaHoc.Add(hocBu.NgayBatDau);
         }
-        var data = new List<BaoCaoDiemDto>();
+        var data = new List<DiemDanhDto>();
         foreach(var ngay in NgayDaHoc)
         {
             List<DiemDTO> diemDanhs = new List<DiemDTO>();
-            var BaoCao = new BaoCaoDiemDto
+            var BaoCao = new DiemDanhDto
             {
                 Ngay = ngay
             };
