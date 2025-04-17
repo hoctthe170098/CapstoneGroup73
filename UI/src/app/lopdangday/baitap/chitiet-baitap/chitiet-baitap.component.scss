@@ -330,4 +330,20 @@
     }
   }
   
+  .answer-feedback {
+    margin-top: 12px;
+    padding-top: 8px;
+    font-size: 14px;
+  
+    p {
+      margin-bottom: 6px;
+    }
+  }
+  
+  .feedback-separator {
+    margin-top: 16px;
+    margin-bottom: 12px;
+    border: none;
+    border-top: 1px solid #ccc;
+  }
   

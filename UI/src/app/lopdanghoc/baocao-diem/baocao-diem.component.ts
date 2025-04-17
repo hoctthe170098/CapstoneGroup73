@@ -29,17 +29,13 @@ export class BaocaoDiemComponent implements OnInit {
     { ngay: '25/04/2021', nhanXet: 'Cần tập trung hơn khi làm bài kiểm tra.' }
   ];
 
-  diemTrenLop = Array.from({ length: 20 }, (_, i) => ({
+  diemHangNgay = Array.from({ length: 15 }, (_, i) => ({
     ngay: `18/03/2021`,
-    diem: '10/10',
-    nhanXet: `Cố gắng tiếp tục phát huy (${i + 1})`
+    diemTrenLop: '10/10',
+    diemBTVN: '9/10',
+    nhanXet: `Trên lớp: Cố gắng tiếp tục phát huy (${i + 1}) | BTVN: Hoàn thành ổn, cần chi tiết hơn (${i + 1})`
   }));
-
-  diemBaiTap = Array.from({ length: 15 }, (_, i) => ({
-    ngay: `19/03/2021`,
-    diem: '9/10',
-    nhanXet: `Hoàn thành ổn, cần chi tiết hơn (${i + 1})`
-  }));
+  
 
   diemKiemTra = Array.from({ length: 12 }, (_, i) => ({
     ten: `Kiểm tra số ${i + 1}`,
