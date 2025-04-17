@@ -40,9 +40,7 @@ public class CreateBaiTapCommandValidator : AbstractValidator<CreateBaiTapComman
             .MustAsync(NgayTaoValidWithLichHoc)
             .WithMessage("Hôm nay không có lịch học của lớp hoặc Bạn không thể tạo bài tập trong buổi dạy thay.");
 
-        RuleFor(x => x)
-            .MustAsync(KhongTrungNgayTao)
-            .WithMessage("Đã tồn tại bài tập được tạo hôm nay cho lớp học này.");
+
     }
 
     private bool ValidTaiLieu(IFormFile file)
@@ -89,22 +87,7 @@ public class CreateBaiTapCommandValidator : AbstractValidator<CreateBaiTapComman
     }
 
 
-    private async Task<bool> KhongTrungNgayTao(CreateBaiTapCommand command, CancellationToken cancellationToken)
-    {
-        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-        if (string.IsNullOrEmpty(token))
-            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
-        var dto = command.CreateBaiTapDto;
-        var today = DateOnly.FromDateTime(DateTime.Now);
-        var coSoId = _identityService.GetCampusId(token);
-        var trung = await _context.BaiTaps.AnyAsync(bt =>
-            bt.LichHoc.TenLop == dto.TenLop &&
-            bt.LichHoc.Phong.CoSoId == coSoId &&
-            bt.NgayTao == today,
-            cancellationToken);
 
-        return !trung;
-    }
 
     private int ConvertDayOfWeekToThu(DayOfWeek dayOfWeek)
     {
