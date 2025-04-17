@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StudyFlow.Application.DiemDanhs.Queries.GetBaoCaoDiemDanhChoTungLop
 {
-    public class BaoCaoDiemDanhDto
+    public class BaoCaoHocPhiDto
     {
         public DateOnly Ngay { get; set; }
         public List<DiemDanhDto> DiemDanhs { get; set; } = new List<DiemDanhDto>();
@@ -14,7 +14,7 @@ namespace StudyFlow.Application.DiemDanhs.Queries.GetBaoCaoDiemDanhChoTungLop
     }
     public class DiemDanhDto
     {
-        public Guid? Id { get; set; }
+        public Guid Id { get; set; }
         public string? HocSinhCode { get; set; }
         public string? TenHocSinh { get; set; }
         public string? TrangThai {  get; set; }

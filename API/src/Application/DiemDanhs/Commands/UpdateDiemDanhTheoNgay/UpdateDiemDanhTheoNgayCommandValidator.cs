@@ -52,9 +52,18 @@ public class UpdateDiemDanhTheoNgayCommandValidator : AbstractValidator<UpdateDi
         var idDiemDanh = diemDanhs.Select(d => d.Id).ToList();
         foreach(var item in idDiemDanh)
         {
-            var diemDanh = await _context.DiemDanhs.FirstOrDefaultAsync(d => d.Id == item);
+            var diemDanh = await _context.DiemDanhs
+                .Include(d=>d.ThamGiaLopHoc.LichHoc)
+                .ThenInclude(lh=>lh.LichHocGoc)
+                .FirstOrDefaultAsync(d => d.Id == item);
             if(diemDanh == null) return false;
             if(diemDanh.Ngay!=DateOnly.FromDateTime(DateTime.Now)) return false;
+            var lichHoc = diemDanh.ThamGiaLopHoc.LichHoc;
+            if (lichHoc.TrangThai == "Dạy bù") lichHoc = lichHoc.LichHocGoc;
+            if (lichHoc.NgayKetThuc == DateOnly.FromDateTime(DateTime.Now))
+            {
+                if (lichHoc.GioKetThuc < TimeOnly.FromDateTime(DateTime.Now)) return false;
+            }
         }
         return true;
     }

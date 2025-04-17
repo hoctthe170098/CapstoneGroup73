@@ -2,23 +2,23 @@
 using StudyFlow.Application.Common.Exceptions;
 using StudyFlow.Application.Common.Interfaces;
 using StudyFlow.Application.Common.Models;
-using StudyFlow.Application.DiemDanhs.Queries.GetBaoCaoDiemDanhChoTungLop;
+using StudyFlow.Application.DiemDanhs.Queries.GetBaoCaoHocPhiChoTungLop;
 using StudyFlow.Domain.Entities;
 
-namespace StudyFlow.Application.Cosos.Queries.GetBaoCaoDiemDanhChoTungLop;
-public record GetBaoCaoDiemDanhChoTungLopQuery : IRequest<Output>
+namespace StudyFlow.Application.Cosos.Queries.GetBaoCaoHocPhiChoTungLop;
+public record GetBaoCaoHocPhiChoTungLopQuery : IRequest<Output>
 {
     public required string TenLop { get; set; }
-    public DateOnly? Ngay { get; set; }
+    public int? Thang { get; set; }
 }
-public class GetBaoCaoDiemDanhChoTungLopQueryHandler : IRequestHandler<GetBaoCaoDiemDanhChoTungLopQuery, Output>
+public class GetBaoCaoHocPhiChoTungLopQueryHandler : IRequestHandler<GetBaoCaoHocPhiChoTungLopQuery, Output>
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IIdentityService _identityService;
 
-    public GetBaoCaoDiemDanhChoTungLopQueryHandler(IApplicationDbContext context
+    public GetBaoCaoHocPhiChoTungLopQueryHandler(IApplicationDbContext context
         , IHttpContextAccessor httpContextAccessor,
         IIdentityService identityService, IMapper mapper)
     {
@@ -27,7 +27,7 @@ public class GetBaoCaoDiemDanhChoTungLopQueryHandler : IRequestHandler<GetBaoCao
         _httpContextAccessor = httpContextAccessor;
         _identityService = identityService;
     }
-    public async Task<Output> Handle(GetBaoCaoDiemDanhChoTungLopQuery request, CancellationToken cancellationToken)
+    public async Task<Output> Handle(GetBaoCaoHocPhiChoTungLopQuery request, CancellationToken cancellationToken)
     {
         Output output = new Output
         {
