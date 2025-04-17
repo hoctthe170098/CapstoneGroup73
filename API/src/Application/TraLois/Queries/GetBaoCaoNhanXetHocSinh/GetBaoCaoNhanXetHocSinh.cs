@@ -30,16 +30,22 @@ public class GetBaoCaoNhanXetHocSinhQueryHandler : IRequestHandler<GetBaoCaoNhan
         if (hocSinh == null)
             throw new NotFoundDataException("Không tìm thấy học sinh.");
 
-        var lichSuNhanXet = await _context.TraLois
+        // Lấy toàn bộ danh sách trả lời trước, sau đó xử lý ở phía client
+        var lichSuRaw = await _context.TraLois
+            .AsNoTracking()
             .Where(t => t.HocSinhCode == request.HocSinhCode)
             .OrderByDescending(t => t.ThoiGian)
+            .ToListAsync(cancellationToken);
+
+        // Áp dụng index và định dạng ngày sau khi lấy về
+        var lichSuNhanXet = lichSuRaw
             .Select((t, index) => new
             {
                 STT = index + 1,
                 Ngay = t.ThoiGian.ToString("dd/MM/yyyy"),
                 NhanXet = t.NhanXet
             })
-            .ToListAsync(cancellationToken);
+            .ToList();
 
         var result = new
         {
@@ -60,3 +66,4 @@ public class GetBaoCaoNhanXetHocSinhQueryHandler : IRequestHandler<GetBaoCaoNhan
         };
     }
 }
+
