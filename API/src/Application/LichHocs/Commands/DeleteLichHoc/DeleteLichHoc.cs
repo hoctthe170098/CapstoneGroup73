@@ -36,6 +36,7 @@ public class DeleteLichHocCommandHandler : IRequestHandler<DeleteLichHocCommand,
         var lichHoc = await _context.LichHocs
             .Where(lh=>lh.TenLop== request.TenLopHoc&&lh.Phong.CoSoId==coSoId).ToListAsync();
         if (!lichHoc.Any()) throw new NotFoundIDException();
+        string message="";
         var lichHocCoDinh = lichHoc.First(lh => lh.TrangThai == "Cố định");
         var HomNay = DateOnly.FromDateTime(DateTime.Now);
         var ThuHomNay = (int)HomNay.DayOfWeek > 0 ? (int)(HomNay.DayOfWeek) + 1 : 8;
@@ -51,6 +52,7 @@ public class DeleteLichHocCommandHandler : IRequestHandler<DeleteLichHocCommand,
                 .ToListAsync();
             _context.ThamGiaLopHocs.RemoveRange(thamGiaLopHoc);
             _context.LichHocs.RemoveRange(lichHoc);
+            message = "Xoá lớp học thành công.";
         }
         else 
         {
@@ -72,14 +74,15 @@ public class DeleteLichHocCommandHandler : IRequestHandler<DeleteLichHocCommand,
             {
                 lh.NgayKetThuc = HomNay;
             }
+            message = "Đóng lớp học thành công.";
         }
-            await _context.SaveChangesAsync(cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
         return new Output
         {
             isError = false,
             data = null,
             code = 200,
-            message = "Xóa/đóng lớp học thành công."
+            message = message
         };
     }
 }

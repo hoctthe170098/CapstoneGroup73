@@ -68,7 +68,7 @@
                     class="text-right text-muted font-small-3">{{getRoleName(rolename)}}</span>
                 </div>
                 <span class="avatar avatar-sm avatar-icon">
-                  <i class="ft-user" style="font-size: 35px;"></i>
+                  <img [src]="getAvatarUrl(rolename)" alt="avatar" style="width: 35px; height: 35px; border-radius: 50%;" />
                 </span>
               </a>
               <div class="dropdown-menu text-left dropdown-menu-right m-0 pb-0" aria-labelledby="dropdownBasic2"
@@ -87,10 +87,7 @@
                 </a>
               </div>
             </li>
-            <li class="nav-item d-none d-lg-block mr-2 mt-1">
-              <a class="nav-link notification-sidebar-toggle" (click)="toggleNotificationSidebar();"><i
-                  class="ft-align-right font-medium-3"></i></a>
-            </li>
+            
           </ul>
         </div>
       </div>

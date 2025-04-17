@@ -72,17 +72,22 @@ public class GetDiemDanhTheoNgayQueryHandler : IRequestHandler<GetDiemDanhTheoNg
             }
             else
             {
-                var checklichNghi = _context.LichHocs
-                    .Any(lh => lh.LichHocGocId == lichHocHomNay.Id 
-                    && lh.NgayHocGoc == ngayHienTai 
-                    && lh.TrangThai == "Dạy bù");
-                if (checklichNghi) throw new Exception("lớp hôm nay nghỉ, không thể điểm danh");
                 var checkLichDayThay = _context.LichHocs
-                        .Any(lh => lh.LichHocGocId == lichHocHomNay.Id 
-                        && lh.NgayHocGoc == ngayHienTai 
+                        .Any(lh => lh.LichHocGocId == lichHocHomNay.Id
+                        && lh.NgayHocGoc == ngayHienTai
                         && lh.TrangThai == "Dạy thay");
                 if (checkLichDayThay)
                     throw new Exception("Lớp hôm nay đã được dạy thay, không thể điểm danh");
+                var lichDayBu = _context.LichHocs
+                    .FirstOrDefault(lh => lh.LichHocGocId == lichHocHomNay.Id 
+                    && lh.NgayHocGoc == ngayHienTai 
+                    && lh.TrangThai == "Dạy bù");
+                if(lichDayBu != null)
+                {
+                    if (lichDayBu.NgayBatDau!=ngayHienTai) 
+                        throw new Exception("lớp hôm nay nghỉ, không thể điểm danh");
+                    else lichHocHomNay=lichDayBu;
+                }             
             }
             output = getDiemDanh(output, lichHocHomNay, ngayHienTai, cancellationToken);
         }

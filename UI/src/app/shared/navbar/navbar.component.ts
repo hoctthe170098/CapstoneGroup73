@@ -84,6 +84,22 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
     else if (role == "Teacher") return "Giáo viên";
     else return role;
   }
+  getAvatarUrl(role: string): string {
+    switch (role) {
+      case 'Teacher':
+        return 'assets/img/avatars/teacher.png';
+      case 'Student':
+        return 'assets/img/avatars/student.png';
+      case 'Administrator':
+        return 'assets/img/avatars/admin.png';
+      case 'CampusManager':
+        return 'assets/img/avatars/campus_manager.png';
+      case 'LearningManager':
+        return 'assets/img/avatars/learning_manager.png';
+      default:
+        return 'assets/img/avatars/default.png';
+    }
+  }
   ngAfterViewInit() {
 
     this.configSub = this.configService.templateConf$.subscribe((templateConf) => {
@@ -227,9 +243,7 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
 
   }
   
-  toggleNotificationSidebar() {
-    this.layoutService.toggleNotificationSidebar(true);
-  }
+  
 
   toggleSidebar() {
     this.layoutService.toggleSidebarSmallScreen(this.hideSidebar);
