@@ -92,6 +92,13 @@ export class LopdanghocService {
       { headers }
     );
   }
+  getBaoCaoDiemDanh(tenLop: string): Observable<any> {
+    const token = localStorage.getItem("token");
+    const headers = new HttpHeaders().set("Authorization", `Bearer ${token}`);
+    const url = `${this.baseUrl}/DiemDanhs/getbaocaodiemdanhhocsinh?TenLop=${encodeURIComponent(tenLop)}`;
+    return this.http.get<any>(url, { headers });
+  }
+  
   updateTraLoi(formData: FormData): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({
