@@ -1,27 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace StudyFlow.Application.DiemDanhs.Queries.GetBaoCaoDiemHocSinh;
 
-namespace StudyFlow.Application.DiemDanhs.Queries.GetBaoCaoDiemHocSinh;
 public class NhanXetDto
 {
     public string Ngay { get; set; } = default!;
     public string? NhanXet { get; set; }
 }
-public class DiemChiTietDto
+
+public class DiemHangNgayDto
 {
     public string Ngay { get; set; } = default!;
-    public string Diem { get; set; } = default!;
-    public string? NhanXet { get; set; }
-}
-public class DiemKiemTraDto
-{
-    public string Ten { get; set; } = default!;
-    public string NgayKiemTra { get; set; } = default!;
-    public string TrangThai { get; set; } = default!;
-    public string Diem { get; set; } = default!;
+    public string DiemTrenLop { get; set; } = "N/A";
+    public string DiemBTVN { get; set; } = "N/A";
     public string? NhanXet { get; set; }
 }
 
@@ -33,7 +22,5 @@ public class BaoCaoHocSinhDto
     public double DiemBaiTapTB { get; set; }
     public double DiemKiemTraTB { get; set; }
     public List<NhanXetDto> NhanXetDinhKy { get; set; } = new();
-    public List<DiemChiTietDto> DiemTrenLopChiTiet { get; set; } = new();
-    public List<DiemChiTietDto> DiemBaiTapVeNha { get; set; } = new();
-    public List<DiemKiemTraDto> DiemKiemTra { get; set; } = new();
+    public List<DiemHangNgayDto> DiemHangNgay { get; set; } = new();
 }

@@ -58,64 +58,48 @@ public class GetBaoCaoDiemHocSinhQueryHandler : IRequestHandler<GetBaoCaoDiemHoc
             .Where(kq => kq.HocSinhCode == hocSinh.Code && kq.BaiKiemTra.LichHoc.TenLop == request.TenLop)
             .ToListAsync(cancellationToken);
 
-        var nhanXetDinhKy = diemDanhList
-            .Where(dd => !string.IsNullOrWhiteSpace(dd.NhanXet))
+        var nhanXetDinhKyList = await _context.NhanXetDinhKys
+            .Where(nx => thamGiaIds.Contains(nx.ThamGiaLopHocId))
+            .OrderByDescending(nx => nx.NgayNhanXet)
+            .Select(nx => new NhanXetDto
+            {
+                Ngay = nx.NgayNhanXet.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
+                NhanXet = nx.NoiDungNhanXet
+            })
+            .ToListAsync(cancellationToken);
+
+        var diemHangNgay = diemDanhList
             .OrderByDescending(dd => dd.Ngay)
-            .Select(dd => new NhanXetDto
+            .Select(dd => new DiemHangNgayDto
             {
                 Ngay = dd.Ngay.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
+                DiemTrenLop = dd.DiemTrenLop.HasValue ? $"{dd.DiemTrenLop:0.##}/10" : "N/A",
+                DiemBTVN = dd.DiemBTVN.HasValue ? $"{dd.DiemBTVN:0.##}/10" : "N/A",
                 NhanXet = dd.NhanXet
-            }).ToList();
+            })
+            .ToList();
 
-        var diemTrenLopChiTiet = diemDanhList
-            .Where(dd => dd.DiemTrenLop.HasValue)
-            .Select(dd => new DiemChiTietDto
-            {
-                Ngay = dd.Ngay.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
-                Diem = dd.DiemTrenLop?.ToString() ?? "N/A",
-                NhanXet = dd.NhanXet
-            }).ToList();
-
-        var diemBaiTapVeNha = diemDanhList
-            .Where(dd => dd.DiemBTVN.HasValue)
-            .Select(dd => new DiemChiTietDto
-            {
-                Ngay = dd.Ngay.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
-                Diem = dd.DiemBTVN?.ToString() ?? "N/A",
-                NhanXet = dd.NhanXet
-            }).ToList();
-
-        var diemKiemTra = baiKiemTraList
-            .Select(kq => new DiemKiemTraDto
-            {
-                Ten = kq.BaiKiemTra.Ten,
-                NgayKiemTra = kq.BaiKiemTra.NgayKiemTra?.ToString("dd/MM/yyyy") ?? "",
-                TrangThai = kq.BaiKiemTra.TrangThai,
-                Diem = kq.Diem?.ToString("0.##") ?? "",
-                NhanXet = kq.NhanXet
-            }).ToList();
-
-        double diemTrenLopTB = diemTrenLopChiTiet.Any()
-            ? diemTrenLopChiTiet.Average(x => double.Parse(x.Diem))
+        double diemTrenLopTB = diemDanhList.Any(dd => dd.DiemTrenLop.HasValue)
+            ? diemDanhList.Where(dd => dd.DiemTrenLop.HasValue).Average(dd => dd.DiemTrenLop!.Value)
             : 0;
 
-        double diemBTVNTB = diemBaiTapVeNha.Any()
-            ? diemBaiTapVeNha.Average(x => double.Parse(x.Diem))
+        double diemBTVNTB = diemDanhList.Any(dd => dd.DiemBTVN.HasValue)
+            ? diemDanhList.Where(dd => dd.DiemBTVN.HasValue).Average(dd => dd.DiemBTVN!.Value)
             : 0;
-        double DiemKiemTraTB = diemKiemTra.Any()
-            ? diemKiemTra.Average(x => double.Parse(x.Diem))
+
+        double diemKiemTraTB = baiKiemTraList.Any(kq => kq.Diem.HasValue)
+            ? baiKiemTraList.Where(kq => kq.Diem.HasValue).Average(kq => kq.Diem!.Value)
             : 0;
+
         var result = new BaoCaoHocSinhDto
         {
             Ten = hocSinh.Ten,
             Code = hocSinh.Code,
             DiemTrenLopTB = Math.Round(diemTrenLopTB, 2),
             DiemBaiTapTB = Math.Round(diemBTVNTB, 2),
-            DiemKiemTraTB = Math.Round(DiemKiemTraTB,2),
-            NhanXetDinhKy = nhanXetDinhKy,
-            DiemTrenLopChiTiet = diemTrenLopChiTiet,
-            DiemBaiTapVeNha = diemBaiTapVeNha,
-            DiemKiemTra = diemKiemTra
+            DiemKiemTraTB = Math.Round(diemKiemTraTB, 2),
+            NhanXetDinhKy = nhanXetDinhKyList,
+            DiemHangNgay = diemHangNgay
         };
 
         return new Output
