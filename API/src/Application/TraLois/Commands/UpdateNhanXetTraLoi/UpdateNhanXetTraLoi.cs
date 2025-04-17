@@ -12,7 +12,7 @@ namespace StudyFlow.Application.TraLois.Commands.UpdateNhanXetTraLoi;
 public record UpdateNhanXetTraLoiCommand : IRequest<Output>
 {
     public Guid TraLoiId { get; init; }
-    public int? Diem { get; init; }
+    public float? Diem { get; init; }
     public string? NhanXet { get; init; }
 }
 public class UpdateNhanXetTraLoiCommandHandler : IRequestHandler<UpdateNhanXetTraLoiCommand, Output>
