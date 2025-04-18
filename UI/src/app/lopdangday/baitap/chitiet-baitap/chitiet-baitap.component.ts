@@ -331,13 +331,11 @@ export class ChitietBaitapComponent implements OnInit {
     const diem = ans.tempDiem;
     const nhanXet = (ans.tempNhanXet || '').trim();
   
-    // Validate điểm
     if (diem === null || diem === undefined || isNaN(diem) || diem < 0 || diem > 10) {
       this.toastr.warning('Điểm phải nằm trong khoảng từ 0 đến 10.');
       return;
     }
   
-    // Validate nhận xét
     if (nhanXet.length > 200) {
       this.toastr.warning('Nhận xét không được vượt quá 200 ký tự.');
       return;
@@ -355,7 +353,6 @@ export class ChitietBaitapComponent implements OnInit {
           this.toastr.success(res.message || 'Chấm điểm thành công!');
           this.gradingAnswerId = null;
   
-          
           ans.diem = payload.diem;
           ans.nhanXet = payload.nhanXet;
   
@@ -363,17 +360,26 @@ export class ChitietBaitapComponent implements OnInit {
           delete ans.tempNhanXet;
   
           this.cdr.detectChanges();
+  
+          
+          const el = document.getElementById('answer-' + ans.id);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            el.classList.add('highlighted');
+  
+            setTimeout(() => {
+              el.classList.remove('highlighted');
+            }, 2000);
+          }
         } else {
           this.toastr.error(res.message || 'Chấm điểm thất bại!');
         }
       },
       error: (err) => {
-        console.error(' Lỗi khi chấm điểm:', err);
+        console.error('❌ Lỗi khi chấm điểm:', err);
         this.toastr.error('Đã xảy ra lỗi khi gửi điểm!');
       }
     });
   }
-  
-  
-  
+ 
 }

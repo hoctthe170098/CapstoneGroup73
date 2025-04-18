@@ -5,19 +5,19 @@
     <div class="col-md-4">
       <div class="score-box">
         <div class="score-label">Điểm trên lớp</div>
-        <div class="score-value">10</div>
+        <div class="score-value">{{ diemTrungBinh.diemTrenLop }}</div>
       </div>
     </div>
     <div class="col-md-4">
       <div class="score-box">
         <div class="score-label">Điểm bài tập về nhà</div>
-        <div class="score-value">9</div>
+        <div class="score-value">{{ diemTrungBinh.diemBaiTap }}</div>
       </div>
     </div>
     <div class="col-md-4">
       <div class="score-box">
         <div class="score-label">Điểm kiểm tra</div>
-        <div class="score-value">8.5</div>
+        <div class="score-value">{{ diemTrungBinh.diemKiemTra }}</div>
       </div>
     </div>
   </div>
@@ -34,7 +34,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of nhanXetDinhKy ">
+          <tr *ngFor="let item of nhanXetDinhKy">
             <td>{{item.ngay}}</td>
             <td>{{item.nhanXet}}</td>
           </tr>
@@ -68,8 +68,6 @@
     </table>
   </div>
 </div>
-
-    
 
     <!-- Bảng dưới: Điểm kiểm tra -->
     <div class="full-table mt-4">
