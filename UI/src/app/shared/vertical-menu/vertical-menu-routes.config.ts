@@ -12,6 +12,7 @@ export const ROUTES: RouteInfo[] = [
       { path: '/dashboard/loainhansu', title: 'Loại nhân sự', icon: 'ft-arrow-right submenu-icon', class: 'dropdown-item', isExternalLink: false, submenu: [] }
     ]
   },
+  {path: '/dashboard-cm', title: 'Dashboard', icon: 'ft-home', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
   {path: '/phong', title: 'Phòng Học', icon: 'ft-briefcase', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
   {path: '/chuongtrinh', title: 'Chương Trình', icon: 'ft-book', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
   {path: '/lophoc', title: 'Lớp Học', icon: 'ft-book-open', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },

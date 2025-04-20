@@ -1,0 +1,344 @@
+.dashboard-wrapper {
+    padding: 20px;
+    .limited-table {
+        max-height: 360px;
+        overflow-y: auto;
+        font-size: 13px;
+        text-align: left;
+        thead {
+          position: sticky;
+          top: 0;
+          background-color: white;
+          z-index: 1;
+        }
+      
+        table {
+          margin-bottom: 0;
+          width: 100%;
+      
+          th,
+          td {
+            vertical-align: middle;
+            font-size: 14px;
+          }
+      
+         
+          th:nth-child(1),
+          td:nth-child(1) {
+            width: 90px;
+          }
+      
+          
+          th:nth-child(2),
+          td:nth-child(2) {
+            width: 160px;
+          }
+      
+         
+          th:nth-child(3),
+          td:nth-child(3) {
+            width: 60px;
+            
+          }
+      
+          // Cột Lớp - phần còn lại tự động
+          th:nth-child(4),
+          td:nth-child(4) {
+            width: auto;
+          }
+        }
+      }
+      
+      
+      
+      
+    .card-tile {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+        height: 100%;
+    }
+
+    .dashboard-tile {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .tile-left {
+            .tile-label {
+                font-size: 14px;
+                font-weight: 600;
+                color: #5a5a5a;
+                margin-bottom: 6px;
+            }
+
+            .tile-value {
+                font-size: 24px;
+                font-weight: bold;
+                color: #1d1d1d;
+            }
+        }
+
+        .tile-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            i {
+                font-size: 20px;
+            }
+        }
+
+        &.tile-student .tile-icon {
+            background-color: #e8edff;
+
+            i {
+                color: #3f51b5;
+            }
+        }
+
+        &.tile-teacher .tile-icon {
+            background-color: #fff8e1;
+
+            i {
+                color: #ffc107;
+            }
+        }
+
+        &.tile-class .tile-icon {
+            background-color: #fce4ec;
+
+            i {
+                color: #ec407a;
+            }
+        }
+    }
+
+    .chart-box {
+        h6 {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: #111;
+        }
+
+        canvas {
+            max-height: 300px;
+        }
+    }
+
+    .card-tile {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .attendance-item,
+    .room-usage-item {
+        margin-bottom: 14px;
+
+        .progress {
+            height: 6px;
+            background-color: #e9ecef;
+
+            .progress-bar {
+                background-color: #00bcd4;
+            }
+        }
+    }
+
+    .room-usage-item .progress-bar.bg-primary {
+        background-color: #0000ff;
+    }
+
+    .room-usage-custom {
+        h6 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            color: #333;
+
+            .legend-item {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+
+                .color-box {
+                    width: 14px;
+                    height: 14px;
+                    border-radius: 3px;
+
+                    &.used {
+                        background-color: #0000ff;
+                    }
+
+                    &.free {
+                        background-color: #d1d9f0;
+                    }
+                }
+            }
+        }
+
+        .scroll-room-list {
+            max-height: 300px;
+            overflow-y: auto;
+            overflow-x: visible;
+            padding-right: 10px;
+
+            .room-bar {
+                display: flex;
+                align-items: center;
+                margin-bottom: 12px;
+
+                .room-label {
+                    width: 40px;
+                    font-weight: 500;
+                    font-size: 13px;
+                    margin-right: 12px;
+                }
+
+                .room-progress {
+                    width: 100%;
+                    background-color: #d1d9f0;
+                    height: 14px;
+                    border-radius: 6px;
+                    overflow: hidden;
+
+                    .used-bar {
+                        background-color: #0000ff;
+                        height: 100%;
+                    }
+                }
+            }
+        }
+
+        .room-scale {
+            position: relative;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+
+            .scale-track {
+                position: relative;
+                flex: 1;
+                height: 20px;
+                margin-left: 52px; // để tránh đè lên nhãn phòng
+            }
+
+            .scale-track span {
+                position: absolute;
+                transform: translateX(-50%);
+                font-size: 12px;
+                color: #666;
+                bottom: 0;
+            }
+
+            .unit-label {
+                font-size: 12px;
+                font-style: italic;
+                color: #666;
+                margin-left: 6px;
+                white-space: nowrap;
+            }
+        }
+
+        .used-bar {
+            background-color: #0000ff;
+            height: 100%;
+            position: relative;
+          
+            &:hover .tooltip {
+              display: block;
+            }
+          
+            .tooltip {
+              display: none;
+              position: absolute;
+              top: -30px;
+              right: 0;
+              background-color: #333;
+              color: #fff;
+              font-size: 11px;
+              padding: 4px 8px;
+              border-radius: 4px;
+              white-space: nowrap;
+              z-index: 10;
+              transform: translateX(50%);
+          
+              &::after {
+                content: '';
+                position: absolute;
+                bottom: -5px;
+                right: 50%;
+                transform: translateX(50%);
+                border-width: 5px;
+                border-style: solid;
+                border-color: #333 transparent transparent transparent;
+              }
+            }
+          }
+          
+
+
+
+    }
+
+}
+
+.room-progress {
+    background-color: #d1d9f0;
+    height: 14px;
+    border-radius: 6px;
+    overflow: visible !important;
+    position: relative;
+  }
+  
+  .used-bar-wrapper {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    overflow: visible;
+  }
+  
+  .used-bar {
+    background-color: #0000ff;
+    height: 100%;
+    border-radius: 6px;
+    position: relative;
+  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    .used-value {
+      font-size: 12px;
+      font-weight: 600;
+      color: white; 
+      white-space: nowrap;
+      line-height: 1;
+      padding: 0 4px; 
+      pointer-events: none;
+    }
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  

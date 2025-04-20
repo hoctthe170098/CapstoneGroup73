@@ -128,5 +128,9 @@ export const Full_ROUTES: Routes = [
     path: 'baocaodiemdanhquanlycoso',
     loadChildren: () => import('../../baocaodiemdanhquanlycoso/baocaodiemdanhquanlycoso.module').then(m => m.BaocaodiemdanhquanlycosoModule)
   },
+  {
+    path: 'dashboard-cm',
+    loadChildren: () => import('../../dashboard-cm/dashboard-cm.module').then(m => m.DashboardCMModule)
+  },
 
 ];
