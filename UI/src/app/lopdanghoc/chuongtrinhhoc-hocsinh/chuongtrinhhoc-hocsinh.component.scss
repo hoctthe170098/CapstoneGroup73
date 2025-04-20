@@ -1,0 +1,64 @@
+.card {
+    background: white;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    padding: 30px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.card h2 {
+    margin-top: 0;
+}
+
+.lesson-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-top: 20px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.lesson-header {
+    background-color: #f6f8fa;
+    padding: 12px 20px;
+    border-bottom: 1px solid #ddd;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.lesson-body {
+    padding: 20px;
+}
+
+.lesson-body p {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.file {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.file img {
+    width: 30px;
+    height: auto;
+    margin-right: 10px;
+}
+
+.file-info {
+    line-height: 1.2;
+}
+
+.file-name {
+    font-weight: bold;
+}
+
+.file-meta {
+    font-size: 12px;
+    color: gray;
+}

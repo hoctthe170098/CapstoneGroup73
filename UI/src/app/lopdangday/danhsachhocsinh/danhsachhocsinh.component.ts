@@ -2,7 +2,6 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { LopdangdayService } from '../shared/lopdangday.service';
 import { DanhSachHocSinh } from '../shared/lopdangday.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { el } from 'date-fns/locale';
 import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: "app-danhsachhocsinh",
@@ -34,8 +33,11 @@ export class DanhsachhocsinhComponent implements OnInit {
           this.cdr.detectChanges();
           console.debug("Danh sách học sinh:", this.danhSachHocSinh);
         } else {
-          if(response.code === 404)
-            this.router.navigate(['/pages/error']); else this.toastr.error(response.message)
+          if (response.message === 'Dữ liệu không tồn tại!'){
+            this.toastr.error('Giáo viên id không hợp lê!', 'Lỗi');
+          }
+          else(response.code === 404)
+            this.router.navigate(['/pages/error'])
         }
       },
       (error) => {

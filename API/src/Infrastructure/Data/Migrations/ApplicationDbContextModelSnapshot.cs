@@ -205,8 +205,8 @@ namespace CleanArchitecture.Infrastructure.Data.Migrations
                     b.Property<Guid>("LichHocId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateOnly>("NgayTao")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("NgayTao")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("NoiDung")
                         .IsRequired()

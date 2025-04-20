@@ -9,7 +9,7 @@ namespace StudyFlow.Domain.Entities;
 public class BaiTap
 {
     public Guid Id { get; set; }//k
-    public DateOnly NgayTao { get; set; }//u
+    public DateTime NgayTao { get; set; }//u
     public required Guid LichHocId { get; set; }//u
     public required string TieuDe { get; set; }
     public required string NoiDung { get; set; }

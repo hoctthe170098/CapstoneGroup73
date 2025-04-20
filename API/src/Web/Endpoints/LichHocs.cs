@@ -19,6 +19,7 @@ using StudyFlow.Application.LichHocs.Commands.UpdateLichDayBu;
 using StudyFlow.Application.ChinhSachs.Commands.DeleteLichDayBu;
 using StudyFlow.Application.LichHocs.Queries.GetLichHocGiaoVien;
 using StudyFlow.Application.Cosos.Queries.GetDiemDanhTheoNgay;
+using StudyFlow.Application.LichHocs.Queries.GetLichHocHocSinh;
 
 namespace StudyFlow.Web.Endpoints;
 
@@ -39,7 +40,8 @@ public class LichHocs : EndpointGroupBase
             .MapPost(CreateLichHocDayBu,"createlichdaybu")
             .MapPut(UpdateLichHocDayBu, "updatelichdaybu")
             .MapDelete(DeleteLichHocDayBu, "deletelichdaybu")
-            .MapGet(GetLichHocGiaoVien,"getlichhocgiaovien");
+            .MapGet(GetLichHocGiaoVien,"getlichhocgiaovien")
+            .MapGet(GetLichHocHocSinh,"getlichhochocsinh");
     }
     [Authorize(Roles =Roles.CampusManager)]
     public async Task<Output> CreateLichHocCoDinh(ISender sender, [FromBody] CreateLichHocCommand command)
@@ -103,6 +105,11 @@ public class LichHocs : EndpointGroupBase
     }
     [Authorize(Roles = Roles.Teacher)]
     public async Task<Output> GetLichHocGiaoVien(ISender sender, [AsParameters] GetLichHocGiaoVienQuery query)
+    {
+        return await sender.Send(query);
+    }
+    [Authorize(Roles = Roles.Student)]
+    public async Task<Output> GetLichHocHocSinh(ISender sender, [AsParameters] GetLichHocHocSinhQuery query)
     {
         return await sender.Send(query);
     }

@@ -5,6 +5,7 @@ using StudyFlow.Application.ChuongTrinhs.Commands.CreateChuongTrinh;
 using StudyFlow.Application.ChuongTrinhs.Commands.DowntaiLieuHocTap;
 using StudyFlow.Application.ChuongTrinhs.Commands.UpdateChuongTrinh;
 using StudyFlow.Application.ChuongTrinhs.Queries.GetAllChuongTrinhs;
+using StudyFlow.Application.ChuongTrinhs.Queries.GetChuongTrinhByClass;
 using StudyFlow.Application.ChuongTrinhs.Queries.GetChuongTrinhById;
 using StudyFlow.Application.ChuongTrinhs.Queries.GetChuongTrinhsWithPagination;
 using StudyFlow.Application.Common.Models;
@@ -24,7 +25,8 @@ public class ChuongTrinhs : EndpointGroupBase
             .MapGet(GetAllChuongTrinhs, "getallchuongtrinhs")
             .MapGet(GetChuongTrinhById, "getchuongtrinhbyid/{chuongTrinhId}")
             .MapDelete(DeleteChuongTrinh,"deletechuongtrinh/{id}")
-            .MapPost(DownloadTaiLieuHocTap, "downloadtailieuhoctap"); ;
+            .MapPost(DownloadTaiLieuHocTap, "downloadtailieuhoctap")
+            .MapPost(GetChuongTrinhByClass, "getchuongtrinhbyclass"); 
     }
     [Authorize(Roles = Roles.LearningManager)]
     public async Task<Output> CreateChuongTrinh(ISender sender, [FromForm] CreateChuongTrinhCommand command)
@@ -65,6 +67,11 @@ public class ChuongTrinhs : EndpointGroupBase
     }
     [Authorize(Roles = Roles.LearningManager)]
     public async Task<Output> GetChuongTrinhById(ISender sender,[AsParameters] GetChuongTrinhByIdQuery query)
+    {
+        return await sender.Send(query);
+    }
+    [Authorize(Roles = Roles.Teacher + "," + Roles.CampusManager + "," + Roles.Student)]
+    public async Task<Output> GetChuongTrinhByClass(ISender sender, GetChuongTrinhByClassQuery query)
     {
         return await sender.Send(query);
     }

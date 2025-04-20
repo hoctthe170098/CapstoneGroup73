@@ -1,23 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using StudyFlow.Application.LichHocs.Commands.CreateLichHoc;
-using StudyFlow.Application.LichHocs.Commands.EditLichHoc;
-using StudyFlow.Application.Common.Models;
-using StudyFlow.Application.LichHocs.Queries;
-using MediatR;
+﻿using StudyFlow.Application.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using StudyFlow.Domain.Constants;
-using StudyFlow.Application.LichHocs.Queries.GetLopHocWithPagination;
-using StudyFlow.Application.LichHocs.Queries.GetLopHocByName;
-using StudyFlow.Application.LichHocs.Queries.GetLopHocByTen;
-using StudyFlow.Application.ChinhSachs.Commands.DeleteBaiKiemTra;
-using StudyFlow.Application.ChinhSachs.Commands.DeleteLichHoc;
-using StudyFlow.Application.LichHocs.Commands.CreateLichDayThay;
-using StudyFlow.Application.LichHocs.Commands.UpdateLichDayThay;
-using StudyFlow.Application.ChinhSachs.Commands.DeleteLichDayThay;
-using StudyFlow.Application.LichHocs.Commands.CreateLichDayBu;
-using StudyFlow.Application.LichHocs.Commands.UpdateLichDayBu;
-using StudyFlow.Application.ChinhSachs.Commands.DeleteLichDayBu;
-using StudyFlow.Application.LichHocs.Queries.GetLichHocGiaoVien;
 using StudyFlow.Application.Cosos.Queries.GetDiemDanhTheoNgay;
 using StudyFlow.Application.DiemDanhs.Commands.UpdateDiemDanhTheoNgay;
 using StudyFlow.Application.Cosos.Queries.GetBaoCaoDiemDanh;
@@ -25,6 +8,9 @@ using StudyFlow.Application.Cosos.Queries.GetBaoCaoDiemHangNgayCuaHocSinh;
 using StudyFlow.Application.DiemDanhs.Queries.GetBaoCaoDiemHocSinh;
 using StudyFlow.Application.DiemDanhs.Queries.GetBaoCaoTatCaDiemChoHocSinh;
 using StudyFlow.Application.Cosos.Queries.GetBaoCaoDiemDanhHocSinh;
+using StudyFlow.Application.Cosos.Queries.GetBaoCaoDiemDanhChoTungLop;
+using StudyFlow.Application.DiemDanhs.Commands.UpdateDiemDanh;
+using StudyFlow.Application.Cosos.Queries.GetBaoCaoHocPhiChoTungLop;
 
 namespace StudyFlow.Web.Endpoints;
 
@@ -38,7 +24,10 @@ public class DiemDanhs : EndpointGroupBase
             .MapGet(GetBaoCaoDiemDanh,"getbaocaodiemdanh")
             .MapGet(GetBaoCaoDiemHangNgayCuaHocSinh,"getbaocaodiemhangngaycuahocsinh")
             .MapGet(GetBaoCaoDiemHocSinh, "getbaocaotatcacacdiem")
-            .MapGet(GetBaoCaoDiemDanhHocSinh,"getbaocaodiemdanhhocsinh");
+            .MapGet(GetBaoCaoDiemDanhHocSinh,"getbaocaodiemdanhhocsinh")
+            .MapGet(GetBaoCaoDiemDanhChoTungLop,"getbaocaodiemdanhchotunglop")
+            .MapPost(UpdateDiemDanh,"updatediemdanh")
+            .MapGet(GetBaoCaoHocPhiChoTungLop,"getbaocaohocphi");
     }
     [Authorize(Roles = Roles.Teacher)]
     public async Task<Output> GetDiemDanhTheoNgay(ISender sender, [AsParameters] GetDiemDanhTheoNgayQuery query)
@@ -50,8 +39,23 @@ public class DiemDanhs : EndpointGroupBase
     {
         return await sender.Send(command);
     }
+    [Authorize(Roles = Roles.CampusManager)]
+    public async Task<Output> UpdateDiemDanh(ISender sender, UpdateDiemDanhCommand command)
+    {
+        return await sender.Send(command);
+    }
     [Authorize(Roles = Roles.Teacher)]
     public async Task<Output> GetBaoCaoDiemDanh(ISender sender, [AsParameters] GetBaoCaoDiemDanhQuery query)
+    {
+        return await sender.Send(query);
+    }
+    [Authorize(Roles = Roles.CampusManager)]
+    public async Task<Output> GetBaoCaoDiemDanhChoTungLop(ISender sender, [AsParameters] GetBaoCaoDiemDanhChoTungLopQuery query)
+    {
+        return await sender.Send(query);
+    }
+    [Authorize(Roles = Roles.CampusManager)]
+    public async Task<Output> GetBaoCaoHocPhiChoTungLop(ISender sender, [AsParameters] GetBaoCaoHocPhiChoTungLopQuery query)
     {
         return await sender.Send(query);
     }
