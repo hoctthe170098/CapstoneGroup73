@@ -85,17 +85,21 @@ public class GetLichHocHocSinhQueryHandler : IRequestHandler<GetLichHocHocSinhQu
                 };
                 var lichHoc = await _context.LichHocs
                     .Where(lh => lh.ThamGiaLopHocs.Select(tg=>tg.HocSinhCode).Contains(hocSinh.Code)
-                    && lh.Thu == i && lh.NgayBatDau <= ngayTrongTuanList[i - 2]
-                    && lh.NgayKetThuc >= ngayTrongTuanList[i - 2])
+                    && lh.Thu == i)
+                    .Include(lh => lh.ThamGiaLopHocs)
                     .Include(lh => lh.ChuongTrinh)
                     .Include(lh => lh.Phong)
                     .ToListAsync();
+                lichHoc = lichHoc
+                .Where(lh => lh.ThamGiaLopHocs
+                .First(tg => tg.HocSinhCode == hocSinh.Code).NgayBatDau <= ngayTrongTuanList[i-2]&& lh.ThamGiaLopHocs
+                .First(tg => tg.HocSinhCode == hocSinh.Code).NgayKetThuc >= ngayTrongTuanList[i-2]).ToList();
                 var listLopHoc = new List<LopHocDto>();
                 foreach (var lich in lichHoc)
                 {
                     var check = await _context.LichHocs
                         .AnyAsync(lh => lh.LichHocGocId == lich.Id
-                        && (lh.TrangThai == "Dạy bù" || lh.TrangThai == "Dạy thay")
+                        && (lh.TrangThai == "Dạy bù")
                         && lh.NgayHocGoc == ngayTrongTuanList[i - 2]);
                     if (!check)
                     {

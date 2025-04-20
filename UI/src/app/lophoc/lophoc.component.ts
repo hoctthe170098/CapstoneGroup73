@@ -102,6 +102,13 @@ editScheduleDayBu: any = {
         i === index ? !this.lophocs[i].showActionMenu : false;
     });
   }
+  toggleFooterActionMenu(index: number, event: MouseEvent) {
+    event.stopPropagation();
+    this.lophocs.forEach((lop, i) => {
+      lop.showFooterActionMenu = i === index ? !lop.showFooterActionMenu : false;
+    });
+  }
+  
   handleClickOutsidePopupDropdown(event: any) {
     const dropdown = document.querySelector('.popup-giaovien-dropdown-wrapper');
     if (dropdown && !dropdown.contains(event.target as Node)) {
@@ -696,6 +703,12 @@ editScheduleDayBu: any = {
         this.toastr.error(err?.error?.message || 'Đã xảy ra lỗi khi xóa lớp học.');
       }
     });
+  }
+  diDenBaoCaoDiemDanh(tenLop: string) {
+    this.router.navigate(['/baocaodiemdanhquanlycoso'], { queryParams: { TenLop: tenLop } });
+  }
+  diDenBaoCaoHocphi(tenLop: string) {
+    this.router.navigate(['/baocaohocphi'], { queryParams: { TenLop: tenLop } });
   }
   
   

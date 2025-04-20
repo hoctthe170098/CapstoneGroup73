@@ -20,18 +20,12 @@ export const ROUTES: RouteInfo[] = [
   {path: '/chinhsach', title: 'Chính Sách', icon: 'ft-sidebar', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
   {path: '/quanly', title: 'Quản Lý', icon: 'ft-user', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
   {path: '/lichday', title: 'Lịch Dạy', icon: 'ft-calendar', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
+  {path: '/lichhoc', title: 'Lịch Học', icon: 'ft-calendar', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
   {path: '/baikiemtra', title: 'Bài Kiểm Tra', icon: 'ft-file-text', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
   {path: '/giaovien', title: 'Giáo Viên', icon: 'ft-user', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
   {path: '/hocsinh', title: 'Học Sinh', icon: 'ft-user', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
   { path: '/sanpham/danh-sach-san-pham', title: 'Sản phẩm', icon: 'ft-clipboard', class: 'dropdown-item', isExternalLink: false, submenu: [] },
   { path: '/coso/danh-sach-coso', title: 'Cơ Sở', icon: 'ft-home', class: 'dropdown-item', isExternalLink: false, submenu: [] },
-  {
-    path: '', title: 'Báo cáo', icon: 'ft-home', class: 'has-sub',isExternalLink: false, submenu: [
-      { path: '/baocaohocphi', title: 'Học phí', icon: '', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
-      { path: '/baocaodiemdanhquanlycoso', title: 'Điểm danh', icon: '', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
-      
-    ]
-  },
   { path: '/inbox', title: 'Email', icon: 'ft-mail', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
   { path: '/chat', title: 'Chat', icon: 'ft-message-square', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
   { path: '/chat-ngrx', title: 'Chat NgRx', icon: 'ft-message-square', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },

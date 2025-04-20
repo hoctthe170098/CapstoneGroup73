@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import { FormsModule } from '@angular/forms';
 import { BaocaohocphiRoutingModule } from './baocaohocphi-routing.module';
 import { BaocaohocphiComponent } from './baocaohocphi.component';
 
@@ -11,7 +11,8 @@ import { BaocaohocphiComponent } from './baocaohocphi.component';
   ],
   imports: [
     CommonModule,
-    BaocaohocphiRoutingModule
+    BaocaohocphiRoutingModule,
+    FormsModule
   ]
 })
 export class BaocaohocphiModule { }

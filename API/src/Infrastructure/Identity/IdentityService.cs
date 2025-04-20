@@ -19,6 +19,7 @@ using Twilio.Exceptions;
 using System.Globalization;
 using static System.Net.Mime.MediaTypeNames;
 using StudyFlow.Application.Common.Exceptions;
+using StudyFlow.Domain.Entities;
 
 namespace StudyFlow.Infrastructure.Identity;
 
@@ -56,7 +57,7 @@ public class IdentityService : IIdentityService
         {
             UserName = userName,
             Email = userName,
-        };                  
+        };
 
         var result = await _userManager.CreateAsync(user, password);
 
@@ -108,8 +109,8 @@ public class IdentityService : IIdentityService
             if (user.IsActive == false) throw new Exception("Tài khoản bạn đã bị khoá");
             var checkCoSo = await _context.CoSos
                 .AnyAsync(c => c.TrangThai == "close"
-                && (c.NhanViens.Any(nv => nv.UserId == user.Id)||c.GiaoViens.Any(gv => gv.UserId == user.Id)
-                ||c.HocSinhs.Any(hs => hs.UserId == user.Id)));
+                && (c.NhanViens.Any(nv => nv.UserId == user.Id) || c.GiaoViens.Any(gv => gv.UserId == user.Id)
+                || c.HocSinhs.Any(hs => hs.UserId == user.Id)));
             if (checkCoSo) throw new Exception("Cơ sở bạn đã đóng cửa");
             var roles = await _userManager.GetRolesAsync(user);
             IdentityOptions _options = new IdentityOptions();
@@ -120,7 +121,7 @@ public class IdentityService : IIdentityService
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            
+
             var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, username),
@@ -169,8 +170,9 @@ public class IdentityService : IIdentityService
             output.isError = false;
             output.message = "Username không khớp, vui lòng thử lại!";
             return output;
-        };
-        if (user.Email==null)
+        }
+        ;
+        if (user.Email == null)
         {
             output.isError = false;
             output.message = "Tài khoản này không có email, vui lòng liên hệ với quản lý!";
@@ -178,7 +180,7 @@ public class IdentityService : IIdentityService
         }
         var newPassword = GenerateRandomPassword();
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-        var result = await _userManager.ResetPasswordAsync(user,token, newPassword);
+        var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
         if (result.Succeeded)
         {
             try
@@ -192,14 +194,14 @@ public class IdentityService : IIdentityService
             {
                 // Xử lý lỗi gửi email. Có thể log lỗi.
                 output.isError = true;
-                output.message = "Lỗi gửi email"+ ex.Message;
+                output.message = "Lỗi gửi email" + ex.Message;
                 return output;
             }
         }
         else
         {
             output.isError = true;
-            output.message = "Lỗi đặt lại mật khẩu:" +  string.Join(", ", result.Errors.Select(e => e.Description));
+            output.message = "Lỗi đặt lại mật khẩu:" + string.Join(", ", result.Errors.Select(e => e.Description));
             return output;
         }
     }
@@ -338,7 +340,7 @@ public class IdentityService : IIdentityService
         {
             // 1. Xác thực mã thông báo JWT
             var tokenHandler = new JwtSecurityTokenHandler();
-            var secretKey = _configuration["Jwt:SecretKey"] ?? throw 
+            var secretKey = _configuration["Jwt:SecretKey"] ?? throw
                 new ArgumentNullException(nameof(_configuration)
                 , "Jwt:SecretKey is missing in configuration.");
             var key = Encoding.ASCII.GetBytes(secretKey);
@@ -432,15 +434,15 @@ public class IdentityService : IIdentityService
     private string genUsername(string name, string code)
     {
         string username = "";
-        name = RemoveDiacritics(name).ToLower(); 
+        name = RemoveDiacritics(name).ToLower();
         string[] chuoi = name.Split(' ');
 
         for (int i = 0; i < chuoi.Length - 1; i++)
         {
-            username += chuoi[i][0]; 
+            username += chuoi[i][0];
         }
 
-        username = username + chuoi[chuoi.Length - 1] + code; 
+        username = username + chuoi[chuoi.Length - 1] + code;
         return username;
     }
 
@@ -564,7 +566,7 @@ public class IdentityService : IIdentityService
         var jwtToken = (JwtSecurityToken)validatedToken;
         var campusIdString = jwtToken.Claims
             .FirstOrDefault(x => x.Type == ClaimTypes.Locality)!.Value;
-        if(campusIdString==null) return Guid.Empty;
+        if (campusIdString == null) return Guid.Empty;
         var chuyendoi = Guid.TryParse(campusIdString, out var campusId);
         if (chuyendoi) return campusId;
         else return Guid.Empty;
@@ -599,7 +601,7 @@ public class IdentityService : IIdentityService
             return Guid.Empty;
     }
 
-    public async Task<Result> UpdateStatusUser(string userId,bool status)
+    public async Task<Result> UpdateStatusUser(string userId, bool status)
     {
         var user = _userManager.Users.SingleOrDefault(u => u.Id == userId);
         if (user != null)
@@ -629,5 +631,25 @@ public class IdentityService : IIdentityService
         {
             return Result.Failure(changeEmailResult.Errors.Select(e => e.Description));
         }
+    }
+
+    public async Task<Result> SendNhanXetDinhKy(string HocSinhCode, string TenLop, NhanXetDinhKy NhanXet)
+    {
+        HocSinh HocSinh = _context.HocSinhs.First(hs => hs.Code == HocSinhCode);
+        string subject = $"Đánh giá định kỳ học sinh lần {NhanXet.STT}";
+        string body = $@"
+<html>
+<body>
+    <p>Xin chào học sinh <b>{HocSinh.Ten}</b>,</p>
+    <p>Đây là nhận xét định kỳ lần {NhanXet.STT} của bạn ở lớp {TenLop}:</p>
+    <p>{NhanXet.NoiDungNhanXet}</p>
+    <p>Vui lòng không phản hồi mail này, có gì thắc mắc liên hệ giáo viên của lớp để biết thêm thông tin.</p>
+    <p>Trân trọng,</p>
+    <p><b>Đội ngũ StudyFlow</b></p>
+</body>
+</html>
+";
+        await SendEmail(HocSinh.Email, subject, body);
+        return Result.Success();
     }
 }

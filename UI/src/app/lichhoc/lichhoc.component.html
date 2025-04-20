@@ -1,0 +1,51 @@
+<div class="calendar-container">
+    <h2 class="calendar-title">Lịch học</h2>
+  
+    <div class="filter-bar">
+      <label>Tuần :</label>
+      <select [(ngModel)]="selectedWeek" (change)="onWeekChange()">
+        <option *ngFor="let week of weeks" [value]="week.value">
+          {{ week.label }}
+        </option>
+      </select>
+      <label>Năm :</label>
+      <select [(ngModel)]="selectedYear" (change)="onYearChange(selectedYear)">
+        <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+      </select>
+    </div>
+  
+    <div class="calendar-table">
+      <div class="calendar-header">
+        <div class="time-column-header">Giờ</div>
+        <div class="day-column-header" *ngFor="let day of schedule">
+          {{ day.thuRutGon }}
+        </div>
+      </div>
+  
+      <div class="calendar-body">
+        <div class="time-column">
+          <div class="time-slot" *ngFor="let hour of hours">{{ hour }}:00</div>
+        </div>
+  
+        <div class="day-column" *ngFor="let day of schedule">
+          <div class="time-blocks">
+            <div class="hour-line" *ngFor="let hour of hours"></div>
+  
+            <div *ngFor="let lesson of day.lops"
+                 class="lesson-block"
+                 [ngStyle]="getLessonStyle(lesson)">
+              <div class="title">{{ lesson.tenLop }} - {{ lesson.tenChuongTrinh }}</div>
+              <div class="room">{{ lesson.tenPhong }}</div>
+              <div class="time">
+                ({{ formatTime(lesson.gioBatDau) }} - {{ formatTime(lesson.gioKetThuc) }})
+              </div>
+              <div class="status">
+                {{ formatTrangThai(lesson.trangThai) }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

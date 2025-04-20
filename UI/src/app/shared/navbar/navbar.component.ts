@@ -96,8 +96,6 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
         return 'assets/img/avatars/campus_manager.png';
       case 'LearningManager':
         return 'assets/img/avatars/learning_manager.png';
-      default:
-        return 'assets/img/avatars/default.png';
     }
   }
   ngAfterViewInit() {

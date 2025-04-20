@@ -35,7 +35,7 @@ public class CreateNhanXetDinhKyCommandValidator : AbstractValidator<CreateNhanX
     private bool DungFormat(string noiDung)
     {
         noiDung = noiDung.Trim();
-        return noiDung.Length == 0 || noiDung.Length > 200;
+        return (noiDung.Length>0&&noiDung.Length<=200);
     }
 
     private async Task<bool> TonTaiLopHoc(string tenLop, CancellationToken cToken)

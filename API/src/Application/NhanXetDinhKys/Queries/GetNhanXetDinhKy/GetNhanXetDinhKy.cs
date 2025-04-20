@@ -39,33 +39,20 @@ public class GetNhanXetDinhKysQueryHandler : IRequestHandler<GetNhanXetDinhKysQu
         if (string.IsNullOrEmpty(token))
             throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
         var coSoId = _identityService.GetCampusId(token);
-        var ThamGiaLopHoc = await _context.ThamGiaLopHocs
+        var ThamGiaLopHocs = await _context.ThamGiaLopHocs
             .Where(tg=>tg.HocSinhCode==request.HocSinhCode
             &&tg.LichHoc.TenLop==request.TenLop
-            &&tg.LichHoc.Phong.CoSoId==coSoId
-            &&tg.LichHoc.TrangThai=="Cố định")
+            &&tg.LichHoc.Phong.CoSoId==coSoId)
             .Include(tg=>tg.LichHoc)
             .Include(tg=>tg.HocSinh)
             .ToListAsync();
-        var LichHocCoDinh = ThamGiaLopHoc.Select(tg=>tg.LichHoc).ToList();
-        if (!LichHocCoDinh.Any()) throw new NotFoundIDException();
-        DateOnly ngayHienTai = DateOnly.FromDateTime(DateTime.Now);
-        var Thus = LichHocCoDinh.Select(lh => lh.Thu).ToList();
-        var NgayKetThuc = ThamGiaLopHoc[0].NgayKetThuc;
-        if(NgayKetThuc>ngayHienTai) NgayKetThuc = ngayHienTai;
-        var NgayDaHoc = getNgayDaHoc(Thus, ThamGiaLopHoc[0].NgayBatDau, NgayKetThuc);
-        var listHocBu = _context.LichHocs
-            .Where(lh => lh.TenLop == request.TenLop
-            && lh.Phong.CoSoId == coSoId
-            && lh.TrangThai == "Học bù")
-            .ToList();
-        foreach (var hocBu in listHocBu)
-        {
-            if (hocBu.NgayHocGoc < NgayKetThuc) NgayDaHoc.Remove((DateOnly)hocBu.NgayHocGoc);
-            if (hocBu.NgayBatDau < NgayKetThuc) NgayDaHoc.Add(hocBu.NgayBatDau);
-        }
+        var NgayDaHoc = await _context.DiemDanhs
+            .Where(dd => ThamGiaLopHocs.Select(tg => tg.Id).Contains(dd.ThamGiaLopHocId))
+            .Select(dd=>dd.Ngay)
+            .Distinct()
+            .ToListAsync();
         var NhanXetDinhKys = _context.NhanXetDinhKys
-            .Where(nx=>ThamGiaLopHoc.Select(tg=>tg.Id).Contains(nx.ThamGiaLopHocId))
+            .Where(nx=>ThamGiaLopHocs.Select(tg=>tg.Id).Contains(nx.ThamGiaLopHocId))
             .ProjectTo<NhanXetDinhKyDto>(_mapper.ConfigurationProvider)
             .OrderBy(nx=>nx.STT)
             .ToList();
@@ -75,27 +62,12 @@ public class GetNhanXetDinhKysQueryHandler : IRequestHandler<GetNhanXetDinhKysQu
             code=200,
             data = new 
             {
-                HocSinhCode = ThamGiaLopHoc[0].HocSinh.Code,
-                TenHocSinh = ThamGiaLopHoc[0].HocSinh.Ten,
-                DenHanNhanXet = (NgayDaHoc.Count/4>NhanXetDinhKys.Count),
+                HocSinhCode = ThamGiaLopHocs[0].HocSinh.Code,
+                TenHocSinh = ThamGiaLopHocs[0].HocSinh.Ten,
+                DenHanNhanXet = (NgayDaHoc.Count / 4 > NhanXetDinhKys.Count),
                 DanhSachNhanXet = NhanXetDinhKys
             },
             message = "Lấy danh sách nhận xét định kỳ thành công"
         };
-    }
-    private List<DateOnly> getNgayDaHoc(List<int> Thus, DateOnly ngayBatDau,
-    DateOnly ngayHienTai)
-    {
-        List<DateOnly> ngayDaHocList = new List<DateOnly>();
-
-        for (DateOnly ngay = ngayBatDau; ngay <= ngayHienTai; ngay = ngay.AddDays(1))
-        {
-            int thu = (int)ngay.DayOfWeek == 0 ? 8 : (int)ngay.DayOfWeek + 1;
-            if (Thus.Contains(thu))
-            {
-                ngayDaHocList.Add(ngay);
-            }
-        }
-        return ngayDaHocList;
     }
 }
