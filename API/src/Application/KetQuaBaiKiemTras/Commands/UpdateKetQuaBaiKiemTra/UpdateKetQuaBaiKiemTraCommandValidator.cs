@@ -46,8 +46,8 @@ public class UpdateKetQuaBaiKiemTraCommandValidator : AbstractValidator<UpdateKe
     {
         foreach (var dto in list)
         {
-            if(dto.Diem>10||dto.Diem<0) return false;
-            if(dto.NhanXet!.Length>200) return false;
+            if(dto.Diem!=null&&dto.Diem>10||dto.Diem<0) return false;
+            if(dto.NhanXet!=null&&dto.NhanXet!.Length>200) return false;
         }
         return true;
     }
