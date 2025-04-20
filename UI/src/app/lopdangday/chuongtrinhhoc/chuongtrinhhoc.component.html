@@ -1,1 +1,27 @@
-<p>chuongtrinhhoc works!</p>
+<div *ngIf="chuongTrinhs" class="card">
+    <h2>{{ chuongTrinhs.tieuDe }}</h2>
+    <p>{{ chuongTrinhs.moTa }}</p>
+
+    <div *ngFor="let baiHoc of chuongTrinhs.noiDungBaiHocs" class="lesson-card">
+        <!-- Card Header -->
+        <div class="lesson-header">
+            <strong>{{ baiHoc.tieuDe }}</strong>
+        </div>
+
+        <!-- Card Body -->
+        <div class="lesson-body">
+            <p *ngIf="baiHoc.mota">{{ baiHoc.mota }}</p>
+            <div *ngFor="let tl of baiHoc.taiLieuHocTaps" class="file">
+                <i class="far fa-file-alt" style="font-size: 28px; margin-right: 10px;"></i>
+                <div class="file-info">
+                    <div class="file-name">
+                        <a *ngIf="tl.urlFile" (click)="downloadFile(tl.urlFile, tl.ten)">
+                            {{ tl.ten }}.{{tl.urlType}}
+                        </a>
+                    </div>
+                    <div class="file-meta">{{ tl.ngayTao | date: 'dd/MM/yyyy' }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

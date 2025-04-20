@@ -11,4 +11,5 @@ public class TaiLieuHocTapDto
     public required string Ten { get; set; }
     public required string urlType { get; set; }
     public required string urlFile { get; set; }
+    public DateOnly NgayTao { get; set; }
 }
