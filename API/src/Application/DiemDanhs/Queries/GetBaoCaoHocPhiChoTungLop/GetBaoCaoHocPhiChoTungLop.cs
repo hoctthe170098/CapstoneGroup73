@@ -68,12 +68,6 @@ public class GetBaoCaoHocPhiChoTungLopQueryHandler : IRequestHandler<GetBaoCaoHo
         }
         var ThangDaHoc = NgayDaHoc.Select(ng => ng.Month).Distinct().OrderBy(th => th).ToList();
         int ThangCanLay = 0;
-        if (request.Thang == null) ThangCanLay = ThangDaHoc[0];
-        else
-        {
-            if (ThangDaHoc.Any(th => th == request.Thang)) ThangCanLay = (int)request.Thang;
-            else throw new NotFoundIDException();
-        }
         var NgayCanLays = NgayDaHoc.Where(ng=>ng.Month == ThangCanLay).ToList();
         var data = new BaoCaoHocPhiDto
         {
