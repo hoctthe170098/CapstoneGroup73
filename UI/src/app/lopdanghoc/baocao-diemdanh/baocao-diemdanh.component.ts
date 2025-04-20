@@ -34,10 +34,10 @@ export class BaocaoDiemdanhComponent implements OnInit {
   }
 
   layDuLieuDiemDanh(tenLop: string): void {
-    console.log('API đang gọi với tên lớp:', tenLop); // ✅ kiểm tra đã gọi
+  
     this.lopService.getBaoCaoDiemDanh(tenLop).subscribe({
       next: (res) => {
-        console.log('res.code:', res.code);
+        
         if (res.code === 404) {
           this.router.navigate(['/pages/error'])
           return;

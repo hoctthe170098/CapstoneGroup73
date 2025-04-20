@@ -697,6 +697,12 @@ editScheduleDayBu: any = {
       }
     });
   }
+  diDenBaoCaoDiemDanh(tenLop: string) {
+    this.router.navigate(['/baocaodiemdanhquanlycoso'], { queryParams: { TenLop: tenLop } });
+  }
+  diDenBaoCaoHocphi(tenLop: string) {
+    this.router.navigate(['/baocaohocphi'], { queryParams: { TenLop: tenLop } });
+  }
   
   
   

@@ -49,13 +49,18 @@ public class UpdateDiemDanhCommandValidator : AbstractValidator<UpdateDiemDanhCo
         var idDiemDanh = diemDanhs.Select(d => d.Id).ToList();
         foreach(var item in idDiemDanh)
         {
-            var lichHoc = await _context.DiemDanhs
-                .Select(d=>d.ThamGiaLopHoc.LichHoc)
-                .Include(d=>d.LichHocGoc)
+            var DiemDanh = await _context.DiemDanhs
+                .Include(d => d.ThamGiaLopHoc)
+                .ThenInclude(tg => tg.LichHoc)
+                .ThenInclude(lh => lh.LichHocGoc)
+                
                 .FirstOrDefaultAsync(d => d.Id == item);
+            if (DiemDanh == null)
+                return false;
+            var lichHoc = DiemDanh.ThamGiaLopHoc.LichHoc;
             if(lichHoc == null) return false;
             if(lichHoc.TrangThai=="Dạy bù") lichHoc = lichHoc.LichHocGoc;
-            if(lichHoc.NgayKetThuc>DateOnly.FromDateTime(DateTime.Now)) return false;
+            if(lichHoc.NgayKetThuc<DateOnly.FromDateTime(DateTime.Now)) return false;
             if (lichHoc.NgayKetThuc == DateOnly.FromDateTime(DateTime.Now))
             {
                 if(lichHoc.GioKetThuc < TimeOnly.FromDateTime(DateTime.Now)) return false;

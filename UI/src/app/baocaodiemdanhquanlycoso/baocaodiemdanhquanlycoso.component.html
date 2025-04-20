@@ -14,14 +14,14 @@
         <table>
           <thead>
             <tr>
-              <th>No</th>
-              <th>Học Sinh</th>
+              <th>Code</th>
+              <th>Tên Học Sinh</th>
               <th>Tình Trạng Điểm Danh</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let hs of danhSachHocSinh; let i = index">
-              <td>{{ i + 1 | number: '2.0' }}</td>
+              <td>{{ hs.code }}</td>
               <td>{{ hs.ten }}</td>
               <td class="trang-thai">
                 <ng-container *ngIf="!dangSua; else formEdit">
@@ -29,7 +29,7 @@
                     {{ hs.trangThai }}
                   </span>
                 </ng-container>
-  
+          
                 <ng-template #formEdit>
                   <label>
                     <input type="radio" name="status-{{ i }}" value="Có mặt" [(ngModel)]="hs.trangThai" />
