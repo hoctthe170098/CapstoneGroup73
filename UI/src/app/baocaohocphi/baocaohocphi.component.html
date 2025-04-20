@@ -14,8 +14,8 @@
         <th>Học Sinh</th>
         <th>Số Buổi Học</th>
         <th>Số Buổi Nghỉ</th>
-        <th>Học Phí 1 Buổi</th>
-        <th>Tổng Học Phí</th>
+        <th>Học Phí/Buổi</th>
+        <th>Tổng</th>
       </tr>
     </thead>
     <tbody>
@@ -23,8 +23,8 @@
         <td>{{ row.tenHocSinh }}</td>
         <td>{{ row.soBuoiHoc }}</td>
         <td>{{ row.soBuoiNghi }}</td>
-        <td>{{ row.hocPhi1Buoi | currency:'VND' }}</td>
-        <td>{{ row.tongHocPhi | currency:'VND' }}</td>
+        <td>{{ row.hocPhi1Buoi?.toLocaleString('vi-VN') }} VND</td>
+        <td>{{ row.tongHocPhi?.toLocaleString('vi-VN') }} VND</td>
       </tr>
     </tbody>
   </table>

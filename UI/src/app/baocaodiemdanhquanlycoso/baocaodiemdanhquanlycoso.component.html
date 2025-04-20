@@ -25,7 +25,10 @@
               <td>{{ hs.ten }}</td>
               <td class="trang-thai">
                 <ng-container *ngIf="!dangSua; else formEdit">
-                  <span [ngClass]="{ 'co-mat': hs.trangThai === 'Có mặt', 'vang': hs.trangThai === 'Vắng' }">
+                  <span [ngClass]="{
+                    'trang-thai-co-mat': hs.trangThai === 'Có mặt',
+                    'trang-thai-vang': hs.trangThai === 'Vắng'
+                  }">
                     {{ hs.trangThai }}
                   </span>
                 </ng-container>

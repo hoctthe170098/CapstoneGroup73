@@ -1,38 +1,40 @@
-import { Component, OnInit,ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { BaocaodiemdanhquanlycosohService } from './shared/baocaodiemdanhquanlycoso.service';
 import { formatDate } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-
+import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-baocaodiemdanhquanlycoso',
   templateUrl: './baocaodiemdanhquanlycoso.component.html',
   styleUrls: ['./baocaodiemdanhquanlycoso.component.scss']
 })
 export class BaocaodiemdanhquanlycosoComponent implements OnInit {
-
-  tenLop: string = ''; 
+  tenLop: string = '';
   danhSachNgay: string[] = [];
   ngayDuocChon: string = '';
   danhSachHocSinh: any[] = [];
   backupDanhSach: any[] = [];
   dangSua = false;
 
-  constructor(private diemDanhService: BaocaodiemdanhquanlycosohService,private route: ActivatedRoute, private cdr: ChangeDetectorRef) { }
+  constructor(
+    private diemDanhService: BaocaodiemdanhquanlycosohService,
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef,
+    private toastr: ToastrService
+  ) {}
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       const tenLop = params['TenLop'];
       if (tenLop) {
         this.tenLop = tenLop;
-        this.taiBaoCao(); // gọi API luôn khi có tên lớp
+        this.taiBaoCao();
       }
     });
   }
 
   taiBaoCao(ngay?: string) {
-    
     this.diemDanhService.getBaoCaoDiemDanh(this.tenLop, ngay).subscribe(res => {
-      console.log('API Response:', res);
       const data = res.data;
       this.danhSachNgay = data.ngays.map((d: string) => this.formatDateOnly(d));
       this.ngayDuocChon = this.formatDateOnly(data.ngay);
@@ -43,6 +45,7 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
         trangThai: dd.trangThai
       }));
       this.backupDanhSach = JSON.parse(JSON.stringify(this.danhSachHocSinh));
+      this.toastr.success
       this.cdr.detectChanges();
     });
   }
@@ -50,8 +53,6 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
   chonNgay(date: string) {
     this.ngayDuocChon = date;
     this.dangSua = false;
-
-    // Gửi request lại theo ngày
     const ngayParam = this.toApiDateFormat(date);
     this.taiBaoCao(ngayParam);
   }
@@ -59,6 +60,7 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
   huySua() {
     this.danhSachHocSinh = JSON.parse(JSON.stringify(this.backupDanhSach));
     this.dangSua = false;
+    this.cdr.detectChanges();
   }
 
   luuDiemDanh() {
@@ -69,35 +71,26 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
         trangThai: hs.trangThai
       }))
     };
-  
+
     this.diemDanhService.updateDiemDanh(payload).subscribe({
       next: (res) => {
         if (!res.isError) {
-          alert('✅ Cập nhật điểm danh thành công!');
           this.backupDanhSach = JSON.parse(JSON.stringify(this.danhSachHocSinh));
           this.dangSua = false;
+
+          this.cdr.detectChanges();
+          this.toastr.success('Cập nhật điểm danh thành công!', 'Thành công');
         } else {
-          // Lỗi từ server nhưng không throw → vẫn trong "next"
-          alert(`❌ Lỗi từ server: ${res.message}`);
+          // Xử lý lỗi từ server
         }
       },
       error: (err) => {
-        const apiMsg = err?.error?.message || err.message || 'Lỗi không xác định';
-        console.error('❌ Lỗi BE trả về:', apiMsg);
-  
-        // Gợi ý xử lý linh hoạt hơn
-        if (apiMsg.includes('Include') || apiMsg.includes('Select')) {
-          alert('⚠️ Lỗi hệ thống: Backend đang có vấn đề kỹ thuật (Include/Select). Vui lòng thử lại sau.');
-        } else {
-          alert('❌ ' + apiMsg);
-        }
-  
+        // Xử lý lỗi kết nối hoặc lỗi khác
         this.dangSua = false;
+        this.cdr.detectChanges();
       }
     });
   }
-  
-  
 
   private formatDateOnly(dateStr: string): string {
     const d = new Date(dateStr);
@@ -108,6 +101,6 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
 
   private toApiDateFormat(ngayStr: string): string {
     const parts = ngayStr.split(', ')[1].split('/');
-    return `${parts[2]}-${parts[1]}-${parts[0]}`; // yyyy-MM-dd
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
   }
 }
