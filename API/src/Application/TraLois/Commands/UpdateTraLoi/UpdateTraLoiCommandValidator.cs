@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using StudyFlow.Application.Common.Interfaces;
+using StudyFlow.Domain.Entities;
 
 namespace StudyFlow.Application.TraLois.Commands.UpdateTraLoi;
 
@@ -30,8 +31,11 @@ public class UpdateTraLoiCommandValidator : AbstractValidator<UpdateTraLoiComman
             .WithMessage("Tệp phải là .doc, .docx hoặc .pdf và không vượt quá 10MB.");
 
         RuleFor(x => x)
-            .MustAsync(HocSinhSoHuuTraLoi)
+            .MustAsync(HocSinhSoHuuVaChuaHetHan)
             .WithMessage("Bạn không có quyền cập nhật câu trả lời này.");
+        RuleFor(x => x)
+            .MustAsync(BaiTapChuaHetHanAsync)
+            .WithMessage("Bài tập này đã hết hạn bạn không thể sửa câu trả lời này");
     }
 
     private bool BeValidFile(IFormFile? file)
@@ -45,20 +49,41 @@ public class UpdateTraLoiCommandValidator : AbstractValidator<UpdateTraLoiComman
         return allowedExtensions.Contains(extension) && isValidSize;
     }
 
-    private async Task<bool> HocSinhSoHuuTraLoi(UpdateTraLoiCommand command, CancellationToken cancellationToken)
+    private Task<bool> BaiTapChuaHetHanAsync(UpdateTraLoiCommand command, CancellationToken cancellationToken)
     {
-        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        return HocSinhSoHuuVaChuaHetHan(command, cancellationToken);
+    }
+
+    private async Task<bool> HocSinhSoHuuVaChuaHetHan(UpdateTraLoiCommand command, CancellationToken cancellationToken)
+    {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"]
+            .ToString().Replace("Bearer ", "");
+
         if (string.IsNullOrEmpty(token)) return false;
 
         var userId = _identityService.GetUserId(token).ToString();
-        var hocSinh = await _context.HocSinhs.AsNoTracking().FirstOrDefaultAsync(h => h.UserId == userId, cancellationToken);
+        var hocSinh = await _context.HocSinhs
+            .AsNoTracking()
+            .FirstOrDefaultAsync(h => h.UserId == userId, cancellationToken);
 
         if (hocSinh == null) return false;
 
         var traLoi = await _context.TraLois
+            .Include(t => t.Baitap)
             .AsNoTracking()
             .FirstOrDefaultAsync(t => t.Id == command.TraLoiId && t.HocSinhCode == hocSinh.Code, cancellationToken);
 
-        return traLoi != null;
+        if (traLoi == null) return false;
+
+        var baiTap = traLoi.Baitap;
+
+        if (baiTap.ThoiGianKetThuc.HasValue && DateTime.Now >= baiTap.ThoiGianKetThuc.Value)
+            return false;
+
+        if (baiTap.TrangThai?.Trim().Equals("Kết thúc", StringComparison.OrdinalIgnoreCase) == true)
+            return false;
+
+        return true;
     }
+
 }
