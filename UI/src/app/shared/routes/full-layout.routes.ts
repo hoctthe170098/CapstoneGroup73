@@ -128,5 +128,9 @@ export const Full_ROUTES: Routes = [
     path: 'baocaodiemdanhquanlycoso',
     loadChildren: () => import('../../baocaodiemdanhquanlycoso/baocaodiemdanhquanlycoso.module').then(m => m.BaocaodiemdanhquanlycosoModule)
   },
+  {
+    path: 'lichhoc',
+    loadChildren: () => import('../../lichhoc/lichhoc.module').then(m => m.LichhocModule)
+  },
 
 ];

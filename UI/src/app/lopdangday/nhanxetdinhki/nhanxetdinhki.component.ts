@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,ChangeDetectorRef} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-
+import { LopdangdayService } from '../shared/lopdangday.service';
 @Component({
   selector: 'app-nhanxetdinhki',
   templateUrl: './nhanxetdinhki.component.html',
@@ -10,41 +10,74 @@ export class NhanxetdinhkiComponent implements OnInit {
   hocSinh: any;
   nhanXetMoi: string = '';
   dropdownIndex: number | null = null;
-
-  lichSu = [
-    {
-      ngay: new Date('2021-02-01'),
-      noiDung: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit...'
-    },
-    {
-      ngay: new Date('2021-02-01'),
-      noiDung: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit...'
-    }
-  ];
-
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  lichSu: any[] = [];
+  tenLop: string | null = null;
+  constructor(private route: ActivatedRoute, private router: Router,private lopService: LopdangdayService,private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     const code = this.route.snapshot.paramMap.get('hocSinhId');
-    const ten = this.route.snapshot.queryParamMap.get('ten');
+    this.tenLop = this.route.parent?.snapshot.paramMap.get('tenLop'); // 👈 Gán vào this
   
+    if (code && this.tenLop) {
+      this.loadNhanXetDinhKy(this.tenLop, code);
+    }
+  }
+  loadNhanXetDinhKy(tenLop: string, code: string) {
     this.hocSinh = {
       code: code,
-      ten: ten
+      ten: '' 
     };
+  
+    this.lopService.getNhanXetDinhKy(tenLop, code).subscribe({
+      next: (res) => {
+        const data = res.data;
+  
+        this.hocSinh = {
+          code: data.hocSinhCode,
+          ten: data.tenHocSinh
+        };
+  
+        this.lichSu = data.danhSachNhanXet.map((item: any) => ({
+          ngay: item.ngayNhanXet,
+          noiDung: item.noiDungNhanXet
+        }));
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Lỗi lấy nhận xét định kỳ:', err);
+      }
+    });
   }
+  
   
 
   xacNhan() {
-    if (this.nhanXetMoi.trim()) {
-      this.lichSu.unshift({
-        ngay: new Date(),
-        noiDung: this.nhanXetMoi.trim()
-      });
-      this.nhanXetMoi = '';
-      this.dropdownIndex = null;
-    }
+    if (!this.nhanXetMoi.trim()) return;
+  
+    const payload = {
+      hocSinhCode: this.hocSinh.code,
+      tenLop: this.tenLop,
+      noiDungNhanXet: this.nhanXetMoi.trim()
+    };
+  
+    this.lopService.createNhanXetDinhKy(payload).subscribe({
+      next: (res) => {
+        if (!res.isError) {
+          // Reload danh sách nhận xét mới nhất
+          this.loadNhanXetDinhKy(this.tenLop, this.hocSinh.code);
+          this.nhanXetMoi = '';
+          this.dropdownIndex = null;
+        } else {
+          alert(res.message); // tuỳ bạn xử lý
+        }
+      },
+      error: (err) => {
+        console.error('Lỗi tạo nhận xét:', err);
+        alert(err?.error?.message || 'Tạo nhận xét thất bại!');
+      }
+    });
   }
+  
 
   troVe() {
     this.router.navigate(['../'], { relativeTo: this.route });

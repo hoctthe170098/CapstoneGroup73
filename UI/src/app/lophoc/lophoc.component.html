@@ -321,13 +321,25 @@
 
             <div class="lop-hoc-footer">
               <div class="footer-left">
-                <button class="btn report-btn-green" (click)="diDenBaoCaoDiemDanh(lop.tenLop)">
-                  Báo cáo điểm danh
-                </button>
-                <button class="btn report-btn-green" (click)="diDenBaoCaoHocphi(lop.tenLop)">
-                  Báo cáo học phí
-                </button>
+                <div class="action-plus-wrapper horizontal-menu" (click)="toggleFooterActionMenu(i, $event)">
+                  <button class="btn report-btn-green dropdown-btn">
+                    <i class="ft-bar-chart-2 icon-left"></i> Báo cáo
+                    
+                  </button>
+              
+                  <div *ngIf="lop.showFooterActionMenu" class="action-menu horizontal" (click)="$event.stopPropagation()">
+                    <div class="action-option" (click)="diDenBaoCaoDiemDanh(lop.tenLop)">
+                      Điểm danh
+                    </div>
+                    <div class="action-option" (click)="diDenBaoCaoHocphi(lop.tenLop)">
+                      Học phí
+                    </div>
+                  </div>
+                </div>
               </div>
+              
+              
+              
             
               <div class="footer-right">
                 <button class="btn edit-btn" (click)="onEditClass(i)">Sửa</button>

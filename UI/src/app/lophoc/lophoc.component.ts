@@ -102,6 +102,13 @@ editScheduleDayBu: any = {
         i === index ? !this.lophocs[i].showActionMenu : false;
     });
   }
+  toggleFooterActionMenu(index: number, event: MouseEvent) {
+    event.stopPropagation();
+    this.lophocs.forEach((lop, i) => {
+      lop.showFooterActionMenu = i === index ? !lop.showFooterActionMenu : false;
+    });
+  }
+  
   handleClickOutsidePopupDropdown(event: any) {
     const dropdown = document.querySelector('.popup-giaovien-dropdown-wrapper');
     if (dropdown && !dropdown.contains(event.target as Node)) {
