@@ -230,8 +230,8 @@ export class ChitietBaitaphocsinhComponent implements OnInit, OnDestroy {
             tenHocSinh: item.hocSinhTen,
             thoiGianNop: new Date(item.thoiGian).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             noiDung: item.noiDung,
-              diem: 10,
-  nhanXet: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.',
+            diem: item.diem,
+            nhanXet: item.nhanXet,
             file: item.urlFile
               ? {
                   ten: this.getFileName(item.urlFile),

@@ -32,7 +32,11 @@
 
   <div class="answers-section">
     <h4>Trả lời của học sinh</h4>
-    <div class="answer-box" *ngFor="let ans of answers">
+    <div
+      class="answer-box"
+      *ngFor="let ans of answers"
+      [id]="'answer-' + ans.id"
+    >
       <div class="top-bar">
         <strong>{{ ans.tenHocSinh }}</strong>
         <div class="time-and-menu">
@@ -56,13 +60,19 @@
         <i class="ft-paperclip"></i>
         <span>{{ ans.file.ten }}</span>
       </div>
+      <hr class="feedback-separator" *ngIf="ans.diem || ans.nhanXet" />
+      <div class="answer-feedback" *ngIf="ans.diem || ans.nhanXet">
+        <p><strong>Điểm:</strong> {{ ans.diem }}/10</p>
+        <p><strong>Nhận xét giáo viên:</strong></p>
+        <p>{{ ans.nhanXet }}</p>
+      </div>
       <!-- Form chấm điểm nếu đang chấm câu trả lời này -->
       <div class="grading-form" *ngIf="gradingAnswerId === ans.id">
         <div class="form-group">
           <label>Điểm: </label>
           <input
             type="number"
-            [(ngModel)]="ans.diem"
+            [(ngModel)]="ans.tempDiem"
             min="0"
             max="10"
             class="form-control"
@@ -73,7 +83,7 @@
         <div class="form-group">
           <label>Nhận xét giáo viên:</label>
           <textarea
-            [(ngModel)]="ans.nhanXet"
+            [(ngModel)]="ans.tempNhanXet"
             class="form-control"
             placeholder="Nhận xét..."
           ></textarea>

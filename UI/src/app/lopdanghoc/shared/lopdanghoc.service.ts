@@ -111,5 +111,15 @@ export class LopdanghocService {
       { headers }
     );
   }
+  getBaoCaoTatCaCacDiem(tenLop: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  
+    return this.http.get<any>(
+      `${this.baseUrl}/DiemDanhs/getbaocaotatcacacdiem?TenLop=${encodeURIComponent(tenLop)}`,
+      { headers }
+    );
+  }
+  
   
 }
