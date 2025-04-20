@@ -64,6 +64,7 @@ public class CreateNhanXetDinhKyCommandHandler : IRequestHandler<CreateNhanXetDi
                 STT = NhanXetDinhKys.Count + 1
             };
             _context.NhanXetDinhKys.Add(nhanXetDinhKy);
+            await _identityService.SendNhanXetDinhKy(request.HocSinhCode,request.TenLop,nhanXetDinhKy);
             await _context.SaveChangesAsync(cancellationToken);
             return new Output
             {
