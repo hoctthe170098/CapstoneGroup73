@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using StudyFlow.Application.Common.Models;
+using StudyFlow.Domain.Entities;
 
 namespace StudyFlow.Application.Common.Interfaces;
 
@@ -22,4 +23,5 @@ public interface IIdentityService
     Guid GetUserId(string token);
     Task<Result> UpdateStatusUser(string userId,bool status);
     Task<Result> changeEmail(string userId,string email);
+    Task<Result> SendNhanXetDinhKy(string HocSinhCode,string TenLop, NhanXetDinhKy NhanXet);
 }

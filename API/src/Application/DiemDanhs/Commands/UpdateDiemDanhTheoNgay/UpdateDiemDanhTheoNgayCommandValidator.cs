@@ -8,7 +8,7 @@ using System;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace StudyFlow.Application.LichHocs.Commands.UpdateDiemDanhTheoNgay;
+namespace StudyFlow.Application.DiemDanhs.Commands.UpdateDiemDanhTheoNgay;
 
 public class UpdateDiemDanhTheoNgayCommandValidator : AbstractValidator<UpdateDiemDanhTheoNgayCommand>
 {

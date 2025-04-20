@@ -12,24 +12,24 @@ public record UpdateKetQuaBaiKiemTraCommand : IRequest<Output>
 {
     public required List<KetQuaBaiKiemTraDto> UpdateKetQuas { get; init; }
 }
-    public class UpdateKetQuaBaiKiemTraCommandHandler : IRequestHandler<UpdateKetQuaBaiKiemTraCommand, Output>
-    {
-        private readonly IApplicationDbContext _context;
-        private readonly IIdentityService _identityService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+public class UpdateKetQuaBaiKiemTraCommandHandler : IRequestHandler<UpdateKetQuaBaiKiemTraCommand, Output>
+{
+    private readonly IApplicationDbContext _context;
+    private readonly IIdentityService _identityService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UpdateKetQuaBaiKiemTraCommandHandler(IApplicationDbContext context, IIdentityService identityService,
-            IHttpContextAccessor httpContextAccessor)
+    public UpdateKetQuaBaiKiemTraCommandHandler(IApplicationDbContext context, IIdentityService identityService,
+        IHttpContextAccessor httpContextAccessor)
+    {
+        _context = context;
+        _identityService = identityService;
+        _httpContextAccessor = httpContextAccessor;
+    }
+    public async Task<Output> Handle(UpdateKetQuaBaiKiemTraCommand request, CancellationToken cancellationToken)
+    {
+        foreach (var item in request.UpdateKetQuas)
         {
-            _context = context;
-            _identityService = identityService;
-            _httpContextAccessor = httpContextAccessor;
-        }
-        public async Task<Output> Handle(UpdateKetQuaBaiKiemTraCommand request, CancellationToken cancellationToken)
-        {
-           foreach(var item in request.UpdateKetQuas)
-        {
-            var ketQua = _context.KetQuaBaiKiemTras.First(kq=>kq.Id == item.Id);
+            var ketQua = _context.KetQuaBaiKiemTras.First(kq => kq.Id == item.Id);
             ketQua.Diem = item.Diem;
             ketQua.NhanXet = item.NhanXet;
             await _context.SaveChangesAsync(cancellationToken);
@@ -40,5 +40,5 @@ public record UpdateKetQuaBaiKiemTraCommand : IRequest<Output>
             code = 200,
             message = "Chỉnh sửa kết quá bài kiểm tra thành công"
         };
-        }
     }
+}

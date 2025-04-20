@@ -31,7 +31,10 @@ public class ImportHocSinhFromExcelCommandHandler : IRequestHandler<ImportHocSin
         {
             if (request.File == null || request.File.Length == 0)
                 throw new NotFoundDataException("File không được để trống");
-
+            if (!Path.GetExtension(request.File.FileName).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new WrongInputException("Import thất bại: File tải lên không phải là file Excel (.xlsx).");
+            }
             var hocSinhList = new List<HocSinhDto>();
 
             using (var stream = new MemoryStream())
@@ -87,8 +90,13 @@ public class ImportHocSinhFromExcelCommandHandler : IRequestHandler<ImportHocSin
             {
                 isError = false,
                 data = hocSinhList,
-                code = 200
+                code = 200,
+                message = "Import file thành công",
             };
+        }
+        catch (WrongInputException)
+        {
+            throw;
         }
         catch
         {

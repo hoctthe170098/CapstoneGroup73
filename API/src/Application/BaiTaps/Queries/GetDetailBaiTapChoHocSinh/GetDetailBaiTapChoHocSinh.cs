@@ -73,7 +73,7 @@ public class GetDetailBaiTapChoHocSinhQueryHandler : IRequestHandler<GetDetailBa
             baiTap.Id,
             baiTap.TieuDe,
             baiTap.NoiDung,
-            NgayTao = baiTap.NgayTao.ToString("yyyy-MM-dd"),
+            NgayTao = baiTap.NgayTao,
             ThoiGianKetThuc = baiTap.ThoiGianKetThuc?.ToString("yyyy-MM-ddTHH:mm:ss"),
             SecondsUntilDeadline = secondsLeft,
             UrlFile = baiTap.UrlFile,
