@@ -67,7 +67,17 @@ public class GetBaoCaoDiemHocSinhQueryHandler : IRequestHandler<GetBaoCaoDiemHoc
                 NhanXet = nx.NoiDungNhanXet
             })
             .ToListAsync(cancellationToken);
-
+         var diemKiemTra = baiKiemTraList
+            .OrderByDescending(dkt => dkt.BaiKiemTra.NgayKiemTra)
+            .Select(dkt => new DiemKiemTraDto
+            {
+                Ten = dkt.BaiKiemTra.Ten,
+                NgayKiemTra = dkt.BaiKiemTra.NgayKiemTra?.ToString("dd/MM/yyyy") ?? "N/A",
+                TrangThai = dkt.BaiKiemTra.TrangThai,
+                Diem = dkt.Diem.HasValue ? $"{dkt.Diem}/10" : "N/A",
+                NhanXet = string.IsNullOrWhiteSpace(dkt.NhanXet) ? "N/A" : dkt.NhanXet
+            })
+            .ToList();
         var diemHangNgay = diemDanhList
             .OrderByDescending(dd => dd.Ngay)
             .Select(dd => new DiemHangNgayDto
@@ -98,6 +108,7 @@ public class GetBaoCaoDiemHocSinhQueryHandler : IRequestHandler<GetBaoCaoDiemHoc
             DiemTrenLopTB = Math.Round(diemTrenLopTB, 2),
             DiemBaiTapTB = Math.Round(diemBTVNTB, 2),
             DiemKiemTraTB = Math.Round(diemKiemTraTB, 2),
+            DiemKiemTras = diemKiemTra,
             NhanXetDinhKy = nhanXetDinhKyList,
             DiemHangNgay = diemHangNgay
         };

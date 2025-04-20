@@ -22,8 +22,12 @@ public class CreateTraLoiCommandValidator : AbstractValidator<CreateTraLoiComman
             .WithMessage("Tệp đính kèm phải là .doc, .docx, hoặc .pdf và không được vượt quá 10MB.");
 
         RuleFor(x => x.BaiTapId)
-            .MustAsync(BeBeforeDeadline)
+            .MustAsync(TruocDeadline)
             .WithMessage("Bài tập này đã quá hạn, bạn không thể nộp trả lời.");
+
+        RuleFor(x => x.BaiTapId)
+            .MustAsync(ChuaBatDau)
+            .WithMessage("Bài tập này chưa được mở, bạn không thể nộp trả lời.");
     }
 
     private bool BeValidFile(IFormFile? file)
@@ -38,15 +42,26 @@ public class CreateTraLoiCommandValidator : AbstractValidator<CreateTraLoiComman
         return isExtensionValid && isSizeValid;
     }
 
-    private async Task<bool> BeBeforeDeadline(Guid baiTapId, CancellationToken cancellationToken)
+    private async Task<bool> TruocDeadline(Guid baiTapId, CancellationToken cancellationToken)
     {
         var baiTap = await _context.BaiTaps
             .AsNoTracking()
             .FirstOrDefaultAsync(bt => bt.Id == baiTapId, cancellationToken);
 
         if (baiTap == null || baiTap.ThoiGianKetThuc == null)
-            return true; 
+            return true;
 
         return DateTime.Now < baiTap.ThoiGianKetThuc;
+    }
+
+    private async Task<bool> ChuaBatDau(Guid baiTapId, CancellationToken cancellationToken)
+    {
+        var baiTap = await _context.BaiTaps
+            .AsNoTracking()
+            .FirstOrDefaultAsync(bt => bt.Id == baiTapId, cancellationToken);
+
+        if (baiTap == null) return true;
+
+        return !string.Equals(baiTap.TrangThai?.Trim(), "Chưa mở", StringComparison.OrdinalIgnoreCase);
     }
 }
