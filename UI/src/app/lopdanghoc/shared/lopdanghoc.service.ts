@@ -121,5 +121,19 @@ export class LopdanghocService {
     );
   }
   
+  getChuongTrinhLopHoc(tenLop: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  
+    const body = {
+      tenLop
+    };
+
+    return this.http.post<any>(
+      `${this.baseUrl}/ChuongTrinhs/getchuongtrinhbyclass`,
+      body,
+      { headers }
+    );
+  }
   
 }

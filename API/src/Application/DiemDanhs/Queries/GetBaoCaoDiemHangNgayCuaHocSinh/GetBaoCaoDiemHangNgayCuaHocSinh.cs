@@ -115,6 +115,5 @@ public class GetBaoCaoDiemHangNgayCuaHocSinhQueryHandler : IRequestHandler<GetBa
             }
         }
         return ngayDaHocList;
-    }
-        
+    }      
 }

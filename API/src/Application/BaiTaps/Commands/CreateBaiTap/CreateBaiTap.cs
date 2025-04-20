@@ -83,7 +83,7 @@ public class CreateBaiTapCommandHandler : IRequestHandler<CreateBaiTapCommand, O
         var baiTap = new BaiTap
         {
             Id = Guid.NewGuid(),
-            NgayTao = today,
+            NgayTao = DateTime.Now,
             LichHocId = lichHoc.Id,
             TieuDe = dto.TieuDe,
             NoiDung = dto.NoiDung,
