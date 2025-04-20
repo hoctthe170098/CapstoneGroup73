@@ -1,10 +1,7 @@
-﻿using System.Linq;
-using FluentValidation;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
+﻿using Microsoft.AspNetCore.Http;
 using StudyFlow.Application.BaiTaps.Commands.CreateBaiTap;
 using StudyFlow.Application.Common.Interfaces;
+using System.Linq;
 
 public class CreateBaiTapCommandValidator : AbstractValidator<CreateBaiTapCommand>
 {
@@ -37,10 +34,12 @@ public class CreateBaiTapCommandValidator : AbstractValidator<CreateBaiTapComman
             .WithMessage("Tệp phải là .pdf, .doc hoặc .docx và không vượt quá 10MB.");
 
         RuleFor(x => x)
-            .MustAsync(NgayTaoValidWithLichHoc)
-            .WithMessage("Hôm nay không có lịch học của lớp hoặc Bạn không thể tạo bài tập trong buổi dạy thay.");
+            .MustAsync(HomNayCoLichHoc)
+            .WithMessage("Hôm nay không có lịch học phù hợp để tạo bài tập.");
 
-
+        RuleFor(x => x)
+            .MustAsync(KhongPhaiLichDayThay)
+            .WithMessage("Bạn không thể tạo bài tập trong buổi dạy thay.");
     }
 
     private bool ValidTaiLieu(IFormFile file)
@@ -51,7 +50,7 @@ public class CreateBaiTapCommandValidator : AbstractValidator<CreateBaiTapComman
         var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
 
         bool isValidExtension = allowedExtensions.Contains(extension);
-        bool isValidSize = file.Length <= 10 * 1024 * 1024; // <= 10MB
+        bool isValidSize = file.Length <= 10 * 1024 * 1024;
 
         return isValidExtension && isValidSize;
     }
@@ -61,7 +60,7 @@ public class CreateBaiTapCommandValidator : AbstractValidator<CreateBaiTapComman
         return dateTime.HasValue && dateTime.Value > DateTime.Now;
     }
 
-    private async Task<bool> NgayTaoValidWithLichHoc(CreateBaiTapCommand command, CancellationToken cancellationToken)
+    private async Task<bool> HomNayCoLichHoc(CreateBaiTapCommand command, CancellationToken cancellationToken)
     {
         var dto = command.CreateBaiTapDto;
         var today = DateOnly.FromDateTime(DateTime.Now);
@@ -75,19 +74,27 @@ public class CreateBaiTapCommandValidator : AbstractValidator<CreateBaiTapComman
                 today <= lh.NgayKetThuc,
                 cancellationToken);
 
-        if (lichHoc == null) return false;
-
-        // Không cho phép tạo nếu là lịch học dạy thay
-        if (lichHoc.TrangThai != null && lichHoc.TrangThai.Trim().Equals("Dạy thay", StringComparison.OrdinalIgnoreCase))
-        {
-            return false;
-        }
-
-        return true;
+        return lichHoc != null;
     }
 
+    private async Task<bool> KhongPhaiLichDayThay(CreateBaiTapCommand command, CancellationToken cancellationToken)
+    {
+        var dto = command.CreateBaiTapDto;
+        var today = DateOnly.FromDateTime(DateTime.Now);
+        var thu = ConvertDayOfWeekToThu(DateTime.Now.DayOfWeek);
 
+        var lichHoc = await _context.LichHocs
+            .FirstOrDefaultAsync(lh =>
+                lh.TenLop == dto.TenLop &&
+                lh.Thu == thu &&
+                lh.NgayBatDau <= today &&
+                today <= lh.NgayKetThuc,
+                cancellationToken);
 
+        if (lichHoc == null) return true; 
+
+        return !string.Equals(lichHoc.TrangThai?.Trim(), "Dạy thay", StringComparison.OrdinalIgnoreCase);
+    }
 
     private int ConvertDayOfWeekToThu(DayOfWeek dayOfWeek)
     {
