@@ -5,6 +5,7 @@ using StudyFlow.Application.BaiKiemTras.Queries.GetBaiKiemTrasWithPagination;
 using StudyFlow.Application.ChinhSachs.Commands.DeleteBaiKiemTra;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Application.NhanXetDinhKys.Commands.CreateNhanXetDinhKy;
+using StudyFlow.Application.NhanXetDinhKys.Commands.DeleteNhanXetDinhKy;
 using StudyFlow.Application.NhanXetDinhKys.Commands.UpdateNhanXetDinhKy;
 using StudyFlow.Application.NhanXetDinhKys.Queries.GetNhanXetDinhKy;
 using StudyFlow.Domain.Constants;
@@ -36,9 +37,9 @@ public class NhanXetDinhKys : EndpointGroupBase
     {
         return await sender.Send(command);
     }
-    [Authorize(Roles = Roles.LearningManager)]
+    [Authorize(Roles = Roles.Teacher)]
     public async Task<Output> DeleteNhanXetDinhKy(ISender sender, Guid id)
     {
-        return await sender.Send(new DeleteBaiKiemTraCommand(id));
+        return await sender.Send(new DeleteNhanXetDinhKyCommand(id));
     }
 }

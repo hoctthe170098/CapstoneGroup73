@@ -12,6 +12,8 @@ export class NhanxetdinhkiComponent implements OnInit {
   dropdownIndex: number | null = null;
   lichSu: any[] = [];
   tenLop: string | null = null;
+  idDangSua: string | null = null;
+  denHanNhanXet: boolean = false;
   constructor(private route: ActivatedRoute, private router: Router,private lopService: LopdangdayService,private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
@@ -31,16 +33,19 @@ export class NhanxetdinhkiComponent implements OnInit {
     this.lopService.getNhanXetDinhKy(tenLop, code).subscribe({
       next: (res) => {
         const data = res.data;
-  
+    
         this.hocSinh = {
           code: data.hocSinhCode,
           ten: data.tenHocSinh
         };
-  
+    
         this.lichSu = data.danhSachNhanXet.map((item: any) => ({
+          id: item.id,
           ngay: item.ngayNhanXet,
           noiDung: item.noiDungNhanXet
         }));
+    
+        this.denHanNhanXet = data.denHanNhanXet; 
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -52,31 +57,35 @@ export class NhanxetdinhkiComponent implements OnInit {
   
 
   xacNhan() {
-    if (!this.nhanXetMoi.trim()) return;
+    const noiDung = this.nhanXetMoi.trim();
+    if (!noiDung) return;
   
-    const payload = {
-      hocSinhCode: this.hocSinh.code,
-      tenLop: this.tenLop,
-      noiDungNhanXet: this.nhanXetMoi.trim()
-    };
-  
-    this.lopService.createNhanXetDinhKy(payload).subscribe({
-      next: (res) => {
-        if (!res.isError) {
-          // Reload danh sách nhận xét mới nhất
-          this.loadNhanXetDinhKy(this.tenLop, this.hocSinh.code);
-          this.nhanXetMoi = '';
-          this.dropdownIndex = null;
-        } else {
-          alert(res.message); // tuỳ bạn xử lý
+    // Trường hợp chỉnh sửa
+    if (this.idDangSua) {
+      this.lopService.updateNhanXetDinhKy({
+        id: this.idDangSua,
+        noiDungNhanXet: noiDung
+      }).subscribe({
+        next: (res) => {
+          if (!res.isError) {
+            this.loadNhanXetDinhKy(this.tenLop, this.hocSinh.code); // reload danh sách
+            this.nhanXetMoi = '';
+            this.idDangSua = null;
+          } else {
+            alert(res.message);
+          }
+        },
+        error: (err) => {
+          alert(err?.error?.message || 'Lỗi cập nhật nhận xét!');
         }
-      },
-      error: (err) => {
-        console.error('Lỗi tạo nhận xét:', err);
-        alert(err?.error?.message || 'Tạo nhận xét thất bại!');
-      }
-    });
+      });
+  
+      return;
+    }
+  
+    // Nếu không phải sửa → là tạo mới (nếu bạn vẫn dùng tính năng tạo)
   }
+  
   
 
   troVe() {
@@ -89,12 +98,26 @@ export class NhanxetdinhkiComponent implements OnInit {
 
   suaNhanXet(item: any) {
     this.nhanXetMoi = item.noiDung;
-    this.lichSu = this.lichSu.filter(x => x !== item);
+    this.idDangSua = item.id; // ✅ giữ ID để update
     this.dropdownIndex = null;
   }
 
   xoaNhanXet(item: any) {
-    this.lichSu = this.lichSu.filter(x => x !== item);
-    this.dropdownIndex = null;
+    const xacNhan = confirm('Bạn có chắc chắn muốn xoá nhận xét này không?');
+    if (!xacNhan) return;
+  
+    this.lopService.deleteNhanXetDinhKy(item.id).subscribe({
+      next: (res) => {
+        if (!res.isError) {
+          this.loadNhanXetDinhKy(this.tenLop, this.hocSinh.code); // reload sau khi xoá
+          this.dropdownIndex = null;
+        } else {
+          alert(res.message);
+        }
+      },
+      error: (err) => {
+        alert(err?.error?.message || 'Xoá nhận xét thất bại!');
+      }
+    });
   }
 }
