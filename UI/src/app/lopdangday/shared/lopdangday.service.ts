@@ -251,7 +251,10 @@ export class LopdangdayService {
     noiDungNhanXet: string;
   }): Observable<any> {
     const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+      .set('Content-Type', 'application/json');
+  
     return this.http.post<any>(
       `${this.baseUrl}/NhanXetDinhKys/createnhanxetdinhky`,
       payload,

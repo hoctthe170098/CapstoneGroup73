@@ -53,7 +53,7 @@ public class CreateNhanXetDinhKyCommandHandler : IRequestHandler<CreateNhanXetDi
             .OrderBy(nx => nx.STT)
             .ToList();
         var ThamGiaLopHocHienTai = ThamGiaLopHocs.OrderByDescending(tg => tg.NgayKetThuc).ToList()[0];
-        if (true)
+        if (NgayDaHoc.Count / 4 > NhanXetDinhKys.Count)
         {
             var nhanXetDinhKy = new NhanXetDinhKy
             {

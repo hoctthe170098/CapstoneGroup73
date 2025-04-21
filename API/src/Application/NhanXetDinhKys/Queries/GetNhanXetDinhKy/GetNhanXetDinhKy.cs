@@ -64,7 +64,7 @@ public class GetNhanXetDinhKysQueryHandler : IRequestHandler<GetNhanXetDinhKysQu
             {
                 HocSinhCode = ThamGiaLopHocs[0].HocSinh.Code,
                 TenHocSinh = ThamGiaLopHocs[0].HocSinh.Ten,
-                DenHanNhanXet = true,
+                DenHanNhanXet = (NgayDaHoc.Count / 4 > NhanXetDinhKys.Count),
                 DanhSachNhanXet = NhanXetDinhKys
             },
             message = "Lấy danh sách nhận xét định kỳ thành công"
