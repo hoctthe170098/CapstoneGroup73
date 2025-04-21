@@ -60,7 +60,7 @@ export class NhanxetdinhkiComponent implements OnInit {
     const noiDung = this.nhanXetMoi.trim();
     if (!noiDung) return;
   
-    // Trường hợp chỉnh sửa
+    // Trường hợp CHỈNH SỬA
     if (this.idDangSua) {
       this.lopService.updateNhanXetDinhKy({
         id: this.idDangSua,
@@ -68,7 +68,7 @@ export class NhanxetdinhkiComponent implements OnInit {
       }).subscribe({
         next: (res) => {
           if (!res.isError) {
-            this.loadNhanXetDinhKy(this.tenLop, this.hocSinh.code); // reload danh sách
+            this.loadNhanXetDinhKy(this.tenLop, this.hocSinh.code);
             this.nhanXetMoi = '';
             this.idDangSua = null;
           } else {
@@ -83,8 +83,26 @@ export class NhanxetdinhkiComponent implements OnInit {
       return;
     }
   
-    // Nếu không phải sửa → là tạo mới (nếu bạn vẫn dùng tính năng tạo)
+    // Trường hợp TẠO MỚI nhận xét
+    this.lopService.createNhanXetDinhKy({
+      hocSinhCode: this.hocSinh.code,
+      tenLop: this.tenLop!,
+      noiDungNhanXet: noiDung
+    }).subscribe({
+      next: (res) => {
+        if (!res.isError) {
+          this.loadNhanXetDinhKy(this.tenLop, this.hocSinh.code);
+          this.nhanXetMoi = '';
+        } else {
+          alert(res.message);
+        }
+      },
+      error: (err) => {
+        alert(err?.error?.message || 'Lỗi tạo nhận xét!');
+      }
+    });
   }
+  
   
   
 
@@ -98,7 +116,7 @@ export class NhanxetdinhkiComponent implements OnInit {
 
   suaNhanXet(item: any) {
     this.nhanXetMoi = item.noiDung;
-    this.idDangSua = item.id; // ✅ giữ ID để update
+    this.idDangSua = item.id; 
     this.dropdownIndex = null;
   }
 
@@ -109,7 +127,7 @@ export class NhanxetdinhkiComponent implements OnInit {
     this.lopService.deleteNhanXetDinhKy(item.id).subscribe({
       next: (res) => {
         if (!res.isError) {
-          this.loadNhanXetDinhKy(this.tenLop, this.hocSinh.code); // reload sau khi xoá
+          this.loadNhanXetDinhKy(this.tenLop, this.hocSinh.code);
           this.dropdownIndex = null;
         } else {
           alert(res.message);
