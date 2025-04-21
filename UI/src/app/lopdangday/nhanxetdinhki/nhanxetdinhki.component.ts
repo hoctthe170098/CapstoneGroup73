@@ -83,7 +83,24 @@ export class NhanxetdinhkiComponent implements OnInit {
       return;
     }
   
-    // Nếu không phải sửa → là tạo mới (nếu bạn vẫn dùng tính năng tạo)
+       // Trường hợp TẠO MỚI nhận xét
+       this.lopService.createNhanXetDinhKy({
+        hocSinhCode: this.hocSinh.code,
+        tenLop: this.tenLop!,
+        noiDungNhanXet: noiDung
+      }).subscribe({
+        next: (res) => {
+          if (!res.isError) {
+            this.loadNhanXetDinhKy(this.tenLop, this.hocSinh.code);
+            this.nhanXetMoi = '';
+          } else {
+            alert(res.message);
+          }
+        },
+        error: (err) => {
+          alert(err?.error?.message || 'Lỗi tạo nhận xét!');
+        }
+      });
   }
   
   
