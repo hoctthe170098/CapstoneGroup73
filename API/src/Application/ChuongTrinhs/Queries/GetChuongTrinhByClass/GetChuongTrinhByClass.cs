@@ -38,6 +38,20 @@ public class GetChuongTrinhByClassQueryHandler : IRequestHandler<GetChuongTrinhB
     {
         try
         {
+
+            if (string.IsNullOrWhiteSpace(request.TenLop))
+            {
+                throw new WrongInputException("Tên lớp không được trống");
+            }
+
+            var isClassExist = await _context.LichHocs
+                .AnyAsync(lh => lh.TenLop == request.TenLop, cancellationToken);
+
+            if (!isClassExist)
+            {
+                throw new WrongInputException("Lớp không tồn tại");
+            }
+
             var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             if (string.IsNullOrEmpty(token))
                 throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
@@ -81,6 +95,8 @@ public class GetChuongTrinhByClassQueryHandler : IRequestHandler<GetChuongTrinhB
             {
                 throw new AuthenticationException($"Role không được phép: [{string.Join(", ", role)}]");
             }
+
+
 
             var chuongTrinh = await _context.LichHocs
                 .Include(ct => ct.ChuongTrinh)
