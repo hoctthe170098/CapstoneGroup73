@@ -1,25 +1,24 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { LichHocService } from './shared/lichday.service';
-import { LichHocTrongNgay } from './shared/lichday.model';
+import { LichHocService } from './shared/lichhoc.service'; // sửa lại path nếu khác
+import { GetLichHocHocSinhResponse, LichHocTrongNgay } from './shared/lichhoc.model';
 
 @Component({
-  selector: 'app-lichday',
-  templateUrl: './lichday.component.html',
-  styleUrls: ['./lichday.component.scss']
+  selector: 'app-lichhoc',
+  templateUrl: './lichhoc.component.html',
+  styleUrls: ['./lichhoc.component.scss']
 })
-export class LichDayComponent implements OnInit {
-  hours = Array.from({ length: 15 }, (_, i) => i + 8); // 8h - 22h
+export class LichhocComponent implements OnInit {
+  hours = Array.from({ length: 15 }, (_, i) => i + 8); // từ 8h đến 22h
   years: number[] = [];
   weeks: { value: number; label: string }[] = [];
   selectedWeek = new Date().getWeekNumber();
   selectedYear = new Date().getFullYear();
-
   schedule: LichHocTrongNgay[] = [];
 
   constructor(
     private lichHocService: LichHocService,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     const currentYear = new Date().getFullYear();
@@ -60,7 +59,7 @@ export class LichDayComponent implements OnInit {
 
   loadSchedule() {
     this.lichHocService
-      .getLichHocGiaoVien(this.selectedWeek, this.selectedYear)
+      .getLichHocHocSinh(this.selectedWeek, this.selectedYear)
       .subscribe((res) => {
         if (!res.isError) {
           this.schedule = res.data.lichHocCaTuans.map((day) => {
@@ -73,8 +72,8 @@ export class LichDayComponent implements OnInit {
                 .getDate()
                 .toString()
                 .padStart(2, '0')}/${(date.getMonth() + 1)
-                  .toString()
-                  .padStart(2, '0')}`
+                .toString()
+                .padStart(2, '0')}`
             };
           });
           this.cdr.detectChanges();
@@ -116,15 +115,18 @@ export class LichDayComponent implements OnInit {
     const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
   }
+
+  formatTrangThai(status: string): string {
+    return status === 'Dạy bù' ? 'Học bù' : status;
+  }
 }
 
-// Utility: Thêm method getWeekNumber vào Date prototype
+// Thêm phương thức getWeekNumber cho Date
 declare global {
   interface Date {
     getWeekNumber(): number;
   }
 }
-
 Date.prototype.getWeekNumber = function () {
   const date = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
   const dayNum = date.getUTCDay() || 7;

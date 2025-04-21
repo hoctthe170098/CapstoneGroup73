@@ -239,4 +239,47 @@ export class LopdangdayService {
       { headers }
     );
   }
+  getNhanXetDinhKy(tenLop: string, hocSinhCode: string): Observable<any> {
+    const token = localStorage.getItem("token");
+    const headers = new HttpHeaders().set("Authorization", `Bearer ${token}`);
+    const url = `${this.baseUrl}/NhanXetDinhKys/getnhanxetdinhky?TenLop=${encodeURIComponent(tenLop)}&HocSinhCode=${encodeURIComponent(hocSinhCode)}`;
+    return this.http.get<any>(url, { headers });
+  }
+  createNhanXetDinhKy(payload: {
+    hocSinhCode: string;
+    tenLop: string;
+    noiDungNhanXet: string;
+  }): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<any>(
+      `${this.baseUrl}/NhanXetDinhKys/createnhanxetdinhky`,
+      payload,
+      { headers }
+    );
+  }
+  updateNhanXetDinhKy(payload: {
+    id: string;
+    noiDungNhanXet: string;
+  }): Observable<any> {
+    const token = localStorage.getItem("token");
+    const headers = new HttpHeaders()
+      .set("Authorization", `Bearer ${token}`)
+      .set("Content-Type", "application/json");
+  
+    return this.http.put<any>(
+      `${this.baseUrl}/NhanXetDinhKys/updatenhanxetdinhky`,
+      payload,
+      { headers }
+    );
+  }
+  deleteNhanXetDinhKy(id: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  
+    return this.http.delete<any>(
+      `${this.baseUrl}/NhanXetDinhKys/deletenhanxetdinhky?id=${id}`,
+      { headers }
+    );
+  }
 }

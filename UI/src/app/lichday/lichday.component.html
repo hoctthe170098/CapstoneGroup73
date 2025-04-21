@@ -31,13 +31,14 @@
         <div class="time-blocks">
           <div class="hour-line" *ngFor="let hour of hours"></div>
 
-          <div *ngFor="let lesson of day.lops"
-               class="lesson-block"
-               [ngStyle]="getLessonStyle(lesson)">
+          <div *ngFor="let lesson of day.lops" class="lesson-block" [ngStyle]="getLessonStyle(lesson)">
             <div class="title">{{ lesson.tenLop }} - {{ lesson.tenChuongTrinh }}</div>
             <div class="room">{{ lesson.tenPhong }}</div>
             <div class="time">
               ({{ formatTime(lesson.gioBatDau) }} - {{ formatTime(lesson.gioKetThuc) }})
+            </div>
+            <div class="status">
+              {{ lesson.trangThai === 'Dạy bù' ? 'Học bù' : lesson.trangThai }}
             </div>
           </div>
         </div>

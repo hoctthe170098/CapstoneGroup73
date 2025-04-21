@@ -69,7 +69,7 @@ public class DiemDanhs : EndpointGroupBase
     {
         return await sender.Send(query);
     }
-    [Authorize(Roles = Roles.Teacher)]
+    [Authorize(Roles = Roles.Student)]
     public async Task<Output> GetBaoCaoDiemDanhHocSinh(ISender sender, [AsParameters] GetBaoCaoDiemDanhHocSinhQuery query)
     {
         return await sender.Send(query);

@@ -31,7 +31,7 @@ export class DanhsachhocsinhComponent implements OnInit {
         if (!response.isError) {
           this.danhSachHocSinh = response.data;
           this.cdr.detectChanges();
-          console.debug("Danh sách học sinh:", this.danhSachHocSinh);
+          
         } else {
           if (response.message === 'Dữ liệu không tồn tại!'){
             this.toastr.error('Giáo viên id không hợp lê!', 'Lỗi');
@@ -41,14 +41,14 @@ export class DanhsachhocsinhComponent implements OnInit {
         }
       },
       (error) => {
-        console.debug("Error fetching students:", error);
+        
       }
     );
   }
   chuyenTrangNhanXet(hs: DanhSachHocSinh) {
     this.router.navigate(
-      [`/lopdangday/chi-tiet/${this.tenLop}/nhanxetdinhki`, hs.code],
-      { queryParams: { ten: hs.ten } }
+      [`/lopdangday/chi-tiet/${this.tenLop}/nhanxetdinhki`, hs.code]
     );
+    
   }
 }
