@@ -92,4 +92,10 @@ export const Full_ROUTES: Routes = [
     canActivate:[AuthGuard],
     data:{role:[UserRole.Student]}
   },
+  {
+    path: 'dashboard-cm',
+    loadChildren: () => import('../../dashboard-cm/dashboard-cm.module').then(m => m.DashboardCMModule),
+    canActivate:[AuthGuard],
+    data:{role:[UserRole.CampusManager]}
+  }
 ];
