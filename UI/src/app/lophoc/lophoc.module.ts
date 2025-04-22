@@ -5,13 +5,17 @@ import { LophocRoutingModule } from './lophoc-routing.module';
 import { LophocComponent } from './lophoc.component';
 import { AddlophocComponent } from './addlophoc/addlophoc.component';
 import { EditLopHocComponent } from './editlophoc/editlophoc.component';
+import { BaocaodiemdanhquanlycosoComponent } from './baocaodiemdanhquanlycoso/baocaodiemdanhquanlycoso.component';
+import { BaocaohocphiComponent } from './baocaohocphi/baocaohocphi.component';
 import { NgSelectModule } from '@ng-select/ng-select'
 
 @NgModule({
   declarations: [
     LophocComponent,
     AddlophocComponent,
-    EditLopHocComponent
+    EditLopHocComponent,
+    BaocaodiemdanhquanlycosoComponent,
+    BaocaohocphiComponent
   ],
   imports: [
     NgSelectModule,

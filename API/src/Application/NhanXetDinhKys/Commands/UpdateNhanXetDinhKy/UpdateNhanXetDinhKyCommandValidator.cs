@@ -44,6 +44,6 @@ public class UpdateNhanXetDinhKyCommandValidator : AbstractValidator<UpdateNhanX
     private bool DungFormat(string noiDung)
     {
         noiDung = noiDung.Trim();
-        return noiDung.Length == 0 || noiDung.Length > 200;
+        return (noiDung.Length > 0 && noiDung.Length <= 200);
     }
 }

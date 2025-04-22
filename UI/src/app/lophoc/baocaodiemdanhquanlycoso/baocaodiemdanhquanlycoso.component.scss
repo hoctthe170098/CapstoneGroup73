@@ -50,9 +50,11 @@
   
         th, td {
           padding: 12px;
-          border: 1px solid #e0e0e0;
+          border-top: 1px solid #e0e0e0;
+          border-bottom: 1px solid #e0e0e0;
           text-align: left;
         }
+        
   
         th {
           background: #f0f2f5;
@@ -106,5 +108,51 @@
           color: white;
         }
       }
+      .sidebar {
+        width: 200px;
+        min-height: 400px;
+        background: #dce4ff;
+        border-radius: 8px;
+        padding: 12px;
+      
+        // THÊM DÒNG DƯỚI ĐỂ CÓ KHUNG
+        max-height: 500px;
+        overflow-y: auto;
+        border: 1px solid #b0c5ff; 
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); // tuỳ chọn để giống khung bóng nhẹ trong ảnh
+      
+        ul {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+      
+          li {
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+      
+            &.active {
+              background: #b6c6fc;
+              font-weight: bold;
+            }
+      
+            &:hover {
+              background: #b9beff;
+            }
+          }
+        }
+      }
+      .trang-thai-co-mat {
+        color: green;
+        font-weight: 500;
+      }
+      
+      .trang-thai-vang {
+        color: red;
+        font-weight: 500;
+      }
+      
+      
   }
   

@@ -166,9 +166,30 @@
   }
   .lop-hoc-footer {
     display: flex;
-    justify-content: flex-end;
-    margin-top: 12px;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    flex-wrap: wrap;
   }
+  
+  .footer-left,
+  .footer-right {
+    display: flex;
+    gap: 10px;
+  }
+  .report-btn-green {
+    background-color: #4CAF50; /* Màu xanh lá cây */
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+  
+    &:hover {
+      background-color: #43a047; // xanh lá đậm khi hover
+    }
+  }
+  
   .edit-btn {
     background-color: #ddd;
     color: #333;
@@ -516,3 +537,34 @@
     background-color: #c82333;
   }
 }
+.horizontal-menu {
+  position: relative;
+}
+
+.horizontal-menu .action-menu.horizontal {
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  top: 0;
+  left: 105%; /* đẩy sang phải một chút so với nút */
+  white-space: nowrap;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  z-index: 1000;
+  padding: 4px 0;
+  min-width: auto;
+}
+
+.horizontal-menu .action-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  border-right: 1px solid #eee;
+}
+
+.horizontal-menu .action-option:last-child {
+  border-right: none;
+}
+

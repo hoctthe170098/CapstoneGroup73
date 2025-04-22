@@ -58,10 +58,12 @@
 }
 .table th,
 .table td {
-  border: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
   padding: 8px;
   text-align: center;
 }
+
 
 /* Nút Sửa */
 .btn-edit {

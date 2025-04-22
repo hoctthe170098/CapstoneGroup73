@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'environments/environment';
+import { HttpParams } from '@angular/common/http';
 @Injectable({
   providedIn: 'root'
 })
@@ -11,6 +12,7 @@ export class LophocService {
   private baseUrl = `${environment.apiURL}/LichHocs`;
   private chuongtrinhUrl = `${environment.apiURL}/ChuongTrinhs`;
   private hocSinhUrl = `${environment.apiURL}/HocSinhs`;
+  private diemdanhUrrl = `${environment.apiURL}/DiemDanhs`;
   constructor(private http: HttpClient) {}
 
 
@@ -139,5 +141,32 @@ export class LophocService {
     const url = `${this.baseUrl}/deletelophoccodinh?tenLopHoc=${encodeURIComponent(tenLopHoc)}`;
     return this.http.delete<any>(url, { headers });
   }
+  getBaoCaoDiemDanh(tenLop: string, ngay?: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
   
+    let params = new HttpParams().set('TenLop', tenLop);
+    if (ngay) {
+      params = params.set('Ngay', ngay);
+    }
+  
+    return this.http.get<any>(`${this.diemdanhUrrl}/getbaocaodiemdanhchotunglop`, { params, headers });
+  }
+  
+  updateDiemDanh(payload: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<any>(`${environment.apiURL}/DiemDanhs/updatediemdanh`, payload, { headers });
+  }
+  getBaoCaoHocPhi(tenLop: string, thang?: number) {
+    const token = localStorage.getItem('token'); // đảm bảo bạn đã login và lưu token
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    let params = new HttpParams().set('TenLop', tenLop);
+    if (thang !== undefined) {
+      params = params.set('Thang', thang.toString());
+    }
+
+    return this.http.get<any>(`${this.diemdanhUrrl}/getbaocaohocphi`, { params, headers });
+  }
 }

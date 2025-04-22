@@ -14,31 +14,36 @@
         <table>
           <thead>
             <tr>
-              <th>No</th>
-              <th>Học Sinh</th>
+              <th>Code</th>
+              <th>Tên Học Sinh</th>
               <th>Tình Trạng Điểm Danh</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let hs of danhSachHocSinh; let i = index">
-              <td>{{ i + 1 | number: '2.0' }}</td>
+              <td>{{ hs.code }}</td>
               <td>{{ hs.ten }}</td>
               <td class="trang-thai">
                 <ng-container *ngIf="!dangSua; else formEdit">
-                  <span [ngClass]="{ 'co-mat': hs.trangThai === 'Có mặt', 'vang': hs.trangThai === 'Vắng' }">
+                  <span [ngClass]="{
+                    'trang-thai-co-mat': hs.trangThai === 'Có mặt',
+                    'trang-thai-vang': hs.trangThai === 'Vắng'
+                  }">
                     {{ hs.trangThai }}
                   </span>
                 </ng-container>
-  
+          
                 <ng-template #formEdit>
-                  <label>
-                    <input type="radio" name="status-{{ i }}" value="Có mặt" [(ngModel)]="hs.trangThai" />
-                    Có mặt
-                  </label>
-                  <label style="margin-left: 12px;">
-                    <input type="radio" name="status-{{ i }}" value="Vắng" [(ngModel)]="hs.trangThai" />
-                    Vắng
-                  </label>
+                  <ng-container *ngIf="hs.id !== '00000000-0000-0000-0000-000000000000'">
+                    <label>
+                      <input type="radio" name="status-{{ i }}" value="Có mặt" [(ngModel)]="hs.trangThai" />
+                      Có mặt
+                    </label>
+                    <label style="margin-left: 12px;">
+                      <input type="radio" name="status-{{ i }}" value="Vắng" [(ngModel)]="hs.trangThai" />
+                      Vắng
+                    </label>
+                  </ng-container>
                 </ng-template>
               </td>
             </tr>

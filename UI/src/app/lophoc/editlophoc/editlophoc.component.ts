@@ -60,7 +60,7 @@ selectedHocSinh: any = null;
         this.hocSinhDropdownList = res?.data || [];
       },
       error: (err) => {
-        console.error('❌ Lỗi khi tải danh sách học sinh:', err);
+        console.error('Lỗi khi tải danh sách học sinh:', err);
       },
     });
   }
@@ -91,7 +91,13 @@ selectedHocSinh: any = null;
       if (tenLop) {
         this.lophocService.getLopHocByTenLop(tenLop).subscribe({
           next: async (res) => {
-            if (res?.data) {
+            if (res.isError) {
+              if (res.code === 404) {
+                this.router.navigate(['/pages/error']);
+              } else {
+                this.toastr.error(res.message || 'Đã xảy ra lỗi khi tải lớp học.');
+              }
+            } else if (res?.data) {
               const today = new Date();
               today.setHours(0, 0, 0, 0);
         

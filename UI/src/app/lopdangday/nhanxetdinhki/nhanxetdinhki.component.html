@@ -1,57 +1,60 @@
 <div class="nhanxet-container">
-    <h2>NHẬN XÉT ĐỊNH KỲ</h2>
-  
-    <div class="hoc-sinh-info">
-      <div>
-        <strong>Học Sinh:</strong> {{ hocSinh?.ten }}
-      </div>
-      <div>
-        <strong>Code :</strong> {{ hocSinh?.code }}
-      </div>
-    </div>
-  
-    <div class="form-group">
-      <label for="nhanxet">Nhận xét:</label>
-      <textarea
-        id="nhanxet"
-        [(ngModel)]="nhanXetMoi"
-        placeholder="Nhận xét kết quả học tập..."
-      ></textarea>
-    </div>
-  
-    <div class="action-buttons">
-      <button class="btn-xacnhan" (click)="xacNhan()">Xác nhận</button>
-      <button class="btn-trove" (click)="troVe()">Trở về</button>
-    </div>
-  
-    <h4>Lịch sử:</h4>
-    <table class="table">
-        <thead>
-          <tr>
-            <th>STT</th>
-            <th>Ngày</th>
-            <th>Nhận Xét</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of lichSu; let i = index">
-            <td>{{ i + 1 | number: '2.0' }}</td>
-            <td>{{ item.ngay | date: 'dd/MM/yyyy' }}</td>
-            <td>
-              <div class="nhanxet-flex">
-                <span class="noi-dung">{{ item.noiDung }}</span>
-                <div class="dropdown">
-                  <button class="dots-btn" (click)="toggleDropdown(i)">⋮</button>
-                  <ul *ngIf="dropdownIndex === i">
-                    <li (click)="suaNhanXet(item)">Chỉnh sửa</li>
-                    <li (click)="xoaNhanXet(item)">Xóa</li>
-                  </ul>
-                </div>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      
+  <h2>NHẬN XÉT ĐỊNH KỲ</h2>
+
+  <div class="hoc-sinh-info">
+    <div><strong>Học Sinh:</strong> {{ hocSinh?.ten }}</div>
+    <div><strong>Code :</strong> {{ hocSinh?.code }}</div>
   </div>
-  
+  <div><strong>Lớp:</strong> {{ tenLop }}</div>
+
+  <!-- Thông báo khi chưa đủ điều kiện -->
+
+
+<!-- Form nhận xét: Hiện khi đủ điều kiện hoặc đang chỉnh sửa -->
+<div *ngIf="denHanNhanXet || idDangSua">
+  <div class="form-group">
+    <label for="nhanxet">Nhận xét:</label>
+    <textarea
+      id="nhanxet"
+      [(ngModel)]="nhanXetMoi"
+      placeholder="Nhận xét kết quả học tập..."></textarea>
+  </div>
+
+  <div class="action-buttons">
+    <button class="btn-xacnhan" (click)="xacNhan()">
+      {{ idDangSua ? 'Lưu chỉnh sửa' : 'Xác nhận' }}
+    </button>
+    <button class="btn-trove" (click)="troVe()">Trở về</button>
+  </div>
+</div>
+
+
+  <h4>Lịch sử:</h4>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>STT</th>
+        <th>Ngày</th>
+        <th>Nhận Xét</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of lichSu.slice().reverse(); let i = index">
+        <td>{{ i + 1 | number: '2.0' }}</td>
+        <td>{{ item.ngay | date: 'dd/MM/yyyy' }}</td>
+        <td>
+          <div class="nhanxet-flex">
+            <span class="noi-dung">{{ item.noiDung }}</span>
+            <div class="dropdown">
+              <button class="dots-btn" (click)="toggleDropdown(i)">⋮</button>
+              <ul *ngIf="dropdownIndex === i">
+                <li (click)="suaNhanXet(item)">Chỉnh sửa</li>
+                <li (click)="xoaNhanXet(item)">Xóa</li>
+              </ul>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

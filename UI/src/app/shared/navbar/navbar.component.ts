@@ -16,6 +16,10 @@ import { UserService } from 'app/pages/content-pages/shared/user.service';
   styleUrls: ["./navbar.component.scss"]
 })
 export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
+  logout() {
+    localStorage.removeItem('token');
+    this.router.navigate(['/pages/login']);
+  }
   currentLang = "en";
   selectedLanguageText = "English";
   selectedLanguageFlag = "./assets/img/flags/us.png";
@@ -43,8 +47,8 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
 
   listItems = [];
   control = new FormControl();
-  username:string;
-  rolename:string;
+  username: string;
+  rolename: string;
   public config: any = {};
 
   constructor(public translate: TranslateService,
@@ -77,10 +81,10 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
     this.username = this.authService.getUserName();
     this.rolename = this.authService.getRoleNames()[0];
   }
-  getRoleName(role: string){
-    if(role =="CampusManager") return "Quản lý cơ sở"
-    else if(role == "LearningManager") return "Quản lý chương trình học";
-    else if(role == "Student") return "Học sinh";
+  getRoleName(role: string) {
+    if (role == "CampusManager") return "Quản lý cơ sở"
+    else if (role == "LearningManager") return "Quản lý chương trình học";
+    else if (role == "Student") return "Học sinh";
     else if (role == "Teacher") return "Giáo viên";
     else return role;
   }
@@ -96,8 +100,6 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
         return 'assets/img/avatars/campus_manager.png';
       case 'LearningManager':
         return 'assets/img/avatars/learning_manager.png';
-      default:
-        return 'assets/img/avatars/default.png';
     }
   }
   ngAfterViewInit() {
@@ -242,8 +244,8 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   }
-  
-  
+
+
 
   toggleSidebar() {
     this.layoutService.toggleSidebarSmallScreen(this.hideSidebar);

@@ -102,6 +102,13 @@ editScheduleDayBu: any = {
         i === index ? !this.lophocs[i].showActionMenu : false;
     });
   }
+  toggleFooterActionMenu(index: number, event: MouseEvent) {
+    event.stopPropagation();
+    this.lophocs.forEach((lop, i) => {
+      lop.showFooterActionMenu = i === index ? !lop.showFooterActionMenu : false;
+    });
+  }
+  
   handleClickOutsidePopupDropdown(event: any) {
     const dropdown = document.querySelector('.popup-giaovien-dropdown-wrapper');
     if (dropdown && !dropdown.contains(event.target as Node)) {
@@ -684,7 +691,13 @@ editScheduleDayBu: any = {
   
     this.lophocService.deleteLopHocCoDinh(tenLop).subscribe({
       next: (res) => {
-        if (!res.isError) {
+        if (res.isError) {
+          if (res.code === 404) {
+            this.router.navigate(['/pages/error']);
+          } else {
+            this.toastr.error(res.message || 'Đã xảy ra lỗi khi tải lớp học.');
+          }
+        } else if (!res.isError) {
           this.toastr.success(res.message || 'Xóa/đóng lớp học thành công.');
           this.loadLopHocs(); // gọi lại danh sách lớp học
         } else {
@@ -696,6 +709,12 @@ editScheduleDayBu: any = {
         this.toastr.error(err?.error?.message || 'Đã xảy ra lỗi khi xóa lớp học.');
       }
     });
+  }
+  diDenBaoCaoDiemDanh(tenLop: string) {
+    this.router.navigate(['/lophoc/baocaodiemdanhquanlycoso'], { queryParams: { TenLop: tenLop } });
+  }
+  diDenBaoCaoHocphi(tenLop: string) {
+    this.router.navigate(['/lophoc/baocaohocphi'], { queryParams: { TenLop: tenLop } });
   }
   
   

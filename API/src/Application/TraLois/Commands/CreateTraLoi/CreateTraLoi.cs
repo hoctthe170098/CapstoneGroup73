@@ -80,12 +80,6 @@ public class CreateTraLoiCommandHandler : IRequestHandler<CreateTraLoiCommand, O
         if (!isThamGiaLop)
             throw new UnauthorizedAccessException("Bạn không có quyền trả lời bài tập này vì không thuộc lớp học tương ứng.");
 
-        // Kiểm tra học sinh đã trả lời chưa
-        var daTraLoi = await _context.TraLois
-            .AnyAsync(t => t.BaiTapId == request.BaiTapId && t.HocSinhCode == hocSinhCode, cancellationToken);
-
-        if (daTraLoi)
-            throw new Exception("Bạn đã gửi câu trả lời cho bài tập này rồi.");
 
         // Lưu file nếu có
         string? fileUrl = null;

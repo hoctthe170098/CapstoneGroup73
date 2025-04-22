@@ -13,7 +13,7 @@ public record GetListBaiTapChoGiaoVienWithPaginationQuery : IRequest<Output>
     public int PageNumber { get; init; } = 1;
     public int PageSize { get; init; } = 10;
     public required string TenLop { get; init; }
-    public string? TrangThai { get; init; } 
+    public string? TrangThai { get; init; }
 }
 
 public class GetListBaiTapChoGiaoVienWithPaginationQueryHandler
@@ -55,27 +55,25 @@ public class GetListBaiTapChoGiaoVienWithPaginationQueryHandler
 
         var giaoVienCode = giaoVien.Code;
 
-        // Lọc lớp học theo giáo viên và tên lớp nếu có
-        var queryLop = _context.LichHocs
-            .Where(lh => lh.GiaoVienCode == giaoVienCode)
-            .Select(lh => lh.TenLop)
-            .Distinct();
+        var baiTapQuery = _context.BaiTaps
+            .Include(bt => bt.LichHoc)
+            .Where(bt =>
+                bt.LichHoc.GiaoVienCode == giaoVienCode &&
+                bt.LichHoc.TenLop == request.TenLop);
 
-        if (!string.IsNullOrWhiteSpace(request.TenLop))
+        // Lọc theo trạng thái nếu có
+        if (!string.IsNullOrWhiteSpace(request.TrangThai) && request.TrangThai.ToLower() != "all")
         {
-            queryLop = queryLop.Where(l => l == request.TenLop.Trim());
+            baiTapQuery = baiTapQuery.Where(bt => bt.TrangThai == request.TrangThai);
         }
 
-        var listClass = await queryLop.ToListAsync(cancellationToken);
-
-        // Tự động cập nhật trạng thái nếu bài tập đã hết hạn
+        // Cập nhật trạng thái nếu bài tập hết hạn
         var now = DateTime.Now;
-        var expiredAssignments = await _context.BaiTaps
+        var expiredAssignments = await baiTapQuery
             .Where(bt =>
                 bt.ThoiGianKetThuc.HasValue &&
                 bt.ThoiGianKetThuc.Value <= now &&
-                bt.TrangThai != "Kết thúc" &&
-                listClass.Contains(bt.LichHoc.TenLop))
+                bt.TrangThai != "Kết thúc")
             .ToListAsync(cancellationToken);
 
         foreach (var baiTap in expiredAssignments)
@@ -88,70 +86,29 @@ public class GetListBaiTapChoGiaoVienWithPaginationQueryHandler
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        var totalCount = listClass.Count;
+        var totalCount = await baiTapQuery.CountAsync(cancellationToken);
         var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
 
-        var paginatedClasses = listClass
+        var baiTaps = await baiTapQuery
+            .OrderByDescending(bt => bt.NgayTao)
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
-            .ToList();
-
-        var today = DateOnly.FromDateTime(DateTime.Now);
-        var thu = (int)DateTime.Now.DayOfWeek;
-        thu = thu == 0 ? 8 : thu + 1;
-
-        var baiTapGroupList = new List<BaiTapGroupByTenLopDto>();
-
-        foreach (var tenLop in paginatedClasses)
-        {
-            IQueryable<BaiTap> baiTapQuery;
-
-            var lichHoc = await _context.LichHocs
-                .AsNoTracking()
-                .FirstOrDefaultAsync(lh =>
-                    lh.GiaoVienCode == giaoVienCode &&
-                    lh.TenLop == tenLop &&
-                    lh.Thu == thu &&
-                    lh.NgayBatDau <= today && today <= lh.NgayKetThuc,
-                    cancellationToken);
-
-            if (lichHoc?.TrangThai == "Dạy thay")
-            {
-                baiTapQuery = _context.BaiTaps.Where(bt => bt.LichHocId == lichHoc.Id);
-            }
-            else
-            {
-                baiTapQuery = _context.BaiTaps
-                    .Include(bt => bt.LichHoc)
-                    .Where(bt =>
-                        bt.LichHoc.TenLop == tenLop &&
-                        bt.LichHoc.GiaoVienCode == giaoVienCode);
-            }
-
-            // Áp dụng filter theo trạng thái
-            if (!string.IsNullOrWhiteSpace(request.TrangThai) && request.TrangThai?.ToLower() != "all")
-            {
-                baiTapQuery = baiTapQuery.Where(bt => bt.TrangThai == request.TrangThai);
-            }
-
-            var baiTaps = await baiTapQuery
-                .OrderByDescending(bt => bt.NgayTao)
-                .ProjectTo<BaiTapGiaoVienDto>(_mapper.ConfigurationProvider)
-                .ToListAsync(cancellationToken);
-
-            baiTapGroupList.Add(new BaiTapGroupByTenLopDto
-            {
-                TenLop = tenLop,
-                BaiTaps = baiTaps
-            });
-        }
+            .ProjectTo<BaiTapGiaoVienDto>(_mapper.ConfigurationProvider)
+            .ToListAsync(cancellationToken);
 
         var result = new BaiTapWithPaginationDTO
         {
             PageNumber = request.PageNumber,
             TotalCount = totalCount,
             TotalPages = totalPages,
-            Items = baiTapGroupList
+            Items = new List<BaiTapGroupByTenLopDto>
+            {
+                new BaiTapGroupByTenLopDto
+                {
+                    TenLop = request.TenLop,
+                    BaiTaps = baiTaps
+                }
+            }
         };
 
         return new Output
@@ -163,4 +120,3 @@ public class GetListBaiTapChoGiaoVienWithPaginationQueryHandler
         };
     }
 }
-

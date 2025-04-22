@@ -22,7 +22,8 @@ export class LoginPageComponent {
     rememberMe: new FormControl(true)
   });
 
-  constructor(private router: Router, private authService: UserService, private spinner: NgxSpinnerService,private toastr: ToastrService) {}
+  constructor(private router: Router, private authService: UserService, 
+    private spinner: NgxSpinnerService,private toastr: ToastrService) {}
 
   get lf() {
     return this.loginForm.controls;
@@ -49,16 +50,17 @@ export class LoginPageComponent {
         if (res.isError == false) {   
           localStorage.setItem('token', res.data);
           var role = this.authService.getRoleNames()[0];
-          console.log(role)
           if(role==UserRole.Administrator)
           this.router.navigate(['/coso']);
         else if(role==UserRole.CampusManager){
           this.router.navigate(['/lophoc']);
         }else if(role==UserRole.LearningManager){
           this.router.navigate(['/chuongtrinh']);
-        }else{
+        }else if(role==UserRole.Teacher){
           this.router.navigate(['/lopdangday']);
-        }
+        }else if(role==UserRole.Student){
+          this.router.navigate(['/lopdanghoc']);
+        }else this.router.navigate(['/pages/error'])
           this.toastr.success(res.message, 'Thành công');
         } else {
           this.isLoginFailed = true;

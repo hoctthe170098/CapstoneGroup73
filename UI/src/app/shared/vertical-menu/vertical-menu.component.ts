@@ -2,7 +2,7 @@ import {
   Component, OnInit, ViewChild, OnDestroy,
   ElementRef, AfterViewInit, ChangeDetectorRef, HostListener
 } from "@angular/core";
-import { ROUTES } from './vertical-menu-routes.config';
+import { ROUTES, RouteInfo } from './vertical-menu-routes.config'; // Import RouteInfo
 import { HROUTES } from '../horizontal-menu/navigation-routes.config';
 
 import { Router } from "@angular/router";
@@ -12,6 +12,8 @@ import { DeviceDetectorService } from 'ngx-device-detector';
 import { ConfigService } from '../services/config.service';
 import { Subscription } from 'rxjs';
 import { LayoutService } from '../services/layout.service';
+import { Subject } from 'rxjs';
+import { UserService } from "app/pages/content-pages/shared/user.service";
 
 @Component({
   selector: "app-sidebar",
@@ -21,9 +23,9 @@ import { LayoutService } from '../services/layout.service';
 export class VerticalMenuComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('toggleIcon') toggleIcon: ElementRef;
-  public menuItems: any[];
+  public menuItems: RouteInfo[] = []; // Sử dụng RouteInfo[]
   level: number = 0;
-  logoUrl = 'assets/img/SF_logo.png';
+  logoUrl = 'assets/img/studyflow_logo_icon.png';
   public config: any = {};
   protected innerWidth: any;
   layoutSub: Subscription;
@@ -31,6 +33,8 @@ export class VerticalMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   perfectScrollbarEnable = true;
   collapseSidebar = false;
   resizeTimeout;
+  userRoles: string[] | null = null;
+  private ngUnsubscribe = new Subject<void>();
 
   constructor(
     private router: Router,
@@ -38,7 +42,8 @@ export class VerticalMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     private layoutService: LayoutService,
     private configService: ConfigService,
     private cdr: ChangeDetectorRef,
-    private deviceService: DeviceDetectorService
+    private deviceService: DeviceDetectorService,
+    private userService: UserService // Inject UserService
   ) {
     this.config = this.configService.templateConf;
     this.innerWidth = window.innerWidth;
@@ -47,18 +52,22 @@ export class VerticalMenuComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   ngOnInit() {
-    this.menuItems = ROUTES;
+    this.userRoles = this.userService.getRoleNames();
+    this.filterMenuItems();
+
+    // (Tùy chọn) Theo dõi thay đổi vai trò nếu cần
+    // this.userService.userRolesChanged$
+    //   .pipe(takeUntil(this.ngUnsubscribe))
+    //   .subscribe(() => this.filterMenuItems());
   }
 
   ngAfterViewInit() {
-
     this.configSub = this.configService.templateConf$.subscribe((templateConf) => {
       if (templateConf) {
         this.config = templateConf;
       }
       this.loadLayout();
       this.cdr.markForCheck();
-
     });
 
     this.layoutSub = this.layoutService.overlaySidebarToggle$.subscribe(
@@ -67,7 +76,6 @@ export class VerticalMenuComponent implements OnInit, AfterViewInit, OnDestroy {
           this.collapseSidebar = collapse;
         }
       });
-
   }
 
 
@@ -83,32 +91,6 @@ export class VerticalMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   loadLayout() {
-
-    // if (this.config.layout.menuPosition === "Top") { // Horizontal Menu
-    //   if (this.innerWidth < 1200) { // Screen size < 1200
-    //     this.menuItems = HROUTES;
-    //   }
-    // }
-    // else if (this.config.layout.menuPosition === "Side") { // Vertical Menu{
-    //   this.menuItems = ROUTES;
-    // }
-
-
-
-
-    // if (this.config.layout.sidebar.backgroundColor === 'white') {
-    //   this.logoUrl = 'assets/img/logo-dark.png';
-    // }
-    // else {
-    //   this.logoUrl = 'assets/img/logo.png';
-    // }
-
-    // if(this.config.layout.sidebar.collapsed) {
-    //   this.collapseSidebar = true;
-    // }
-    // else {
-    //   this.collapseSidebar = false;
-    // }
     this.logoUrl = 'assets/img/studyflow_logo_icon.png';
   }
 
@@ -133,7 +115,6 @@ export class VerticalMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   isTouchDevice() {
-
     const isMobile = this.deviceService.isMobile();
     const isTablet = this.deviceService.isTablet();
 
@@ -143,9 +124,26 @@ export class VerticalMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     else {
       this.perfectScrollbarEnable = true;
     }
-
   }
 
+  filterMenuItems(): void {
+    if (this.userRoles) {
+      this.menuItems = ROUTES.filter(item => this.checkPermission(item));
+    } else {
+      // Nếu chưa đăng nhập hoặc không có vai trò, hiển thị một số menu mặc định (nếu cần)
+      this.menuItems = ROUTES.filter(item => item.path === '/dashboard' || item.path.startsWith('/pages/'));
+    }
+  }
+
+  checkPermission(routeInfo: RouteInfo): boolean {
+    if (!routeInfo.roles || routeInfo.roles.length === 0) {
+      return true; // Không có roles cụ thể, cho phép tất cả
+    }
+    if (!this.userRoles) {
+      return false; // Chưa đăng nhập, không cho phép
+    }
+    return this.userRoles.some(role => routeInfo.roles!.includes(role));
+  }
 
   ngOnDestroy() {
     if (this.layoutSub) {
@@ -154,7 +152,7 @@ export class VerticalMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.configSub) {
       this.configSub.unsubscribe();
     }
-
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
-
 }

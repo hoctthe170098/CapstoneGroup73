@@ -1,0 +1,33 @@
+<div class="fee-report">
+  <h2>BÁO CÁO HỌC PHÍ</h2>
+
+  <div class="filter">
+    <label for="thang">Tháng</label>
+    <select id="thang" [(ngModel)]="selectedThang" (change)="onThangChange()">
+      <option *ngFor="let thang of danhSachThang" [value]="thang">{{ thang }}</option>
+    </select>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Học Sinh</th>
+        <th>Số Buổi Học</th>
+        <th>Số Buổi Nghỉ</th>
+        <th>Học Phí/Buổi</th>
+        <th>Phần trăm giảm</th>
+        <th>Tổng</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of baoCaoHocPhi?.hocPhis">
+        <td>{{ row.tenHocSinh }}</td>
+        <td>{{ row.soBuoiHoc }}</td>
+        <td>{{ row.soBuoiNghi }}</td>
+        <td>{{ row.hocPhi1Buoi?.toLocaleString('vi-VN') }} VND</td>
+        <td>{{row.soPhanTramGiam}}%</td>
+        <td>{{ row.tongHocPhi?.toLocaleString('vi-VN') }} VND</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
