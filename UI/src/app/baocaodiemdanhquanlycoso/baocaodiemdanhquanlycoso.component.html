@@ -34,14 +34,16 @@
                 </ng-container>
           
                 <ng-template #formEdit>
-                  <label>
-                    <input type="radio" name="status-{{ i }}" value="Có mặt" [(ngModel)]="hs.trangThai" />
-                    Có mặt
-                  </label>
-                  <label style="margin-left: 12px;">
-                    <input type="radio" name="status-{{ i }}" value="Vắng" [(ngModel)]="hs.trangThai" />
-                    Vắng
-                  </label>
+                  <ng-container *ngIf="hs.id !== '00000000-0000-0000-0000-000000000000'">
+                    <label>
+                      <input type="radio" name="status-{{ i }}" value="Có mặt" [(ngModel)]="hs.trangThai" />
+                      Có mặt
+                    </label>
+                    <label style="margin-left: 12px;">
+                      <input type="radio" name="status-{{ i }}" value="Vắng" [(ngModel)]="hs.trangThai" />
+                      Vắng
+                    </label>
+                  </ng-container>
                 </ng-template>
               </td>
             </tr>

@@ -42,37 +42,37 @@ public class GetBaoCaoDiemDanhChoTungLopQueryHandler : IRequestHandler<GetBaoCao
         DateOnly ngayHienTai = DateOnly.FromDateTime(DateTime.Now);
         var LichHocCoDinh = _context.LichHocs
             .Where(lh => lh.TenLop == request.TenLop
-            &&lh.Phong.CoSoId == coSoId
-            &&lh.TrangThai=="Cố định").ToList();
-        if(!LichHocCoDinh.Any()) throw new NotFoundIDException();
+            && lh.Phong.CoSoId == coSoId
+            && lh.TrangThai == "Cố định").ToList();
+        if (!LichHocCoDinh.Any()) throw new NotFoundIDException();
         var Thus = LichHocCoDinh.Select(lh => lh.Thu).ToList();
-        var NgayDaHoc = getNgayDaHoc(Thus, LichHocCoDinh[0].NgayBatDau,ngayHienTai);
-        var ListHocSinh = _context.ThamGiaLopHocs
-            .Where(tg => LichHocCoDinh.Select(lh=>lh.Id).ToList().Contains(tg.LichHocId))
-            .Select(tg => new
-            {
-                tg.HocSinhCode,
-                tg.HocSinh.Ten
-            })
-            .Distinct().ToList();
+        var NgayDaHoc = getNgayDaHoc(Thus, LichHocCoDinh[0].NgayBatDau, ngayHienTai);
         var listHocBu = _context.LichHocs
-            .Where(lh => lh.TenLop == request.TenLop 
-            && lh.Phong.CoSoId == coSoId 
+            .Where(lh => lh.TenLop == request.TenLop
+            && lh.Phong.CoSoId == coSoId
             && lh.TrangThai == "Học bù")
             .ToList();
-        foreach(var hocBu in listHocBu)
+        foreach (var hocBu in listHocBu)
         {
             if (hocBu.NgayHocGoc < ngayHienTai) NgayDaHoc.Remove((DateOnly)hocBu.NgayHocGoc);
             if (hocBu.NgayBatDau < ngayHienTai) NgayDaHoc.Add(hocBu.NgayBatDau);
         }
-        NgayDaHoc = NgayDaHoc.OrderByDescending(ng=>ng).ToList();
+        NgayDaHoc = NgayDaHoc.OrderByDescending(ng => ng).ToList();
         DateOnly NgayCanLay = DateOnly.MinValue;
         if (request.Ngay == null) NgayCanLay = NgayDaHoc[0];
-        else 
+        else
         {
             if (!NgayDaHoc.Contains((DateOnly)request.Ngay)) throw new NotFoundIDException();
             else NgayCanLay = (DateOnly)request.Ngay;
         }
+        var ListHocSinh = _context.ThamGiaLopHocs
+    .Where(tg => LichHocCoDinh.Select(lh => lh.Id).ToList().Contains(tg.LichHocId)&&tg.NgayKetThuc>=NgayCanLay&&tg.NgayBatDau<=NgayCanLay)
+    .Select(tg => new
+    {
+        tg.HocSinhCode,
+        tg.HocSinh.Ten
+    })
+    .Distinct().ToList();
         var data = new List<BaoCaoHocPhiDto>();
         List<DiemDanhDto> diemDanhs = new List<DiemDanhDto>();
         var BaoCao = new BaoCaoHocPhiDto
@@ -94,15 +94,16 @@ public class GetBaoCaoDiemDanhChoTungLopQueryHandler : IRequestHandler<GetBaoCao
             {
                 item.Id = diemDanh.Id;
                 item.TrangThai = diemDanh.TrangThai;
-                diemDanhs.Add(item);
             }
+            else item.TrangThai = "Không điểm danh";
+            diemDanhs.Add(item);
         }
         BaoCao.DiemDanhs = diemDanhs.ToList();
         BaoCao.Ngays = NgayDaHoc;
         output.data = BaoCao;
         return output;
     }
-    private List<DateOnly> getNgayDaHoc(List<int>Thus, DateOnly ngayBatDau, 
+    private List<DateOnly> getNgayDaHoc(List<int> Thus, DateOnly ngayBatDau,
         DateOnly ngayHienTai)
     {
         List<DateOnly> ngayDaHocList = new List<DateOnly>();
@@ -117,5 +118,5 @@ public class GetBaoCaoDiemDanhChoTungLopQueryHandler : IRequestHandler<GetBaoCao
         }
         return ngayDaHocList;
     }
-        
+
 }

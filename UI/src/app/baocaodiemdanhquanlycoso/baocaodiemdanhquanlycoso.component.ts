@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { BaocaodiemdanhquanlycosohService } from './shared/baocaodiemdanhquanlycoso.service';
 import { formatDate } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-baocaodiemdanhquanlycoso',
@@ -20,7 +20,8 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
     private diemDanhService: BaocaodiemdanhquanlycosohService,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -35,18 +36,23 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
 
   taiBaoCao(ngay?: string) {
     this.diemDanhService.getBaoCaoDiemDanh(this.tenLop, ngay).subscribe(res => {
-      const data = res.data;
-      this.danhSachNgay = data.ngays.map((d: string) => this.formatDateOnly(d));
-      this.ngayDuocChon = this.formatDateOnly(data.ngay);
-      this.danhSachHocSinh = data.diemDanhs.map((dd: any) => ({
-        id: dd.id,
-        code: dd.hocSinhCode,
-        ten: dd.tenHocSinh,
-        trangThai: dd.trangThai
-      }));
-      this.backupDanhSach = JSON.parse(JSON.stringify(this.danhSachHocSinh));
-      this.toastr.success
-      this.cdr.detectChanges();
+      if(res.isError){
+        if(res.code==404) this.router.navigate(['/pages/error']);
+        else this.toastr.error(res.message);
+      }else{
+        const data = res.data;
+        this.danhSachNgay = data.ngays.map((d: string) => this.formatDateOnly(d));
+        this.ngayDuocChon = this.formatDateOnly(data.ngay);
+        this.danhSachHocSinh = data.diemDanhs.map((dd: any) => ({
+          id: dd.id,
+          code: dd.hocSinhCode,
+          ten: dd.tenHocSinh,
+          trangThai: dd.trangThai
+        }));
+        this.backupDanhSach = JSON.parse(JSON.stringify(this.danhSachHocSinh));
+        this.toastr.success
+        this.cdr.detectChanges();
+      }    
     });
   }
 
@@ -65,23 +71,27 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
 
   luuDiemDanh() {
     const payload = {
-      updateDiemDanhs: this.danhSachHocSinh.map(hs => ({
-        id: hs.id,
-        hocSinhCode: hs.code,
-        trangThai: hs.trangThai
-      }))
+      updateDiemDanhs: this.danhSachHocSinh
+        .filter(hs => hs.id !== '00000000-0000-0000-0000-000000000000')
+        .map(hs => ({
+          id: hs.id,
+          hocSinhCode: hs.code,
+          trangThai: hs.trangThai
+        }))
     };
-
+    if (payload.updateDiemDanhs.length === 0) {
+      this.toastr.error('Không có học sinh nào được chọn để cập nhật điểm danh.');
+      return; 
+    }
     this.diemDanhService.updateDiemDanh(payload).subscribe({
       next: (res) => {
         if (!res.isError) {
           this.backupDanhSach = JSON.parse(JSON.stringify(this.danhSachHocSinh));
           this.dangSua = false;
-
           this.cdr.detectChanges();
           this.toastr.success('Cập nhật điểm danh thành công!', 'Thành công');
         } else {
-          // Xử lý lỗi từ server
+          this.toastr.error(res.message);
         }
       },
       error: (err) => {

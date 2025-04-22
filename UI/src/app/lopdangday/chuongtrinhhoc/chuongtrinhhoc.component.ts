@@ -36,10 +36,9 @@ export class ChuongtrinhhocComponent implements OnInit {
         if (!response.isError) {
           this.chuongTrinhs = response.data;
         } else {
-          if (response.message === "Dữ liệu không tồn tại!") {
-            this.toastr.error("Id không hợp lê!", "Lỗi");
-          } else response.code === 404;
+          if(response.code === 404)
           this.router.navigate(["/pages/error"]);
+          else this.toastr.error(response.message)
         }
         this.cdr.detectChanges();
       },

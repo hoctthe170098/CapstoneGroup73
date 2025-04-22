@@ -1,4 +1,6 @@
 import { Routes, RouterModule } from '@angular/router';
+import { AuthGuard } from '../auth/auth-guard.service';
+import { UserRole } from 'app/pages/content-pages/shared/user.model';
 
 //Route for content layout with sidebar, navbar and footer.
 
@@ -8,129 +10,98 @@ export const Full_ROUTES: Routes = [
     loadChildren: () => import('../../dashboard/dashboard.module').then(m => m.DashboardModule)
   },
   {
-    path: 'sanpham',
-    loadChildren: () => import('../../sanpham/sanpham.module').then(m => m.SanphamModule)
-  },
-  
-  {
     path: 'phong',
-    loadChildren: () => import('../../slot/slot.module').then(m => m.SlotModule)
+    loadChildren: () => import('../../slot/slot.module').then(m => m.SlotModule),
+    canActivate:[AuthGuard],
+    data:{role:[UserRole.CampusManager]}
   },
   {
     path: 'chinhsach',
-    loadChildren: () => import('../../chinhsach/chinhsach.module').then(m => m.ChinhsachModule)
+    loadChildren: () => import('../../chinhsach/chinhsach.module').then(m => m.ChinhsachModule),
+    canActivate:[AuthGuard],
+    data:{role:[UserRole.Administrator]}
   },
   {
     path: 'baikiemtra',
-    loadChildren: () => import('../../baikiemtra/baikiemtra.module').then(m => m.TestlistModule)
+    loadChildren: () => import('../../baikiemtra/baikiemtra.module').then(m => m.TestlistModule),
+    canActivate:[AuthGuard],
+    data:{role:[UserRole.LearningManager]}
   },
   {
     path: 'lichday',
-    loadChildren: () => import('../../lichday/lichday.module').then(m => m.LichdayModule)
+    loadChildren: () => import('../../lichday/lichday.module').then(m => m.LichdayModule),
+    canActivate:[AuthGuard],
+    data:{role:[UserRole.Teacher]}
   },
   {
     path: 'hocsinh',
-    loadChildren: () => import('../../hocsinh/hocsinh.module').then(m => m.HocSinhModule)
+    loadChildren: () => import('../../hocsinh/hocsinh.module').then(m => m.HocSinhModule),
+    canActivate:[AuthGuard],
+    data:{role:[UserRole.CampusManager]}
   },
   {
     path: 'quanly',
-    loadChildren: () => import('../../quanly/quanly.module').then(m => m.AccountmanagerModule)
+    loadChildren: () => import('../../quanly/quanly.module').then(m => m.AccountmanagerModule),
+    canActivate:[AuthGuard],
+    data:{role:[UserRole.Administrator]}
   },
   {
     path: 'giaovien',
-    loadChildren: () => import('../../giaovien/giaovien.module').then(m => m.GiaovienModule)
+    loadChildren: () => import('../../giaovien/giaovien.module').then(m => m.GiaovienModule),
+    canActivate:[AuthGuard],
+    data:{role:[UserRole.CampusManager]}
   },
   {
     path: 'lophoc',
-    loadChildren: () => import('../../lophoc/lophoc.module').then(m => m.LophocModule)
+    loadChildren: () => import('../../lophoc/lophoc.module').then(m => m.LophocModule),
+    canActivate:[AuthGuard],
+    data:{role:[UserRole.CampusManager]}
   },
   {
     path: 'lopdangday',
-    loadChildren: () => import('../../lopdangday/lopdangday.module').then(m => m.LopdangdayModule)
+    loadChildren: () => import('../../lopdangday/lopdangday.module').then(m => m.LopdangdayModule),
+    canActivate:[AuthGuard],
+    data:{role:[UserRole.Teacher]}
   },
   {
     path: 'lopdanghoc',
-    loadChildren: () => import('../../lopdanghoc/lopdanghoc.module').then(m => m.LopdanghocModule)
+    loadChildren: () => import('../../lopdanghoc/lopdanghoc.module').then(m => m.LopdanghocModule),
+    canActivate:[AuthGuard],
+    data:{role:[UserRole.Student]}
   },
   {
     path: 'coso',
-    loadChildren: () => import('../../coso/coso.module').then(m => m.CosoModule)
+    loadChildren: () => import('../../coso/coso.module').then(m => m.CosoModule),
+    canActivate:[AuthGuard],
+    data:{role:[UserRole.Administrator]}
   },
   {
     path: 'chuongtrinh',
-    loadChildren: () => import('../../chuongtrinh/chuongtrinh.module').then(m => m.ChuongtrinhModule)
-  },
-  {
-    path: 'calendar',
-    loadChildren: () => import('../../calendar/calendar.module').then(m => m.CalendarsModule)
-  },
-  {
-    path: 'charts',
-    loadChildren: () => import('../../charts/charts.module').then(m => m.ChartsNg2Module)
-  },
-   {
-    path: 'forms',
-    loadChildren: () => import('../../forms/forms.module').then(m => m.FormModule)
-  },
-  {
-    path: 'maps',
-    loadChildren: () => import('../../maps/maps.module').then(m => m.MapsModule)
-  },
-  {
-    path: 'tables',
-    loadChildren: () => import('../../tables/tables.module').then(m => m.TablesModule)
-  },
-  {
-    path: 'datatables',
-    loadChildren: () => import('../../data-tables/data-tables.module').then(m => m.DataTablesModule)
-  },
-  {
-    path: 'uikit',
-    loadChildren: () => import('../../ui-kit/ui-kit.module').then(m => m.UIKitModule)
-  },
-  {
-    path: 'components',
-    loadChildren: () => import('../../components/ui-components.module').then(m => m.UIComponentsModule)
+    loadChildren: () => import('../../chuongtrinh/chuongtrinh.module').then(m => m.ChuongtrinhModule),
+    canActivate:[AuthGuard],
+    data:{role:[UserRole.LearningManager]}
   },
   {
     path: 'pages',
-    loadChildren: () => import('../../pages/full-pages/full-pages.module').then(m => m.FullPagesModule)
-  },
-  {
-    path: 'cards',
-    loadChildren: () => import('../../cards/cards.module').then(m => m.CardsModule)
-  },
-  {
-    path: 'chat',
-    loadChildren: () => import('../../chat/chat.module').then(m => m.ChatModule)
-  },
-  {
-    path: 'chat-ngrx',
-    loadChildren: () => import('../../chat-ngrx/chat-ngrx.module').then(m => m.ChatNGRXModule)
-  },
-  {
-    path: 'inbox',
-    loadChildren: () => import('../../inbox/inbox.module').then(m => m.InboxModule)
-  },
-  {
-    path: 'taskboard',
-    loadChildren: () => import('../../taskboard/taskboard.module').then(m => m.TaskboardModule)
-  },
-  {
-    path: 'taskboard-ngrx',
-    loadChildren: () => import('../../taskboard-ngrx/taskboard-ngrx.module').then(m => m.TaskboardNGRXModule)
+    loadChildren: () => import('../../pages/full-pages/full-pages.module').then(m => m.FullPagesModule),
+    canActivate:[AuthGuard]
   },
   {
     path: 'baocaohocphi',
-    loadChildren: () => import('../../baocaohocphi/baocaohocphi.module').then(m => m.BaocaohocphiModule)
+    loadChildren: () => import('../../baocaohocphi/baocaohocphi.module').then(m => m.BaocaohocphiModule),
+    canActivate:[AuthGuard],
+    data:{role:[UserRole.CampusManager]}
   },
   {
     path: 'baocaodiemdanhquanlycoso',
-    loadChildren: () => import('../../baocaodiemdanhquanlycoso/baocaodiemdanhquanlycoso.module').then(m => m.BaocaodiemdanhquanlycosoModule)
+    loadChildren: () => import('../../baocaodiemdanhquanlycoso/baocaodiemdanhquanlycoso.module').then(m => m.BaocaodiemdanhquanlycosoModule),
+    canActivate:[AuthGuard],
+    data:{role:[UserRole.CampusManager]}
   },
   {
     path: 'lichhoc',
-    loadChildren: () => import('../../lichhoc/lichhoc.module').then(m => m.LichhocModule)
+    loadChildren: () => import('../../lichhoc/lichhoc.module').then(m => m.LichhocModule),
+    canActivate:[AuthGuard],
+    data:{role:[UserRole.Student]}
   },
-
 ];
