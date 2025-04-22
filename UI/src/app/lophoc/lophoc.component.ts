@@ -691,7 +691,13 @@ editScheduleDayBu: any = {
   
     this.lophocService.deleteLopHocCoDinh(tenLop).subscribe({
       next: (res) => {
-        if (!res.isError) {
+        if (res.isError) {
+          if (res.code === 404) {
+            this.router.navigate(['/pages/error']);
+          } else {
+            this.toastr.error(res.message || 'Đã xảy ra lỗi khi tải lớp học.');
+          }
+        } else if (!res.isError) {
           this.toastr.success(res.message || 'Xóa/đóng lớp học thành công.');
           this.loadLopHocs(); // gọi lại danh sách lớp học
         } else {
@@ -705,10 +711,10 @@ editScheduleDayBu: any = {
     });
   }
   diDenBaoCaoDiemDanh(tenLop: string) {
-    this.router.navigate(['/baocaodiemdanhquanlycoso'], { queryParams: { TenLop: tenLop } });
+    this.router.navigate(['/lophoc/baocaodiemdanhquanlycoso'], { queryParams: { TenLop: tenLop } });
   }
   diDenBaoCaoHocphi(tenLop: string) {
-    this.router.navigate(['/baocaohocphi'], { queryParams: { TenLop: tenLop } });
+    this.router.navigate(['/lophoc/baocaohocphi'], { queryParams: { TenLop: tenLop } });
   }
   
   

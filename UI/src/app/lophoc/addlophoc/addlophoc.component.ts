@@ -40,7 +40,13 @@ export class AddlophocComponent implements OnInit {
   fetchChuongTrinhs(): void {
     this.lophocService.getChuongTrinhs().subscribe(
       (res) => {
-        if (!res.isError) {
+        if (res.isError) {
+          if (res.code === 404) {
+            this.router.navigate(['/pages/error']);
+          } else {
+            this.toastr.error(res.message || 'Đã xảy ra lỗi khi tải lớp học.');
+          }
+        } else if (!res.isError) {
           this.chuongTrinhList = res.data;
          
         } else {
