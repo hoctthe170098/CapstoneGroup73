@@ -53,7 +53,8 @@ public class GetBaoCaoHocPhiChoTungLopQueryHandler : IRequestHandler<GetBaoCaoHo
             .Select(tg => new
             {
                 tg.HocSinhCode,
-                tg.HocSinh.Ten
+                tg.HocSinh.Ten,
+                tg.HocSinh.ChinhSachId,
             })
             .Distinct().ToList();
         var listHocBu = _context.LichHocs
@@ -68,6 +69,8 @@ public class GetBaoCaoHocPhiChoTungLopQueryHandler : IRequestHandler<GetBaoCaoHo
         }
         var ThangDaHoc = NgayDaHoc.Select(ng => ng.Month).Distinct().OrderBy(th => th).ToList();
         int ThangCanLay = 0;
+        if (request.Thang == null) ThangCanLay = ThangDaHoc[0];
+        else ThangCanLay = (int)request.Thang;
         var NgayCanLays = NgayDaHoc.Where(ng=>ng.Month == ThangCanLay).ToList();
         var data = new BaoCaoHocPhiDto
         {
@@ -79,12 +82,20 @@ public class GetBaoCaoHocPhiChoTungLopQueryHandler : IRequestHandler<GetBaoCaoHo
         List<HocPhiDto> hocPhis = new List<HocPhiDto>();
         foreach (var hs in ListHocSinh)
         {
+            float phanTramGiam = 0;
             var hocPhi = new HocPhiDto
             {
                 HocSinhCode = hs.HocSinhCode,
                 TenHocSinh = hs.Ten,
-                HocPhi1Buoi = HocPhi1Buoi
+                HocPhi1Buoi = HocPhi1Buoi,
             };
+            if (hs.ChinhSachId == null) hocPhi.SoPhanTramGiam = 0;
+            else
+            {
+                var chinhSach = _context.ChinhSaches.First(cs => cs.Id == hs.ChinhSachId);
+                phanTramGiam = chinhSach.PhanTramGiam;
+                hocPhi.SoPhanTramGiam = (int)(phanTramGiam * 100);
+            }
             var soBuoiHoc = 0;
             var soBuoiNghi = 0;
             foreach(var ngayHoc in NgayCanLays)
@@ -101,7 +112,7 @@ public class GetBaoCaoHocPhiChoTungLopQueryHandler : IRequestHandler<GetBaoCaoHo
             }
             hocPhi.SoBuoiHoc = soBuoiHoc;
             hocPhi.SoBuoiNghi = soBuoiNghi;
-            hocPhi.TongHocPhi = hocPhi.SoBuoiHoc * HocPhi1Buoi;
+            hocPhi.TongHocPhi = hocPhi.SoBuoiHoc * HocPhi1Buoi * (1 - phanTramGiam);
             hocPhis.Add(hocPhi);
         }
         data.HocPhis = hocPhis.ToList();

@@ -20,6 +20,7 @@ namespace StudyFlow.Application.DiemDanhs.Queries.GetBaoCaoHocPhiChoTungLop
         public int SoBuoiHoc {  get; set; }
         public int SoBuoiNghi { get; set; }
         public int HocPhi1Buoi { get; set; }
-        public int TongHocPhi  { get; set; }
+        public int SoPhanTramGiam { get; set; }
+        public float TongHocPhi  { get; set; }
     }
 }

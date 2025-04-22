@@ -43,6 +43,7 @@ public class GetBaiKiemTrasWithPaginationQueryHandler : IRequestHandler<GetBaiKi
         var listTest = await _context.BaiKiemTras
             .Where(t=>t.LichHoc.Phong.CoSoId== coSoId)
             .Include(t=>t.LichHoc)
+            .Include(t=>t.KetQuaBaiKiemTras)
             .ToListAsync(cancellationToken);
         var query =  listTest.AsQueryable();
         if (request.TenBaiKiemTra.Trim() != "")

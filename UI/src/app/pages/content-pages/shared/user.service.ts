@@ -82,4 +82,16 @@ getUserName(): string | null{
   }
   return null;
 }
+isTokenExpired(): boolean {
+  const decodedToken = this.getDecodedToken();
+  if (decodedToken && decodedToken.exp) {
+    // 'exp' là thời điểm hết hạn của token (dạng Unix timestamp - giây)
+    const expirationTimeInSeconds = decodedToken.exp;
+    const currentTimeInSeconds = Math.floor(Date.now() / 1000); // Lấy thời gian hiện tại theo giây
+
+    // So sánh thời gian hết hạn với thời gian hiện tại
+    return expirationTimeInSeconds < currentTimeInSeconds;
+  }
+  return true; // Coi như đã hết hạn nếu không có thông tin 'exp'
+}
 }
