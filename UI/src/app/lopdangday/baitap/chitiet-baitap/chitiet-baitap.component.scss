@@ -359,4 +359,27 @@
       background-color: white;
     }
   }
+  .pagination {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 16px;
   
+    button {
+      padding: 6px 12px;
+      border: none;
+      background-color: #e0e0e0;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+  
+    button.active {
+      background-color: #007bff;
+      color: white;
+    }
+  
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  }

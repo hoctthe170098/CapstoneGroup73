@@ -21,7 +21,8 @@ export class ChitietBaitapComponent implements OnInit {
   countdownDisplay: string = "";
   answers: any[] = [];
   currentPage = 1;
-  pageSize = 3;
+  pageSize = 5;
+  totalPages = 1;
   editBaiTap: any;
   gradingAnswerId: string | null = null;
   ngOnInit(): void {
@@ -282,7 +283,7 @@ export class ChitietBaitapComponent implements OnInit {
       pageNumber: this.currentPage,
       pageSize: this.pageSize,
     };
-
+  
     this.lopdangdayService.getTraLoiByBaiTapForTeacher(payload).subscribe({
       next: (res) => {
         if (!res.isError) {
@@ -304,7 +305,8 @@ export class ChitietBaitapComponent implements OnInit {
                 }
               : null,
             showMenu: false
-          }));         
+          }));
+          this.totalPages = res.data.totalPages || 1;
         } else {
           this.toastr.error(res.message || "Không thể lấy danh sách trả lời.");
         }
@@ -314,6 +316,7 @@ export class ChitietBaitapComponent implements OnInit {
       },
     });
   }
+  
  
 
   cancelGrading(): void {
@@ -381,5 +384,11 @@ export class ChitietBaitapComponent implements OnInit {
       }
     });
   }
- 
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.loadTraLoiCuaHocSinh();
+    }
+  }
+  
 }

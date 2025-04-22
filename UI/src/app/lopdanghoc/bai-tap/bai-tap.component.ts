@@ -12,7 +12,7 @@ export class BaiTapComponent implements OnInit {
   filteredBaiTaps: any[] = [];
   trangThaiFilter: string = '';
   currentPage: number = 1;
-  pageSize: number = 5;
+  pageSize: number = 6;
   totalPages: number = 1;
   tenLop: string = '';
 
@@ -40,13 +40,11 @@ export class BaiTapComponent implements OnInit {
     this.lopdanghocService.getBaiTapsForStudent(payload).subscribe({
       next: (res) => {
         if (!res.isError && res.data) {
-          const allBaiTaps = res.data.items.flatMap((item: any) => item.baiTaps || []);
-          this.baiTaps = allBaiTaps;
-          this.filteredBaiTaps = allBaiTaps;
+          const items = res.data.items.flatMap((item: any) => item.baiTaps || []);
+          this.baiTaps = items;
           this.totalPages = res.data.totalPages || 1;
         } else {
           this.baiTaps = [];
-          this.filteredBaiTaps = [];
           this.totalPages = 1;
         }
         this.cdr.detectChanges();
@@ -54,12 +52,12 @@ export class BaiTapComponent implements OnInit {
       error: (err) => {
         console.error('Lỗi khi lấy danh sách bài tập:', err);
         this.baiTaps = [];
-        this.filteredBaiTaps = [];
         this.totalPages = 1;
         this.cdr.detectChanges();
       }
     });
   }
+  
   
 
   applyFilter(): void {

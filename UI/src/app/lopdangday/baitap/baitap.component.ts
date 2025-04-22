@@ -55,31 +55,29 @@ export class BaitapComponent implements OnInit {
       tenLop: this.tenLop,
       trangThai: this.trangThaiFilter || 'all'
     };
-
+  
     this.lopdangdayService.getBaiTapsForTeacher(payload).subscribe({
       next: (res) => {
         if (!res.isError && res.data) {
-          const allBaiTaps = res.data.items.flatMap((item: any) => item.baiTaps || []);
-          this.baiTaps = allBaiTaps;
-          this.filteredBaiTaps = allBaiTaps;
+          const firstItem = res.data.items[0]; 
+          this.baiTaps = firstItem?.baiTaps || [];
           this.totalPages = res.data.totalPages || 1;
         } else {
           this.baiTaps = [];
-          this.filteredBaiTaps = [];
           this.totalPages = 1;
         }
-
+  
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Lỗi khi lấy danh sách bài tập:', err);
         this.baiTaps = [];
-        this.filteredBaiTaps = [];
         this.totalPages = 1;
         this.cdr.detectChanges();
       }
     });
   }
+  
 
   applyFilter(): void {
     this.currentPage = 1;
@@ -164,9 +162,6 @@ export class BaitapComponent implements OnInit {
       formData.append('CreateBaiTapDto.taiLieu', this.newBaiTap.files[0]);
     }
 
-
-   
-  
     this.lopdangdayService.createBaiTap(formData).subscribe({
       next: (res) => {
         if (!res.isError) {

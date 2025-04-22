@@ -16,7 +16,7 @@
   
     <!-- Danh sách bài tập -->
     <div class="list-container">
-      <div class="baitap-item" *ngFor="let bt of paginatedBaiTaps">
+      <div class="baitap-item" *ngFor="let bt of baiTaps">
         <div class="left-icon ft-book-open"></div>
         <div class="info">
             <h4 class="clickable-title"
@@ -26,7 +26,7 @@
 
           <p>
             <i class="ft-calendar"></i> {{ bt.ngayTao | date:'dd/MM/yyyy' }} &nbsp;&nbsp;
-            <i class="ft-clock"></i> {{ bt.thoiGianKetThuc | date:'HH:mm' }}
+            <i class="ft-clock"></i> {{ bt.ngayTao | date:'HH:mm' }}
           </p>
         </div>
         <div class="status">

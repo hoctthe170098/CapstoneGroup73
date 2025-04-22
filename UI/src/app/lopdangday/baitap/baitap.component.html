@@ -1,126 +1,153 @@
- <div class="baitap-wrapper">
-      <div class="header-bar">
-        <h3>DANH SÁCH BÀI TẬP</h3>
-        <button class="add-btn" (click)="openAddModal()">+ Thêm Bài Tập</button>
-      </div>
-    
-      <!-- Filter -->
-      <div class="filter-bar">
-        <select [(ngModel)]="trangThaiFilter" (change)="applyFilter()">
-          <option value="">Tất cả trạng thái</option>
-          <option value="Chưa mở">Chưa mở</option>
-          <option value="Đang mở">Đang mở</option>
-          <option value="Kết thúc">Kết thúc</option>
-        </select>
-      </div>
-    
-      <!-- Danh sách bài tập -->
-      <div class="list-container">
-        <div class="baitap-item" *ngFor="let bt of paginatedBaiTaps">
-          <div class="left-icon ft-book-open"></div>
-          <div class="info">
-            <h4 class="clickable-title"
-    [routerLink]="['/lopdangday/chi-tiet', tenLop, 'baitap', bt.id]">
-  {{ bt.tieuDe }}
-</h4>
-            <p>
-              <i class="ft-calendar"></i> {{ bt.ngayTao | date:'dd/MM/yyyy' }} &nbsp;&nbsp;
-              <i class="ft-clock"></i> {{ bt.thoiGianKetThuc | date:'HH:mm' }}
-            </p>
-          </div>
-          <div class="status">
-            <span>Trạng thái</span><br />
-            <span [ngClass]="{
-              'open': bt.trangThai === 'Đang mở',
-              'closed': bt.trangThai === 'Kết thúc',
-              'pending': bt.trangThai === 'Chưa mở'
-            }">
-              {{ bt.trangThai }}
-            </span>
-          </div>
-          <div class="delete-action" (click)="confirmDelete(bt)">
-            <i class="ft-trash-2 text-danger"></i>
-          </div>
-        </div>
-      </div>
-<!-- POPUP THÊM BÀI TẬP -->
-<div class="modal-overlay" *ngIf="isAddModalOpen" (click)="closeAddModal()"></div>
-<div class="modal-content" *ngIf="isAddModalOpen">
-  <div class="modal-header">
-    <h3>Thêm bài tập</h3>
-    <button class="close-btn" (click)="closeAddModal()"><i class="ft-x"></i></button>
+<div class="baitap-wrapper">
+  <div class="header-bar">
+    <h3>DANH SÁCH BÀI TẬP</h3>
+    <button class="add-btn" (click)="openAddModal()">+ Thêm Bài Tập</button>
   </div>
 
-  <div class="modal-body">
-    <!-- Thời gian hết hạn -->
-    <label>Thời gian hết hạn</label>
-    <input
-  type="datetime-local"
-  [(ngModel)]="newBaiTap.thoiGianKetThuc"
-  (ngModelChange)="formErrors.thoiGianKetThuc = ''"
-  class="form-control"
-/>
-<div class="error-text" *ngIf="formErrors.thoiGianKetThuc">{{ formErrors.thoiGianKetThuc }}</div>
-    <!-- Tiêu đề -->
-    <label>Tiêu đề</label>
-    <input
-  type="text"
-  [(ngModel)]="newBaiTap.tieuDe"
-  (ngModelChange)="formErrors.tieuDe = ''"
-  class="form-control"
-  placeholder="Tiêu đề..."
-/>
-<div class="error-text" *ngIf="formErrors.tieuDe">{{ formErrors.tieuDe }}</div>
-    <!-- Nội dung -->
-    <label>Nội dung</label>
-    <textarea
-  [(ngModel)]="newBaiTap.noiDung"
-  (ngModelChange)="formErrors.noiDung = ''"
-  class="form-control"
-  placeholder="Nội dung bài tập..."
-></textarea>
-<div class="error-text" *ngIf="formErrors.noiDung">{{ formErrors.noiDung }}</div>
-    <!-- File tải lên -->
-    <label>File tải lên</label>
-    <div *ngFor="let file of newBaiTap.files; let i = index" class="uploaded-file">
-      <div class="file-info">
-        <strong>{{ file.name }}</strong><br />
-        <span>{{ (file.size / 1024) | number: '1.0-0' }} KB</span>
+  <!-- Filter -->
+  <div class="filter-bar">
+    <select [(ngModel)]="trangThaiFilter" (change)="applyFilter()">
+      <option value="">Tất cả trạng thái</option>
+      <option value="Chưa mở">Chưa mở</option>
+      <option value="Đang mở">Đang mở</option>
+      <option value="Kết thúc">Kết thúc</option>
+    </select>
+  </div>
+
+  <!-- Danh sách bài tập -->
+  <div class="list-container">
+    <div class="baitap-item" *ngFor="let bt of baiTaps">
+      <div class="left-icon ft-book-open"></div>
+      <div class="info">
+        <h4
+          class="clickable-title"
+          [routerLink]="['/lopdangday/chi-tiet', tenLop, 'baitap', bt.id]"
+        >
+          {{ bt.tieuDe }}
+        </h4>
+        <p>
+          <i class="ft-calendar"></i>
+          {{ bt.ngayTao | date : "dd/MM/yyyy" }} &nbsp;&nbsp;
+          <i class="ft-clock"></i> {{ bt.ngayTao | date : "HH:mm" }}
+        </p>
       </div>
-      <button class="remove-btn" (click)="removeFile(i)">
+      <div class="status">
+        <span>Trạng thái</span><br />
+        <span
+          [ngClass]="{
+            open: bt.trangThai === 'Đang mở',
+            closed: bt.trangThai === 'Kết thúc',
+            pending: bt.trangThai === 'Chưa mở'
+          }"
+        >
+          {{ bt.trangThai }}
+        </span>
+      </div>
+      <div class="delete-action" (click)="confirmDelete(bt)">
         <i class="ft-trash-2 text-danger"></i>
+      </div>
+    </div>
+  </div>
+  <!-- POPUP THÊM BÀI TẬP -->
+  <div
+    class="modal-overlay"
+    *ngIf="isAddModalOpen"
+    (click)="closeAddModal()"
+  ></div>
+  <div class="modal-content" *ngIf="isAddModalOpen">
+    <div class="modal-header">
+      <h3>Thêm bài tập</h3>
+      <button class="close-btn" (click)="closeAddModal()">
+        <i class="ft-x"></i>
       </button>
     </div>
-    <div class="error-text" *ngIf="formErrors.file">{{ formErrors.file }}</div>
+
+    <div class="modal-body">
+      <!-- Thời gian hết hạn -->
+      <label>Thời gian hết hạn</label>
+      <input
+        type="datetime-local"
+        [(ngModel)]="newBaiTap.thoiGianKetThuc"
+        (ngModelChange)="formErrors.thoiGianKetThuc = ''"
+        class="form-control"
+      />
+      <div class="error-text" *ngIf="formErrors.thoiGianKetThuc">
+        {{ formErrors.thoiGianKetThuc }}
+      </div>
+      <!-- Tiêu đề -->
+      <label>Tiêu đề</label>
+      <input
+        type="text"
+        [(ngModel)]="newBaiTap.tieuDe"
+        (ngModelChange)="formErrors.tieuDe = ''"
+        class="form-control"
+        placeholder="Tiêu đề..."
+      />
+      <div class="error-text" *ngIf="formErrors.tieuDe">
+        {{ formErrors.tieuDe }}
+      </div>
+      <!-- Nội dung -->
+      <label>Nội dung</label>
+      <textarea
+        [(ngModel)]="newBaiTap.noiDung"
+        (ngModelChange)="formErrors.noiDung = ''"
+        class="form-control"
+        placeholder="Nội dung bài tập..."
+      ></textarea>
+      <div class="error-text" *ngIf="formErrors.noiDung">
+        {{ formErrors.noiDung }}
+      </div>
+      <!-- File tải lên -->
+      <label>File tải lên</label>
+      <div
+        *ngFor="let file of newBaiTap.files; let i = index"
+        class="uploaded-file"
+      >
+        <div class="file-info">
+          <strong>{{ file.name }}</strong
+          ><br />
+          <span>{{ file.size / 1024 | number : "1.0-0" }} KB</span>
+        </div>
+        <button class="remove-btn" (click)="removeFile(i)">
+          <i class="ft-trash-2 text-danger"></i>
+        </button>
+      </div>
+      <div class="error-text" *ngIf="formErrors.file">
+        {{ formErrors.file }}
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <label class="upload-btn" title="Chọn file">
+        <i class="ft-upload-cloud"></i>
+        <input type="file" (change)="handleFileInput($event)" hidden />
+      </label>
+
+      <div class="footer-actions">
+        <button class="cancel-btn" (click)="closeAddModal()">Hủy</button>
+        <button class="add-btn" (click)="submitNewBaiTap()">Thêm</button>
+      </div>
+    </div>
   </div>
 
-  <!-- Footer -->
-  <div class="modal-footer">
-    <label class="upload-btn" title="Chọn file">
-      <i class="ft-upload-cloud"></i>
-      <input type="file" (change)="handleFileInput($event)" hidden />
-    </label>
-
-    <div class="footer-actions">
-      <button class="cancel-btn" (click)="closeAddModal()">Hủy</button>
-      <button class="add-btn" (click)="submitNewBaiTap()">Thêm</button>
-    </div>
+  <!-- Pagination -->
+  <div class="pagination">
+    <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+      &lt;
+    </button>
+    <button
+      *ngFor="let page of [].constructor(totalPages); let i = index"
+      [class.active]="currentPage === i + 1"
+      (click)="goToPage(i + 1)"
+    >
+      {{ i + 1 }}
+    </button>
+    <button
+      (click)="goToPage(currentPage + 1)"
+      [disabled]="currentPage === totalPages"
+    >
+      &gt;
+    </button>
   </div>
 </div>
-
-
-
-
-    <!-- Pagination -->
-    <div class="pagination">
-      <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">&lt;</button>
-      <button
-        *ngFor="let page of [].constructor(totalPages); let i = index"
-        [class.active]="currentPage === i + 1"
-        (click)="goToPage(i + 1)">
-        {{ i + 1 }}
-      </button>
-      <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">&gt;</button>
-    </div>
-  </div>
-  
