@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { BaocaodiemdanhquanlycosohService } from './shared/baocaodiemdanhquanlycoso.service';
+import { LophocService } from '../shared/lophoc.service';
 import { formatDate } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -17,7 +17,7 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
   dangSua = false;
 
   constructor(
-    private diemDanhService: BaocaodiemdanhquanlycosohService,
+    private lophocService: LophocService,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private toastr: ToastrService,
@@ -35,7 +35,7 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
   }
 
   taiBaoCao(ngay?: string) {
-    this.diemDanhService.getBaoCaoDiemDanh(this.tenLop, ngay).subscribe(res => {
+    this.lophocService.getBaoCaoDiemDanh(this.tenLop, ngay).subscribe(res => {
       if(res.isError){
         if(res.code==404) this.router.navigate(['/pages/error']);
         else this.toastr.error(res.message);
@@ -83,7 +83,7 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
       this.toastr.error('Không có học sinh nào được chọn để cập nhật điểm danh.');
       return; 
     }
-    this.diemDanhService.updateDiemDanh(payload).subscribe({
+    this.lophocService.updateDiemDanh(payload).subscribe({
       next: (res) => {
         if (!res.isError) {
           this.backupDanhSach = JSON.parse(JSON.stringify(this.danhSachHocSinh));

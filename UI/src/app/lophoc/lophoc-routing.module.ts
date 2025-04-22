@@ -3,9 +3,12 @@ import { RouterModule, Routes } from '@angular/router';
 import { LophocComponent } from './lophoc.component';
 import { AddlophocComponent } from './addlophoc/addlophoc.component';
 import { EditLopHocComponent } from './editlophoc/editlophoc.component';
+import { BaocaodiemdanhquanlycosoComponent } from './baocaodiemdanhquanlycoso/baocaodiemdanhquanlycoso.component';
+import { BaocaohocphiComponent } from './baocaohocphi/baocaohocphi.component';
+
 
 const routes: Routes = [
-  {
+    {
       path: '',
        component: LophocComponent,
       data: {
@@ -25,7 +28,22 @@ const routes: Routes = [
        data: {
          title: 'Chỉnh Sửa Lớp Học'
        }
-     }
+    },
+    {
+      path: 'baocaodiemdanhquanlycoso',
+      component: BaocaodiemdanhquanlycosoComponent,
+      data: {
+        title: 'Báo Cáo Điểm Danh'
+      }
+    },
+    {
+      path: 'baocaohocphi',
+      component: BaocaohocphiComponent,
+      data: {
+        title: 'Báo Cáo Học Phí'
+      }
+    }
+     
 ];
 
 @NgModule({

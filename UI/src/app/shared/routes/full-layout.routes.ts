@@ -87,18 +87,6 @@ export const Full_ROUTES: Routes = [
     canActivate:[AuthGuard]
   },
   {
-    path: 'baocaohocphi',
-    loadChildren: () => import('../../baocaohocphi/baocaohocphi.module').then(m => m.BaocaohocphiModule),
-    canActivate:[AuthGuard],
-    data:{role:[UserRole.CampusManager]}
-  },
-  {
-    path: 'baocaodiemdanhquanlycoso',
-    loadChildren: () => import('../../baocaodiemdanhquanlycoso/baocaodiemdanhquanlycoso.module').then(m => m.BaocaodiemdanhquanlycosoModule),
-    canActivate:[AuthGuard],
-    data:{role:[UserRole.CampusManager]}
-  },
-  {
     path: 'lichhoc',
     loadChildren: () => import('../../lichhoc/lichhoc.module').then(m => m.LichhocModule),
     canActivate:[AuthGuard],
