@@ -6,6 +6,9 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { saveAs } from 'file-saver';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+
 @Component({
   selector: 'app-hocsinh',
   templateUrl: './hocsinh.component.html',
@@ -18,14 +21,10 @@ export class HocsinhComponent implements OnInit {
   lop: string = '';
   searchTerm: string = '';
   
-  classOptions = [
-    { code: 'Lớp 1', name: 'Lớp 1' },
-    { code: 'Lớp 2', name: 'Lớp 2' },
-    { code: 'Lớp 3', name: 'Lớp 3' },
-    { code: 'Lớp 4', name: 'Lớp 4' },
-    { code: 'Lớp 5 Anh', name: 'Lớp 5 Anh' },
-  ];
-   filteredClassOptions = this.classOptions.slice();
+  classOptions: { code: string; name: string }[] = [];
+filteredClassOptions: { code: string; name: string }[] = [];
+private lopSearchSubject = new Subject<string>();
+
 
    lopSearchTerm: string = '';
  
@@ -52,22 +51,13 @@ editStudentForm: FormGroup;
 selectedStudent: any;
 isEditModalOpen: boolean = false;
  
-   toggleLopDropdown() {
-     this.lopDropdownOpen = !this.lopDropdownOpen;
-     if (this.lopDropdownOpen) {
-       this.lopSearchTerm = '';
-       this.filteredClassOptions = this.classOptions.slice();
-     }
-   }
+   
  
    // Khi gõ vào ô "Tìm lớp"
    onLopSearchTermChange() {
-     const lower = this.lopSearchTerm.toLowerCase();
-     this.filteredClassOptions = this.classOptions.filter(opt =>
-       opt.name.toLowerCase().includes(lower) ||
-       opt.code.toLowerCase().includes(lower)
-     );
-   }
+    this.getDanhSachLopHoc(this.lopSearchTerm.trim());
+  }
+  
  
    
  
@@ -97,7 +87,30 @@ isEditModalOpen: boolean = false;
   toggleDetails(index: number) {
     this.students[index].showDetails = !this.students[index].showDetails;
   }
-
+  toggleLopDropdown() {
+    this.lopDropdownOpen = !this.lopDropdownOpen;
+  
+    if (this.lopDropdownOpen) {
+      this.lopSearchTerm = '';
+      this.getDanhSachLopHoc(''); // Gọi API để load tất cả lớp
+    }
+  }
+  getDanhSachLopHoc(keyword: string) {
+    this.hocSinhService.getDanhSachLopTheoTen(keyword).subscribe(res => {
+      if (!res.isError && res.data) {
+        this.classOptions = res.data.map((item: any) => ({
+          code: item.tenLop,
+          name: item.tenLop
+        }));
+        this.filteredClassOptions = this.classOptions;
+      } else {
+        this.classOptions = [];
+        this.filteredClassOptions = [];
+      }
+    });
+  }
+  
+  
   
 
   onChooseFileclick() {
@@ -260,6 +273,25 @@ isEditModalOpen: boolean = false;
     }
 
   ngOnInit(): void {
+    this.getDanhSachLopHoc('');
+    this.lopSearchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(search => {
+      this.hocSinhService.getDanhSachLopTheoTen(search).subscribe(res => {
+        if (!res.isError && res.data) {
+          this.classOptions = res.data.map((item: any) => ({
+            code: item.tenLop,
+            name: item.tenLop
+          }));
+          this.filteredClassOptions = this.classOptions;
+        } else {
+          this.classOptions = [];
+          this.filteredClassOptions = [];
+        }
+      });
+    });
+    
     this.loadDanhSachHocSinh();
     this.loadProvinces();
     this.loadDanhSachChinhSach();
@@ -566,5 +598,9 @@ onProvinceChangeForEdit(provinceCode: string) {
     const day = String(d.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
-  
+  clearSelectedLop(event: MouseEvent) {
+    event.stopPropagation(); 
+    this.lop = '';
+    this.loadDanhSachHocSinh(); 
+  }
 }

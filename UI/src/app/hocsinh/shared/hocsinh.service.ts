@@ -81,5 +81,14 @@ addListHocSinhs(body: any): Observable<any> {
   const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
   return this.http.post(`${this.baseUrl}/addlisthocsinhs`, body, { headers });
 }
+getDanhSachLopTheoTen(tenLop: string): Observable<any> {
+  const token = localStorage.getItem('token');
+  const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+  return this.http.get<any>(
+    `https://localhost:5001/api/LichHocs/gettenlophocbyname?TenLop=${encodeURIComponent(tenLop)}`,
+    { headers }
+  );
+}
 
 }

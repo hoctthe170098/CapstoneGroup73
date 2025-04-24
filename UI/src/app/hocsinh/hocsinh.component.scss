@@ -326,7 +326,15 @@ body {
   .cancel-btn:hover {
     opacity: 0.9;
   }
-
+  .lop-text {
+    display: inline-block;
+    max-width: 100px; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+  }
+  
   .lop-select-container {
     position: relative;
     width: 140px; /* tương tự dropdown-filter cũ */
@@ -491,3 +499,21 @@ body {
       }
     }
   }
+  .clear-icon {
+    font-size: 13px;
+    margin-left: 6px;
+    cursor: pointer;
+    color: #555;
+    padding: 2px 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    transition: background-color 0.2s, color 0.2s;
+  
+    &:hover {
+      background-color: #ccc;
+      color: #000;
+    }
+  }
+  

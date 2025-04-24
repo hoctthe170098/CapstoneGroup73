@@ -16,7 +16,10 @@
     <div class="lop-select-container">
       <div class="lop-select-display" (click)="toggleLopDropdown()">
         <span *ngIf="!lop">Lớp</span>
-        <span *ngIf="lop">{{ lop }}</span>
+        <span *ngIf="lop" class="lop-text" [title]="lop">{{ lop }}</span>   
+        <span *ngIf="lop" class="clear-icon" (click)="clearSelectedLop($event)">
+          &times;
+        </span>     
         <i class="fa fa-caret-down caret-icon"></i>
       </div>
 
