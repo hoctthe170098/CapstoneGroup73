@@ -10,6 +10,7 @@ export const ROUTES: RouteInfo[] = [
       { path: '/dashboard/dashboard2', title: 'Dashboard 2', icon: 'ft-arrow-right submenu-icon', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] } 
     ]
   },
+  {path: '/dashboard-admin', title: 'Dashboard', icon: 'ft-home', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [],roles:[UserRole.Administrator] },
   {path: '/dashboard-cm', title: 'Dashboard', icon: 'ft-home', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [],roles:[UserRole.CampusManager] },
   {path: '/phong', title: 'Phòng Học', icon: 'ft-briefcase', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] ,roles:[UserRole.CampusManager] },
   {path: '/chuongtrinh', title: 'Chương Trình', icon: 'ft-book', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [],roles:[UserRole.LearningManager] },

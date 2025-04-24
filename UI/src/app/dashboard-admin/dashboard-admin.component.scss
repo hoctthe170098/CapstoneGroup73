@@ -1,0 +1,135 @@
+.dashboard-wrapper {
+    padding: 20px;
+  
+    .card-tile {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+      height: 100%;
+    }
+  
+    .dashboard-tile {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+  
+      .tile-left {
+        .tile-label {
+          font-size: 14px;
+          font-weight: 600;
+          color: #5a5a5a;
+          margin-bottom: 6px;
+        }
+  
+        .tile-value {
+          font-size: 24px;
+          font-weight: bold;
+          color: #1d1d1d;
+        }
+      }
+  
+      .tile-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+  
+        i {
+          font-size: 20px;
+        }
+      }
+  
+      &.tile-student .tile-icon {
+        background-color: #e8edff;
+        i {
+          color: #3f51b5;
+        }
+      }
+  
+      &.tile-teacher .tile-icon {
+        background-color: #fff8e1;
+        i {
+          color: #ffc107;
+        }
+      }
+  
+      &.tile-employee .tile-icon {
+        background-color: #fdeef4;
+        i {
+          color: #ec407a;
+        }
+      }
+    }
+  
+    .chart-box {
+      display: flex;
+      flex-direction: column;
+  
+      h6 {
+        font-weight: 600;
+        font-size: 16px;
+        margin-bottom: 16px;
+        color: #111;
+      }
+  
+      
+    }
+    .bar-chart-box canvas {
+        height: 240px !important;
+        max-height: 240px !important;
+      }
+    .scroll-horizontal {
+      .horizontal-chart-container {
+        max-height: 280px;
+        overflow-y: auto;
+      }
+    }
+    .equal-height-box {
+        height: 380px;
+        display: flex;
+        flex-direction: column;
+      
+        canvas {
+          flex-grow: 1;
+          width: 100% !important;
+          height: auto !important;
+        }
+      }
+      .doughnut-box .doughnut-center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+      }
+      
+      .doughnut-box canvas {
+        max-width: 260px;
+        max-height: 260px;
+      }
+      
+      .horizontal-bar-box {
+        display: flex;
+        flex-direction: column;
+      
+        .horizontal-scroll-wrapper {
+          max-height: 300px; // Giới hạn chiều cao
+       
+        }
+      
+        canvas {
+          display: block;
+          width: 100% !important;
+          height: auto !important;
+          min-height: 240px; // đảm bảo không bị co nhỏ
+        }
+      }
+      
+      
+      
+      
+  }
+  
