@@ -256,8 +256,8 @@
             <small
               class="error-message"
               *ngIf="
-                addTeacherForm.controls['code'].invalid &&
-                addTeacherForm.controls['code'].touched
+                editTeacherForm.controls['code'].invalid &&
+                editTeacherForm.controls['code'].touched
               "
             >
               Mã giáo viên phải có không chứa quá 18 ký tự.
@@ -277,8 +277,8 @@
               <small
                 class="error-message"
                 *ngIf="
-                  addTeacherForm.controls['ten'].invalid &&
-                  addTeacherForm.controls['ten'].touched
+                  editTeacherForm.controls['ten'].invalid &&
+                  editTeacherForm.controls['ten'].touched
                 "
               >
                 Tên phải điền và không được quá 20 ký tự.
@@ -301,8 +301,8 @@
               <small
                 class="error-message"
                 *ngIf="
-                  addTeacherForm.controls['ngaySinh'].errors?.invalidAge &&
-                  addTeacherForm.controls['ngaySinh'].touched
+                  editTeacherForm.controls['ngaySinh'].errors?.invalidAge &&
+                  editTeacherForm.controls['ngaySinh'].touched
                 "
               >
                 Giáo viên phải trên 18 tuổi.
@@ -323,8 +323,8 @@
               <small
                 class="error-message"
                 *ngIf="
-                  addTeacherForm.controls['email'].invalid &&
-                  addTeacherForm.controls['email'].touched
+                 editTeacherForm.controls['email'].invalid &&
+                  editTeacherForm.controls['email'].touched
                 "
               >
                 Email không hợp lệ hoặc quá 50 ký tự.
@@ -344,8 +344,8 @@
               <small
                 class="error-message"
                 *ngIf="
-                  addTeacherForm.controls['soDienThoai'].invalid &&
-                  addTeacherForm.controls['soDienThoai'].touched
+                  editTeacherForm.controls['soDienThoai'].invalid &&
+                  editTeacherForm.controls['soDienThoai'].touched
                 "
               >
                 Số điện thoại phải có 10 hoặc 11 số.
@@ -368,8 +368,8 @@
             <small
               class="error-message"
               *ngIf="
-                addTeacherForm.controls['truongDangDay'].invalid &&
-                addTeacherForm.controls['truongDangDay'].touched
+                editTeacherForm.controls['truongDangDay'].invalid &&
+                editTeacherForm.controls['truongDangDay'].touched
               "
             >
               Tên trường không được quá 50 ký tự.
@@ -417,8 +417,8 @@
               <small
                 class="error-message"
                 *ngIf="
-                  addTeacherForm.controls['diaChiCuThe'].invalid &&
-                  addTeacherForm.controls['diaChiCuThe'].touched
+                  editTeacherForm.controls['diaChiCuThe'].invalid &&
+                  editTeacherForm.controls['diaChiCuThe'].touched
                 "
               >
                 Địa chỉ không được quá 150 ký tự.
