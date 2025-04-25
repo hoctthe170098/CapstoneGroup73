@@ -50,29 +50,29 @@
   <div class="row mt-4">
     <!-- Attendance -->
     <div class="col-md-6">
-        <div class="card-tile">
-            <h6>Tình trạng chuyên cần học sinh</h6>
-            <div class="table-responsive limited-table">
-              <table class="table table-striped">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Tên học sinh</th>
-                    <th>Số buổi nghỉ</th>
-                    <th>Lớp</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let item of attendanceData; let i = index">
-                    <td>{{ i + 1 }}</td>
-                    <td>{{ item.tenHocSinh }}</td>
-                    <td>{{ item.soBuoiNghi }}</td>
-                    <td>{{ item.lop }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div> 
+      <div class="card-tile">
+        <h6>Tình trạng chuyên cần học sinh</h6>
+        <div class="table-responsive limited-table">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Tên học sinh</th>
+                <th>Số buổi nghỉ</th>
+                <th>Lớp</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of attendanceData; let i = index">
+                <td>{{ item.code }}</td>
+                <td>{{ item.tenHocSinh }}</td>
+                <td>{{ item.soBuoiNghi }}</td>
+                <td>{{ item.lop }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <!-- Room usage -->
@@ -89,32 +89,79 @@
         </div>
 
         <div class="scroll-room-list">
-            <div class="room-bar" *ngFor="let room of roomUsageList">
-                <div class="room-label">{{ room.name }}</div>
-                <div class="room-progress">
-                    <div class="used-bar-wrapper" [style.width.%]="(room.used / 24) * 100">
-                      <div class="used-bar">
-                        <span class="used-value">{{ room.used }}hr</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-              
+          <div class="room-bar" *ngFor="let room of roomUsageList">
+            <div class="room-label">{{ room.name }}</div>
+            <div class="room-progress">
+              <div
+                class="used-bar-wrapper"
+                [style.width.%]="(room.used / 24) * 100"
+              >
+                <div class="used-bar">
+                  <span class="used-value">{{ room.used }}hr</span>
+                </div>
+              </div>
+            </div>
           </div>
-          
 
-        <div class="room-scale">
-          <div class="scale-track">
-            <span
-              *ngFor="let hour of [0, 3, 6, 9, 12, 15, 18, 21, 24]"
-              [style.left.%]="(hour / 24) * 100"
-            >
-              {{ hour }}
-            </span>
+          <div class="room-scale">
+            <div class="scale-track">
+              <span
+                *ngFor="let hour of [0, 3, 6, 9, 12, 15, 18, 21, 24]"
+                [style.left.%]="(hour / 24) * 100"
+              >
+                {{ hour }}
+              </span>
+            </div>
+            <div class="unit-label">(h)</div>
           </div>
-          <div class="unit-label">(h)</div>
         </div>
       </div>
     </div>
   </div>
+<!-- New row: Tỉ lệ điểm danh tổng và theo lớp -->
+<div class="row mt-4">
+  <!-- Doughnut -->
+  <div class="col-md-4">
+    <div class="card-tile">
+      <h6>Tỉ lệ điểm danh trung bình</h6>
+      <canvas
+        baseChart
+        [data]="doughnutData"
+        [labels]="doughnutLabels"
+        [chartType]="'doughnut'"
+        [colors]="doughnutColors"
+        [options]="doughnutOptions"
+      ></canvas>
+    </div>
+  </div>
+
+  <!-- Attendance by class (Progress Bars) -->
+  <div class="col-md-8">
+    <div class="card-tile attendance-by-class">
+      <h6>Tỉ lệ điểm danh theo lớp</h6>
+      <div class="progress-list">
+        <div class="progress-item" *ngFor="let class of classAttendanceList">
+          <div class="progress-header">
+            <span class="class-name">{{ class.name }}</span>
+            <span class="percentage">{{ class.percentage }}%</span>
+          </div>
+          <div class="progress">
+            <div
+              class="progress-bar"
+              role="progressbar"
+              [style.width.%]="class.percentage"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            ></div>
+          </div>
+          <div class="progress-footer">
+            Số buổi học: {{ class.totalSessions }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 </div>

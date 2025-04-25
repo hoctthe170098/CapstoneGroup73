@@ -16,7 +16,7 @@ export class DashboardCMComponent implements OnInit {
     { label: 'Số lớp học', value: 15, icon: 'ft-bar-chart', class: 'tile-class' }
   ];
 
-  // Bar Chart (Lớp hoạt động)
+  // Bar Chart 
   barChartLabels: Label[] = ['Th 1/2025', 'Th 2/2025', 'Th 3/2025', 'Th 4/2025', 'Th 5/2025', 'Th 6/2025'];
   barChartData: ChartDataSets[] = [
     { data: [17, 13, 17, 6, 14, 42], label: 'Lớp hoạt động', backgroundColor: '#0000ff' }
@@ -34,7 +34,7 @@ export class DashboardCMComponent implements OnInit {
   };
   barChartType: ChartType = 'bar';
 
-  // Pie Chart (Học sinh theo chính sách)
+  // Pie Chart 
   pieChartLabels: Label[] = ['Đặc biệt', 'Gia đình', 'Cơ bản'];
   pieChartData: number[] = [15, 20, 65];
   pieChartType: ChartType = 'pie';
@@ -54,12 +54,12 @@ export class DashboardCMComponent implements OnInit {
     }
   };
   attendanceData = [
-    { tenHocSinh: 'Bùi Ngọc Dũng', soBuoiNghi: 5, tiLe: 50, lop: 'Lớp toán 10A3' },
-    { tenHocSinh: 'Bùi Ngọc Dũng', soBuoiNghi: 4, tiLe: 40, lop: 'Lớp anh văn 10A3' },
-    { tenHocSinh: 'Bùi Ngọc Dũng', soBuoiNghi: 3, tiLe: 30, lop: 'Lớp văn 10A3' },
-    { tenHocSinh: 'Bùi Ngọc Dũng', soBuoiNghi: 3, tiLe: 30, lop: 'Lớp sử 10A3' },
-    { tenHocSinh: 'Bùi Ngọc Dũng', soBuoiNghi: 2, tiLe: 20, lop: 'Lớp toán tin 10A3' },
-    { tenHocSinh: 'Bùi Ngọc Dũng', soBuoiNghi: 2, tiLe: 20, lop: 'Lớp toán 10A3' }
+    { code:'HS111', tenHocSinh: 'Bùi Ngọc Dũng', soBuoiNghi: 5, tiLe: 50, lop: 'Lớp toán 10A3' },
+    { code:'HS111', tenHocSinh: 'Bùi Ngọc Dũng', soBuoiNghi: 4, tiLe: 40, lop: 'Lớp anh văn 10A3' },
+    {code:'HS111', tenHocSinh: 'Bùi Ngọc Dũng', soBuoiNghi: 3, tiLe: 30, lop: 'Lớp văn 10A3' },
+    {code:'HS111', tenHocSinh: 'Bùi Ngọc Dũng', soBuoiNghi: 3, tiLe: 30, lop: 'Lớp sử 10A3' },
+    {code:'HS111', tenHocSinh: 'Bùi Ngọc Dũng', soBuoiNghi: 2, tiLe: 20, lop: 'Lớp toán tin 10A3' },
+    { code:'HS111',tenHocSinh: 'Bùi Ngọc Dũng', soBuoiNghi: 2, tiLe: 20, lop: 'Lớp toán 10A3' }
   ];
   
   roomUsageList = [
@@ -75,7 +75,33 @@ export class DashboardCMComponent implements OnInit {
     { name: '109', used: 18}
   ];
 
-  
+  doughnutLabels: Label[] = ['Có mặt', 'Vắng'];
+doughnutData: number[] = [85, 15];
+doughnutColors: Color[] = [
+  { backgroundColor: ['#4dd0e1', '#f44336'] }
+];
+doughnutOptions: ChartOptions = {
+  responsive: true,
+  maintainAspectRatio: true,
+  cutoutPercentage: 60,
+  legend: {
+    position: 'bottom',
+    labels: {
+      fontSize: 13,
+      fontColor: '#333'
+    }
+  }
+};
+
+classAttendanceList = [
+  { name: 'Lớp anh văn I', percentage: 85, totalSessions: 10 },
+  { name: 'Lớp anh văn II', percentage: 80, totalSessions: 10 },
+  { name: 'Lớp anh văn III', percentage: 75, totalSessions: 10 },
+  { name: 'Lớp anh văn IV', percentage: 90, totalSessions: 10 },
+  { name: 'Lớp anh văn V', percentage: 60, totalSessions: 10 },
+  { name: 'Lớp anh văn VI', percentage: 88, totalSessions: 10 }
+];
+
   constructor() { }
   
   ngOnInit(): void {
