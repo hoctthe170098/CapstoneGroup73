@@ -47,13 +47,13 @@ export class ImportGiaovienComponent {
             this.toastr.success('Import thành công!', 'Thành công');
             this.cdr.detectChanges();
           } else {
-            this.toastr.error('Import thất bại, dữ liệu không hợp lệ', 'Lỗi');
+            this.toastr.error(res.message || 'Lỗi import file');
             this.fileSelected = false;
           }
         },
         error: (err) => {
-          console.error("❌ Import lỗi:", err);
-          this.toastr.error('Không thể import file', 'Lỗi');
+          console.error(" Import lỗi:", err);
+          this.toastr.error(err?.error?.message || 'Đã xảy ra lỗi!');
           this.fileSelected = false;
         }
       });
