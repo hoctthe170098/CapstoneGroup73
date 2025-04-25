@@ -71,4 +71,5 @@ export class TestlistService {
     const url = `${this.lopUrl}/gettenlophocbyname?TenLop=${encodeURIComponent(tenLop)}`;
     return this.http.get<string[]>(url, { headers });
   }
+  
 }
