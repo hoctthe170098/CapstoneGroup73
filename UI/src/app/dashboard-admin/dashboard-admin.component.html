@@ -29,19 +29,22 @@
               ></canvas>
             </div>
           </div>
-      <div class="col-md-4">
-        <div class="chart-box card-tile">
-          <h6>Số học sinh theo chính sách</h6>
-          <canvas
-            baseChart
-            [data]="pieChartData"
-            [labels]="pieChartLabels"
-            [chartType]="'pie'"
-            [colors]="pieChartColors"
-            [options]="pieChartOptions"
-          ></canvas>
-        </div>
-      </div>
+          <div class="col-md-4">
+            <div class="chart-box card-tile">
+              <h6>Số học sinh theo chính sách</h6>
+              <div class="pie-chart-wrapper">
+                <canvas
+                  baseChart
+                  [data]="pieChartData"
+                  [labels]="pieChartLabels"
+                  [chartType]="'pie'"
+                  [colors]="pieChartColors"
+                  [options]="pieChartOptions"
+                ></canvas>
+              </div>
+            </div>
+          </div>
+          
     </div>
   
     

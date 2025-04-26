@@ -139,8 +139,16 @@ export class ChitietBaitapComponent implements OnInit {
             size: "",
           }
         : null,
+       
     };
 
+    this.formErrorsEdit = {
+      tieuDe: "",
+      noiDung: "",
+      thoiGianKetThuc: "",
+      trangThai: "",
+      file: ""
+    };
     this.isEditModalOpen = true;
   }
 
@@ -183,7 +191,7 @@ export class ChitietBaitapComponent implements OnInit {
         size: `${Math.round(file.size / 1024)} KB`,
         rawFile: file,
       };
-
+      this.editBaiTap.hasRemovedFile = false;
       // Clear lỗi nếu có
       this.formErrorsEdit.file = "";
     }
@@ -196,6 +204,7 @@ export class ChitietBaitapComponent implements OnInit {
 
   removeEditFile(): void {
     this.editBaiTap.file = null;
+    this.editBaiTap.hasRemovedFile = true; 
   }
 
   formErrorsEdit = {
@@ -245,7 +254,10 @@ export class ChitietBaitapComponent implements OnInit {
     } else if (!allowedStatus.includes(trangThai)) {
       this.formErrorsEdit.trangThai = "Trạng thái không hợp lệ.";
     }
-
+    if (!file && this.editBaiTap.hasRemovedFile) {
+      this.formErrorsEdit.file = 'Bạn cần upload file lên';
+    }
+    
     const hasError = Object.values(this.formErrorsEdit).some((e) => e !== "");
     if (hasError) return;
 
