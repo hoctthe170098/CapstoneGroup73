@@ -104,10 +104,17 @@ public class UpdateDiemDanhTheoNgayCommandValidator : AbstractValidator<UpdateDi
         foreach(var id in idDiemDanh)
         {
             var diemDanh = await _context.DiemDanhs
+            .Include(d=>d.ThamGiaLopHoc.LichHoc)
             .FirstOrDefaultAsync(dd => dd.Id == id
             && (dd.ThamGiaLopHoc.LichHoc.GiaoVienCode == giaoVien.Code
             || _context.LichHocs.Any(lh => lh.GiaoVienCode == giaoVien.Code && lh.LichHocGocId == dd.ThamGiaLopHoc.LichHocId)));
             if (diemDanh == null) return false;
+            if (diemDanh.ThamGiaLopHoc.LichHoc.TrangThai == "Dạy thay")
+            {
+                var lichHocGoc = _context.LichHocs
+                    .First(lh=>lh.Id==diemDanh.ThamGiaLopHoc.LichHoc.LichHocGocId);
+                if(lichHocGoc.GiaoVienCode== giaoVien.Code) return false;
+            }
         }
         return true;
     }

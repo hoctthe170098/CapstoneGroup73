@@ -53,7 +53,9 @@ public class GetBaoCaoDiemDanhHocSinhQueryHandler : IRequestHandler<GetBaoCaoDie
             .ToList();
         if(!LichHocCoDinh.Any()) throw new NotFoundIDException();
         var Thus = LichHocCoDinh.Select(lh => lh.Thu).ToList();
-        var NgayDaHoc = getNgayDaHoc(Thus, LichHocCoDinh[0].NgayBatDau,ngayHienTai);
+        var NgayDaHoc = (ngayHienTai <= LichHocCoDinh[0].NgayKetThuc)
+            ? getNgayDaHoc(Thus, LichHocCoDinh[0].NgayBatDau, ngayHienTai)
+            : getNgayDaHoc(Thus, LichHocCoDinh[0].NgayBatDau, LichHocCoDinh[0].NgayKetThuc);
         var LichHocBu = _context.LichHocs
             .Where(lh => lh.TenLop == request.TenLop 
             && lh.ThamGiaLopHocs.Select(tg => tg.HocSinhCode).Contains(HocSinh.Code) 

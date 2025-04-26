@@ -56,7 +56,9 @@ public class GetDiemDanhTheoNgayQueryHandler : IRequestHandler<GetDiemDanhTheoNg
         var lichHocCoDinh = _context.LichHocs
             .Where(lh => lh.TenLop == request.TenLop
             && lh.GiaoVienCode == giaoVien.Code
-            && lh.TrangThai == "Cố định").ToList();
+            && lh.TrangThai == "Cố định"&&lh.NgayBatDau<=ngayHienTai&&lh.NgayKetThuc>=ngayHienTai).ToList();
+        if (lichHocCoDinh[0].NgayBatDau > ngayHienTai) throw new Exception("Lớp học này chưa bắt đầu, không thể điểm danh");
+        if (lichHocCoDinh[0].NgayKetThuc < ngayHienTai) throw new Exception("Lớp học này đã kết thúc, không thể điểm danh");
         if (lichHocCoDinh.Any())
         {
             var lichHocHomNay = lichHocCoDinh.FirstOrDefault(lh => lh.Thu == thu);
