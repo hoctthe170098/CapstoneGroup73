@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query;
 using OfficeOpenXml;
 using StudyFlow.Application.Common.Exceptions;
 using StudyFlow.Application.Common.Interfaces;
@@ -36,14 +37,16 @@ public class ExportKetQuaBaiKiemTraToExcelCommandHandler : IRequestHandler<Expor
                 .ProjectTo<KetQuaKiemTraExcelDto>(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
-            if (!ketQuaKiemTra.Any())
+            if (!ketQuaKiemTra.Any()||ketQuaKiemTra.All(kq=>kq.Diem==null))
             {
-                throw new NotFoundDataException("Không có dữ liệu nào để xuất.");
+                throw new NotFoundDataException("Không có điểm nào để xuất file.");
             }
 
             using (var package = new ExcelPackage())
             {
-                var baiKiemTra = await _context.BaiKiemTras.FirstOrDefaultAsync(kt => kt.Id.ToString() == request.BaiKiemTraId, cancellationToken);
+                var baiKiemTra = await _context.BaiKiemTras
+                    .Include(kt=>kt.LichHoc)
+                    .FirstOrDefaultAsync(kt => kt.Id.ToString() == request.BaiKiemTraId, cancellationToken);
                 var worksheet = package.Workbook.Worksheets.Add(baiKiemTra!.Ten + " " + baiKiemTra.NgayKiemTra);
 
                 var headers = new[] { "Id", "Học Sinh Code", "Họ và Tên", "Điểm", "Nhận Xét" };
@@ -65,7 +68,7 @@ public class ExportKetQuaBaiKiemTraToExcelCommandHandler : IRequestHandler<Expor
 
                 worksheet.Cells.AutoFitColumns();
 
-                string fileName = baiKiemTra.Ten + " (" + baiKiemTra.NgayKiemTra + ")" + ".xlsx";
+                string fileName = baiKiemTra.Ten + $" {baiKiemTra.LichHoc.TenLop}" + " (" + baiKiemTra.NgayKiemTra + ")" + ".xlsx";
 
                 return new Output
                 {
@@ -75,7 +78,7 @@ public class ExportKetQuaBaiKiemTraToExcelCommandHandler : IRequestHandler<Expor
                     {
                         FileDownloadName = fileName
                     },
-                    message = "File downloaded successfully."
+                    message = "Tải kết quả bài kiểm tra thành công."
                 };
             }
         }

@@ -28,9 +28,8 @@ public class GetDashBoardChoAdminQueryHandler : IRequestHandler<GetDashBoardChoA
         int TongSoGiaoVien = 0;
         int TongSoNhanVien = 0;
         int TongSoLopHoc = 0;
+        int TiLeDiemDanh = 0;
         int TongSoLopHocDangDienRa = 0;
-        int TongSoBuoiHoc = 0;
-        int TongSoBuoiNghi = 0;
         var listCoSos = await _context.CoSos.Where(c=>c.TrangThai=="open").ToListAsync();
         var ChiaTheoCoSo = new List<CoSoDto>();
         foreach(var coso in  listCoSos)
@@ -60,12 +59,11 @@ public class GetDashBoardChoAdminQueryHandler : IRequestHandler<GetDashBoardChoA
                 .Distinct()
                 .CountAsync();
             TongSoLopHocDangDienRa += soLopHocDangDienRa;
-            foreach(var HocSinh in listHocSinh)
-            {
-                GetTiLeDiemDanh(ref TongSoBuoiHoc,ref TongSoBuoiNghi, HocSinh);
-            }
             ChiaTheoCoSo.Add(CoSo);
         }
+        var TongSoDiemDanhNghi = _context.DiemDanhs.Where(dd => dd.TrangThai == "Vắng").Count();
+        var TongSoDiemDanh = _context.DiemDanhs.Count();
+        TiLeDiemDanh = TongSoDiemDanhNghi * 100 / TongSoDiemDanh;
         var listChinhSach = _context.ChinhSaches.ToList();
         var ChiaTheoChinhSach = new List<ChinhSachDto>();
         foreach(var chinhSach in listChinhSach)
@@ -88,73 +86,12 @@ public class GetDashBoardChoAdminQueryHandler : IRequestHandler<GetDashBoardChoA
                 SoGiaoVien = TongSoGiaoVien,
                 SoNhanVien = TongSoNhanVien,
                 SoLopHoc = TongSoLopHoc,
+                TiLeDiemDanh = TiLeDiemDanh,
                 SoLopHocDangDiemRa = TongSoLopHocDangDienRa,
-                TongSoBuoiHoc = TongSoBuoiHoc,
-                TongSoBuoiNghi = TongSoBuoiNghi,
                 HocSinhGiaoVienLopHocTheoCoSos = ChiaTheoCoSo.ToList(),
                 HocSinhTheoChinhSachs = ChiaTheoChinhSach.ToList()
             },
             message = "Lấy Dashboard thành công."
         };
-    }
-
-    private void GetTiLeDiemDanh(ref int tongSoBuoiHoc,ref int tongSoBuoiNghi, HocSinh HocSinh)
-    {
-        DateOnly ngayHienTai = DateOnly.FromDateTime(DateTime.Now);
-        var LopDaHoc = _context.LichHocs
-            .Where(lh =>lh.ThamGiaLopHocs.Any(tg=>tg.HocSinhCode==HocSinh.Code))
-            .Select(lh=>lh.TenLop)
-            .Distinct().ToList();
-        foreach(var TenLop in LopDaHoc)
-        {
-            var LichHocCoDinh = _context.LichHocs
-                        .Where(lh => lh.TenLop == TenLop
-                        && lh.ThamGiaLopHocs.Select(tg => tg.HocSinhCode).Contains(HocSinh.Code)
-                        && lh.TrangThai == "Cố định")
-                        .ToList();
-            var Thus = LichHocCoDinh.Select(lh => lh.Thu).ToList();
-            var NgayDaHoc = (ngayHienTai <= LichHocCoDinh[0].NgayKetThuc)
-            ? getNgayDaHoc(Thus, LichHocCoDinh[0].NgayBatDau, ngayHienTai)
-            : getNgayDaHoc(Thus, LichHocCoDinh[0].NgayBatDau, LichHocCoDinh[0].NgayKetThuc);
-            var LichHocBu = _context.LichHocs
-            .Where(lh => lh.TenLop == TenLop
-            && lh.ThamGiaLopHocs.Select(tg => tg.HocSinhCode).Contains(HocSinh.Code)
-            && lh.TrangThai == "Dạy bù")
-            .Include(lh => lh.Phong)
-            .Include(lh => lh.GiaoVien)
-            .ToList();
-            foreach (var hocBu in LichHocBu)
-            {
-                if (hocBu.NgayHocGoc < ngayHienTai) NgayDaHoc.Remove((DateOnly)hocBu.NgayHocGoc);
-                if (hocBu.NgayBatDau < ngayHienTai) NgayDaHoc.Add(hocBu.NgayBatDau);
-            }
-            foreach (var ngay in NgayDaHoc)
-            {
-                var diemDanh =  _context.DiemDanhs
-                        .FirstOrDefault(dd => dd.Ngay == ngay
-                        && dd.ThamGiaLopHoc.HocSinhCode == HocSinh.Code
-                        && dd.ThamGiaLopHoc.LichHoc.TenLop == TenLop);
-                if (diemDanh != null)
-                {
-                    tongSoBuoiHoc++;
-                    if (diemDanh.TrangThai == "Vắng mặt") tongSoBuoiNghi++;
-                }
-            }
-        }
-    }
-    private List<DateOnly> getNgayDaHoc(List<int> Thus, DateOnly ngayBatDau,
-        DateOnly ngayHienTai)
-    {
-        List<DateOnly> ngayDaHocList = new List<DateOnly>();
-
-        for (DateOnly ngay = ngayBatDau; ngay <= ngayHienTai; ngay = ngay.AddDays(1))
-        {
-            int thu = (int)ngay.DayOfWeek == 0 ? 8 : (int)ngay.DayOfWeek + 1;
-            if (Thus.Contains(thu))
-            {
-                ngayDaHocList.Add(ngay);
-            }
-        }
-        return ngayDaHocList;
     }
 }

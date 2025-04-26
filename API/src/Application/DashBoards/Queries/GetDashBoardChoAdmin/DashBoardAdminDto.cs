@@ -14,8 +14,7 @@ public class DashBoardAdminDto
     public required List<ChinhSachDto> HocSinhTheoChinhSachs {  get; set; }
     public int SoLopHoc {  get; set; }
     public int SoLopHocDangDiemRa {  get; set; }
-    public int TongSoBuoiHoc {  get; set; }
-    public int TongSoBuoiNghi { get; set; }
+    public int TiLeDiemDanh {  get; set; }
 }
 public class CoSoDto
 {
