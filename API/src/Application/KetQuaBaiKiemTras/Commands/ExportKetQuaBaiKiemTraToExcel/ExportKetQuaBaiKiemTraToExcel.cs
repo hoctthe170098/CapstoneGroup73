@@ -33,7 +33,7 @@ public class ExportKetQuaBaiKiemTraToExcelCommandHandler : IRequestHandler<Expor
         try
         {
             var ketQuaKiemTra = await _context.KetQuaBaiKiemTras
-                .Where(kq => kq.BaiKiemTraId.ToString() == request.BaiKiemTraId)
+                .Where(kq => kq.BaiKiemTraId.ToString() == request.BaiKiemTraId && kq.BaiKiemTra.TrangThai == "Đã kiểm tra")
                 .ProjectTo<KetQuaKiemTraExcelDto>(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
@@ -81,6 +81,10 @@ public class ExportKetQuaBaiKiemTraToExcelCommandHandler : IRequestHandler<Expor
                     message = "Tải kết quả bài kiểm tra thành công."
                 };
             }
+        }
+        catch(NotFoundDataException)
+        {
+            throw;
         }
         catch
         {
