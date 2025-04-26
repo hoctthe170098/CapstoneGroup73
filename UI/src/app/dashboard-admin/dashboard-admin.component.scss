@@ -128,6 +128,25 @@
         }
       }
       
+      .bar-chart-scroll-wrapper {
+        overflow-x: auto;
+        overflow-y: hidden;
+        width: 100%;
+        padding-bottom: 10px;
+        canvas {
+          min-width: 600px; 
+        }
+      }
+      .bar-chart-scroll-outer {
+        overflow-x: auto;
+        overflow-y: hidden;
+        width: 100%;
+      }
+      
+      .bar-chart-scroll-inner {
+        width: 600px;
+      }
+      
       
       
       

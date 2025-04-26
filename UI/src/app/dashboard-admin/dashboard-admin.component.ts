@@ -1,4 +1,11 @@
-import { Component, OnInit, ChangeDetectorRef } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  ChangeDetectorRef,
+  ViewChildren,
+  QueryList,
+} from "@angular/core";
+import { BaseChartDirective } from "ng2-charts";
 import { ChartOptions, ChartType, ChartDataSets } from "chart.js";
 import { Label, Color } from "ng2-charts";
 import { DashboardAdminService } from "./shared/dasboard-admin.service";
@@ -10,6 +17,8 @@ import { ToastrService } from "ngx-toastr";
   styleUrls: ["./dashboard-admin.component.scss"],
 })
 export class DashboardAdminComponent implements OnInit {
+  @ViewChildren(BaseChartDirective) charts!: QueryList<BaseChartDirective>;
+
   tiles: any[] = [];
   tiles2: any[] = [];
 
@@ -18,6 +27,7 @@ export class DashboardAdminComponent implements OnInit {
 
   pieChartLabels: Label[] = [];
   pieChartData: number[] = [];
+  barChartCanvasMinWidth: number = 600;
   pieChartColors: Color[] = [
     { backgroundColor: ["#f44336", "#fdd835", "#4dd0e1"] },
   ];
@@ -186,6 +196,10 @@ export class DashboardAdminComponent implements OnInit {
           this.barChartLabels = data.hocSinhGiaoVienLopHocTheoCoSos.map(
             (item: any) => item.tenCoSo
           );
+          this.barChartCanvasMinWidth = Math.max(
+            this.barChartLabels.length * 120,
+            600
+          );
           this.barChartData = [
             {
               data: data.hocSinhGiaoVienLopHocTheoCoSos.map(
@@ -208,26 +222,43 @@ export class DashboardAdminComponent implements OnInit {
               categoryPercentage: 0.5,
             },
           ];
+
+          // Update Pie Chart
           this.pieChartLabels = data.hocSinhTheoChinhSachs.map(
             (item: any) => item.tenChinhSach
           );
-
           const tongSoHocSinh = data.soHocSinh || 1;
           this.pieChartData = data.hocSinhTheoChinhSachs.map((item: any) =>
             parseFloat(((item.soHocSinh / tongSoHocSinh) * 100).toFixed(1))
           );
-
-          // Lấy đủ số lượng màu cần thiết
-          const pieColors = this.colorList.slice(
-            0,
-            data.hocSinhTheoChinhSachs.length
+          const totalOtherPoliciesPercent = this.pieChartData.reduce(
+            (sum, val) => sum + val,
+            0
           );
 
-          // Gán vào pieChartColors
+          const normalPolicyPercent = parseFloat(
+            (100 - totalOtherPoliciesPercent).toFixed(1)
+          );
+
+          if (normalPolicyPercent > 0) {
+            this.pieChartLabels.push("Bình thường");
+            this.pieChartData.push(normalPolicyPercent);
+
+            const extraColor = "#808080";
+            const currentColors = this.pieChartColors[0]
+              .backgroundColor as string[];
+            currentColors.push(extraColor);
+          }
+
+          const pieColors = this.colorList.slice(0, this.pieChartLabels.length);
           this.pieChartColors = [{ backgroundColor: pieColors }];
 
           // Update Doughnut Chart
-          this.doughnutData = [data.tongSoBuoiHoc, data.tongSoBuoiNghi];
+          const tiLeDiemDanh = data.tiLeDiemDanh ?? 0;
+          this.doughnutData = [
+            100 - tiLeDiemDanh,
+            tiLeDiemDanh, 
+          ];
 
           // Update Horizontal Bar
           this.horizontalLabels = data.hocSinhGiaoVienLopHocTheoCoSos.map(
@@ -242,15 +273,30 @@ export class DashboardAdminComponent implements OnInit {
               backgroundColor: "#ff9800",
             },
           ];
+
+          // Cập nhật ngay lập tức sau khi gán data
           this.cdr.detectChanges();
+          requestAnimationFrame(() => {
+            this.charts?.forEach((chart) => {
+              chart.chart?.resize(); // Resize lại
+              chart.update(); // Update dữ liệu
+            });
+          });
         } else {
           this.toastr.error(res.message || "Không thể load dữ liệu Dashboard");
         }
       },
       error: (err) => {
-        console.error(" Lỗi khi lấy Dashboard:", err);
+        console.error("❌ Lỗi khi lấy Dashboard:", err);
         this.toastr.error("Đã xảy ra lỗi khi lấy dữ liệu Dashboard.");
       },
     });
+  }
+  private updateCharts(): void {
+    if (this.charts && this.charts.length > 0) {
+      this.charts.forEach((chart) => {
+        chart.update();
+      });
+    }
   }
 }

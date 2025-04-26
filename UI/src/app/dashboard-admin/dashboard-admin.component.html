@@ -17,17 +17,23 @@
     <!-- Bar + Pie -->
     <div class="row mb-3">
         <div class="col-md-8">
-            <div class="chart-box card-tile bar-chart-box">
-              <h6>Số học sinh, giáo viên theo cơ sở</h6>
-              <canvas
-                baseChart
-                [datasets]="barChartData"
-                [labels]="barChartLabels"
-                [options]="barChartOptions"
-                [legend]="true"
-                [chartType]="'bar'"
-              ></canvas>
-            </div>
+          <div class="chart-box card-tile bar-chart-box">
+            <h6>Số học sinh, giáo viên theo cơ sở</h6>
+            <div class="bar-chart-scroll-outer">
+              <div class="bar-chart-scroll-inner" [style.width.px]="barChartCanvasMinWidth">
+                <canvas
+                  baseChart
+                  [datasets]="barChartData"
+                  [labels]="barChartLabels"
+                  [options]="barChartOptions"
+                  [legend]="true"
+                  [chartType]="'bar'">
+                </canvas>
+              </div>
+            </div>            
+          </div>
+          
+          
           </div>
           <div class="col-md-4">
             <div class="chart-box card-tile">
