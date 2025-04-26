@@ -120,11 +120,11 @@ public class GetDashBoardChoCampusManagerQueryHandler : IRequestHandler<GetDashB
         var Phong = _context.Phongs.Where(p => p.CoSoId == coSoId).ToList();
         foreach (var p in Phong)
         {
-            var thoiGianSuDungPhong = new PhongHocDto { TenPhong = p.Ten, PhanTramThoiGianSuDungPhong = 0 };
-            thoiGianSuDungPhong.PhanTramThoiGianSuDungPhong = (int)_context.LichHocs
-    .Where(lh => lh.NgayBatDau <= ngayHienTai && lh.NgayKetThuc >= ngayHienTai&&lh.PhongId==p.Id)
+            var thoiGianSuDungPhong = new PhongHocDto { TenPhong = p.Ten, ThoiGianTrungBinhSuDungPhong = 0 };
+            thoiGianSuDungPhong.ThoiGianTrungBinhSuDungPhong = Math.Round(_context.LichHocs
+    .Where(lh => lh.NgayBatDau <= ngayHienTai && lh.NgayKetThuc >= ngayHienTai && lh.PhongId == p.Id)
     .ToList()
-    .Sum(lh => (lh.GioKetThuc - lh.GioBatDau).TotalMinutes) * 100 / (14*60*7);
+    .Sum(lh => (lh.GioKetThuc - lh.GioBatDau).TotalMinutes) / (60 * 7), 1);
             ThoiGianSuDungPhongs.Add(thoiGianSuDungPhong);
         }
         return new Output
