@@ -120,7 +120,7 @@ public class EditLichHocCommandValidator : AbstractValidator<EditLichHocCommand>
 
     private bool EnoughHocSinh(List<string> list)
     {
-        return list.Count >= 1;
+        return list.Count >= 3;
     }
 
     private async Task<bool> ChuaBatDau(EditLichHocCommand command, 
