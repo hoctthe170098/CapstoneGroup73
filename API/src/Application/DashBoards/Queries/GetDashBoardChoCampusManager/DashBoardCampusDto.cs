@@ -37,7 +37,7 @@ public class DiemDanhTheoLopDto
 public class PhongHocDto
 {
     public required string TenPhong {  get; set; }
-    public int PhanTramThoiGianSuDungPhong {  get; set; }
+    public double ThoiGianTrungBinhSuDungPhong {  get; set; }
 }
 public class HocSinhNghiNhieuNhatDto
 {

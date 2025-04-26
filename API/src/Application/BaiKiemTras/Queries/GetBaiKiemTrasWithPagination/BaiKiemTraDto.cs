@@ -22,7 +22,7 @@ public class BaiKiemTraDto
         {
             CreateMap<BaiKiemTra, BaiKiemTraDto>()
                 .ForMember(dest => dest.TenLop, opt => opt.MapFrom(src => src.LichHoc.TenLop))
-                .ForMember(dest =>dest.CoDiem, opt=> opt.MapFrom(src=>src.KetQuaBaiKiemTras.Count>0));
+                .ForMember(dest =>dest.CoDiem, opt=> opt.MapFrom(src=>src.KetQuaBaiKiemTras.All(kq=>kq.Diem!=null)));
         }
     }
 }
