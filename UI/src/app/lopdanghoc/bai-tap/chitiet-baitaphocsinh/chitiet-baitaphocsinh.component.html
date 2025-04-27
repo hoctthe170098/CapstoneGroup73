@@ -29,7 +29,7 @@
   <!-- Form trả lời bài tập -->
   <div class="answer-form">
     <label
-      ><strong>Nội dung</strong
+      ><strong>Trả lời</strong
       ><span class="field-required-asterisk">(*)</span></label
     >
     <div class="custom-editor">
@@ -92,7 +92,7 @@
     
       <!-- Nếu đang chỉnh sửa -->
       <ng-container *ngIf="editingAnswerId === ans.id; else showAnswer">
-        <label><strong>Nội dung</strong></label>
+        <label><strong>Trả lời</strong></label>
         <quill-editor
           [(ngModel)]="editAnswerData.noiDung"
           [styles]="{height: '150px'}"
