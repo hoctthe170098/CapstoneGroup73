@@ -65,11 +65,15 @@
           </td>
           <td>
             <span [class.checked]="test.trangThai === 'Đã kiểm tra'">{{ test.trangThai }}</span></td>
-          <td>
-            <span [class.download]="test.coDiem" [class.pending]="!test.coDiem">
-              {{ test.coDiem ? 'Download' : 'Chưa vào điểm' }}
-            </span>
-          </td>
+            <td>
+              <span *ngIf="test.coDiem" class="download" (click)="exportKetQua(test.id)">
+                Download
+              </span>
+              <span *ngIf="!test.coDiem" class="pending">
+                Chưa vào điểm
+              </span>
+            </td>
+            
           <td>
             <button class="edit-btn ft-edit-2" (click)="openEditModal(test)"></button>
             <button class="delete-btn ft-trash-2" (click)="confirmAndDelete(test)"></button>

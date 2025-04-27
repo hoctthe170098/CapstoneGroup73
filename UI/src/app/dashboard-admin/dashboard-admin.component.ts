@@ -241,7 +241,7 @@ export class DashboardAdminComponent implements OnInit {
           );
 
           if (normalPolicyPercent > 0) {
-            this.pieChartLabels.push("Bình thường");
+            this.pieChartLabels.push("Không có chính sách");
             this.pieChartData.push(normalPolicyPercent);
 
             const extraColor = "#808080";
