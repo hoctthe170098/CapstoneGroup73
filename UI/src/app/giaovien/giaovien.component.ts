@@ -386,7 +386,8 @@ getDistrictName(districtCode: string): string {
         truongDangDay: teacher.truongDangDay,
         province: provinceCode,
         district: districtCode,
-        diaChiCuThe: detailAddress
+        diaChiCuThe: detailAddress,
+        status: teacher.isActive ? true : false
     });
 
     this.isEditModalOpen = true;

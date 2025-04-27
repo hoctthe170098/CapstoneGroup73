@@ -493,7 +493,7 @@ openEditStudentModal(student: any) {
       province: provinceCode,
       district: districtCode,
       diaChiCuThe: detailAddress,
-      
+      status: hs.isActive ? true : false 
     });
   
   
