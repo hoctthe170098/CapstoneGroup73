@@ -377,7 +377,20 @@ addTest() {
        
         this.toastr.error('Xoá bài kiểm tra thất bại ');
       }
-    });
+    }); 
   }
-  
+  exportKetquabaikiemtra() {
+    this.testlistService.exportKetquabaikiemtraToExcel().subscribe(
+      (response: Blob) => {
+        const fileName = 'DanhSachKetquabaikiemtra.xlsx';
+        saveAs(response, fileName);
+      },
+      (error) => {
+        console.error(' Lỗi khi xuất file:', error);
+      }
+    );
+  }
 }
+  
+  
+
