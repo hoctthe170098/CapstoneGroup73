@@ -216,17 +216,19 @@ body {
     background: rgba(0, 0, 0, 0.5);
   }
   
-  /* Khung trắng popup */
+ 
   .modal-content {
     position: relative;
-    z-index: 10000; /* trên overlay */
+    z-index: 10000;
     background-color: #fff;
     border-radius: 8px;
-    width: 600px; /* Hoặc tùy chỉnh */
-    max-width: 90%; /* Co giãn trên màn hình nhỏ */
+    width: 600px;
+    max-width: 90%; 
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
+    height: 550px;
+    overflow-y: auto;
   }
   
   /* Header của popup */

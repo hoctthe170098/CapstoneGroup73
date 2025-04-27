@@ -214,35 +214,42 @@
         // Cập nhật cơ sở
         updateCampus() {
             if (this.editCampusForm.valid && this.selectedCampus) {
-                const formData = this.editCampusForm.value;
-                const diaChiFormatted = `${this.getProvinceName(formData.province)}, ${this.getDistrictName(formData.district)}, ${formData.diaChi}`;
-
-                const updatedCampus: CoSo = {
-                    ...this.selectedCampus,
-                    ten: formData.ten,
-                    diaChi: diaChiFormatted,
-                    soDienThoai: formData.soDienThoai,
-                    province: formData.province,
-                    district: formData.district,
-                    trangThai: formData.isActive ? 'open' : 'close'
-                };
-
-                this.coSoService.updateCoSo(updatedCampus).subscribe({
-                    next: (res) => {
-                        if (!res.isError) {
-                            this.toastr.success(res.message);
-                            this.closeEditModal();
-                            this.loadDanhSachCoSo();
-                        } else {
-                            this.toastr.error(res.message);
-                        }
-                    },
-                    error: () => {
-                        this.toastr.error('Có lỗi xảy ra, vui lòng thử lại!');
-                    }
-                });
+              const formData = this.editCampusForm.value;
+          
+              const selectedProvince = this.provinces.find(p => String(p.code) === String(formData.province));
+              const selectedDistrict = this.editDistricts.find(d => String(d.code) === String(formData.district));
+          
+              const diaChiFormatted = `${selectedProvince?.name || ''}, ${selectedDistrict?.name || ''}, ${formData.diaChi}`;
+          
+              const updatedCampus: CoSo = {
+                ...this.selectedCampus,
+                ten: formData.ten,
+                diaChi: diaChiFormatted,
+                soDienThoai: formData.soDienThoai,
+                province: formData.province,
+                district: formData.district,
+                trangThai: formData.isActive ? 'open' : 'close'
+              };
+          
+              this.coSoService.updateCoSo(updatedCampus).subscribe({
+                next: (res) => {
+                  if (!res.isError) {
+                    this.toastr.success(res.message);
+                    this.closeEditModal();
+                    this.loadDanhSachCoSo();
+                  } else {
+                    this.toastr.error(res.message);
+                  }
+                },
+                error: () => {
+                  this.toastr.error('Có lỗi xảy ra, vui lòng thử lại!');
+                }
+              });
+            } else {
+              this.editCampusForm.markAllAsTouched();
             }
-        }
+          }
+          
 
         // Đóng modal
         closeModal() { this.isModalOpen = false; }

@@ -182,26 +182,28 @@
                 (change)="onProvinceChange($event.target.value)"
               >
                 <option value="">-- Chọn Thành phố --</option>
-                <option
-                  *ngFor="let province of provinces"
-                  [value]="province.code"
-                >
+                <option *ngFor="let province of provinces" [value]="province.code">
                   {{ province.name }}
                 </option>
               </select>
+              <small class="error-message" *ngIf="addTeacherForm.controls['province'].invalid && addTeacherForm.controls['province'].touched">
+                Vui lòng chọn Thành phố.
+              </small>
             </div>
+            
             <div class="form-group">
               <label>Quận/Huyện</label>
               <select formControlName="district" class="form-control">
                 <option value="">-- Chọn Quận/Huyện --</option>
-                <option
-                  *ngFor="let district of districts"
-                  [value]="district.code"
-                >
+                <option *ngFor="let district of districts" [value]="district.code">
                   {{ district.name }}
                 </option>
               </select>
+              <small class="error-message" *ngIf="addTeacherForm.controls['district'].invalid && addTeacherForm.controls['district'].touched">
+                Vui lòng chọn Quận/Huyện.
+              </small>
             </div>
+            
             <div class="form-group">
               <label>Địa chỉ cụ thể</label>
               <input
@@ -386,26 +388,28 @@
                 (change)="onProvinceChangeForEdit($event.target.value)"
               >
                 <option value="">-- Chọn Thành phố --</option>
-                <option
-                  *ngFor="let province of provinces"
-                  [value]="province.code"
-                >
+                <option *ngFor="let province of provinces" [value]="province.code">
                   {{ province.name }}
                 </option>
               </select>
+              <small class="error-message" *ngIf="editTeacherForm.controls['province'].invalid && editTeacherForm.controls['province'].touched">
+                Vui lòng chọn Thành phố.
+              </small>
             </div>
+            
             <div class="form-group">
               <label>Quận/Huyện</label>
               <select class="form-control" formControlName="district">
                 <option value="">-- Chọn Quận/Huyện --</option>
-                <option
-                  *ngFor="let district of editDistricts"
-                  [value]="district.code"
-                >
+                <option *ngFor="let district of editDistricts" [value]="district.code">
                   {{ district.name }}
                 </option>
               </select>
+              <small class="error-message" *ngIf="editTeacherForm.controls['district'].invalid && editTeacherForm.controls['district'].touched">
+                Vui lòng chọn Quận/Huyện.
+              </small>
             </div>
+            
             <div class="form-group">
               <label>Địa chỉ cụ thể</label>
               <input
