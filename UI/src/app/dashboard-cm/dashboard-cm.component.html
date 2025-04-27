@@ -92,14 +92,10 @@
           <div class="room-bar" *ngFor="let room of roomUsageList">
             <div class="room-label">{{ room.name }}</div>
             <div class="room-progress">
-              <div
-                class="used-bar-wrapper"
-                [style.width.%]="(room.used / 24) * 100"
-              >
-                <div class="used-bar">
-                  <span class="used-value">{{ room.used }}hr</span>
-                </div>
+              <div class="used-bar-wrapper" [style.width.%]="(room.used / 24) * 100">
+                <div class="used-bar"></div>
               </div>
+              <div class="used-value-text">{{ room.used }} hrs</div> 
             </div>
           </div>
 
