@@ -55,7 +55,7 @@ export class NhanxetdinhkiComponent implements OnInit {
         }));
 
         this.denHanNhanXet = data.denHanNhanXet;
-        console.log('Đến hạn nhận xét?', this.denHanNhanXet);
+       
         this.cdr.detectChanges();
       },
       error: (err) => {
