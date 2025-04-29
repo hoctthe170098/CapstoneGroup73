@@ -241,7 +241,7 @@ export class DashboardAdminComponent implements OnInit {
           );
 
           if (normalPolicyPercent > 0) {
-            this.pieChartLabels.push("Bình thường");
+            this.pieChartLabels.push("Không có chính sách");
             this.pieChartData.push(normalPolicyPercent);
 
             const extraColor = "#808080";
@@ -254,11 +254,7 @@ export class DashboardAdminComponent implements OnInit {
           this.pieChartColors = [{ backgroundColor: pieColors }];
 
           // Update Doughnut Chart
-          const tiLeDiemDanh = data.tiLeDiemDanh ?? 0;
-          this.doughnutData = [
-            100 - tiLeDiemDanh,
-            tiLeDiemDanh, 
-          ];
+          this.doughnutData = [data.tiLeDiemDanh, 100 - data.tiLeDiemDanh];
 
           // Update Horizontal Bar
           this.horizontalLabels = data.hocSinhGiaoVienLopHocTheoCoSos.map(

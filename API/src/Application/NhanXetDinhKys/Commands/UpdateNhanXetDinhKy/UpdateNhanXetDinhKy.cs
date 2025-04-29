@@ -34,12 +34,16 @@ public class UpdateNhanXetDinhKyCommandHandler : IRequestHandler<UpdateNhanXetDi
         if (string.IsNullOrEmpty(token))
             throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
         var coSoId = _identityService.GetCampusId(token);
+        var UserId = _identityService.GetUserId(token);
+        var giaoVien = await _context.GiaoViens
+            .FirstAsync(gv => gv.UserId == UserId.ToString());
         var NhanXetDinhKy = _context.NhanXetDinhKys
             .Include(nv=>nv.ThamGiaLopHoc)
             .ThenInclude(tg=>tg.LichHoc)
             .Include(nv=>nv.ThamGiaLopHoc)
             .ThenInclude(nv=>nv.HocSinh)
-            .First(nv=>nv.Id==request.Id);
+            .FirstOrDefault(nv=>nv.Id==request.Id&&nv.ThamGiaLopHoc.LichHoc.GiaoVienCode==giaoVien.Code);
+        if (NhanXetDinhKy == null) throw new NotFoundIDException();
         var HocSinhCode = NhanXetDinhKy.ThamGiaLopHoc.HocSinh.Code;
         var TenLop = NhanXetDinhKy.ThamGiaLopHoc.LichHoc.TenLop;
         var ThamGiaLopHocs = await _context.ThamGiaLopHocs

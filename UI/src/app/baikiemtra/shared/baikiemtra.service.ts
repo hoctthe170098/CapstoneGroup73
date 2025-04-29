@@ -7,7 +7,7 @@ import { catchError, tap, map } from 'rxjs/operators';
 @Injectable({ providedIn: 'root' })
 export class TestlistService {
   private baseUrl = `${environment.apiURL}/BaiKiemTras`;
- 
+  private ketquaUrl = `${environment.apiURL}/KetQuaBaiKiemTras`; 
   private lopUrl = `${environment.apiURL}/LichHocs`;
 
   constructor(private http: HttpClient) {}
@@ -71,5 +71,15 @@ export class TestlistService {
     const url = `${this.lopUrl}/gettenlophocbyname?TenLop=${encodeURIComponent(tenLop)}`;
     return this.http.get<string[]>(url, { headers });
   }
+  exportKetquabaikiemtraToExcel(): Observable<Blob> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
   
+    return this.http.post(`${this.ketquaUrl}/exportketquabaikiemtra`, {}, { headers, responseType: 'blob' });
+  }
 }
+  
+  
+  
+  
+  

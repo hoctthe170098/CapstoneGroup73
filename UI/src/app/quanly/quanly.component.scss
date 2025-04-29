@@ -92,16 +92,16 @@ body {
   }
   
   /* Bảng danh sách */
-  .student-table {
+  .manager-table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
   }
-  .student-table thead tr {
+  .manager-table thead tr {
     background-color: #f8f8f8;
   }
-  .student-table th,
-  .student-table td {
+  .manager-table th,
+  .manager-table td {
     vertical-align: middle;
     border-bottom: 1px solid #e2e2e2;
     padding: 12px;

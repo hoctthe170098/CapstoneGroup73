@@ -18,7 +18,7 @@ export class AccountmanagerComponent implements OnInit {
   cosoId: string = '';
   roleName: string = '';
   cosoList: any[] = [];
-  students: any[] = [];
+  managers: any[] = [];
 
   currentPage: number = 1;
   totalPages: number = 1;
@@ -28,12 +28,12 @@ export class AccountmanagerComponent implements OnInit {
   isModalOpen: boolean = false;
   isEditModalOpen: boolean = false;
 
-  newStudent: any = {
+  newmanager: any = {
     code: '', ten: '', gioiTinh: '', ngaySinh: '', email: '',
     soDienThoai: '', coSoId: '', province: '', district: '', diaChi: '', role: '', status: 'true'
   };
 
-  editStudent: any = {
+  editmanager: any = {
     code: '', ten: '', gioiTinh: '', ngaySinh: '', email: '',
     soDienThoai: '', coSoId: '', province: '', district: '', diaChi: '', role: '', status: ''
   };
@@ -87,11 +87,11 @@ export class AccountmanagerComponent implements OnInit {
         this.spinner.hide();
         if (!response.isError && response.data) {
           // Map dữ liệu từ API, sử dụng trường isActive của API và tạo thuộc tính hiển thị trạng thái
-          this.students = response.data.items.map((student: any) => ({
-            ...student,
+          this.managers = response.data.items.map((manager: any) => ({
+            ...manager,
             showDetails: false,
-            isActive: student.trangThai, // sử dụng isActive từ API (boolean)
-            displayStatus: student.trangThai ? 'Hoạt động' : 'Tạm ngừng'
+            isActive: manager.trangThai, // sử dụng isActive từ API (boolean)
+            displayStatus: manager.trangThai ? 'Hoạt động' : 'Tạm ngừng'
           }));
 
           this.totalItems = response.data.totalCount || 0;
@@ -141,32 +141,31 @@ export class AccountmanagerComponent implements OnInit {
     this.loadDanhSachNhanVien();
   }
   toggleDetails(index: number) {
-    this.students[index].showDetails = !this.students[index].showDetails;
+    this.managers[index].showDetails = !this.managers[index].showDetails;
   }
 
-  openAddStudentModal() { this.isModalOpen = true; }
+  openAddManagerModal() { this.isModalOpen = true; }
   closeModal() { this.isModalOpen = false; }
 
-  submitNewStudent() {
-    this.forceNVPrefix();
-
-    if (!this.newStudent.code || this.newStudent.code.trim() === '') {
+  submitNewmanager() {
+   
+    if (!this.newmanager.code || this.newmanager.code.trim() === '') {
       ;
       return;
     }
-    if (this.newStudent.code.length > 18) {
+    if (this.newmanager.code.length > 18) {
 
       return;
     }
-    if (!this.newStudent.ten || this.newStudent.ten.trim() === '') {
+    if (!this.newmanager.ten || this.newmanager.ten.trim() === '') {
 
       return;
     }
-    if (this.newStudent.ten.length > 30) {
+    if (this.newmanager.ten.length > 30) {
 
       return;
     }
-    if (!this.validatePhoneNumber(this.newStudent.soDienThoai)) {
+    if (!this.validatePhoneNumber(this.newmanager.soDienThoai)) {
 
       return;
 
@@ -178,23 +177,21 @@ export class AccountmanagerComponent implements OnInit {
     const provinceName = this.getProvinceName();
     const districtName = this.getDistrictName();
 
-    // Đảm bảo mã nhân viên luôn có tiền tố "NV"
+   
 
 
-    const fullAddress = `${this.newStudent.diaChi}, ${districtName}, ${provinceName}`;
+    const fullAddress = `${this.newmanager.diaChi}, ${districtName}, ${provinceName}`;
 
     const newHs = {
-      code: this.newStudent.code && this.newStudent.code.startsWith("NV")
-        ? this.newStudent.code.replace(/^NV/, "")
-        : this.newStudent.code,
-      ten: this.newStudent.ten,
-      gioiTinh: this.newStudent.gioiTinh,
-      ngaySinh: this.newStudent.ngaySinh ? this.formatDate(this.newStudent.ngaySinh) : '',
-      email: this.newStudent.email,
-      soDienThoai: this.newStudent.soDienThoai,
-      coSoId: this.newStudent.coSoId || null,
+      code: `${this.newmanager.code.trim()}`, // ✨ Luôn tự gắn NV vào trước
+      ten: this.newmanager.ten,
+      gioiTinh: this.newmanager.gioiTinh,
+      ngaySinh: this.newmanager.ngaySinh ? this.formatDate(this.newmanager.ngaySinh) : '',
+      email: this.newmanager.email,
+      soDienThoai: this.newmanager.soDienThoai,
+      coSoId: this.newmanager.coSoId || null,
       diaChi: fullAddress.trim() !== ", ," ? fullAddress : "Không xác định",
-      role: this.newStudent.role
+      role: this.newmanager.role
     };
 
     this.spinner.show();
@@ -233,14 +230,14 @@ export class AccountmanagerComponent implements OnInit {
     );
   }
   validateCoSo() {
-    if (!this.newStudent.coSoId || this.newStudent.coSoId.trim() === '') {
+    if (!this.newmanager.coSoId || this.newmanager.coSoId.trim() === '') {
       this.isCoSoInvalid = true;
     } else {
       this.isCoSoInvalid = false;
     }
   }
   validateRole() {
-    if (!this.newStudent.role || this.newStudent.role.trim() === '') {
+    if (!this.newmanager.role || this.newmanager.role.trim() === '') {
       this.isRoleInvalid = true;
     } else {
       this.isRoleInvalid = false;
@@ -291,23 +288,9 @@ export class AccountmanagerComponent implements OnInit {
   getDistrictName(): string {
     return this.selectedDistrict ? this.selectedDistrict.name : "Không xác định";
   }
-  forceNVPrefix() {
-    if (!this.newStudent.code.startsWith('NV')) {
-      this.newStudent.code = 'NV' + this.newStudent.code.replace(/^NV/, '').trim();
-    }
-    if (this.newStudent.code.length > 18) {
-      this.newStudent.code = this.newStudent.code.substring(0, 18);
-    }
-  }
+  
 
-  forceNVPrefixEdit() {
-    if (!this.editStudent.code.startsWith('NV')) {
-      this.editStudent.code = 'NV' + this.editStudent.code.replace(/^NV/, '').trim();
-    }
-    if (this.editStudent.code.length > 18) {
-      this.editStudent.code = this.editStudent.code.substring(0, 18);
-    }
-  }
+  
 
 
   onProvinceChange(provinceCode: string) {
@@ -347,11 +330,11 @@ export class AccountmanagerComponent implements OnInit {
 
 
 
-  onEditStudentClick(index: number) {
-    const hs = this.students[index];
+  onEditManagerClick(index: number) {
+    const hs = this.managers[index];
 
     // Sao chép dữ liệu để chỉnh sửa
-    this.editStudent = {
+    this.editmanager = {
       ...hs,
       ngaySinh: this.formatDate(hs.ngaySinh),
       status: hs.isActive ? "true" : "false"
@@ -359,21 +342,21 @@ export class AccountmanagerComponent implements OnInit {
     };
 
     const coSo = this.cosoList.find(cs => cs.ten === hs.tenCoSo);
-    this.editStudent.coSoId = coSo ? coSo.id : null;
-    if (!this.editStudent.gioiTinh) {
-      this.editStudent.gioiTinh = "Nam";
+    this.editmanager.coSoId = coSo ? coSo.id : null;
+    if (!this.editmanager.gioiTinh) {
+      this.editmanager.gioiTinh = "Nam";
     }
 
     const validRoles = ["CampusManager", "LearningManager"];
-    if (!validRoles.includes(this.editStudent.role)) {
+    if (!validRoles.includes(this.editmanager.role)) {
       // Nếu API trả về giá trị không hợp lệ (hoặc rỗng) thì không gán mặc định để tránh ép cứng
       // Bạn có thể giữ giá trị rỗng để người dùng tự chọn lại
-      this.editStudent.role = "";
+      this.editmanager.role = "";
     }
 
 
-    if (this.editStudent.diaChi) {
-      const parts = this.editStudent.diaChi.split(',').map(p => p.trim());
+    if (this.editmanager.diaChi) {
+      const parts = this.editmanager.diaChi.split(',').map(p => p.trim());
 
       if (parts.length >= 3) {
         const provinceName = parts[parts.length - 1];
@@ -383,38 +366,38 @@ export class AccountmanagerComponent implements OnInit {
         // Tìm **Tỉnh/Thành phố**
         this.selectedProvince = this.provinces.find(p => p.name === provinceName);
         if (this.selectedProvince) {
-          this.editStudent.province = this.selectedProvince.code;
+          this.editmanager.province = this.selectedProvince.code;
           this.editDistricts = this.selectedProvince.districts || [];
 
           // 🟢 Tìm **Quận/Huyện**
           this.selectedDistrict = this.editDistricts.find(d => d.name === districtName);
           if (this.selectedDistrict) {
-            this.editStudent.district = this.selectedDistrict.code;
+            this.editmanager.district = this.selectedDistrict.code;
           }
         }
-        this.editStudent.diaChi = specificAddress;
+        this.editmanager.diaChi = specificAddress;
       }
     }
     this.isEditModalOpen = true;
   }
   closeEditModal() { this.isEditModalOpen = false; }
-  submitEditStudent() {
-    this.forceNVPrefixEdit(); // Đảm bảo Code đúng định dạng khi chỉnh sửa
+  submitEditmanager() {
+   
 
-    if (!this.editStudent.soDienThoai || this.editStudent.soDienThoai.trim() === '') {
-
-      return;
-    }
-    if (!this.validatePhoneNumber(this.editStudent.soDienThoai)) {
+    if (!this.editmanager.soDienThoai || this.editmanager.soDienThoai.trim() === '') {
 
       return;
     }
-
-    if (!this.editStudent.ten || this.editStudent.ten.trim() === '') {
+    if (!this.validatePhoneNumber(this.editmanager.soDienThoai)) {
 
       return;
     }
-    if (this.editStudent.ten.length > 30) {
+
+    if (!this.editmanager.ten || this.editmanager.ten.trim() === '') {
+
+      return;
+    }
+    if (this.editmanager.ten.length > 30) {
 
       return;
     }
@@ -422,19 +405,19 @@ export class AccountmanagerComponent implements OnInit {
     const provinceName = this.selectedProvince ? this.selectedProvince.name : "Không xác định";
     const districtName = this.selectedDistrict ? this.selectedDistrict.name : "Không xác định";
 
-    const fullAddress = `${this.editStudent.diaChi.trim()}, ${districtName}, ${provinceName}`;
+    const fullAddress = `${provinceName}, ${districtName}, ${this.editmanager.diaChi.trim()}`;
 
     const updatedHs = {
-      code: this.editStudent.code,
-      ten: this.editStudent.ten,
-      gioiTinh: this.editStudent.gioiTinh,
+      code: this.editmanager.code,
+      ten: this.editmanager.ten,
+      gioiTinh: this.editmanager.gioiTinh,
       diaChi: fullAddress.trim() !== ", Không xác định, Không xác định" ? fullAddress : "Không xác định",
-      ngaySinh: this.editStudent.ngaySinh ? this.formatDate(this.editStudent.ngaySinh) : '',
-      email: this.editStudent.email,
-      soDienThoai: this.editStudent.soDienThoai,
-      coSoId: this.editStudent.coSoId || null,
-      role: this.editStudent.tenVaiTro,
-      status: this.editStudent.status
+      ngaySinh: this.editmanager.ngaySinh ? this.formatDate(this.editmanager.ngaySinh) : '',
+      email: this.editmanager.email,
+      soDienThoai: this.editmanager.soDienThoai,
+      coSoId: this.editmanager.coSoId || null,
+      role: this.editmanager.tenVaiTro,
+      status: this.editmanager.status
     };
 
     this.accountmanagerService.updateNhanVien(updatedHs).subscribe(
@@ -466,7 +449,7 @@ export class AccountmanagerComponent implements OnInit {
 
     if (this.selectedProvince) {
       this.editDistricts = this.selectedProvince.districts || [];
-      this.editStudent.district = '';  // Reset quận/huyện khi đổi tỉnh
+      this.editmanager.district = '';  // Reset quận/huyện khi đổi tỉnh
     } else {
       this.editDistricts = [];
     }
@@ -489,10 +472,10 @@ export class AccountmanagerComponent implements OnInit {
     );
 
     if (this.selectedDistrict) {
-      this.editStudent.district = this.selectedDistrict.code;
+      this.editmanager.district = this.selectedDistrict.code;
     } else {
       console.error(`⚠️ Không tìm thấy quận/huyện có mã: ${districtCodeFormatted}`);
-      this.editStudent.district = '';  // Reset giá trị nếu không tìm thấy
+      this.editmanager.district = '';  // Reset giá trị nếu không tìm thấy
     }
   }
   formatDate(date: any) {

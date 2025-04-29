@@ -172,7 +172,9 @@ isEditModalOpen: boolean = false;
   
 
   openAddStudentModal() {
-    this.addStudentForm.reset();
+    this.addStudentForm.reset({
+      gioiTinh: 'Nam'  
+    });
     this.isModalOpen = true;
   }
 

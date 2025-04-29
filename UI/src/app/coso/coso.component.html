@@ -89,24 +89,36 @@
           <select
             formControlName="province"
             (change)="onProvinceChange($event.target.value)"
+            [ngClass]="{ 'is-invalid': addCampusForm.controls.province.invalid && addCampusForm.controls.province.touched }"
           >
             <option value="">-- Chọn Thành phố --</option>
             <option *ngFor="let province of provinces" [value]="province.code">
               {{ province.name }}
             </option>
           </select>
+          <div class="error-message" *ngIf="addCampusForm.controls.province.invalid && addCampusForm.controls.province.touched">
+            <span>Vui lòng chọn Thành phố.</span>
+          </div>
         </div>
+        
 
         <!-- Dropdown chọn Quận/Huyện -->
         <div class="form-group">
           <label>Quận/Huyện</label>
-          <select formControlName="district">
+          <select
+            formControlName="district"
+            [ngClass]="{ 'is-invalid': addCampusForm.controls.district.invalid && addCampusForm.controls.district.touched }"
+          >
             <option value="">-- Chọn Quận/Huyện --</option>
             <option *ngFor="let district of districts" [value]="district.code">
               {{ district.name }}
             </option>
           </select>
+          <div class="error-message" *ngIf="addCampusForm.controls.district.invalid && addCampusForm.controls.district.touched">
+            <span>Vui lòng chọn Quận/Huyện.</span>
+          </div>
         </div>
+        
         <div class="form-group">
           <label>Địa chỉ cụ thể</label>
           <input
@@ -192,27 +204,36 @@
           <select
             formControlName="province"
             (change)="onProvinceChangeForEdit($event.target.value)"
+            [ngClass]="{ 'is-invalid': editCampusForm.controls.province.invalid && editCampusForm.controls.province.touched }"
           >
             <option value="">-- Chọn Thành phố --</option>
             <option *ngFor="let province of provinces" [value]="province.code">
               {{ province.name }}
             </option>
           </select>
+          <div class="error-message" *ngIf="editCampusForm.controls.province.invalid && editCampusForm.controls.province.touched">
+            <span>Vui lòng chọn Thành phố.</span>
+          </div>
         </div>
+        
 
         <!-- Dropdown chọn Quận/Huyện -->
         <div class="form-group">
           <label>Quận/Huyện</label>
-          <select formControlName="district">
+          <select
+            formControlName="district"
+            [ngClass]="{ 'is-invalid': editCampusForm.controls.district.invalid && editCampusForm.controls.district.touched }"
+          >
             <option value="">-- Chọn Quận/Huyện --</option>
-            <option
-              *ngFor="let district of editDistricts"
-              [value]="district.code"
-            >
+            <option *ngFor="let district of editDistricts" [value]="district.code">
               {{ district.name }}
             </option>
           </select>
+          <div class="error-message" *ngIf="editCampusForm.controls.district.invalid && editCampusForm.controls.district.touched">
+            <span>Vui lòng chọn Quận/Huyện.</span>
+          </div>
         </div>
+        
 
         <div class="form-group">
           <label>Địa chỉ cụ thể</label>

@@ -29,16 +29,16 @@ export class GiaovienComponent implements OnInit {
 
   constructor(private giaovienService: GiaovienService, private router: Router, private cdr: ChangeDetectorRef, private toastr: ToastrService, private fb: FormBuilder) {
     this.addTeacherForm = this.fb.group({
-      code: ['', [Validators.required, Validators.maxLength(18)]], // Code < 18 ký tự
-      ten: ['', [Validators.required, Validators.maxLength(20)]], // Tên tối đa 20 ký tự
+      code: ['', [Validators.required, Validators.maxLength(18)]], 
+      ten: ['', [Validators.required, Validators.maxLength(20)]], 
       gioiTinh: ['Nam', Validators.required],
-      ngaySinh: ['', [Validators.required, this.validateAge]], // Phải trên 18 tuổi
-      email: ['', [Validators.required, Validators.email, Validators.maxLength(50)]], // Email hợp lệ, tối đa 50 ký tự
-      soDienThoai: ['', [Validators.required, Validators.pattern(/^0\d{9,10}$/)]], // 10 hoặc 11 số
-      truongDangDay: ['', [Validators.required, Validators.maxLength(50)]], // Không quá 50 ký tự
+      ngaySinh: ['', [Validators.required, this.validateAge]], 
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(50)]], 
+      soDienThoai: ['', [Validators.required, Validators.pattern(/^0\d{9,10}$/)]], 
+      truongDangDay: ['', [Validators.required, Validators.maxLength(50)]], 
       province: ['', Validators.required],
       district: ['', Validators.required],
-      diaChiCuThe: ['', [Validators.required, Validators.maxLength(150)]], // Tối đa 150 ký tự
+      diaChiCuThe: ['', [Validators.required, Validators.maxLength(150)]], 
       status: [true]
     });
   
@@ -227,7 +227,9 @@ changePage(page: number) {
   
 
   openAddTeacherModal() {
-    this.addTeacherForm.reset();
+    this.addTeacherForm.reset({
+      gioiTinh: 'Nam'  
+    });
     this.isModalOpen = true;
   }
 
@@ -448,7 +450,10 @@ getDistrictName(districtCode: string): string {
   formData.diaChi = `${provinceName}, ${districtName}, ${formData.diaChiCuThe || ''}`.trim();
 
   formData.status = formData.status ? "true" : "false";
-
+  if (this.editTeacherForm.invalid) {
+    this.editTeacherForm.markAllAsTouched(); 
+    return; 
+  }
 
   this.giaovienService.updateGiaoVien(formData).subscribe({
     next: (res) => {
