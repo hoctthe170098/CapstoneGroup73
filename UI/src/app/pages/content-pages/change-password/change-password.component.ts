@@ -4,7 +4,7 @@ import { UserService } from '../shared/user.service';
 import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { Router } from '@angular/router';
-import { ChangePasswordRequest } from '../shared/user.model';
+import { ChangePasswordRequest, UserRole } from '../shared/user.model';
 
 @Component({
   selector: 'app-change-password',
@@ -29,7 +29,8 @@ export class ChangePasswordComponent {
     private userService: UserService,
     private toastr: ToastrService,
     private spinner: NgxSpinnerService,
-    private router: Router
+    private router: Router,
+    private authService: UserService
   ) {}
 
   get cpf() {
@@ -64,9 +65,7 @@ export class ChangePasswordComponent {
     };
   
     this.userService.changePassword(request).subscribe(
-      (res: any) => {
-        console.log('Response from API:', res); // Debug API response
-        
+      (res: any) => {    
         if (res && !res.isError) {
           this.toastr.success('Đổi mật khẩu thành công!', 'Thành công');
           this.router.navigate(['/dashboard/dashboard1']);
@@ -82,15 +81,20 @@ export class ChangePasswordComponent {
         this.toastr.error('Đổi mật khẩu thất bại. Vui lòng thử lại!', 'Lỗi');
         this.spinner.hide();
       }
-    );
-    
+    );    
   }
-  
-    
-  
-  
-
   onCancel() {
-    this.router.navigate(['/dashboard/dashboard1']); // Hoặc chuyển hướng về trang cũ
+    var role = this.authService.getRoleNames()[0];
+          if(role==UserRole.Administrator)
+          this.router.navigate(['/coso']);
+        else if(role==UserRole.CampusManager){
+          this.router.navigate(['/lophoc']);
+        }else if(role==UserRole.LearningManager){
+          this.router.navigate(['/chuongtrinh']);
+        }else if(role==UserRole.Teacher){
+          this.router.navigate(['/lopdangday']);
+        }else if(role==UserRole.Student){
+          this.router.navigate(['/lopdanghoc']);
+        }else this.router.navigate(['/pages/error'])
   }
 }

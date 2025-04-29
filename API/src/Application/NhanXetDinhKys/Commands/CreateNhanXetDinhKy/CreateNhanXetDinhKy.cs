@@ -35,6 +35,12 @@ public class CreateNhanXetDinhKyCommandHandler : IRequestHandler<CreateNhanXetDi
         if (string.IsNullOrEmpty(token))
             throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
         var coSoId = _identityService.GetCampusId(token);
+        var UserId = _identityService.GetUserId(token);
+        var giaoVien = await _context.GiaoViens
+            .FirstAsync(gv => gv.UserId == UserId.ToString());
+        var checkLopHoc = _context.LichHocs
+            .Any(lh => lh.GiaoVienCode == giaoVien.Code && lh.TrangThai == "Cố định" && lh.TenLop == request.TenLop);
+        if (!checkLopHoc) throw new NotFoundIDException();
         var ThamGiaLopHocs = await _context.ThamGiaLopHocs
             .Where(tg => tg.HocSinhCode == request.HocSinhCode
             && tg.LichHoc.TenLop == request.TenLop
