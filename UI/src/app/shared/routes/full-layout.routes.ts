@@ -6,10 +6,6 @@ import { UserRole } from 'app/pages/content-pages/shared/user.model';
 
 export const Full_ROUTES: Routes = [
   {
-    path: 'dashboard',
-    loadChildren: () => import('../../dashboard/dashboard.module').then(m => m.DashboardModule)
-  },
-  {
     path: 'phong',
     loadChildren: () => import('../../slot/slot.module').then(m => m.SlotModule),
     canActivate:[AuthGuard],

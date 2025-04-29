@@ -469,7 +469,6 @@ editScheduleDayBu: any = {
   
     this.lophocService.getLopHocByTenLop(tenLop).subscribe(
       (res) => {
-        console.log('✅ Kết quả API:',tenLop);
         this.router.navigate(['/lophoc/edit', tenLop]);
 
       },
@@ -616,8 +615,6 @@ editScheduleDayBu: any = {
     });
   }
   onEditLichDayBu(lich: any, lop: any) {
-    console.log('📋 Lịch dạy bù được chọn để sửa:', lich);
-    console.log('🏫 Lớp:', lop.tenLop);
   
     // Dùng phongOptions đã load sẵn ở ngOnInit
     const matchedPhong = this.phongOptions.find(p => p.ten === lich.tenPhong);

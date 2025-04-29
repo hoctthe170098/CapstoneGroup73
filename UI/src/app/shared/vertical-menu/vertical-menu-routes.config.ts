@@ -3,13 +3,6 @@ import { RouteInfo } from './vertical-menu.metadata';
 
 //Sidebar menu Routes and data
 export const ROUTES: RouteInfo[] = [
-
-  {
-    path: '', title: 'Dashboard', icon: 'ft-home', class: 'has-sub', badge: '2', badgeClass: 'badge badge-pill badge-danger float-right mr-1 mt-1', isExternalLink: false, submenu: [
-      { path: '/dashboard-cm', title: 'Dashboard 1', icon: 'ft-arrow-right submenu-icon', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
-      { path: '/dashboard/dashboard2', title: 'Dashboard 2', icon: 'ft-arrow-right submenu-icon', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] } 
-    ]
-  },
   {path: '/dashboard-admin', title: 'Dashboard', icon: 'ft-home', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [],roles:[UserRole.Administrator] },
   {path: '/dashboard-cm', title: 'Dashboard', icon: 'ft-home', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [],roles:[UserRole.CampusManager] },
   {path: '/phong', title: 'Phòng Học', icon: 'ft-briefcase', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] ,roles:[UserRole.CampusManager] },

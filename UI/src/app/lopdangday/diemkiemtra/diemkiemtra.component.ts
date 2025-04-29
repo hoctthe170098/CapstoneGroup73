@@ -66,9 +66,6 @@ export class DiemkiemtraComponent implements OnInit {
         errors.diem = 'Điểm phải từ 0 đến 10';
         hasError = true;
       }
-      console.log("0123456789012345678asd2345678901234...1111".length);
-      console.log(`=> Nhận xét của ${hs.hocSinhCode}:`, hs.nhanXet);
-console.log(`=> Độ dài:`, (hs.nhanXet ?? '').toString().length);
       if ((hs.nhanXet ?? '').toString().length > 200) {
         errors.nhanXet = 'Nhận xét không được vượt quá 200 ký tự';
         hasError = true;
