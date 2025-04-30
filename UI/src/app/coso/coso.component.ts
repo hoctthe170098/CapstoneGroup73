@@ -23,9 +23,9 @@
         addCampusForm: FormGroup;
         editCampusForm: FormGroup;
 
-        provinces: any[] = [];  // Danh sách tỉnh/thành phố
-        districts: any[] = [];  // Danh sách quận/huyện khi chọn tỉnh
-        editDistricts: any[] = [];  // Danh sách quận/huyện khi chỉnh sửa cơ sở
+        provinces: any[] = [];  
+        districts: any[] = [];  
+        editDistricts: any[] = [];  
 
         constructor(
             private fb: FormBuilder,
@@ -142,10 +142,16 @@
 
         // Mở modal thêm cơ sở
         openAddCampusModal() {
-            this.addCampusForm.reset();
+            this.addCampusForm.reset({
+              ten: '',
+              diaChi: '',
+              soDienThoai: '',
+              province: '',
+              district: ''
+            });
             this.isModalOpen = true;
-            this.addCampusForm.markAllAsTouched();
-        }
+          }
+          
 
         // Mở modal chỉnh sửa cơ sở
         openEditCampusModal(campus: CoSo) {
