@@ -37,7 +37,6 @@ export class AppTopbarComponent {
 
   signOut(event: Event) {
     event.preventDefault(); 
-    console.log('Sign Out clicked');
     alert('Sign out');
   }
 

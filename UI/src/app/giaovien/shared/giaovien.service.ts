@@ -30,11 +30,7 @@ export class GiaovienService {
   getDanhSachGiaoVien(pageNumber: number = 1, pageSize: number = 8, searchTen: string = '', sortBy: string = '', isActive: any = null): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    
     const body = { pageNumber, pageSize, searchTen, sortBy, isActive };
-  
-    console.log("🔍 Gửi request đến API với body:", body); // Debug log
-  
     return this.http.post<any>(`${this.baseUrl}/getgiaovienswithpagination`, body, { headers });
   }
   

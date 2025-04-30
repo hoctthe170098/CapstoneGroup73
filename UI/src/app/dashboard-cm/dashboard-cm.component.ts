@@ -137,7 +137,7 @@ export class DashboardCMComponent implements OnInit {
           data.diemDanhTheoLops.forEach((lop: any) => {
             lop.hocSinhNghiNhieuNhats?.forEach((hocSinh: any) => {
               this.attendanceData.push({
-                code: hocSinh.code,
+                code: hocSinh.hocSinhCode,
                 tenHocSinh: hocSinh.tenHocSinh,
                 soBuoiNghi: hocSinh.soBuoiNghi,
                 lop: lop.tenLop

@@ -38,7 +38,6 @@ export class NhanxetdinhkiComponent implements OnInit {
       code: code,
       ten: ''
     };
-
     this.lopService.getNhanXetDinhKy(tenLop, code).subscribe({
       next: (res) => {
         const data = res.data;
@@ -47,19 +46,34 @@ export class NhanxetdinhkiComponent implements OnInit {
           code: data.hocSinhCode,
           ten: data.tenHocSinh
         };
-
         this.lichSu = data.danhSachNhanXet.map((item: any) => ({
           id: item.id,
           ngay: item.ngayNhanXet,
           noiDung: item.noiDungNhanXet
         }));
-
-        this.denHanNhanXet = data.denHanNhanXet;
-       
+        this.denHanNhanXet = data.denHanNhanXet;      
         this.cdr.detectChanges();
+        if(!res.isError){
+          const data = res.data;
+          this.hocSinh = {
+            code: data.hocSinhCode,
+            ten: data.tenHocSinh
+          };
+          this.lichSu = data.danhSachNhanXet.map((item: any) => ({
+            id: item.id,
+            ngay: item.ngayNhanXet,
+            noiDung: item.noiDungNhanXet
+          }));
+          this.denHanNhanXet = data.denHanNhanXet;
+          this.cdr.detectChanges();
+        }else{
+          if(res.code==404){
+            this.router.navigate(['/pages/error'])
+          }else this.toastr.error(res.message)
+        }
       },
       error: (err) => {
-        console.error('Lỗi lấy nhận xét định kỳ:', err);
+        this.toastr.error('Lỗi lấy nhận xét định kỳ:', err);
       }
     });
   }

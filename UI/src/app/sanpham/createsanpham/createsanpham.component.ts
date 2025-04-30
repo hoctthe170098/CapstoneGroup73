@@ -74,7 +74,6 @@ export class CreatesanphamComponent implements OnInit {
             this.toast.error(res.message);
           }
         })
-    console.log('Đã chọn file:', file);
     if(this.uploadedFiles.find((x:File)=>x.name == file.name)!=undefined){
       this.toast.error("File này đã được đính kèm!");
     }else{

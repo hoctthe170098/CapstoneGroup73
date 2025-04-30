@@ -8,6 +8,7 @@ import { LockScreenPageComponent } from "./lock-screen/lock-screen-page.componen
 import { LoginPageComponent } from "./login/login-page.component";
 import { MaintenancePageComponent } from "./maintenance/maintenance-page.component";
 import { ChangePasswordComponent } from './change-password/change-password.component';
+import { AuthGuard } from 'app/shared/auth/auth-guard.service';
 
 
 
@@ -16,13 +17,6 @@ const routes: Routes = [
     
     path: '',
     children: [
-      {
-        path: 'comingsoon',
-        component: ComingSoonPageComponent,
-        data: {
-          title: 'Coming Soon page'
-        }
-      },
       {
         path: 'error',
         component: ErrorPageComponent,
@@ -36,18 +30,11 @@ const routes: Routes = [
         data: {
           title: 'Forgot Password Page'
         }
-      },   
-      
-      {
-        path: 'lockscreen',
-        component: LockScreenPageComponent,
-        data: {
-          title: 'Lock Screen page'
-        }
-      },   
+      },     
       { 
         path: 'change-password', 
-        component: ChangePasswordComponent 
+        component: ChangePasswordComponent,
+        canActivate :[AuthGuard]
       },
       {
         path: 'login',
@@ -55,16 +42,7 @@ const routes: Routes = [
         data: {
           title: 'Login Page'
         }
-      },
-      {
-        path: 'maintenance',
-        component: MaintenancePageComponent,
-        data: {
-          title: 'Maintenance Page'
-        }
-      },
-       
-      
+      }
     ]
   }
 ];
