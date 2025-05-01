@@ -1,4 +1,4 @@
-<div class="hoc-sinh-wrapper">
+
   <!-- Tiêu đề -->
   <h2 class="page-title">DANH SÁCH GIÁO VIÊN</h2>
   <div class="filter-row">
@@ -473,11 +473,11 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngIf="students.length === 0">
+        <!-- <tr *ngIf="students.length === 0">
           <td colspan="12" style="text-align: center; color: red">
             Không có giáo viên nào
           </td>
-        </tr>
+        </tr> -->
 
         <ng-container *ngFor="let gv of students; let i = index">
           <!-- Hàng tóm tắt -->
@@ -607,4 +607,4 @@
 </div>
 
 
-</div>
+
