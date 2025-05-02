@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { LichHocService } from './shared/lichhoc.service'; // sửa lại path nếu khác
 import { GetLichHocHocSinhResponse, LichHocTrongNgay } from './shared/lichhoc.model';
-
+import { Router } from "@angular/router";
 @Component({
   selector: 'app-lichhoc',
   templateUrl: './lichhoc.component.html',
@@ -17,7 +17,8 @@ export class LichhocComponent implements OnInit {
 
   constructor(
     private lichHocService: LichHocService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router:Router
   ) {}
 
   ngOnInit(): void {
@@ -61,6 +62,10 @@ export class LichhocComponent implements OnInit {
     this.lichHocService
       .getLichHocHocSinh(this.selectedWeek, this.selectedYear)
       .subscribe((res) => {
+        if (res.code === 404) {
+          this.router.navigate(['/pages/error'])
+          return;
+        }
         if (!res.isError) {
           this.schedule = res.data.lichHocCaTuans.map((day) => {
             const date = new Date(day.ngay);

@@ -133,6 +133,10 @@ loadDanhSachGiaoVien() {
 
   this.giaovienService.getDanhSachGiaoVien(this.currentPage, this.pageSize, this.searchTerm, '', isActiveFilter)
     .subscribe(response => {
+      if (response.code === 404) {
+        this.router.navigate(['/pages/error'])
+        return;
+      }
 
       if (!response.isError && response.data && response.data.items) {
         this.students = response.data.items.map((gv: any) => ({

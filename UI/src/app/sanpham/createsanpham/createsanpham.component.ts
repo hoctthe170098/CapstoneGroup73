@@ -35,6 +35,10 @@ export class CreatesanphamComponent implements OnInit {
   }
   getPhanLoaiCongViec(){
     this.service.getPhanLoaiCongViec().subscribe((res:any)=>{
+      if (res.code === 404) {
+        this.router.navigate(['/pages/error'])
+        return;
+      }
       if(!res.isError){
         this.phanLoaiCongViec = res.data;
       }else this.toast.error(res.message);
@@ -42,6 +46,10 @@ export class CreatesanphamComponent implements OnInit {
   }
   getGiaiDoanThucHien(){
     this.service.getGiaiDoanThucHien().subscribe((res:any)=>{
+      if (res.code === 404) {
+        this.router.navigate(['/pages/error'])
+        return;
+      }
       if(!res.isError){
         this.giaiDoanThucHien = res.data;
       }else this.toast.error(res.message);
@@ -49,6 +57,10 @@ export class CreatesanphamComponent implements OnInit {
   }
   getTrangThaiThucHien(){
     this.service.getTrangThaiThucHien().subscribe((res:any)=>{
+      if (res.code === 404) {
+        this.router.navigate(['/pages/error'])
+        return;
+      }
       if(!res.isError){
         this.trangThaiThucHien = res.data;
       }else this.toast.error(res.message);
@@ -56,6 +68,10 @@ export class CreatesanphamComponent implements OnInit {
   }
   getMucDoRuiRo(){
     this.service.getMucDoRuiRo().subscribe((res:any)=>{
+      if (res.code === 404) {
+        this.router.navigate(['/pages/error'])
+        return;
+      }
       if(!res.isError){
         this.mucDoRuiRo = res.data;
       }else this.toast.error(res.message);

@@ -97,6 +97,10 @@ isEditModalOpen: boolean = false;
   }
   getDanhSachLopHoc(keyword: string) {
     this.hocSinhService.getDanhSachLopTheoTen(keyword).subscribe(res => {
+      if (res.code === 404) {
+        this.router.navigate(['/pages/error'])
+        return;
+      }
       if (!res.isError && res.data) {
         this.classOptions = res.data.map((item: any) => ({
           code: item.tenLop,

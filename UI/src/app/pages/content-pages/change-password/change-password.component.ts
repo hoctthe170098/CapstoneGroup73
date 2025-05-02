@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component,ChangeDetectorRef } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UserService } from '../shared/user.service';
 import { ToastrService } from 'ngx-toastr';
@@ -30,13 +30,16 @@ export class ChangePasswordComponent {
     private toastr: ToastrService,
     private spinner: NgxSpinnerService,
     private router: Router,
-    private authService: UserService
+    private authService: UserService,
+    private cdr: ChangeDetectorRef
   ) {}
-
+  ngOnInit(): void {
+    
+  }
   get cpf() {
     return this.changePasswordForm.controls;
   }
-
+  
   togglePassword(field: string) {
     this.showPassword[field] = !this.showPassword[field];
   }
@@ -66,9 +69,17 @@ export class ChangePasswordComponent {
   
     this.userService.changePassword(request).subscribe(
       (res: any) => {    
+        if (res.code === 404) {
+          this.router.navigate(['/pages/error'])
+          return;
+        }
         if (res && !res.isError) {
           this.toastr.success('Đổi mật khẩu thành công!', 'Thành công');
-          this.router.navigate(['/dashboard/dashboard1']);
+          setTimeout(() => {
+            this.router.navigate(['/pages/change-password']).then(() => {
+              window.location.reload(); // Refresh sau khi hiển thị toast
+            });
+          }, 1500);
         } else if (res.isError && res.message.includes('Incorrect password')) {  
           this.toastr.error('Mật khẩu cũ không đúng!', 'Lỗi');
         } else {

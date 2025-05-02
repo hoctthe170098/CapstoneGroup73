@@ -10,7 +10,7 @@ import { ChartOptions, ChartType, ChartDataSets } from "chart.js";
 import { Label, Color } from "ng2-charts";
 import { DashboardAdminService } from "./shared/dasboard-admin.service";
 import { ToastrService } from "ngx-toastr";
-
+import { Router } from "@angular/router";
 @Component({
   selector: "app-dashboard-admin",
   templateUrl: "./dashboard-admin.component.html",
@@ -113,7 +113,8 @@ export class DashboardAdminComponent implements OnInit {
   constructor(
     private dashboardService: DashboardAdminService,
     private toastr: ToastrService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router:Router
   ) {}
 
   ngOnInit(): void {
@@ -159,6 +160,10 @@ export class DashboardAdminComponent implements OnInit {
   loadDashboardData(): void {
     this.dashboardService.getDashboardAdmin().subscribe({
       next: (res) => {
+        if (res.code === 404) {
+          this.router.navigate(['/pages/error'])
+          return;
+        }
         if (!res.isError && res.data) {
           const data = res.data;
 

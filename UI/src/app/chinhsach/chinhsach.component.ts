@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ChinhSachService } from './shared/chinhsach.service';
 import { ChinhSach } from './shared/chinhsach.model';
 import { ToastrService } from 'ngx-toastr';
-
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-chinhsach',
   templateUrl: './chinhsach.component.html',
@@ -28,7 +28,8 @@ export class ChinhsachComponent implements OnInit {
   constructor(
     private chinhSachService: ChinhSachService,
     private toastr: ToastrService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router:Router
   ) {}
 
   ngOnInit(): void {
@@ -48,6 +49,10 @@ export class ChinhsachComponent implements OnInit {
 
     this.chinhSachService.getChinhSachs(payload).subscribe({
       next: (res) => {
+        if (res.code === 404) {
+          this.router.navigate(['/pages/error'])
+          return;
+        }
         if (!res.isError && res.data) {
           this.danhSachChinhSach = res.data.items;
           this.totalPages = res.data.totalPages;

@@ -30,7 +30,10 @@ export class ChuongtrinhComponent implements OnInit {
    */
   getPrograms(page: number, search: string): void {
     this.chuongtrinhService.getPrograms(page, search).subscribe(response => {
-      
+      if (response.code === 404) {
+        this.router.navigate(['/pages/error'])
+        return;
+      }
       if (!response.isError && response.code === 200) {
         // ✅ Chỉ lọc theo tiêu đề (tieuDe)
         this.programs = response.data.items

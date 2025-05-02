@@ -48,8 +48,10 @@ export class AccountmanagerComponent implements OnInit {
 
   constructor(private accountmanagerService: AccountmanagerService, 
     private cd: ChangeDetectorRef,
-     private toastr: ToastrService,
-    private spinner: NgxSpinnerService) { }
+    private toastr: ToastrService,
+    private spinner: NgxSpinnerService,
+    private router: Router
+) { }
 
 
   ngOnInit(): void {
@@ -123,6 +125,10 @@ export class AccountmanagerComponent implements OnInit {
   loadDanhSachCoSo() {
     this.accountmanagerService.getDanhSachCoSo().subscribe(
       response => {
+        if (response.code === 404) {
+          this.router.navigate(['/pages/error'])
+          return;
+        }
         if (response && response.data) {
           this.cosoList = response.data;
         }
@@ -422,6 +428,7 @@ export class AccountmanagerComponent implements OnInit {
 
     this.accountmanagerService.updateNhanVien(updatedHs).subscribe(
       response => {
+        
         if (!response.isError) {
           this.toastr.success(response.message);
           this.isEditModalOpen = false;

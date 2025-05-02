@@ -28,6 +28,10 @@ export class DanhsachhocsinhComponent implements OnInit {
   loadDanhSachHocSinh() {
     this.lopDangDayService.getDanhSachHocSinhLop(this.tenLop).subscribe(
       (response) => {
+         if (response.code === 404) {
+            this.router.navigate(['/pages/error'])
+            return;
+          }
         if (!response.isError) {
           this.danhSachHocSinh = response.data;
           this.cdr.detectChanges();

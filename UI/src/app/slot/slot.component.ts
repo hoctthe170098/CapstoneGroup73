@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { SlotService } from './shared/slot.service';
 import { Slot } from './shared/slot.model';
 import { ToastrService } from 'ngx-toastr';
-
+import { Router } from "@angular/router";
 @Component({
   selector: 'app-slot',
   templateUrl: './slot.component.html',
@@ -26,7 +26,8 @@ export class SlotComponent implements OnInit {
   constructor(
     private slotService: SlotService,
     private cd: ChangeDetectorRef,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -37,6 +38,10 @@ export class SlotComponent implements OnInit {
   loadRooms(): void {
     this.slotService.getDanhSachPhong().subscribe({
       next: (res) => {
+        if (res.code === 404) {
+          this.router.navigate(['/pages/error'])
+          return;
+        }
         if (!res.isError && res.data) {
           
           this.rooms = res.data.map((r: any) => ({
