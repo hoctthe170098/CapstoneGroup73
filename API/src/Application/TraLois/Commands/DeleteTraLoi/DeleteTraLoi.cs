@@ -37,6 +37,7 @@ public class DeleteTraLoiCommandHandler : IRequestHandler<DeleteTraLoiCommand, O
     {
         var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"]
             .ToString().Replace("Bearer ", "");
+
         if (string.IsNullOrEmpty(token))
             throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
 
@@ -47,8 +48,17 @@ public class DeleteTraLoiCommandHandler : IRequestHandler<DeleteTraLoiCommand, O
             ?? throw new NotFoundDataException("Không tìm thấy học sinh tương ứng.");
 
         var traLoi = await _context.TraLois
+            .Include(t => t.Baitap)
             .FirstOrDefaultAsync(t => t.Id == request.TraLoiId && t.HocSinhCode == hocSinh.Code, cancellationToken)
             ?? throw new NotFoundDataException("Không tìm thấy câu trả lời hoặc bạn không có quyền xóa.");
+
+        // Kiểm tra nếu bài tập đã hết hạn hoặc trạng thái là Kết thúc
+        var baiTap = traLoi.Baitap;
+        if ((baiTap.ThoiGianKetThuc.HasValue && DateTime.Now >= baiTap.ThoiGianKetThuc.Value) ||
+            string.Equals(baiTap.TrangThai?.Trim(), "Kết thúc", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new Exception("Bài tập đã kết thúc, bạn không thể xóa câu trả lời.");
+        }
 
         // Xóa file đính kèm nếu có
         if (!string.IsNullOrEmpty(traLoi.UrlFile))

@@ -31,11 +31,12 @@ public class UpdateTraLoiCommandValidator : AbstractValidator<UpdateTraLoiComman
             .WithMessage("Tệp phải là .doc, .docx hoặc .pdf và không vượt quá 10MB.");
 
         RuleFor(x => x)
-            .MustAsync(HocSinhSoHuuVaChuaHetHan)
+            .MustAsync(IsOwnerOfTraLoi)
             .WithMessage("Bạn không có quyền cập nhật câu trả lời này.");
+
         RuleFor(x => x)
-            .MustAsync(BaiTapChuaHetHanAsync)
-            .WithMessage("Bài tập này đã hết hạn bạn không thể sửa câu trả lời này");
+            .MustAsync(IsBeforeDeadline)
+            .WithMessage("Bài tập này đã hết hạn, bạn không thể sửa câu trả lời.");
     }
 
     private bool BeValidFile(IFormFile? file)
@@ -44,28 +45,22 @@ public class UpdateTraLoiCommandValidator : AbstractValidator<UpdateTraLoiComman
 
         var allowedExtensions = new[] { ".doc", ".docx", ".pdf" };
         var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-        var isValidSize = file.Length <= 10 * 1024 * 1024;
-
-        return allowedExtensions.Contains(extension) && isValidSize;
+        return allowedExtensions.Contains(extension) && file.Length <= 10 * 1024 * 1024;
     }
 
-    private Task<bool> BaiTapChuaHetHanAsync(UpdateTraLoiCommand command, CancellationToken cancellationToken)
+    private async Task<bool> IsOwnerOfTraLoi(UpdateTraLoiCommand command, CancellationToken cancellationToken)
     {
-        return HocSinhSoHuuVaChuaHetHan(command, cancellationToken);
-    }
+        var hocSinh = await GetHocSinhFromTokenAsync(cancellationToken);
+        if (hocSinh == null) return false;
 
-    private async Task<bool> HocSinhSoHuuVaChuaHetHan(UpdateTraLoiCommand command, CancellationToken cancellationToken)
-    {
-        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"]
-            .ToString().Replace("Bearer ", "");
-
-        if (string.IsNullOrEmpty(token)) return false;
-
-        var userId = _identityService.GetUserId(token).ToString();
-        var hocSinh = await _context.HocSinhs
+        return await _context.TraLois
             .AsNoTracking()
-            .FirstOrDefaultAsync(h => h.UserId == userId, cancellationToken);
+            .AnyAsync(t => t.Id == command.TraLoiId && t.HocSinhCode == hocSinh.Code, cancellationToken);
+    }
 
+    private async Task<bool> IsBeforeDeadline(UpdateTraLoiCommand command, CancellationToken cancellationToken)
+    {
+        var hocSinh = await GetHocSinhFromTokenAsync(cancellationToken);
         if (hocSinh == null) return false;
 
         var traLoi = await _context.TraLois
@@ -73,7 +68,7 @@ public class UpdateTraLoiCommandValidator : AbstractValidator<UpdateTraLoiComman
             .AsNoTracking()
             .FirstOrDefaultAsync(t => t.Id == command.TraLoiId && t.HocSinhCode == hocSinh.Code, cancellationToken);
 
-        if (traLoi == null) return false;
+        if (traLoi?.Baitap == null) return false;
 
         var baiTap = traLoi.Baitap;
 
@@ -86,4 +81,17 @@ public class UpdateTraLoiCommandValidator : AbstractValidator<UpdateTraLoiComman
         return true;
     }
 
+    private async Task<HocSinh?> GetHocSinhFromTokenAsync(CancellationToken cancellationToken)
+    {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"]
+            .ToString().Replace("Bearer ", "");
+
+        if (string.IsNullOrEmpty(token)) return null;
+
+        var userId = _identityService.GetUserId(token).ToString();
+
+        return await _context.HocSinhs
+            .AsNoTracking()
+            .FirstOrDefaultAsync(h => h.UserId == userId, cancellationToken);
+    }
 }
