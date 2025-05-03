@@ -88,13 +88,27 @@
     td.wide-col {
       width: 160px; 
     }
+    td.action-icons {
+      height: 48px; 
+      padding: 0.5rem 0; 
+    }
     .action-icons {
       display: flex;
+      align-items: center;
+      justify-content: center;
       gap: 0.5rem;
+      height: 100%;
 
       i {
-        cursor: pointer;
-        font-size: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        font-size: 18px;
+        line-height: 1;
+        margin: 0; 
+        padding: 0;
       }
 
       .icon-red {

@@ -97,6 +97,9 @@
                 type="date"
                 class="form-control"
               />
+              <small class="error-message" *ngIf="addTeacherForm.controls['ngaySinh'].errors?.required && addTeacherForm.controls['ngaySinh'].touched">
+                Ngày sinh không được để trống.
+              </small>
               <small
                 class="error-message"
                 *ngIf="
@@ -106,6 +109,7 @@
               >
                 Giáo viên phải trên 18 tuổi.
               </small>
+              
             </div>
           </div>
 
@@ -302,6 +306,10 @@
                 type="date"
                 class="form-control"
               />
+              <small class="error-message" *ngIf="editTeacherForm.controls['ngaySinh'].errors?.required && editTeacherForm.controls['ngaySinh'].touched">
+                Ngày sinh không được để trống.
+              </small>
+              
               <small
                 class="error-message"
                 *ngIf="
