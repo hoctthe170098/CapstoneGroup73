@@ -3,7 +3,7 @@ import { TestlistService } from './shared/baikiemtra.service';
 import { BaiKiemTraDto } from './shared/baikiemtra.model';
 import { saveAs } from 'file-saver';
 import { ToastrService } from 'ngx-toastr';
-
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-testlist',
@@ -51,7 +51,7 @@ export class TestListComponent implements OnInit {
       url: ''
     }
   };
-  constructor(private testlistService: TestlistService,private cdr: ChangeDetectorRef, private toastr: ToastrService) {}
+  constructor(private testlistService: TestlistService,private cdr: ChangeDetectorRef, private toastr: ToastrService, private router: Router) {}
   ngOnInit() {
     this.loadTests();
     this.searchClassByName(''); // load tất cả lớp
@@ -103,6 +103,10 @@ export class TestListComponent implements OnInit {
     this.testlistService.getTests(this.currentPage, this.itemsPerPage, trangThaiToSend, tenLop, tenBaiKiemTra)
       .subscribe({
         next: res => {
+          if (res.code === 404) {
+            this.router.navigate(['/pages/error'])
+            return;
+          }
           
           if (!res || !res.data) {
             this.paginatedList = [];

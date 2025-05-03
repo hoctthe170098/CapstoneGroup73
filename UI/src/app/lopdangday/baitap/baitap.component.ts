@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { LopdangdayService } from '../shared/lopdangday.service';
 import { ToastrService } from 'ngx-toastr';
 import { Input } from '@angular/core';
-import { ActivatedRoute } from '@angular/router'; 
+import { ActivatedRoute,Router} from '@angular/router';
 @Component({
   selector: 'app-baitap',
   templateUrl: './baitap.component.html',
@@ -37,6 +37,7 @@ export class BaitapComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private toastr: ToastrService,
     private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -58,6 +59,10 @@ export class BaitapComponent implements OnInit {
   
     this.lopdangdayService.getBaiTapsForTeacher(payload).subscribe({
       next: (res) => {
+        if (res.code === 404) {
+          this.router.navigate(['/pages/error'])
+          return;
+        }
         if (!res.isError && res.data) {
           const firstItem = res.data.items[0]; 
           this.baiTaps = firstItem?.baiTaps || [];

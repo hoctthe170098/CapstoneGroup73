@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { NgForm, AbstractControl } from '@angular/forms';
 
 @Component({
   selector: 'app-accountmanager',
@@ -29,7 +30,7 @@ export class AccountmanagerComponent implements OnInit {
   isEditModalOpen: boolean = false;
 
   newmanager: any = {
-    code: '', ten: '', gioiTinh: '', ngaySinh: '', email: '',
+    code: '', ten: '', gioiTinh: 'Nam', ngaySinh: '', email: '',
     soDienThoai: '', coSoId: '', province: '', district: '', diaChi: '', role: '', status: 'true'
   };
 
@@ -48,8 +49,10 @@ export class AccountmanagerComponent implements OnInit {
 
   constructor(private accountmanagerService: AccountmanagerService, 
     private cd: ChangeDetectorRef,
-     private toastr: ToastrService,
-    private spinner: NgxSpinnerService) { }
+    private toastr: ToastrService,
+    private spinner: NgxSpinnerService,
+    private router: Router
+) { }
 
 
   ngOnInit(): void {
@@ -123,6 +126,10 @@ export class AccountmanagerComponent implements OnInit {
   loadDanhSachCoSo() {
     this.accountmanagerService.getDanhSachCoSo().subscribe(
       response => {
+        if (response.code === 404) {
+          this.router.navigate(['/pages/error'])
+          return;
+        }
         if (response && response.data) {
           this.cosoList = response.data;
         }
@@ -147,88 +154,57 @@ export class AccountmanagerComponent implements OnInit {
   openAddManagerModal() { this.isModalOpen = true; }
   closeModal() { this.isModalOpen = false; }
 
-  submitNewmanager() {
-   
-    if (!this.newmanager.code || this.newmanager.code.trim() === '') {
-      ;
+  submitNewmanager(form: NgForm) {
+    if (form.invalid || this.isUnderage) {
+      Object.values(form.controls).forEach((control: AbstractControl) => {
+        control.markAsTouched();
+      });
+      this.toastr.error('Vui lòng điền đầy đủ và đúng thông tin!');
       return;
     }
-    if (this.newmanager.code.length > 18) {
-
-      return;
-    }
-    if (!this.newmanager.ten || this.newmanager.ten.trim() === '') {
-
-      return;
-    }
-    if (this.newmanager.ten.length > 30) {
-
-      return;
-    }
-    if (!this.validatePhoneNumber(this.newmanager.soDienThoai)) {
-
-      return;
-
-    }
-
-
-
-
+  
     const provinceName = this.getProvinceName();
     const districtName = this.getDistrictName();
-
-   
-
-
-    const fullAddress = `${this.newmanager.diaChi}, ${districtName}, ${provinceName}`;
-
+    const fullAddress = `${this.newmanager.diaChi}, ${districtName}, ${provinceName}`.trim();
+  
     const newHs = {
-      code: `${this.newmanager.code.trim()}`, // ✨ Luôn tự gắn NV vào trước
+      code: this.newmanager.code?.trim(),
       ten: this.newmanager.ten,
       gioiTinh: this.newmanager.gioiTinh,
       ngaySinh: this.newmanager.ngaySinh ? this.formatDate(this.newmanager.ngaySinh) : '',
       email: this.newmanager.email,
       soDienThoai: this.newmanager.soDienThoai,
       coSoId: this.newmanager.coSoId || null,
-      diaChi: fullAddress.trim() !== ", ," ? fullAddress : "Không xác định",
+      diaChi: fullAddress !== ', ,' ? fullAddress : 'Không xác định',
       role: this.newmanager.role
     };
-
+  
     this.spinner.show();
     this.accountmanagerService.createNhanVien(newHs).subscribe(
       response => {
         this.spinner.hide();
         if (!response.isError) {
-          
           this.toastr.success(response.message);
-          this.loadDanhSachNhanVien();
-          this.isModalOpen = false;
+  
+          form.resetForm();              
+          this.newmanager = {};           
+          this.isModalOpen = false;       
+          this.loadDanhSachNhanVien();    
         } else {
-          // ✅ Nếu có lỗi từ API, hiển thị thông báo từ `errors`
-          if (response.errors && response.errors.length > 0) {
-            this.toastr.error(response.errors.join("\n")); // Hiển thị tất cả lỗi từ API
-          } else {
-            this.toastr.error(response.message);
-          }
+          const errorMsg = response.errors?.length ? response.errors.join('\n') : response.message;
+          this.toastr.error(errorMsg);
           this.isModalOpen = true;
         }
       },
       error => {
         this.spinner.hide();
-        console.error('❌ Lỗi khi thêm nhân viên:', error);
-        if (error.error && error.error.isError) {
-          // ✅ Kiểm tra lỗi từ API và hiển thị
-          if (error.error.errors && error.error.errors.length > 0) {
-            alert(`🚨 ${error.error.errors.join("\n")}`);
-          } else {
-            alert(`⚠️ ${error.error.message || 'Lỗi không xác định'}`);
-          }
-        } else {
-          alert('⚠️ Lỗi khi thêm nhân viên. Kiểm tra API hoặc dữ liệu đầu vào!');
-        }
+        this.toastr.error('Lỗi khi thêm nhân viên. Vui lòng kiểm tra kết nối hoặc dữ liệu!');
+        console.error('❌ API thêm nhân viên lỗi:', error);
       }
     );
   }
+  
+  
   validateCoSo() {
     if (!this.newmanager.coSoId || this.newmanager.coSoId.trim() === '') {
       this.isCoSoInvalid = true;
@@ -381,25 +357,16 @@ export class AccountmanagerComponent implements OnInit {
     this.isEditModalOpen = true;
   }
   closeEditModal() { this.isEditModalOpen = false; }
-  submitEditmanager() {
-   
-
-    if (!this.editmanager.soDienThoai || this.editmanager.soDienThoai.trim() === '') {
-
-      return;
-    }
-    if (!this.validatePhoneNumber(this.editmanager.soDienThoai)) {
-
-      return;
-    }
-
-    if (!this.editmanager.ten || this.editmanager.ten.trim() === '') {
-
-      return;
-    }
-    if (this.editmanager.ten.length > 30) {
-
-      return;
+  submitEditmanager(form: NgForm) {
+    if (form.invalid || this.isUnderage) {
+      // Đánh dấu tất cả các control là touched để hiển thị lỗi
+      Object.values(form.controls).forEach((control: AbstractControl) => {
+        control.markAsTouched();
+      });
+  
+      // Hiển thị toastr
+      this.toastr.error('Vui lòng điền đầy đủ và đúng thông tin trước khi áp dụng!');
+      return; // ⛔ Không gửi API nếu form lỗi
     }
 
     const provinceName = this.selectedProvince ? this.selectedProvince.name : "Không xác định";
@@ -422,6 +389,7 @@ export class AccountmanagerComponent implements OnInit {
 
     this.accountmanagerService.updateNhanVien(updatedHs).subscribe(
       response => {
+        
         if (!response.isError) {
           this.toastr.success(response.message);
           this.isEditModalOpen = false;

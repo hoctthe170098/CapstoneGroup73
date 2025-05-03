@@ -39,6 +39,10 @@ export class LopdangdayComponent implements OnInit {
     // Gọi service và subscribe để nhận dữ liệu
     this.lopDangDayService.getDanhSachLopHoc(this.pageNumber, this.pageSize, this.searchClass, this.startDate, this.endDate).subscribe(
       (response) => {
+        if (response.code === 404) {
+          this.router.navigate(['/pages/error'])
+          return;
+        }
         // Ẩn spinner sau khi dữ liệu được load
         this.spinner.hide();
 

@@ -3,6 +3,7 @@ import { ChartOptions, ChartType, ChartDataSets } from 'chart.js';
 import { Label, Color, BaseChartDirective } from 'ng2-charts';
 import { DashboardCMService } from './shared/dashboard-cm.service';
 import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard-cm',
@@ -67,7 +68,8 @@ export class DashboardCMComponent implements OnInit {
   constructor(
     private dashboardService: DashboardCMService,
     private toastr: ToastrService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router:Router
   ) {}
 
   ngOnInit(): void {
@@ -77,6 +79,10 @@ export class DashboardCMComponent implements OnInit {
   loadDashboardData(): void {
     this.dashboardService.getDashboardQuanLyCoSo().subscribe({
       next: (res) => {
+        if (res.code === 404) {
+          this.router.navigate(['/pages/error'])
+          return;
+        }
         if (!res.isError && res.data) {
           const data = res.data;
 

@@ -39,6 +39,10 @@ export class LopdanghocComponent implements OnInit {
       .getDanhSachLopHoc(this.pageNumber, this.pageSize, this.searchClass)
       .subscribe(
         (response) => {
+          if (response.code === 404) {
+            this.router.navigate(['/pages/error'])
+            return;
+          }
           // Ẩn spinner sau khi dữ liệu được load
           this.spinner.hide();
 

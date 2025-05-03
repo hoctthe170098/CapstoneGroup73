@@ -3,7 +3,7 @@
     import { CoSo } from './shared/coso.model';
     import { CoSoService } from './shared/coso.service';
     import { ToastrService } from 'ngx-toastr';
-
+    import { Router } from '@angular/router';
     @Component({
         selector: 'app-coso',
         templateUrl: './coso.component.html',
@@ -31,7 +31,8 @@
             private fb: FormBuilder,
             private coSoService: CoSoService,
             private cdr: ChangeDetectorRef,
-            private toastr: ToastrService
+            private toastr: ToastrService,
+            private router: Router
         ) {
             this.addCampusForm = this.fb.group({
                 ten: ['', [Validators.required, Validators.maxLength(30)]],
@@ -83,6 +84,10 @@
             this.coSoService.getDanhSachCoSo(this.currentPage, this.itemsPerPage, this.searchText)
                 .subscribe(
                     (res: any) => {
+                        if (res.code === 404) {
+                            this.router.navigate(['/pages/error'])
+                            return;
+                          }
                         if (!res.isError) {
                             this.campuses = res.data.items;
                             this.totalItems = res.data.totalCount;
