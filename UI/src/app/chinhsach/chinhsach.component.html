@@ -144,13 +144,12 @@
               {{ item.phanTramGiam * 100 | number : "1.0-0" }}%
             </td>
             <td>{{ item.mota }}</td>
-            <td class="action-icons">
-              <i
-                class="ft-trash-2 icon-red"
-                (click)="xoaChinhSach(item.id)"
-              ></i>
-              <i class="ft-edit icon-green" (click)="openEditModal(item)"></i>
-            </td>
+            <td>
+              <div class="action-icons">
+                <i class="ft-trash-2 icon-red" (click)="xoaChinhSach(item.id)"></i>
+                <i class="ft-edit icon-green" (click)="openEditModal(item)"></i>
+              </div>
+            </td>            
           </tr>
         </tbody>
       </table>

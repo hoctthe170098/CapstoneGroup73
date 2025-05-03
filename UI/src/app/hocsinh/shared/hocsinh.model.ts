@@ -16,7 +16,7 @@ export class HocSinh {
   chinhSach: string = '';
   // Danh sách các lớp học mà học sinh tham gia
   lopHocs: string[] = [];
-  
+  isActive: boolean;
   province?: string;  // Mã hoặc tên tỉnh/thành
   district?: string;  // Mã hoặc tên quận/huyện
 }

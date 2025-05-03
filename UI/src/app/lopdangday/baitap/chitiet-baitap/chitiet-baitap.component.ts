@@ -56,6 +56,8 @@ export class ChitietBaitapComponent implements OnInit {
         if (!res.isError) {
           this.baiTapDetail = res.data;
           this.startCountdown(this.baiTapDetail.secondsUntilDeadline);
+          this.loadTraLoiCuaHocSinh();
+          this.cdr.detectChanges();
         }
         this.isLoading = false;
       },

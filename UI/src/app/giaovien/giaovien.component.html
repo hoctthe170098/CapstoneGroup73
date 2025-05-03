@@ -1,4 +1,4 @@
-<div class="hoc-sinh-wrapper">
+
   <!-- Tiêu đề -->
   <h2 class="page-title">DANH SÁCH GIÁO VIÊN</h2>
   <div class="filter-row">
@@ -97,6 +97,9 @@
                 type="date"
                 class="form-control"
               />
+              <small class="error-message" *ngIf="addTeacherForm.controls['ngaySinh'].errors?.required && addTeacherForm.controls['ngaySinh'].touched">
+                Ngày sinh không được để trống.
+              </small>
               <small
                 class="error-message"
                 *ngIf="
@@ -106,6 +109,7 @@
               >
                 Giáo viên phải trên 18 tuổi.
               </small>
+              
             </div>
           </div>
 
@@ -255,6 +259,7 @@
               class="form-control"
               readonly
               placeholder="Nhập mã giáo viên"
+              readonly
             />
             <small
               class="error-message"
@@ -301,6 +306,10 @@
                 type="date"
                 class="form-control"
               />
+              <small class="error-message" *ngIf="editTeacherForm.controls['ngaySinh'].errors?.required && editTeacherForm.controls['ngaySinh'].touched">
+                Ngày sinh không được để trống.
+              </small>
+              
               <small
                 class="error-message"
                 *ngIf="
@@ -434,7 +443,7 @@
           <div class="form-group toggle-container">
             <label for="statusToggle">Kích Hoạt</label>
             <label class="switch">
-              <input type="checkbox" formControlName="status" [checked]="editTeacherForm.get('status')?.value">
+              <input type="checkbox" formControlName="status">
               <span class="slider round"></span>
             </label>
             
@@ -472,11 +481,11 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngIf="students.length === 0">
+        <!-- <tr *ngIf="students.length === 0">
           <td colspan="12" style="text-align: center; color: red">
             Không có giáo viên nào
           </td>
-        </tr>
+        </tr> -->
 
         <ng-container *ngFor="let gv of students; let i = index">
           <!-- Hàng tóm tắt -->
@@ -606,4 +615,4 @@
 </div>
 
 
-</div>
+

@@ -5,6 +5,7 @@ import { GiaovienService } from './shared/giaovien.service';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { saveAs } from 'file-saver';
+import { NgxSpinnerService } from 'ngx-spinner';
 @Component({
   selector: 'app-giaovien',
   templateUrl: './giaovien.component.html',
@@ -27,7 +28,7 @@ export class GiaovienComponent implements OnInit {
   editTeacherForm: FormGroup;
   selectedTeacher: any;
 
-  constructor(private giaovienService: GiaovienService, private router: Router, private cdr: ChangeDetectorRef, private toastr: ToastrService, private fb: FormBuilder) {
+  constructor(private giaovienService: GiaovienService, private router: Router, private cdr: ChangeDetectorRef, private toastr: ToastrService, private fb: FormBuilder, private spinner: NgxSpinnerService) {
     this.addTeacherForm = this.fb.group({
       code: ['', [Validators.required, Validators.maxLength(18)]], 
       ten: ['', [Validators.required, Validators.maxLength(20)]], 
@@ -279,9 +280,10 @@ changePage(page: number) {
       diaChi: diaChiFormatted
     };
   
-  
+  this.spinner.show();
     this.giaovienService.createGiaoVien(newTeacher).subscribe({
       next: (res) => {
+        this.spinner.hide();
         if (!res.isError) {
           this.toastr.success("Thêm giáo viên thành công!", "Thành công");
           this.closeModal();
@@ -291,6 +293,7 @@ changePage(page: number) {
         }
       },
       error: () => {
+        this.spinner.hide();
         this.toastr.error("Có lỗi xảy ra, vui lòng thử lại!", "Lỗi");
       }
     });
@@ -353,20 +356,19 @@ getDistrictName(districtCode: string): string {
         return;
     }
 
-    this.selectedTeacher = { ...teacher }; // 🆕 Lưu lại giáo viên đang chỉnh sửa
+    this.selectedTeacher = { ...teacher }; 
 
 
-    //  Tách địa chỉ thành phần riêng (Tỉnh, Quận/Huyện, Địa chỉ cụ thể)
+    
     const addressParts = teacher.diaChi ? teacher.diaChi.split(',').map(part => part.trim()) : ['', '', ''];
-    const provinceName = addressParts[0] || ''; // Thành phố
-    const districtName = addressParts[1] || ''; // Quận/Huyện
-    const detailAddress = addressParts[2] || ''; // Địa chỉ cụ thể
-
-    // Lấy `provinceCode` từ `provinceName`
+    const provinceName = addressParts[0] || ''; 
+    const districtName = addressParts[1] || '';
+    const detailAddress = addressParts[2] || ''; 
+    
+    
     const provinceObj = this.provinces.find(p => p.name === provinceName);
     const provinceCode = provinceObj ? provinceObj.code : '';
 
-    // Gọi danh sách quận/huyện theo tỉnh đã chọn
     this.onProvinceChangeForEdit(provinceCode);
 
     //  Lấy `districtCode` từ `districtName`
@@ -386,7 +388,8 @@ getDistrictName(districtCode: string): string {
         truongDangDay: teacher.truongDangDay,
         province: provinceCode,
         district: districtCode,
-        diaChiCuThe: detailAddress
+        diaChiCuThe: detailAddress,
+        status: teacher.isActive ? true : false
     });
 
     this.isEditModalOpen = true;
