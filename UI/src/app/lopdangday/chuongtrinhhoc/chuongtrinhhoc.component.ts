@@ -33,6 +33,10 @@ export class ChuongtrinhhocComponent implements OnInit {
   loadDanhSachChuongTrinhHoc() {
     this.lopDangHocService.getChuongTrinhLopHoc(this.tenLop).subscribe(
       (response) => {
+        if (response.code === 404) {
+          this.router.navigate(['/pages/error'])
+          return;
+        }
         if (!response.isError) {
           this.chuongTrinhs = response.data;
         } else {

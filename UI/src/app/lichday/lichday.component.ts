@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { LichHocService } from './shared/lichday.service';
 import { LichHocTrongNgay } from './shared/lichday.model';
-
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-lichday',
   templateUrl: './lichday.component.html',
@@ -18,7 +18,8 @@ export class LichDayComponent implements OnInit {
 
   constructor(
     private lichHocService: LichHocService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -62,6 +63,10 @@ export class LichDayComponent implements OnInit {
     this.lichHocService
       .getLichHocGiaoVien(this.selectedWeek, this.selectedYear)
       .subscribe((res) => {
+        if (res.code === 404) {
+          this.router.navigate(['/pages/error'])
+          return;
+        }
         if (!res.isError) {
           this.schedule = res.data.lichHocCaTuans.map((day) => {
             const date = new Date(day.ngay);

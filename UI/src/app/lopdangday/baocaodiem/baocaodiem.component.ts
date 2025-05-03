@@ -27,6 +27,10 @@ export class BaocaodiemComponent implements OnInit {
 
   fetchBaoCaoDiem(): void {
     this.lopService.getBaoCaoDiemHangNgay(this.tenLop).subscribe(res => {
+      if (res.code === 404) {
+        this.router.navigate(['/pages/error'])
+        return;
+      }
       if (res?.data && Array.isArray(res.data)) {
         const diemData = res.data;
 

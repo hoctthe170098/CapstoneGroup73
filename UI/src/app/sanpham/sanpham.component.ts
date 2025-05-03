@@ -43,6 +43,10 @@ export class SanphamComponent implements OnInit {
   }
   getSanPham() {
     this.service.getSanPhamList(this.page).subscribe((res: any) => {
+      if (res.code === 404) {
+        this.router.navigate(['/pages/error'])
+        return;
+      }
       if(!res.IsError){
         this.rows = res.data.items;
         this.columns = [

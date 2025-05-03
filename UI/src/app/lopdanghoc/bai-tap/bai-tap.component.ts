@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { LopdanghocService } from '../shared/lopdanghoc.service';
 import { ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute,Router } from '@angular/router';
 @Component({
   selector: 'app-bai-tap',
   templateUrl: './bai-tap.component.html',
@@ -19,7 +19,8 @@ export class BaiTapComponent implements OnInit {
   constructor(
     private lopdanghocService: LopdanghocService,
     private cdr: ChangeDetectorRef,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -39,6 +40,10 @@ export class BaiTapComponent implements OnInit {
   
     this.lopdanghocService.getBaiTapsForStudent(payload).subscribe({
       next: (res) => {
+        if (res.code === 404) {
+          this.router.navigate(['/pages/error'])
+          return;
+        }
         if (!res.isError && res.data) {
           const items = res.data.items.flatMap((item: any) => item.baiTaps || []);
           this.baiTaps = items;
