@@ -5,6 +5,12 @@
         <div class="drag-drop-box" (drop)="onDropFile($event)" (dragover)="onDragOver($event)">
           <p>Drag your file(s) or <strong>browse</strong></p>
           <input type="file" (change)="onFileSelected($event)" />
+          <div class="template-note">
+            File import có định dạng <strong>.xls</strong> hoặc <strong>.xlsx</strong>. 
+            <a href="assets/templates/template-import-giaovien.xlsx" download class="download-link">
+              Download template file
+            </a>.
+          </div>
         </div>
       </div>
 

@@ -11,7 +11,20 @@
   .choose-file-area {
     margin-bottom: 16px;
   }
+  .template-note {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #555;
   
+    .download-link {
+      color: #007bff;
+      text-decoration: underline;
+  
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
   .drag-drop-box {
     border: 2px dashed #ccc;
     border-radius: 8px;
