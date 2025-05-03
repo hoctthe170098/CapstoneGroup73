@@ -13,9 +13,9 @@
       <tbody>
         <tr *ngFor="let item of lichThi">
           <td>{{ item.ten }}</td>
-          <td>{{ item.ngay }}</td>
+          <td>{{ item.ngayKiemTra | date: 'dd/MM/yyyy' }}</td>
           <td>{{ item.trangThai }}</td>
-          <td>{{ item.diem }}</td>
+          <td>{{ item.diem !== null ? item.diem : 'Chưa có điểm' }}</td>
           <td>{{ item.nhanXet }}</td>
         </tr>
       </tbody>

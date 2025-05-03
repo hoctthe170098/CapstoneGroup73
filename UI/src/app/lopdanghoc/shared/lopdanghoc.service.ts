@@ -135,5 +135,12 @@ export class LopdanghocService {
       { headers }
     );
   }
+  getLichKiemTraVaKetQua(tenLop: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    
+    const url = `${this.baseUrl}/BaiKiemTras/getlichkiemtravaketquachohocsinh?TenLop=${encodeURIComponent(tenLop)}`;
+    return this.http.get<any>(url, { headers });
+  }
   
 }

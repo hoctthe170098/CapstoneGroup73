@@ -13,7 +13,7 @@
                   <h4 class="mb-2 card-title">Đăng nhập</h4>
                   <p>Chào mừng bạn,vui lòng đăng nhập.</p>
                   
-                  <form [formGroup]="loginForm">
+                  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
                     <div class="form-group">
                       <input type="text" formControlName="username" class="form-control" placeholder="Username"
                         [ngClass]="{ 'is-invalid': loginFormSubmitted && lf.username.invalid, 'is-valid': loginFormSubmitted && !lf.username.invalid }"
@@ -42,7 +42,7 @@
                   </div>
                   
                     <div class="d-flex justify-content-center">
-                      <a class="btn btn-primary" (click)="onSubmit()">Đăng nhập</a>
+                      <button type="submit" class="btn btn-primary">Đăng nhập</button>
                   </div>    
                   </form>
                   
