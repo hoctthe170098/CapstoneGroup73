@@ -9,6 +9,7 @@ import { LophocService } from '../shared/lophoc.service';
 import { Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
+import { NgxSpinnerService } from 'ngx-spinner';
 @Component({
   selector: 'app-edit-lophoc',
   templateUrl: './editlophoc.component.html',
@@ -34,7 +35,8 @@ selectedHocSinh: any = null;
     private lophocService: LophocService,
     private cdr: ChangeDetectorRef,
     private toastr: ToastrService,
-    private router: Router
+    private router: Router,
+    private spinner:NgxSpinnerService
   ) {}
 
   ngOnInit(): void {
@@ -213,9 +215,10 @@ selectedHocSinh: any = null;
     };
   
    
-  
+  this.spinner.show();
     this.lophocService.editLichHoc(payload).subscribe({
       next: (res) => {
+        this.spinner.hide();
         if (res?.isError) {
           this.toastr.error(res.message);
         } else {
@@ -224,6 +227,7 @@ selectedHocSinh: any = null;
         }
       },
       error: (err) => {
+        this.spinner.hide();
         this.toastr.error('Lỗi khi gửi dữ liệu đến máy chủ.');
       },
     });

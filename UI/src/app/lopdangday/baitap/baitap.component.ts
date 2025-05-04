@@ -1,15 +1,16 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { LopdangdayService } from '../shared/lopdangday.service';
-import { ToastrService } from 'ngx-toastr';
-import { Input } from '@angular/core';
-import { ActivatedRoute,Router} from '@angular/router';
+import { Component, OnInit, ChangeDetectorRef } from "@angular/core";
+import { LopdangdayService } from "../shared/lopdangday.service";
+import { ToastrService } from "ngx-toastr";
+import { Input } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
+import { NgxSpinnerService } from "ngx-spinner";
 @Component({
-  selector: 'app-baitap',
-  templateUrl: './baitap.component.html',
-  styleUrls: ['./baitap.component.scss']
+  selector: "app-baitap",
+  templateUrl: "./baitap.component.html",
+  styleUrls: ["./baitap.component.scss"],
 })
 export class BaitapComponent implements OnInit {
-  @Input() tenLop: string = '';
+  @Input() tenLop: string = "";
   baiTaps: any[] = [];
   filteredBaiTaps: any[] = [];
   currentPage: number = 1;
@@ -18,34 +19,34 @@ export class BaitapComponent implements OnInit {
 
   isAddModalOpen: boolean = false;
 
-  trangThaiFilter: string = '';
-  
+  trangThaiFilter: string = "";
+
   newBaiTap: any = {
-    tieuDe: '',
-    noiDung: '',
-    gioHetHan: '',
-    files: [] as File[]
+    tieuDe: "",
+    noiDung: "",
+    gioHetHan: "",
+    files: [] as File[],
   };
   formErrors = {
-    thoiGianKetThuc: '',
-    tieuDe: '',
-    noiDung: '',
-    file: ''
+    thoiGianKetThuc: "",
+    tieuDe: "",
+    noiDung: "",
+    file: "",
   };
   constructor(
     private lopdangdayService: LopdangdayService,
     private cdr: ChangeDetectorRef,
     private toastr: ToastrService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private spinner: NgxSpinnerService
   ) {}
 
   ngOnInit(): void {
-  
-    this.route.parent?.paramMap.subscribe(params => {
-      this.tenLop = decodeURIComponent(params.get('tenLop') || '');
-     
-      this.loadBaiTaps(); 
+    this.route.parent?.paramMap.subscribe((params) => {
+      this.tenLop = decodeURIComponent(params.get("tenLop") || "");
+
+      this.loadBaiTaps();
     });
   }
 
@@ -54,35 +55,34 @@ export class BaitapComponent implements OnInit {
       pageNumber: this.currentPage,
       pageSize: this.pageSize,
       tenLop: this.tenLop,
-      trangThai: this.trangThaiFilter || 'all'
+      trangThai: this.trangThaiFilter || "all",
     };
-  
+
     this.lopdangdayService.getBaiTapsForTeacher(payload).subscribe({
       next: (res) => {
         if (res.code === 404) {
-          this.router.navigate(['/pages/error'])
+          this.router.navigate(["/pages/error"]);
           return;
         }
         if (!res.isError && res.data) {
-          const firstItem = res.data.items[0]; 
+          const firstItem = res.data.items[0];
           this.baiTaps = firstItem?.baiTaps || [];
           this.totalPages = res.data.totalPages || 1;
         } else {
           this.baiTaps = [];
           this.totalPages = 1;
         }
-  
+
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Lỗi khi lấy danh sách bài tập:', err);
+        console.error("Lỗi khi lấy danh sách bài tập:", err);
         this.baiTaps = [];
         this.totalPages = 1;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
-  
 
   applyFilter(): void {
     this.currentPage = 1;
@@ -104,11 +104,11 @@ export class BaitapComponent implements OnInit {
   openAddModal(): void {
     this.isAddModalOpen = true;
     this.newBaiTap = {
-      tieuDe: '',
-      noiDung: '',
-      gioHetHan: '',
+      tieuDe: "",
+      noiDung: "",
+      gioHetHan: "",
       files: [],
-      tenLop: 'Lớp toán 6'
+      tenLop: "Lớp toán 6",
     };
   }
 
@@ -121,91 +121,96 @@ export class BaitapComponent implements OnInit {
     this.newBaiTap.files = this.newBaiTap.files.concat(selectedFiles);
 
     if (selectedFiles.length > 0) {
-      this.formErrors.file = '';
+      this.formErrors.file = "";
     }
   }
-  
 
   removeFile(index: number): void {
     this.newBaiTap.files.splice(index, 1);
   }
 
   submitNewBaiTap(): void {
-    this.formErrors = { thoiGianKetThuc: '', tieuDe: '', noiDung: '', file: '' };
+    this.formErrors = {
+      thoiGianKetThuc: "",
+      tieuDe: "",
+      noiDung: "",
+      file: "",
+    };
 
- 
     if (!this.newBaiTap.thoiGianKetThuc) {
-      this.formErrors.thoiGianKetThuc = 'Vui lòng chọn thời gian hết hạn';
+      this.formErrors.thoiGianKetThuc = "Vui lòng chọn thời gian hết hạn";
     }
-  
+
     if (!this.newBaiTap.tieuDe?.trim()) {
-      this.formErrors.tieuDe = 'Tiêu đề không được để trống';
+      this.formErrors.tieuDe = "Tiêu đề không được để trống";
     }
-  
+
     if (!this.newBaiTap.noiDung?.trim()) {
-      this.formErrors.noiDung = 'Nội dung không được để trống';
+      this.formErrors.noiDung = "Nội dung không được để trống";
     }
-  
+
     if (!this.newBaiTap.files || this.newBaiTap.files.length === 0) {
-      this.formErrors.file = 'Vui lòng chọn ít nhất 1 tệp';
+      this.formErrors.file = "Vui lòng chọn ít nhất 1 tệp";
     }
-  
-    const hasError = Object.values(this.formErrors).some(msg => msg !== '');
+
+    const hasError = Object.values(this.formErrors).some((msg) => msg !== "");
     if (hasError) {
       return;
     }
 
     const formData = new FormData();
-    formData.append('CreateBaiTapDto.tenLop', this.tenLop);
-    formData.append('CreateBaiTapDto.tieuDe', this.newBaiTap.tieuDe);
-    formData.append('CreateBaiTapDto.noiDung', this.newBaiTap.noiDung);
-  
-    const validTime = this.newBaiTap.thoiGianKetThuc;
-    formData.append('CreateBaiTapDto.thoiGianKetThuc', validTime);
-  
-    if (this.newBaiTap.files.length > 0) {
-      formData.append('CreateBaiTapDto.taiLieu', this.newBaiTap.files[0]);
-    }
+    formData.append("CreateBaiTapDto.tenLop", this.tenLop);
+    formData.append("CreateBaiTapDto.tieuDe", this.newBaiTap.tieuDe);
+    formData.append("CreateBaiTapDto.noiDung", this.newBaiTap.noiDung);
 
+    const validTime = this.newBaiTap.thoiGianKetThuc;
+    formData.append("CreateBaiTapDto.thoiGianKetThuc", validTime);
+
+    if (this.newBaiTap.files.length > 0) {
+      formData.append("CreateBaiTapDto.taiLieu", this.newBaiTap.files[0]);
+    }
+    this.spinner.show();
     this.lopdangdayService.createBaiTap(formData).subscribe({
       next: (res) => {
+        this.spinner.hide();
         if (!res.isError) {
-          this.toastr.success(res.message || 'Tạo bài tập thành công!');
+          this.toastr.success(res.message || "Tạo bài tập thành công!");
           this.closeAddModal();
           this.loadBaiTaps();
         } else {
-          this.toastr.error(res.message || 'Tạo bài tập thất bại!');
+          this.toastr.error(res.message || "Tạo bài tập thất bại!");
         }
       },
       error: (err) => {
-        this.toastr.error(err?.error?.message || 'Đã xảy ra lỗi!');
-      }
+        this.spinner.hide();
+        this.toastr.error(err?.error?.message || "Đã xảy ra lỗi!");
+      },
     });
   }
-  
 
   confirmDelete(bt: any): void {
-    const confirmed = confirm(`Bạn có chắc chắn muốn xoá bài tập "${bt.tieuDe}"?`);
+    const confirmed = confirm(
+      `Bạn có chắc chắn muốn xoá bài tập "${bt.tieuDe}"?`
+    );
     if (confirmed) {
       this.deleteBaiTap(bt.id);
     }
   }
-  
+
   deleteBaiTap(id: string): void {
     this.lopdangdayService.deleteBaiTap(id).subscribe({
       next: (res) => {
         if (!res.isError) {
-          this.toastr.success(res.message || 'Xoá bài tập thành công!');
+          this.toastr.success(res.message || "Xoá bài tập thành công!");
           this.loadBaiTaps();
         } else {
-          this.toastr.error(res.message || 'Xoá bài tập thất bại!');
+          this.toastr.error(res.message || "Xoá bài tập thất bại!");
         }
       },
       error: (err) => {
-        console.error('Lỗi khi xoá bài tập:', err);
-        this.toastr.error('Đã xảy ra lỗi khi xoá bài tập!');
-      }
+        console.error("Lỗi khi xoá bài tập:", err);
+        this.toastr.error("Đã xảy ra lỗi khi xoá bài tập!");
+      },
     });
   }
-  
 }
