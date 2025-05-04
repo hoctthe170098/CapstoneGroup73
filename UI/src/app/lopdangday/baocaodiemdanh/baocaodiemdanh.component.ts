@@ -1,7 +1,7 @@
 import { Component, OnInit,ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute,Router} from '@angular/router';
 import { LopdangdayService } from '../shared/lopdangday.service';
-
+import { NgxSpinnerService } from 'ngx-spinner';
 @Component({
   selector: 'app-baocaodiemdanh',
   templateUrl: './baocaodiemdanh.component.html',
@@ -21,7 +21,8 @@ export class BaocaodiemdanhComponent implements OnInit {
     private route: ActivatedRoute,
     private lopService: LopdangdayService,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private spinner: NgxSpinnerService
   ) {}
 
   ngOnInit(): void {
@@ -37,8 +38,10 @@ export class BaocaodiemdanhComponent implements OnInit {
   }
 
   layBaoCaoDiemDanh(): void {
+    this.spinner.show();
     this.lopService.getBaoCaoDiemDanh(this.tenLop).subscribe({
       next: (res) => {
+        this.spinner.hide();
         if (res.code === 404) {
           this.router.navigate(['/pages/error'])
           return;
@@ -80,6 +83,7 @@ export class BaocaodiemdanhComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
+        this.spinner.hide();
         console.error('Lỗi lấy báo cáo điểm danh:', err);
         this.danhSachNgay = [];
         this.danhSachHocSinh = [];

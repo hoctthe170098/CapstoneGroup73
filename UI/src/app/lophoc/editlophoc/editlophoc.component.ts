@@ -43,7 +43,7 @@ selectedHocSinh: any = null;
     this.editLopForm = this.fb.group({
       tenLop: ['', [Validators.required, Validators.maxLength(20)]],
       chuongTrinh: [null, Validators.required],
-      hocPhi: [null, [Validators.required, Validators.min(50000)]],
+      hocPhi: [null, [Validators.required, Validators.min(50000), Validators.max(500000)]],
       giaoVien: [null, Validators.required],
       ngayBatDau: ['', [Validators.required, this.validateStartDateAfterToday()]],
       ngayKetThuc: ['', [Validators.required, this.validateEndDate()]],

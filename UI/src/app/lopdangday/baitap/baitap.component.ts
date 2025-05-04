@@ -57,9 +57,10 @@ export class BaitapComponent implements OnInit {
       tenLop: this.tenLop,
       trangThai: this.trangThaiFilter || "all",
     };
-
+    this.spinner.show();
     this.lopdangdayService.getBaiTapsForTeacher(payload).subscribe({
       next: (res) => {
+        this.spinner.hide();
         if (res.code === 404) {
           this.router.navigate(["/pages/error"]);
           return;
@@ -76,6 +77,7 @@ export class BaitapComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
+        this.spinner.hide();
         console.error("Lỗi khi lấy danh sách bài tập:", err);
         this.baiTaps = [];
         this.totalPages = 1;

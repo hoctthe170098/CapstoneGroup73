@@ -4,6 +4,7 @@
     import { CoSoService } from './shared/coso.service';
     import { ToastrService } from 'ngx-toastr';
     import { Router } from '@angular/router';
+    import { NgxSpinnerService } from 'ngx-spinner';
     @Component({
         selector: 'app-coso',
         templateUrl: './coso.component.html',
@@ -32,7 +33,8 @@
             private coSoService: CoSoService,
             private cdr: ChangeDetectorRef,
             private toastr: ToastrService,
-            private router: Router
+            private router: Router,
+            private spinner: NgxSpinnerService
         ) {
             this.addCampusForm = this.fb.group({
                 ten: ['', [Validators.required, Validators.maxLength(30)]],
@@ -81,9 +83,11 @@
         
         // Lấy danh sách cơ sở từ server
         loadDanhSachCoSo() {
+            this.spinner.show();
             this.coSoService.getDanhSachCoSo(this.currentPage, this.itemsPerPage, this.searchText)
                 .subscribe(
                     (res: any) => {
+                        this.spinner.hide();
                         if (res.code === 404) {
                             this.router.navigate(['/pages/error'])
                             return;
@@ -96,6 +100,7 @@
                             this.toastr.error(res.message);
                         }
                     }, err => {
+                        this.spinner.hide();
                         this.toastr.error('Có lỗi xảy ra, vui lòng thử lại!');
                     });
         }
@@ -205,14 +210,16 @@
                 trangThai: 'open',
                 default: false
             };
-
+            this.spinner.show();
             this.coSoService.createCoSo(newCampus).subscribe({
                 next: (res) => {
                     if (!res.isError) {
+                        this.spinner.hide();
                         this.toastr.success(res.message);
                         this.closeModal();
                         this.loadDanhSachCoSo();
                     } else {
+                        this.spinner.hide();
                         this.toastr.error(res.message);
                     }
                 },
@@ -241,7 +248,7 @@
                 district: formData.district,
                 trangThai: formData.isActive ? 'open' : 'close'
               };
-          
+              this.spinner.hide();
               this.coSoService.updateCoSo(updatedCampus).subscribe({
                 next: (res) => {
                   if (!res.isError) {
@@ -253,6 +260,7 @@
                   }
                 },
                 error: () => {
+                this.spinner.hide();    
                   this.toastr.error('Có lỗi xảy ra, vui lòng thử lại!');
                 }
               });

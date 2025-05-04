@@ -3,6 +3,7 @@ import { LophocService } from '../shared/lophoc.service';
 import { formatDate } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { NgxSpinnerService } from 'ngx-spinner';
 @Component({
   selector: 'app-baocaodiemdanhquanlycoso',
   templateUrl: './baocaodiemdanhquanlycoso.component.html',
@@ -21,7 +22,8 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private toastr: ToastrService,
-    private router: Router
+    private router: Router,
+    private spinner: NgxSpinnerService
   ) {}
 
   ngOnInit(): void {
@@ -35,8 +37,10 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
   }
 
   taiBaoCao(ngay?: string) {
+    this.spinner.show();
     this.lophocService.getBaoCaoDiemDanh(this.tenLop, ngay).subscribe(res => {
       if(res.isError){
+        this.spinner.hide();
         if(res.code==404) this.router.navigate(['/pages/error']);
         else this.toastr.error(res.message);
       }else{
@@ -53,6 +57,8 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
         this.toastr.success
         this.cdr.detectChanges();
       }    
+    }, err => {
+      this.spinner.hide(); 
     });
   }
 
@@ -83,8 +89,10 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
       this.toastr.error('Không có học sinh nào được chọn để cập nhật điểm danh.');
       return; 
     }
+    this.spinner.show();
     this.lophocService.updateDiemDanh(payload).subscribe({
       next: (res) => {
+        this.spinner.hide();
         if (!res.isError) {
           this.backupDanhSach = JSON.parse(JSON.stringify(this.danhSachHocSinh));
           this.dangSua = false;
@@ -95,7 +103,7 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
         }
       },
       error: (err) => {
-        // Xử lý lỗi kết nối hoặc lỗi khác
+        this.spinner.hide();
         this.dangSua = false;
         this.cdr.detectChanges();
       }

@@ -1,7 +1,7 @@
 import { Component, OnInit,ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute,Router} from '@angular/router';
 import { LopdangdayService } from '../shared/lopdangday.service';
-
+import { NgxSpinnerService } from 'ngx-spinner';
 @Component({
   selector: 'app-baocaodiem',
   templateUrl: './baocaodiem.component.html',
@@ -12,7 +12,7 @@ export class BaocaodiemComponent implements OnInit {
   students: any[] = [];
   tenLop: string = '';
 
-  constructor(private lopService: LopdangdayService,  private router: Router,private route: ActivatedRoute,private cdr: ChangeDetectorRef) {}
+  constructor(private lopService: LopdangdayService,  private router: Router,private route: ActivatedRoute,private cdr: ChangeDetectorRef,private spinner: NgxSpinnerService) {}
 
   ngOnInit(): void {
     this.route.parent?.paramMap.subscribe(params => {
@@ -26,7 +26,9 @@ export class BaocaodiemComponent implements OnInit {
   }
 
   fetchBaoCaoDiem(): void {
+    this.spinner.show();
     this.lopService.getBaoCaoDiemHangNgay(this.tenLop).subscribe(res => {
+      this.spinner.hide();
       if (res.code === 404) {
         this.router.navigate(['/pages/error'])
         return;

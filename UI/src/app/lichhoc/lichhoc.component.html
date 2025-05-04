@@ -34,7 +34,21 @@
             <div *ngFor="let lesson of day.lops"
                  class="lesson-block"
                  [ngStyle]="getLessonStyle(lesson)">
-              <div class="title">{{ lesson.tenLop }} - {{ lesson.tenChuongTrinh }}</div>
+                 <div class="title">
+                  <a
+                    [routerLink]="[
+                      '/lopdanghoc',
+                      'chi-tiet',
+                      lesson.tenLop,
+                      'bai-tap'
+                    ]"
+                    class="link"
+                  >
+                    {{ lesson.tenLop }}
+                 
+                  - {{ lesson.tenChuongTrinh }}
+                </a>
+                </div>
               <div class="room">{{ lesson.tenPhong }}</div>
               <div class="time">
                 ({{ formatTime(lesson.gioBatDau) }} - {{ formatTime(lesson.gioKetThuc) }})

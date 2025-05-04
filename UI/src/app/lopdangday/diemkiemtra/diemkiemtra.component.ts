@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { KetQuaBaiKiemTra } from '../shared/lopdangday.model';
 import { LopdangdayService } from '../shared/lopdangday.service';
 import { ToastrService } from 'ngx-toastr';
-
+import { NgxSpinnerService } from 'ngx-spinner';
 @Component({
   selector: 'app-diemkiemtra',
   templateUrl: './diemkiemtra.component.html',
@@ -22,7 +22,8 @@ export class DiemkiemtraComponent implements OnInit {
     private router: Router,
     private lopdangdayService: LopdangdayService,
     private cdr: ChangeDetectorRef,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private spinner: NgxSpinnerService
   ) {}
 
   ngOnInit(): void {
@@ -36,8 +37,10 @@ export class DiemkiemtraComponent implements OnInit {
   }
 
   loadKetQua() {
+    this.spinner.show();
     this.lopdangdayService.getKetQuaBaiKiemTraChoGiaoVien(this.baiKiemTraId).subscribe({
       next: res => {
+        this.spinner.hide();
         if (res.code === 404) {
           this.router.navigate(['/pages/error']);
           return;
@@ -48,6 +51,7 @@ export class DiemkiemtraComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: err => {
+        this.spinner.hide();
         console.error(err);
       }
     });
@@ -88,16 +92,18 @@ export class DiemkiemtraComponent implements OnInit {
     }));
 
     const payload = { updateKetQuas: dataToSend };
-
+    this.spinner.show();
     this.lopdangdayService.updateKetQuaBaiKiemTra(payload).subscribe({
       next: res => {
         if (res?.isError) {
+          this.spinner.hide();
           this.toastr.error(res.message || 'Có lỗi xảy ra!');
         } else {
           this.toastr.success(res.message || 'Lưu kết quả thành công!');
         }
       },
       error: err => {
+        this.spinner.hide();
         console.error('Lỗi khi lưu:', err);
         this.toastr.error('Lỗi hệ thống hoặc không thể kết nối.');
       }

@@ -75,11 +75,13 @@ export class ChangePasswordComponent {
         }
         if (res && !res.isError) {
           this.toastr.success('Đổi mật khẩu thành công!', 'Thành công');
-          setTimeout(() => {
-            this.router.navigate(['/pages/change-password']).then(() => {
-              window.location.reload(); // Refresh sau khi hiển thị toast
-            });
-          }, 1500);
+          this.changePasswordForm.reset();
+          this.changePasswordFormSubmitted = false;
+        //   setTimeout(() => {
+        //     this.router.navigate(['/pages/change-password']).then(() => {
+        //       window.location.reload(); // Refresh sau khi hiển thị toast
+        //     });
+        //   }, 250);
         } else if (res.isError && res.message.includes('Incorrect password')) {  
           this.toastr.error('Mật khẩu cũ không đúng!', 'Lỗi');
         } else {

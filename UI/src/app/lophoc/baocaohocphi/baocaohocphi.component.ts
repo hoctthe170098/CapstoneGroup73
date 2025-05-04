@@ -2,6 +2,7 @@ import { Component, OnInit,ChangeDetectorRef } from '@angular/core';
 import { LophocService } from '../shared/lophoc.service';
 import { ActivatedRoute,Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { NgxSpinnerService } from 'ngx-spinner';
 @Component({
   selector: 'app-baocaohocphi',
   templateUrl: './baocaohocphi.component.html',
@@ -18,7 +19,8 @@ export class BaocaohocphiComponent implements OnInit {
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private toastr: ToastrService,
-    private router: Router
+    private router: Router,
+    private spinner: NgxSpinnerService
   ) {}
 
   ngOnInit(): void {
@@ -31,8 +33,10 @@ export class BaocaohocphiComponent implements OnInit {
     });
   }
   loadBaoCao(thang?: number, nam?: number): void {
+    this.spinner.show();
     this.lophocService.getBaoCaoHocPhi(this.tenLop, thang, nam).subscribe(res => {
       if (res.isError) {
+        this.spinner.hide();
         if (res.code === 404) {
           this.router.navigate(['/pages/error']);
         } else {
@@ -60,6 +64,9 @@ export class BaocaohocphiComponent implements OnInit {
   
         this.cdr.detectChanges();
       }
+    }, err => {
+      this.spinner.hide();
+      this.toastr.error('Lỗi khi tải báo cáo học phí!');
     });
   }
   

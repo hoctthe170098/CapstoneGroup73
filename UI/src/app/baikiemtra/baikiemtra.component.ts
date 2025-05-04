@@ -4,7 +4,7 @@ import { BaiKiemTraDto } from './shared/baikiemtra.model';
 import { saveAs } from 'file-saver';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
-
+import { NgxSpinnerService } from 'ngx-spinner';
 @Component({
   selector: 'app-testlist',
   templateUrl: './baikiemtra.component.html',
@@ -51,7 +51,7 @@ export class TestListComponent implements OnInit {
       url: ''
     }
   };
-  constructor(private testlistService: TestlistService,private cdr: ChangeDetectorRef, private toastr: ToastrService, private router: Router) {}
+  constructor(private testlistService: TestlistService,private cdr: ChangeDetectorRef, private toastr: ToastrService, private router: Router,private spinner: NgxSpinnerService) {}
   ngOnInit() {
     this.loadTests();
     this.searchClassByName(''); // load tất cả lớp
@@ -99,10 +99,11 @@ export class TestListComponent implements OnInit {
     const tenLop = this.selectedClass || 'all';  
     const tenBaiKiemTra = this.searchText?.trim() || '';
     ;
-  
+    this.spinner.show();
     this.testlistService.getTests(this.currentPage, this.itemsPerPage, trangThaiToSend, tenLop, tenBaiKiemTra)
       .subscribe({
         next: res => {
+          this.spinner.hide();
           if (res.code === 404) {
             this.router.navigate(['/pages/error'])
             return;
@@ -115,7 +116,7 @@ export class TestListComponent implements OnInit {
             this.cdr.detectChanges();
             return;
           }
-  
+          
           const responseData = res.data;
           this.totalItems = responseData.totalCount || 0;
           this.paginatedList = Array.isArray(responseData.data) ? responseData.data : [];
@@ -124,6 +125,7 @@ export class TestListComponent implements OnInit {
           this.cdr.detectChanges();
         },
         error: err => {
+          this.spinner.hide();
           this.paginatedList = [];
           this.totalItems = 0;
           // Gọi detectChanges() ở trường hợp lỗi
@@ -250,11 +252,12 @@ addTest() {
   formData.append('BaiKiemTraDto.NgayKiemTra', this.newTest.ngayKiemTra);
   formData.append('BaiKiemTraDto.TenLop', this.newTest.tenLop);
   formData.append('BaiKiemTraDto.TaiLieu', this.newTest.taiLieu);
-
+  this.spinner.show();
   this.testlistService.createTest(formData).subscribe({
     next: (res) => {
+      this.spinner.hide();
       if (res?.isError) {
-        this.toastr.error(res.message || 'Tạo bài kiểm tra thất bại.');
+        this.toastr.error(res.message);
         return;
       }
 
@@ -270,12 +273,9 @@ addTest() {
       this.loadTests();
     },
     error: (error) => {
-      const res = error?.error;
-      if (res?.isError) {
-        this.toastr.error(res.message || res.errors?.[0] || 'Tạo bài kiểm tra thất bại!');
-      } else {
+       this.spinner.hide();
         this.toastr.error('Đã xảy ra lỗi không xác định.');
-      }
+    
     }
   });
 }
@@ -342,10 +342,11 @@ addTest() {
   if (this.editTest.taiLieu instanceof File) {
     formData.append('BaiKiemTraDto.TaiLieu', this.editTest.taiLieu);
   }
-
+  this.spinner.show();
   this.testlistService.updateTest(formData).subscribe({
     next: (res) => {
       if (res?.isError) {
+        this.spinner.hide();
         this.toastr.error(res.message || res.errors?.[0] || 'Cập nhật thất bại!');
         return;
       }
@@ -355,12 +356,8 @@ addTest() {
       this.loadTests();
     },
     error: (err) => {
-      const res = err?.error;
-      if (res?.isError) {
-        this.toastr.error(res.message || res.errors?.[0] || 'Cập nhật thất bại!');
-      } else {
-        this.toastr.error('Đã xảy ra lỗi không xác định.');
-      }
+      this.spinner.hide();
+      this.toastr.error('Đã xảy ra lỗi không xác định.');
     }
   });
 }

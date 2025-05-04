@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { LopdanghocService } from '../shared/lopdanghoc.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute,Router } from '@angular/router';
+import { NgxSpinnerService } from 'ngx-spinner';
 @Component({
   selector: 'app-bai-tap',
   templateUrl: './bai-tap.component.html',
@@ -20,7 +21,8 @@ export class BaiTapComponent implements OnInit {
     private lopdanghocService: LopdanghocService,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private spinner: NgxSpinnerService
   ) {}
 
   ngOnInit(): void {
@@ -37,9 +39,10 @@ export class BaiTapComponent implements OnInit {
       tenLop: this.tenLop, 
       trangThai: this.trangThaiFilter || 'all'
     };
-  
+    this.spinner.show();
     this.lopdanghocService.getBaiTapsForStudent(payload).subscribe({
       next: (res) => {
+        this.spinner.hide();
         if (res.code === 404) {
           this.router.navigate(['/pages/error'])
           return;
@@ -55,6 +58,7 @@ export class BaiTapComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
+        this.spinner.hide();
         console.error('Lỗi khi lấy danh sách bài tập:', err);
         this.baiTaps = [];
         this.totalPages = 1;

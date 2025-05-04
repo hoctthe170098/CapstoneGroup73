@@ -66,9 +66,9 @@
           <td>
             <span [class.checked]="test.trangThai === 'Đã kiểm tra'">{{ test.trangThai }}</span></td>
             <td>
-              <span *ngIf="test.coDiem" class="download" (click)="exportKetQua(test.id)">
+              <a *ngIf="test.coDiem" class="download" (click)="exportKetquabaikiemtra(test.id)">
                 Download
-              </span>
+              </a>
               <span *ngIf="!test.coDiem" class="pending">
                 Chưa vào điểm
               </span>

@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { LopdangdayService } from '../shared/lopdangday.service';
 import { Location } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
-
+import { NgxSpinnerService } from 'ngx-spinner';
 @Component({
   selector: 'app-diemdanh',
   templateUrl: './diemdanh.component.html',
@@ -21,7 +21,8 @@ export class DiemdanhComponent implements OnInit {
     private lopService: LopdangdayService,
     private router: Router,
     private location: Location,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private spinner: NgxSpinnerService
   ) {}
 
   ngOnInit(): void {
@@ -35,9 +36,11 @@ export class DiemdanhComponent implements OnInit {
   }
 
   loadDiemDanh(tenLop: string) {
+    this.spinner.show();
     this.lopService.getDiemDanhTheoNgay(tenLop).subscribe(
       (res) => {
         if (res.isError) {
+          this.spinner.hide();
           this.students = [];
           this.isError = true;
           if (res.code === 404) {
@@ -75,6 +78,7 @@ export class DiemdanhComponent implements OnInit {
         this.cdr.detectChanges();
       },
       (err) => {
+        this.spinner.hide();
         this.students = [];
         this.isError = true;
         if (err.status === 404 || err.error?.code === 404) {

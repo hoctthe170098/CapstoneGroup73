@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChuongtrinhService } from '../shared/chuongtrinh.service';
 import { ToastrService } from 'ngx-toastr';
-
+import { NgxSpinnerService } from 'ngx-spinner';
 @Component({
   selector: 'app-editchuongtrinh',
   templateUrl: './editchuongtrinh.component.html',
@@ -30,7 +30,8 @@ export class EditchuongtrinhComponent implements OnInit {
     private router: Router,
     private chuongtrinhService: ChuongtrinhService,
     private cdr: ChangeDetectorRef,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private spinner: NgxSpinnerService
   ) { }
 
   ngOnInit(): void {
@@ -41,12 +42,12 @@ export class EditchuongtrinhComponent implements OnInit {
       
       return;
     }
-
+    this.spinner.show();
     this.chuongtrinhService.getProgramById(this.programId).subscribe({
       next: (response) => {
-       
+        this.spinner.show();
         if (!response) {
-         
+          this.spinner.hide();
           return;
         }
         // Gán dữ liệu vào program
@@ -249,17 +250,20 @@ export class EditchuongtrinhComponent implements OnInit {
     
 
     // Gọi API cập nhật chương trình
+    this.spinner.show();
     this.chuongtrinhService.updateProgram(formData).subscribe({
       next: (response) => {
         if (response.isError) {
-          this.toastr.warning(`❌ Lỗi: ${response.message || "Có lỗi xảy ra!"}`);
+          this.spinner.hide();
+          this.toastr.warning(response.message );
         } else {
           this.toastr.success("Cập nhật chương trình thành công!");
           this.router.navigate(['/chuongtrinh']);
         }
       },
       error: (error) => {
-        alert(`❌ Lỗi khi cập nhật: ${error?.error?.message || "Lỗi không xác định!"}`);
+        this.spinner.hide();
+        this.toastr.warning(error?.error?.message );
       }
     });
   }

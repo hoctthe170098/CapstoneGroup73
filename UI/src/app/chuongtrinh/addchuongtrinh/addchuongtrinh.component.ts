@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ChuongtrinhService } from '../shared/chuongtrinh.service';
 import { ToastrService } from 'ngx-toastr';
-
+import { NgxSpinnerService } from 'ngx-spinner';
 @Component({
   selector: 'app-addchuongtrinh',
   templateUrl: './addchuongtrinh.component.html',
@@ -34,8 +34,12 @@ export class AddchuongtrinhComponent {
   constructor(
     private router: Router,
     private chuongtrinhService: ChuongtrinhService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private spinner: NgxSpinnerService
   ) {}
+  ngOnInit(): void {
+    
+  }
 
   validateField(field: string) {
     const maxLength = field === 'tieuDe' ? 200 : 300;
@@ -195,9 +199,10 @@ export class AddchuongtrinhComponent {
         formData.append(`chuongTrinhDto.noiDungBaiHocs[${i}].taiLieuHocTaps[${j}].file`, file.file);
       });
     });
-
+    this.spinner.show();
     this.chuongtrinhService.addProgram(formData).subscribe({
       next: (response) => {
+        this.spinner.hide();
         if(!response.isError){
           this.toastr.success(response.message);
           this.router.navigate(['/chuongtrinh']);
@@ -206,7 +211,7 @@ export class AddchuongtrinhComponent {
         }
       },
       error: (error) => {
-       
+        this.spinner.hide();
         this.toastr.warning('Lỗi khi thêm chương trình!');
       }
     });

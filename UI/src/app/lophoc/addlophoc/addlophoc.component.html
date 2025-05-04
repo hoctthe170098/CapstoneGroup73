@@ -60,6 +60,10 @@
                 *ngIf="themLopForm.get('hocPhi').touched && themLopForm.get('hocPhi').hasError('min')">
                 Học phí phải lớn hơn hoặc bằng 50.000!
               </small>
+              <small class="text-danger"
+                *ngIf="themLopForm.get('hocPhi').touched && themLopForm.get('hocPhi').hasError('max')">
+                Học phí phải nhỏ hơn hoặc bằng 500.000!
+              </small>
             </div>
           </div>
 

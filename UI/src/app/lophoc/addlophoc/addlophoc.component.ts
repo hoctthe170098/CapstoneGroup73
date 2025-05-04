@@ -33,7 +33,7 @@ export class AddlophocComponent implements OnInit {
     this.themLopForm = this.fb.group({
       tenLop: ["", [Validators.required, Validators.maxLength(20)]], // Giới hạn 20 ký tự
       chuongTrinh: [null, Validators.required],
-      hocPhi: [null, [Validators.required, Validators.min(50000)]], // Học phí phải >= 400.000
+      hocPhi: [null, [Validators.required, Validators.min(50000),Validators.max(500000)]], // Học phí phải >= 50.000 <=500000
       giaoVien: [null, Validators.required],
       ngayBatDau: ["", [Validators.required, this.validateStartDate]], // Ngày bắt đầu từ hôm nay trở đi
       ngayKetThuc: ["", [Validators.required, this.validateEndDate.bind(this)]], // Ngày kết thúc sau 2 tháng
@@ -159,14 +159,14 @@ export class AddlophocComponent implements OnInit {
           ngayBatDau: formValue.ngayBatDau,
           ngayKetThuc: formValue.ngayKetThuc,
           hocPhi: formValue.hocPhi,
-          giaoVienCode: formValue.giaoVien.code, // đảm bảo có đúng field này
+          giaoVienCode: formValue.giaoVien.code, 
           chuongTrinhId: formValue.chuongTrinh.id,
           lichHocs: lichHocs,
         },
       };
 
 
-
+      this.spinner.show();
       this.lophocService.createLichHocCoDinh(payload).subscribe(
         (res: any) => {
           this.spinner.hide();

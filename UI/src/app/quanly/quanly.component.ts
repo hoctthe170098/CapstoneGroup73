@@ -199,7 +199,7 @@ export class AccountmanagerComponent implements OnInit {
       error => {
         this.spinner.hide();
         this.toastr.error('Lỗi khi thêm nhân viên. Vui lòng kiểm tra kết nối hoặc dữ liệu!');
-        console.error('❌ API thêm nhân viên lỗi:', error);
+        
       }
     );
   }
