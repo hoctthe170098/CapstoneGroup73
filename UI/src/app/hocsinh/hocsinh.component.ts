@@ -335,7 +335,7 @@ isEditModalOpen: boolean = false;
   loadDanhSachHocSinh() {
     let isActiveFilter: boolean | null = this.trangThai === 'Hoạt động' ? true : this.trangThai === 'Tạm ngừng' ? false : null;
 
-    this.hocSinhService.getDanhSachHocSinh(this.currentPage, this.pageSize, this.searchTerm, '', isActiveFilter, '')
+    this.hocSinhService.getDanhSachHocSinh(this.currentPage, this.pageSize, this.searchTerm, '', isActiveFilter, this.lop)
       .subscribe(response => {
 
         if (!response.isError && response.data && response.data.items) {
