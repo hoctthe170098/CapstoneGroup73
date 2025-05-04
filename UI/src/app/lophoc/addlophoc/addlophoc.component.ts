@@ -13,17 +13,17 @@ export class AddlophocComponent implements OnInit {
   phongList: any[] = [];
   // Dữ liệu mẫu, có thể thay bằng dữ liệu từ API
   chuongTrinhList: any[] = [];
-  
+
   giaoVienList: any[] = [];
 
-  constructor(private fb: FormBuilder,private lophocService: LophocService,private toastr: ToastrService, private router: Router) {}
+  constructor(private fb: FormBuilder, private lophocService: LophocService, private toastr: ToastrService, private router: Router) { }
 
   ngOnInit(): void {
     this.fetchPhongs(); // Gọi API lấy danh sách phòng
     this.fetchGiaoViens(); // Gọi API lấy danh sách giáo viên
     this.fetchChuongTrinhs();
-     
-   
+
+
     this.themLopForm = this.fb.group({
       tenLop: ['', [Validators.required, Validators.maxLength(20)]], // Giới hạn 20 ký tự
       chuongTrinh: [null, Validators.required],
@@ -48,13 +48,13 @@ export class AddlophocComponent implements OnInit {
           }
         } else if (!res.isError) {
           this.chuongTrinhList = res.data;
-         
+
         } else {
-          
+
         }
       },
       (err) => {
-       
+
       }
     );
   }
@@ -63,13 +63,13 @@ export class AddlophocComponent implements OnInit {
       (response) => {
         if (!response.isError) {
           this.phongList = response.data;
-         
+
         } else {
-          
+
         }
       },
       (error) => {
-        
+
       }
     );
   }
@@ -77,22 +77,22 @@ export class AddlophocComponent implements OnInit {
     const requestPayload = {
       searchTen: searchTen // Có thể truyền giá trị tìm kiếm, nếu không mặc định rỗng
     };
-  
+
     this.lophocService.getGiaoViens(requestPayload).subscribe(
       (response) => {
         if (!response.isError) {
           this.giaoVienList = response.data; // Giả sử API trả về danh sách trực tiếp trong response.data
-          
+
         } else {
-          
+
         }
       },
       (error) => {
-        
+
       }
     );
   }
-  
+
 
   // Tạo getter để truy cập FormArray lichHoc
   get lichHoc(): FormArray {
@@ -107,28 +107,28 @@ export class AddlophocComponent implements OnInit {
       gioKetThuc: ['', [Validators.required, this.validateTimeEnd]],
       phong: [null, Validators.required]
     }, { validators: this.validateTimeRange }); // 👈 Thêm validator ở đây
-  
+
     return group;
   }
-   
+
 
   // Thêm 1 dòng lịch học
   addSchedule(): void {
-  const newSchedule = this.createSchedule();
-  
-  // Lấy giá trị của các lịch học đã có
-  const existingDays = this.lichHoc.controls
-    .map(control => control.get('thu')?.value)
-    .filter(value => value); // Loại bỏ giá trị null hoặc ""
+    const newSchedule = this.createSchedule();
 
-  // Nếu giá trị mới không phải null hoặc rỗng thì mới kiểm tra trùng lặp
-  if (newSchedule.get('thu')?.value && existingDays.includes(newSchedule.get('thu')?.value)) {
-    alert('Thứ này đã tồn tại trong lịch học!');
-    return;
+    // Lấy giá trị của các lịch học đã có
+    const existingDays = this.lichHoc.controls
+      .map(control => control.get('thu')?.value)
+      .filter(value => value); // Loại bỏ giá trị null hoặc ""
+
+    // Nếu giá trị mới không phải null hoặc rỗng thì mới kiểm tra trùng lặp
+    if (newSchedule.get('thu')?.value && existingDays.includes(newSchedule.get('thu')?.value)) {
+      alert('Thứ này đã tồn tại trong lịch học!');
+      return;
+    }
+
+    this.lichHoc.push(newSchedule);
   }
-
-  this.lichHoc.push(newSchedule);
-}
 
 
   // Xóa 1 dòng lịch học theo index
@@ -140,14 +140,14 @@ export class AddlophocComponent implements OnInit {
   onSubmit(): void {
     if (this.themLopForm.valid) {
       const formValue = this.themLopForm.value;
-  
+
       const lichHocs = formValue.lichHoc.map((lich: any) => ({
         thu: parseInt(lich.thu),
         phongId: lich.phong.id,
         gioBatDau: lich.gioBatDau,
         gioKetThuc: lich.gioKetThuc
       }));
-  
+
       const payload = {
         lopHocDto: {
           tenLop: formValue.tenLop,
@@ -159,9 +159,9 @@ export class AddlophocComponent implements OnInit {
           lichHocs: lichHocs
         }
       };
-  
-     
-  
+
+
+
       this.lophocService.createLichHocCoDinh(payload).subscribe(
         (res: any) => {
           if (res.isError) {
@@ -179,9 +179,9 @@ export class AddlophocComponent implements OnInit {
       this.themLopForm.markAllAsTouched();
     }
   }
-  
-  
-  
+
+
+
 
   // Xử lý hủy
   onCancel(): void {
@@ -192,10 +192,10 @@ export class AddlophocComponent implements OnInit {
     if (!control.value) return null;
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Đặt thời gian về 00:00 để so sánh chỉ theo ngày
-  
+
     const startDate = new Date(control.value);
     startDate.setHours(0, 0, 0, 0); // Đặt thời gian về 00:00 để so sánh chính xác
-  
+
     if (startDate < today) {
       return { invalidStartDate: true };
     }
@@ -240,21 +240,21 @@ export class AddlophocComponent implements OnInit {
   validateTimeRange(group: AbstractControl): { [key: string]: any } | null {
     const start = group.get('gioBatDau')?.value;
     const end = group.get('gioKetThuc')?.value;
-  
+
     if (!start || !end) return null;
-  
+
     const [startHour, startMinute] = start.split(':').map(Number);
     const [endHour, endMinute] = end.split(':').map(Number);
-  
+
     const startTime = startHour * 60 + startMinute;
     const endTime = endHour * 60 + endMinute;
-  
-    if (endTime - startTime < 60) {
+
+    if (endTime - startTime < 120) {
       return { invalidTimeRange: true };
     }
-  
+
     return null;
   }
-  
+
 }
 

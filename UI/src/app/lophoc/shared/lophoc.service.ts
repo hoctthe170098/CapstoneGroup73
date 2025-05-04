@@ -158,7 +158,7 @@ export class LophocService {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.post<any>(`${environment.apiURL}/DiemDanhs/updatediemdanh`, payload, { headers });
   }
-  getBaoCaoHocPhi(tenLop: string, thang?: number) {
+  getBaoCaoHocPhi(tenLop: string, thang?: number, nam?: number) {
     const token = localStorage.getItem('token'); // đảm bảo bạn đã login và lưu token
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
@@ -166,7 +166,9 @@ export class LophocService {
     if (thang !== undefined) {
       params = params.set('Thang', thang.toString());
     }
-
+    if (nam !== undefined) {
+      params = params.set('Nam', nam.toString());
+    }
     return this.http.get<any>(`${this.diemdanhUrrl}/getbaocaohocphi`, { params, headers });
   }
 }

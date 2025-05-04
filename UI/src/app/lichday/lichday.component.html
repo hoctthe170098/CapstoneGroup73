@@ -32,7 +32,21 @@
           <div class="hour-line" *ngFor="let hour of hours"></div>
 
           <div *ngFor="let lesson of day.lops" class="lesson-block" [ngStyle]="getLessonStyle(lesson)">
-            <div class="title">{{ lesson.tenLop }} - {{ lesson.tenChuongTrinh }}</div>
+            <div class="title">
+              <a
+                [routerLink]="[
+                  '/lopdangday',
+                  'chi-tiet',
+                  lesson.tenLop,
+                  'danhsachhocsinh'
+                ]"
+                class="link"
+              >
+                {{ lesson.tenLop }}
+             
+              - {{ lesson.tenChuongTrinh }}
+            </a>
+            </div>
             <div class="room">{{ lesson.tenPhong }}</div>
             <div class="time">
               ({{ formatTime(lesson.gioBatDau) }} - {{ formatTime(lesson.gioKetThuc) }})

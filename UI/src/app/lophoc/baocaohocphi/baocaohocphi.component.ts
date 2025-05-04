@@ -9,10 +9,10 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class BaocaohocphiComponent implements OnInit {
   baoCaoHocPhi: any;
-  danhSachThang: number[] = [];
-  selectedThang?: number;
+  danhSachThang: { thang: number; nam: number }[] = [];
+  selectedThangNam: { thang: number; nam: number } | null = null;
   tenLop: string = ''; 
-
+  
   constructor(
     private lophocService: LophocService,
     private route: ActivatedRoute,
@@ -30,8 +30,8 @@ export class BaocaohocphiComponent implements OnInit {
       }
     });
   }
-  loadBaoCao(thang?: number): void {
-    this.lophocService.getBaoCaoHocPhi(this.tenLop, thang).subscribe(res => {
+  loadBaoCao(thang?: number, nam?: number): void {
+    this.lophocService.getBaoCaoHocPhi(this.tenLop, thang, nam).subscribe(res => {
       if (res.isError) {
         if (res.code === 404) {
           this.router.navigate(['/pages/error']);
@@ -40,18 +40,35 @@ export class BaocaohocphiComponent implements OnInit {
         }
       } else {
         this.baoCaoHocPhi = res.data;
-        this.danhSachThang = [];
-        for (let i = this.baoCaoHocPhi.thangBatDau; i <= this.baoCaoHocPhi.thangKetThuc; i++) {
-          this.danhSachThang.push(i);
-        }
-        this.selectedThang = this.baoCaoHocPhi.thang;
+  
+        // map danh sách tháng-năm
+        this.danhSachThang = res.data.thangNams.map((tn: any) => ({
+          thang: tn.thang,
+          nam: tn.nam
+        }));
+  
+        // gán selected ban đầu
+        this.danhSachThang = res.data.thangNams.map((tn: any) => ({
+          thang: tn.thang,
+          nam: tn.nam
+        }));
+        
+        const selected = this.danhSachThang.find(
+          t => t.thang === res.data.thang && t.nam === res.data.nam
+        );
+        this.selectedThangNam = selected ?? null;
+  
         this.cdr.detectChanges();
       }
     });
   }
   
+  
 
-  onThangChange(): void {
-    this.loadBaoCao(this.selectedThang);
+  onThangNamChange(): void {
+    if (this.selectedThangNam) {
+      this.loadBaoCao(this.selectedThangNam.thang, this.selectedThangNam.nam);
+    }
   }
+  
 }
