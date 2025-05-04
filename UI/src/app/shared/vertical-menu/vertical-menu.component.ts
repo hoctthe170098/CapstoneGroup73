@@ -14,6 +14,7 @@ import { Subscription } from 'rxjs';
 import { LayoutService } from '../services/layout.service';
 import { Subject } from 'rxjs';
 import { UserService } from "app/pages/content-pages/shared/user.service";
+import { UserRole } from "app/pages/content-pages/shared/user.model";
 
 @Component({
   selector: "app-sidebar",
@@ -37,6 +38,7 @@ export class VerticalMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   private ngUnsubscribe = new Subject<void>();
 
   constructor(
+    private authService: UserService,
     private router: Router,
     public translate: TranslateService,
     private layoutService: LayoutService,
@@ -154,5 +156,19 @@ export class VerticalMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
+  }
+  clickLogo(){
+    var role = this.authService.getRoleNames()[0];
+    if(role==UserRole.Administrator)
+    this.router.navigate(['/coso']);
+  else if(role==UserRole.CampusManager){
+    this.router.navigate(['/lophoc']);
+  }else if(role==UserRole.LearningManager){
+    this.router.navigate(['/chuongtrinh']);
+  }else if(role==UserRole.Teacher){
+    this.router.navigate(['/lopdangday']);
+  }else if(role==UserRole.Student){
+    this.router.navigate(['/lopdanghoc']);
+  }else this.router.navigate(['/'])
   }
 }

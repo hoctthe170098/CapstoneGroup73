@@ -10,6 +10,7 @@ public record GetBaoCaoHocPhiChoTungLopQuery : IRequest<Output>
 {
     public required string TenLop { get; set; }
     public int? Thang { get; set; }
+    public int? Nam { get; set; }
 }
 public class GetBaoCaoHocPhiChoTungLopQueryHandler : IRequestHandler<GetBaoCaoHocPhiChoTungLopQuery, Output>
 {
@@ -29,6 +30,8 @@ public class GetBaoCaoHocPhiChoTungLopQueryHandler : IRequestHandler<GetBaoCaoHo
     }
     public async Task<Output> Handle(GetBaoCaoHocPhiChoTungLopQuery request, CancellationToken cancellationToken)
     {
+        if ((request.Thang == null && request.Nam != null) 
+            || (request.Thang != null && request.Nam == null)) throw new FormatException(); 
         Output output = new Output
         {
             isError = false,
@@ -67,16 +70,46 @@ public class GetBaoCaoHocPhiChoTungLopQueryHandler : IRequestHandler<GetBaoCaoHo
             if (hocBu.NgayHocGoc < ngayHienTai) NgayDaHoc.Remove((DateOnly)hocBu.NgayHocGoc);
             if (hocBu.NgayBatDau < ngayHienTai) NgayDaHoc.Add(hocBu.NgayBatDau);
         }
+        if (!NgayDaHoc.Any()) throw new Exception("Lớp học này chưa học buổi nào.");
+        var monthYearFirstOccurrence = new Dictionary<ThangNamDto, DateOnly>();
+        foreach (var day in NgayDaHoc)
+        {
+            ThangNamDto ThangNam = new ThangNamDto
+            {
+                Thang = day.Month,
+                Nam = day.Year
+            };
+            if (!monthYearFirstOccurrence.ContainsKey(ThangNam))
+            {
+                monthYearFirstOccurrence.Add(ThangNam, day); // Lưu ngày đầu tiên gặp của tháng-năm
+            }
+        }
+        // 2. Sắp xếp các cặp tháng-năm dựa trên ngày xuất hiện đầu tiên
+        var sortedMonthYears = monthYearFirstOccurrence.OrderBy(pair => pair.Value)
+                                                        .Select(pair => pair.Key)
+                                                        .ToList();
         var ThangDaHoc = NgayDaHoc.Select(ng => ng.Month).Distinct().OrderBy(th => th).ToList();
         int ThangCanLay = 0;
-        if (request.Thang == null) ThangCanLay = ThangDaHoc[0];
-        else ThangCanLay = (int)request.Thang;
-        var NgayCanLays = NgayDaHoc.Where(ng=>ng.Month == ThangCanLay).ToList();
+        int NamCanLay = 0;
+        if (request.Thang == null&&request.Nam==null)
+        {
+            ThangCanLay = sortedMonthYears[0].Thang;
+            NamCanLay = sortedMonthYears[0].Nam;
+        }
+        else
+        {
+            var ThangNamCanLay = sortedMonthYears
+                .FirstOrDefault(t => t.Thang == request.Thang && t.Nam == request.Nam);
+            if (ThangNamCanLay == null) throw new NotFoundDataException();
+            ThangCanLay = ThangNamCanLay.Thang;
+            NamCanLay = ThangNamCanLay.Nam;
+        }
+        var NgayCanLays = NgayDaHoc.Where(ng=>ng.Month == ThangCanLay&&ng.Year==NamCanLay).ToList();
         var data = new BaoCaoHocPhiDto
         {
             Thang = ThangCanLay,
-            ThangBatDau = ThangDaHoc[0],
-            ThangKetThuc = ThangDaHoc[ThangDaHoc.Count - 1],
+            Nam = NamCanLay,
+            ThangNams = sortedMonthYears.ToList(),
             HocPhis = new List<HocPhiDto>()
         };
         List<HocPhiDto> hocPhis = new List<HocPhiDto>();

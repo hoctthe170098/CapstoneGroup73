@@ -34,8 +34,6 @@ public class CreateChuongTrinhCommandHandler : IRequestHandler<CreateChuongTrinh
 
     public async Task<Output> Handle(CreateChuongTrinhCommand request, CancellationToken cancellationToken)
     {
-        try
-        {
             var chuongTrinhDto = request.ChuongTrinhDto;
             var chuongTrinh = new ChuongTrinh
             {
@@ -102,9 +100,4 @@ public class CreateChuongTrinhCommandHandler : IRequestHandler<CreateChuongTrinh
                 message = "Tạo chương trình mới thành công"
             };
         }
-        catch
-        {
-            throw new WrongInputException();
-        }
     }
-}

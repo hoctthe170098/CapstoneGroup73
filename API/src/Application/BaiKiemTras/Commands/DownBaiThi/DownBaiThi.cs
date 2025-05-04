@@ -29,7 +29,7 @@ public class DownBaiThiCommandHandler : IRequestHandler<DownBaiThiCommand, Outpu
         _context = Guard.Against.Null(context);
         _webHostEnvironment = Guard.Against.Null(webHostEnvironment);
         _logger = Guard.Against.Null(logger);
-        _uploadFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "baikiemtras");
+        _uploadFolderPath = Path.Combine(_webHostEnvironment.ContentRootPath, "baikiemtras");
         if (!Directory.Exists(_uploadFolderPath))
         {
             Directory.CreateDirectory(_uploadFolderPath);

@@ -97,7 +97,6 @@ public class GetHocSinhsWithPaginationQueryHandler
                     .Select(tg => tg.HocSinhCode)
                     .Distinct()
                     .ToListAsync();
-
                 query = query.Where(hs => hocSinhCodesInClass.Contains(hs.Code));
             }
 

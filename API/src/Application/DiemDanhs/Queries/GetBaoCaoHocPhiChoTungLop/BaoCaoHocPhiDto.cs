@@ -9,9 +9,9 @@ namespace StudyFlow.Application.DiemDanhs.Queries.GetBaoCaoHocPhiChoTungLop
     public class BaoCaoHocPhiDto
     {
         public int Thang { get; set; }
+        public int Nam {  get; set; }
         public List<HocPhiDto> HocPhis { get; set; } = new List<HocPhiDto>();
-        public int ThangBatDau { get; set; }
-        public int ThangKetThuc {  get; set; }
+        public required List<ThangNamDto> ThangNams { get; set; } 
     }
     public class HocPhiDto
     {

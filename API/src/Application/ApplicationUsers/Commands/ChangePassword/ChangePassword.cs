@@ -30,7 +30,8 @@ namespace StudyFlow.Application.ApplicationUsers.Commands.ChangePassword;
             ||string.IsNullOrWhiteSpace(request.newPassword)) throw new NotFoundDataException();
         else
         {
-            if (!IsValidPassword(request.newPassword)) throw new FormatException();
+            if (!IsValidPassword(request.newPassword)) 
+                throw new Exception("Mật khẩu phải có 8 ký tự, trong đó ít nhất  1 ký tự hoa, 1 ký tự thường, 1 chữ số và 1 ký tự đặc biệt. ");
             return await _identityService
                 .ChangePassword(request.token,request.oldPassword, request.newPassword);
         }
