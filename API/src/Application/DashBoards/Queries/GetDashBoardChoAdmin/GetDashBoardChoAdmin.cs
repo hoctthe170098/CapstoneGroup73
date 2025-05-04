@@ -63,7 +63,8 @@ public class GetDashBoardChoAdminQueryHandler : IRequestHandler<GetDashBoardChoA
         }
         var TongSoDiemDanhNghi = _context.DiemDanhs.Where(dd => dd.TrangThai == "Vắng").Count();
         var TongSoDiemDanh = _context.DiemDanhs.Count();
-        TiLeDiemDanh = TongSoDiemDanhNghi * 100 / TongSoDiemDanh;
+        if (TongSoDiemDanh == 0) TiLeDiemDanh = 0;
+        else TiLeDiemDanh = TongSoDiemDanhNghi * 100 / TongSoDiemDanh;
         var listChinhSach = _context.ChinhSaches.ToList();
         var ChiaTheoChinhSach = new List<ChinhSachDto>();
         foreach(var chinhSach in listChinhSach)

@@ -28,7 +28,7 @@ public class DowntaiLieuHocTapCommandHandler : IRequestHandler<DowntaiLieuHocTap
         _context = Guard.Against.Null(context);
         _webHostEnvironment = Guard.Against.Null(webHostEnvironment);
         _logger = Guard.Against.Null(logger);
-        _uploadFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+        _uploadFolderPath = Path.Combine(_webHostEnvironment.ContentRootPath, "uploads");
         if (!Directory.Exists(_uploadFolderPath))
         {
             Directory.CreateDirectory(_uploadFolderPath);

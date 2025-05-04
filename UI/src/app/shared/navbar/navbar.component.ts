@@ -9,6 +9,7 @@ import { FormControl } from '@angular/forms';
 import { LISTITEMS } from '../data/template-search';
 import { Router } from '@angular/router';
 import { UserService } from 'app/pages/content-pages/shared/user.service';
+import { UserRole } from 'app/pages/content-pages/shared/user.model';
 
 @Component({
   selector: "app-navbar",
@@ -244,9 +245,6 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   }
-
-
-
   toggleSidebar() {
     this.layoutService.toggleSidebarSmallScreen(this.hideSidebar);
   }

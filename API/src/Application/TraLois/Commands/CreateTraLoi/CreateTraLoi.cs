@@ -114,7 +114,7 @@ public class CreateTraLoiCommandHandler : IRequestHandler<CreateTraLoiCommand, O
     {
         try
         {
-            var uploadsFolder = Path.Combine(_env.ContentRootPath, "traloi-files");
+            var uploadsFolder = Path.Combine(_env.ContentRootPath, "tralois");
             if (!Directory.Exists(uploadsFolder))
                 Directory.CreateDirectory(uploadsFolder);
 
@@ -124,7 +124,7 @@ public class CreateTraLoiCommandHandler : IRequestHandler<CreateTraLoiCommand, O
             using var stream = new FileStream(filePath, FileMode.Create);
             await file.CopyToAsync(stream, cancellationToken);
 
-            return "/traloi-files/" + fileName;
+            return "/tralois/" + fileName;
         }
         catch (IOException ex)
         {

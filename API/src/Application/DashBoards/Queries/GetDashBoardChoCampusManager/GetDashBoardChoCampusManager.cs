@@ -116,7 +116,8 @@ public class GetDashBoardChoCampusManagerQueryHandler : IRequestHandler<GetDashB
             .Where(dd => dd.TrangThai == "Vắng" && dd.ThamGiaLopHoc.LichHoc.Phong.CoSoId == coSoId).CountAsync();
         var TongSoDiemDanh = await _context.DiemDanhs
             .Where(dd => dd.ThamGiaLopHoc.LichHoc.Phong.CoSoId == coSoId).CountAsync();
-        TiLeDiemDanh = SoDiemDanhNghi * 100 / TongSoDiemDanh;
+        if (TongSoDiemDanh == 0) TiLeDiemDanh = 0;
+        else TiLeDiemDanh = SoDiemDanhNghi * 100 / TongSoDiemDanh;
         var Phong = _context.Phongs.Where(p => p.CoSoId == coSoId).ToList();
         foreach (var p in Phong)
         {

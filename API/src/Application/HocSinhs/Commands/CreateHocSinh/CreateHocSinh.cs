@@ -64,10 +64,10 @@ public class CreateHocSinhCommandHandler : IRequestHandler<CreateHocSinhCommand,
             throw new FormatException("Ngày sinh không hợp lệ. Định dạng phải là yyyy-MM-dd");
         }
         // Validate NgaySinh (Date of Birth) is at least 18 years old
-        var fiveYearsAgo = DateOnly.FromDateTime(DateTime.Now.AddYears(-5));
+        var fiveYearsAgo = DateOnly.FromDateTime(DateTime.Now.AddYears(-10));
         if (ngaySinh > fiveYearsAgo)
         {
-            throw new WrongInputException("Học sinh phải đủ 5 tuổi trở lên");
+            throw new WrongInputException("Học sinh phải đủ 10 tuổi trở lên");
         }
         Guid coSoId = _identityService.GetCampusId(token);
         if (coSoId == Guid.Empty)

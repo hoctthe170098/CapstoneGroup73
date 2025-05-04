@@ -11,7 +11,7 @@ export class HocSinhService {
 
   private provinceApiUrl = 'https://provinces.open-api.vn/api/?depth=2';
   private baseUrl = `${environment.apiURL}/HocSinhs`;
-  private CHINH_SACH_URL = 'https://localhost:5001/api/ChinhSachs';
+  private CHINH_SACH_URL = `${environment.apiURL}/ChinhSachs`;
   constructor(private http: HttpClient) {}
 
 
@@ -86,7 +86,7 @@ getDanhSachLopTheoTen(tenLop: string): Observable<any> {
   const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
   return this.http.get<any>(
-    `https://localhost:5001/api/LichHocs/gettenlophocbyname?TenLop=${encodeURIComponent(tenLop)}`,
+    `${environment.apiURL}/LichHocs/gettenlophocbyname?TenLop=${encodeURIComponent(tenLop)}`,
     { headers }
   );
 }

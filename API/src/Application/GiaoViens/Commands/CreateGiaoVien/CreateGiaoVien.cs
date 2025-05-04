@@ -68,7 +68,7 @@ public class CreateGiaoVienCommandHandler : IRequestHandler<CreateGiaoVienComman
         var eighteenYearsAgo = DateOnly.FromDateTime(DateTime.Now.AddYears(-18));
         if (ngaySinh > eighteenYearsAgo)
         {
-            throw new WrongInputException("Giáo viên phải đủ 18 tuổi trở lên");
+            throw new Exception("Giáo viên phải đủ 18 tuổi trở lên");
         }
         Guid coSoId = _identityService.GetCampusId(token);
         if(coSoId == Guid.Empty)
@@ -79,7 +79,7 @@ public class CreateGiaoVienCommandHandler : IRequestHandler<CreateGiaoVienComman
         if (request.Code.Length > 20 || request.Ten.Length > 50 || request.DiaChi.Length > 100
             ||request.TruongDangDay.Length>100)
         {
-            throw new WrongInputException("Độ dài dữ liệu không hợp lệ!");
+            throw new Exception("Độ dài dữ liệu không hợp lệ!");
         }
         // Validate phone number 
         if (!string.IsNullOrEmpty(request.SoDienThoai))
@@ -106,13 +106,13 @@ public class CreateGiaoVienCommandHandler : IRequestHandler<CreateGiaoVienComman
         var emailExists = await _context.GiaoViens.AnyAsync(nv => nv.Email == request.Email, cancellationToken);
         if (phoneExists || emailExists)
         {
-            throw new WrongInputException($"Số điện thoại hoặc email đã tồn tại");
+            throw new Exception($"Số điện thoại hoặc email đã tồn tại");
         }
         // Validate Code not duplicate
         var exists = await _context.GiaoViens.AnyAsync(gv => gv.Code.Substring(2) == request.Code, cancellationToken);
         if (exists)
         {
-            throw new WrongInputException($"Mã giáo viên '{request.Code}' đã tồn tại!");
+            throw new Exception($"Mã giáo viên '{request.Code}' đã tồn tại!");
         }
         // Create identity user     
         var (result, userId) = await _identityService
