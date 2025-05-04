@@ -86,7 +86,7 @@ getDanhSachLopTheoTen(tenLop: string): Observable<any> {
   const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
   return this.http.get<any>(
-    `https://localhost:5001/api/LichHocs/gettenlophocbyname?TenLop=${encodeURIComponent(tenLop)}`,
+    `${environment.apiURL}/LichHocs/gettenlophocbyname?TenLop=${encodeURIComponent(tenLop)}`,
     { headers }
   );
 }
