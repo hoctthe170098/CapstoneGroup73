@@ -251,7 +251,7 @@ isEditModalOpen: boolean = false;
       code: ['', [Validators.required, Validators.maxLength(18)]],
       ten: ['', [Validators.required, Validators.maxLength(50)]],
       gioiTinh: ['Nam', Validators.required],
-      ngaySinh: ['', [Validators.required]],
+      ngaySinh: ['', [Validators.required, this.validateAge]],
       email: ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
       soDienThoai: ['', [Validators.required, Validators.pattern(/^0\d{9,10}$/)]],
       truongDangHoc: ['', Validators.required, Validators.maxLength(50)],
@@ -265,7 +265,7 @@ isEditModalOpen: boolean = false;
       code: [''], 
       ten: ['', [Validators.required, Validators.maxLength(50)]],
       gioiTinh: ['Nam', Validators.required],
-      ngaySinh: ['', [Validators.required]],
+      ngaySinh: ['', [Validators.required, this.validateAge]],
       email: ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
       soDienThoai: ['', [Validators.required, Validators.pattern(/^0\d{9,10}$/)]],
       truongDangHoc: ['', [Validators.required, Validators.maxLength(50)]],
@@ -318,7 +318,21 @@ isEditModalOpen: boolean = false;
       }
     );
   }
-
+  validateAge(control: any) {
+    if (!control.value) return null;
+  
+    const birthDate = new Date(control.value);
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const dayDiff = today.getDate() - birthDate.getDate();
+  
+    const isBirthdayPassed = monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0);
+    const realAge = isBirthdayPassed ? age : age - 1;
+  
+    return realAge >= 10 ? null : { ageTooYoung: true };
+  }
+  
   onProvinceChange(provinceCode: string) {
     const selectedProvince = this.provinces.find(p => p.code == provinceCode);
     this.districts = selectedProvince ? selectedProvince.districts : [];

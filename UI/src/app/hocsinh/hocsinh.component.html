@@ -138,22 +138,30 @@
           <!-- Ngày Sinh -->
           <div class="form-group">
             <label>Ngày Sinh</label>
-            
-              <input
-                formControlName="ngaySinh"
-                type="date"
-                class="form-control"
-              />
-              <small
-                class="error-message"
-                *ngIf="
-                  addStudentForm.controls['ngaySinh'].invalid &&
-                  addStudentForm.controls['ngaySinh'].touched
-                "
+
+            <input
+              formControlName="ngaySinh"
+              type="date"
+              class="form-control"
+            />
+            <small
+              class="error-message"
+              *ngIf="
+                addStudentForm.controls['ngaySinh'].invalid &&
+                addStudentForm.controls['ngaySinh'].touched
+              "
+            >
+              <span
+                *ngIf="addStudentForm.controls['ngaySinh'].errors?.required"
               >
-                Vui lòng chọn ngày sinh hợp lệ.
-              </small>
-            
+                Vui lòng chọn ngày sinh.
+              </span>
+              <span
+                *ngIf="addStudentForm.controls['ngaySinh'].errors?.ageTooYoung"
+              >
+                Học sinh phải từ 10 tuổi trở lên.
+              </span>
+            </small>
           </div>
         </div>
 
@@ -399,8 +407,14 @@
             >
               <span
                 *ngIf="editStudentForm.controls['ngaySinh'].errors?.required"
-                >Vui lòng nhập ngày sinh hợp lệ.</span
               >
+                Vui lòng chọn ngày sinh.
+              </span>
+              <span
+                *ngIf="editStudentForm.controls['ngaySinh'].errors?.ageTooYoung"
+              >
+                Học sinh phải từ 10 tuổi trở lên.
+              </span>
             </small>
           </div>
         </div>
