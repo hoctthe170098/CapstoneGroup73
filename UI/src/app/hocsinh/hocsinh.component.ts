@@ -525,6 +525,7 @@ openEditStudentModal(student: any) {
   }
   submitEditStudent() {
     if (this.editStudentForm.invalid) {
+      this.editStudentForm.markAllAsTouched(); 
         this.toastr.error("Vui lòng nhập đầy đủ thông tin!", "Lỗi");
         return;
     }
@@ -595,18 +596,17 @@ openEditStudentModal(student: any) {
 
 
 onProvinceChangeForEdit(provinceCode: string) {
-
   const selectedProvince = this.provinces.find(p => String(p.code) === String(provinceCode));
+  this.editDistricts = selectedProvince ? selectedProvince.districts : [];
 
-  if (selectedProvince) {
-      this.editDistricts = selectedProvince.districts;
-  } else {
-      console.warn("Không tìm thấy tỉnh/thành phố trong danh sách Edit!");
-      this.editDistricts = [];
-  }
-
- 
+  
+  const districtControl = this.editStudentForm.get('district');
+  districtControl?.setValue('');
+  districtControl?.markAsTouched(); 
+  districtControl?.updateValueAndValidity(); 
 }
+
+
 
 
 
