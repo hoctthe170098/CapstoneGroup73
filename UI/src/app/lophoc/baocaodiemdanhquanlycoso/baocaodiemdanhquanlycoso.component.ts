@@ -13,6 +13,7 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
   tenLop: string = '';
   danhSachNgay: string[] = [];
   ngayDuocChon: string = '';
+  ngay:Date;
   danhSachHocSinh: any[] = [];
   backupDanhSach: any[] = [];
   dangSua = false;
@@ -46,6 +47,7 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
       }else{
         const data = res.data;
         this.danhSachNgay = data.ngays.map((d: string) => this.formatDateOnly(d));
+        this.ngay = data.ngay;
         this.ngayDuocChon = this.formatDateOnly(data.ngay);
         this.danhSachHocSinh = data.diemDanhs.map((dd: any) => ({
           id: dd.id,
@@ -77,13 +79,20 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
 
   luuDiemDanh() {
     const payload = {
+      tenLop: this.tenLop,
+      ngay: this.ngay,
       updateDiemDanhs: this.danhSachHocSinh
-        .filter(hs => hs.id !== '00000000-0000-0000-0000-000000000000')
-        .map(hs => ({
-          id: hs.id,
-          hocSinhCode: hs.code,
-          trangThai: hs.trangThai
-        }))
+        .map(hs => {
+          let idToUpdate = hs.id;
+          if (hs.id === '00000000-0000-0000-0000-000000000000') {
+            idToUpdate = null;
+          }
+          return {
+            id: idToUpdate,
+            hocSinhCode: hs.code,
+            trangThai: hs.trangThai
+          };
+        })
     };
     if (payload.updateDiemDanhs.length === 0) {
       this.toastr.error('Không có học sinh nào được chọn để cập nhật điểm danh.');
@@ -98,6 +107,7 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
           this.dangSua = false;
           this.cdr.detectChanges();
           this.toastr.success('Cập nhật điểm danh thành công!', 'Thành công');
+          this.taiBaoCao(this.toApiDateFormat(this.ngayDuocChon));
         } else {
           this.toastr.error(res.message);
         }
@@ -107,7 +117,7 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
         this.dangSua = false;
         this.cdr.detectChanges();
       }
-    });
+    }); 
   }
 
   private formatDateOnly(dateStr: string): string {

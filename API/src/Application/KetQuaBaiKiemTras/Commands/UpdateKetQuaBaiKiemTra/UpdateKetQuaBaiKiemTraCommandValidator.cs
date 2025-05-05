@@ -22,6 +22,8 @@ public class UpdateKetQuaBaiKiemTraCommandValidator : AbstractValidator<UpdateKe
         _httpContextAccessor = httpContextAccessor;
         _identityService = identityService;
         RuleFor(x => x.UpdateKetQuas)
+            .MustAsync(DenHanChinhSua)
+            .WithMessage("Bài kiểm tra này chưa đến hạn chỉnh sửa kết quả")
             .MustAsync(TonTaiKetQua)
             .WithMessage("Không tồn tại kết quả này")
             .MustAsync(CungChungMotBaiKiemTra)
@@ -30,6 +32,19 @@ public class UpdateKetQuaBaiKiemTraCommandValidator : AbstractValidator<UpdateKe
             .WithMessage("Bạn không thể chỉnh sửa điểm danh này")
             .Must(DungFormatKetQua)
             .WithMessage("Điểm danh có format chưa đúng");
+    }
+
+    private async Task<bool> DenHanChinhSua(List<KetQuaBaiKiemTraDto> list, CancellationToken token)
+    {
+        var HomNay = DateOnly.FromDateTime(DateTime.Now);
+        foreach(var item in list)
+        {
+            var KetQuaBaiKiemTra = await _context.KetQuaBaiKiemTras.Include(kq=>kq.BaiKiemTra).FirstOrDefaultAsync(kq=>kq.Id == item.Id);
+            if(KetQuaBaiKiemTra == null) return false;
+            var BaiKiemTra = KetQuaBaiKiemTra.BaiKiemTra;
+            if(BaiKiemTra.NgayKiemTra >= HomNay) return false;
+        }
+        return true;
     }
 
     private async Task<bool> TonTaiKetQua(List<KetQuaBaiKiemTraDto> list, CancellationToken token)

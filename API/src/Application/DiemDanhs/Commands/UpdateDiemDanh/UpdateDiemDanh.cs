@@ -11,6 +11,8 @@ using StudyFlow.Domain.Entities;
 namespace StudyFlow.Application.DiemDanhs.Commands.UpdateDiemDanh;
 public record UpdateDiemDanhCommand : IRequest<Output>
 {
+    public required DateOnly Ngay { get; init; }
+    public required string TenLop {  get; init; }
     public required List<UpdateDiemDanhDto> UpdateDiemDanhs { get; init; }
 }
     public class UpdateDiemDanhCommandHandler : IRequestHandler<UpdateDiemDanhCommand, Output>
@@ -30,8 +32,28 @@ public record UpdateDiemDanhCommand : IRequest<Output>
         {
            foreach(var item in request.UpdateDiemDanhs)
         {
-            var diemDanh = _context.DiemDanhs.First(dd=>dd.Id== item.Id);
-            diemDanh.TrangThai = item.TrangThai;
+            if (item.Id != null)
+            {
+                var diemDanh = _context.DiemDanhs.First(dd => dd.Id == item.Id);
+                diemDanh.TrangThai = item.TrangThai;
+            }
+            else 
+            {
+                if (item.TrangThai == "Không điểm danh") continue;
+                int thu = (int)(request.Ngay.DayOfWeek);
+                if (thu == 0) thu = 8; else thu++;
+                var lichHoc = _context.LichHocs.First(lh=>lh.Thu == thu&&lh.TenLop==request.TenLop);
+                var ThamGia = _context.ThamGiaLopHocs
+                    .First(tg=>tg.HocSinhCode==item.HocSinhCode&&tg.LichHocId==lichHoc.Id);
+                var diemDanh = new DiemDanh
+                {
+                    Id = Guid.NewGuid(),
+                    ThamGiaLopHocId = ThamGia.Id,
+                    TrangThai = item.TrangThai,
+                    Ngay = request.Ngay
+                };
+                _context.DiemDanhs.Add(diemDanh);
+            }
             await _context.SaveChangesAsync(cancellationToken);
         }
         return new Output
