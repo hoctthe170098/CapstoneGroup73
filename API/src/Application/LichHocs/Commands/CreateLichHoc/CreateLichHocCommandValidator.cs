@@ -36,7 +36,9 @@ public class CreateLichHocCommandValidator : AbstractValidator<CreateLichHocComm
             .WithMessage("Ngày kết thúc phải lớn hơn ngày bắt đầu ít nhất 2 tháng");
 
         RuleFor(x => x.LopHocDto.HocPhi)
-            .GreaterThanOrEqualTo(50000).WithMessage("Học phí phải lớn hơn 50,000");
+            .GreaterThanOrEqualTo(50000)
+            .LessThanOrEqualTo(500000)
+            .WithMessage("Học phí phải lớn hơn 50,000 và nhỏ hơn 500,000");
 
         RuleFor(x => x.LopHocDto.GiaoVienCode)
             .NotEmpty().WithMessage("GiaoVienCode không được để trống")

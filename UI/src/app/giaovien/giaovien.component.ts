@@ -117,17 +117,15 @@ checkPhoneExists(phone: string): Promise<boolean> {
 
 
 onProvinceChangeForEdit(provinceCode: string) {
+  const selectedProvince = this.provinces.find(p => String(p.code) === String(provinceCode));
+  this.editDistricts = selectedProvince ? selectedProvince.districts : [];
 
-    const selectedProvince = this.provinces.find(p => String(p.code) === String(provinceCode));
-
-    if (selectedProvince) {
-        this.editDistricts = selectedProvince.districts;
-    } else {
-        this.editDistricts = [];
-    }
-
-   
+  const districtControl = this.editTeacherForm.get('district');
+  districtControl?.setValue('');
+  districtControl?.markAsTouched();
+  districtControl?.updateValueAndValidity();
 }
+
   
 loadDanhSachGiaoVien() {
   let isActiveFilter: boolean | null = this.trangThai === 'Hoạt động' ? true : this.trangThai === 'Tạm ngừng' ? false : null;
@@ -242,65 +240,72 @@ changePage(page: number) {
     this.isModalOpen = false;
   }
 
- async submitNewTeacher() {
+  submitNewTeacher() {
     if (this.addTeacherForm.invalid) {
       this.addTeacherForm.markAllAsTouched();
       return;
     }
   
     const formData = this.addTeacherForm.value;
-  const emailExists = await this.checkEmailExists(formData.email);
-  if (emailExists) {
-    this.toastr.error("Email đã tồn tại!", "Lỗi");
-    return;
-  }
-
-  const phoneExists = await this.checkPhoneExists(formData.soDienThoai);
-  if (phoneExists) {
-    this.toastr.error("Số điện thoại đã tồn tại!", "Lỗi");
-    return;
-  }
   
+    this.spinner.show();
   
-    const provinceObj = this.provinces.find(p => p.code == formData.province);
-    const provinceName = provinceObj ? provinceObj.name : '';
-  
-    const districtObj = this.districts.find(d => d.code == formData.district);
-    const districtName = districtObj ? districtObj.name : '';
-  
-  
-    //  Nếu không có giá trị thì gán là chuỗi rỗng để tránh lỗi `undefined`
-    const diaChiFormatted = `${provinceName || ''}, ${districtName || ''}, ${formData.diaChiCuThe || ''}`.trim();
-  
-    const newTeacher = {
-      code: formData.code,
-      ten: formData.ten,
-      gioiTinh: formData.gioiTinh,
-      ngaySinh: formData.ngaySinh,
-      email: formData.email,
-      soDienThoai: formData.soDienThoai,
-      truongDangDay: formData.truongDangDay,
-      diaChi: diaChiFormatted
-    };
-  
-  this.spinner.show();
-    this.giaovienService.createGiaoVien(newTeacher).subscribe({
-      next: (res) => {
+    // Gọi check email và phone tuần tự
+    this.checkEmailExists(formData.email).then(emailExists => {
+      if (emailExists) {
         this.spinner.hide();
-        if (!res.isError) {
-          this.toastr.success("Thêm giáo viên thành công!", "Thành công");
-          this.closeModal();
-          this.loadDanhSachGiaoVien();
-        } else {
-          this.toastr.error(res.message, "Lỗi");
-        }
-      },
-      error: () => {
-        this.spinner.hide();
-        this.toastr.error("Có lỗi xảy ra, vui lòng thử lại!", "Lỗi");
+        this.toastr.error("Email đã tồn tại!", "Lỗi");
+        return;
       }
+  
+      this.checkPhoneExists(formData.soDienThoai).then(phoneExists => {
+        if (phoneExists) {
+          this.spinner.hide();
+          this.toastr.error("Số điện thoại đã tồn tại!", "Lỗi");
+          return;
+        }
+  
+        // Format lại địa chỉ
+        const provinceObj = this.provinces.find(p => p.code == formData.province);
+        const provinceName = provinceObj ? provinceObj.name : '';
+  
+        const districtObj = this.districts.find(d => d.code == formData.district);
+        const districtName = districtObj ? districtObj.name : '';
+  
+        const diaChiFormatted = `${provinceName}, ${districtName}, ${formData.diaChiCuThe || ''}`.trim();
+  
+        const newTeacher = {
+          code: formData.code,
+          ten: formData.ten,
+          gioiTinh: formData.gioiTinh,
+          ngaySinh: formData.ngaySinh,
+          email: formData.email,
+          soDienThoai: formData.soDienThoai,
+          truongDangDay: formData.truongDangDay,
+          diaChi: diaChiFormatted
+        };
+  
+        // Gọi API tạo giáo viên
+        this.giaovienService.createGiaoVien(newTeacher).subscribe({
+          next: (res) => {
+            this.spinner.hide();
+            if (!res.isError) {
+              this.toastr.success("Thêm giáo viên thành công!", "Thành công");
+              this.closeModal();
+              this.loadDanhSachGiaoVien();
+            } else {
+              this.toastr.error(res.message, "Lỗi");
+            }
+          },
+          error: () => {
+            this.spinner.hide();
+            this.toastr.error("Có lỗi xảy ra, vui lòng thử lại!", "Lỗi");
+          }
+        });
+      });
     });
   }
+  
   
 
   
@@ -417,66 +422,71 @@ getDistrictName(districtCode: string): string {
     this.isEditModalOpen = false;
   }
 
-  async submitEditStudent() {
-
-  let formData = { ...this.editTeacherForm.value };
-
-  if (!formData.code || formData.code.trim() === "") {
-    if (this.selectedTeacher && this.selectedTeacher.code) {
-      formData.code = this.selectedTeacher.code;
-    } else {
-      this.toastr.error("Không tìm thấy mã giáo viên!", "Lỗi");
-      console.error("Lỗi: Mã giáo viên không tồn tại!");
-      return;
-    }
-  }
-
-  const emailExists = await this.checkEmailExists(formData.email);
-  if (emailExists && formData.email !== this.selectedTeacher.email) {
-    this.toastr.error("Email đã tồn tại!", "Lỗi");
-    return;
-  }
-
-  const phoneExists = await this.checkPhoneExists(formData.soDienThoai);
-  if (phoneExists && formData.soDienThoai !== this.selectedTeacher.soDienThoai) {
-    this.toastr.error("Số điện thoại đã tồn tại!", "Lỗi");
-    return;
-  }
-  if (formData.ngaySinh) {
-    const date = new Date(formData.ngaySinh);
-    formData.ngaySinh = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-  }
-
-  const provinceObj = this.provinces.find(p => p.code == formData.province);
-  const provinceName = provinceObj ? provinceObj.name : '';
-
-  const districtObj = this.editDistricts.find(d => d.code == formData.district);
-  const districtName = districtObj ? districtObj.name : '';
-
-  formData.diaChi = `${provinceName}, ${districtName}, ${formData.diaChiCuThe || ''}`.trim();
-
-  formData.status = formData.status ? "true" : "false";
-  if (this.editTeacherForm.invalid) {
-    this.editTeacherForm.markAllAsTouched(); 
-    return; 
-  }
-
-  this.giaovienService.updateGiaoVien(formData).subscribe({
-    next: (res) => {
-      if (!res.isError) {
-        this.toastr.success("Cập nhật giáo viên thành công!", "Thành công");
-        this.closeEditModal();
-        this.loadDanhSachGiaoVien();
+  submitEditStudent() {
+    const formData = { ...this.editTeacherForm.value };
+  
+    if (!formData.code || formData.code.trim() === "") {
+      if (this.selectedTeacher && this.selectedTeacher.code) {
+        formData.code = this.selectedTeacher.code;
       } else {
-        this.toastr.error(res.message, "Lỗi");
+        this.toastr.error("Không tìm thấy mã giáo viên!", "Lỗi");
+        console.error("Lỗi: Mã giáo viên không tồn tại!");
+        return;
       }
-    },
-    error: (error) => {
-      console.error(" Lỗi kết nối API:", error);
-      this.toastr.error("Có lỗi xảy ra, vui lòng thử lại!", "Lỗi");
     }
-  });
-}
+  
+    this.checkEmailExists(formData.email).then(emailExists => {
+      if (emailExists && formData.email !== this.selectedTeacher.email) {
+        this.toastr.error("Email đã tồn tại!", "Lỗi");
+        return;
+      }
+  
+      this.checkPhoneExists(formData.soDienThoai).then(phoneExists => {
+        if (phoneExists && formData.soDienThoai !== this.selectedTeacher.soDienThoai) {
+          this.toastr.error("Số điện thoại đã tồn tại!", "Lỗi");
+          return;
+        }
+  
+        // Format ngày sinh
+        if (formData.ngaySinh) {
+          const date = new Date(formData.ngaySinh);
+          formData.ngaySinh = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        }
+  
+        // Địa chỉ
+        const provinceObj = this.provinces.find(p => p.code == formData.province);
+        const provinceName = provinceObj ? provinceObj.name : '';
+  
+        const districtObj = this.editDistricts.find(d => d.code == formData.district);
+        const districtName = districtObj ? districtObj.name : '';
+  
+        formData.diaChi = `${provinceName}, ${districtName}, ${formData.diaChiCuThe || ''}`.trim();
+        formData.status = formData.status ? "true" : "false";
+  
+        if (this.editTeacherForm.invalid) {
+          this.editTeacherForm.markAllAsTouched();
+          return;
+        }
+  
+        this.giaovienService.updateGiaoVien(formData).subscribe({
+          next: (res) => {
+            if (!res.isError) {
+              this.toastr.success("Cập nhật giáo viên thành công!", "Thành công");
+              this.closeEditModal();
+              this.loadDanhSachGiaoVien();
+            } else {
+              this.toastr.error(res.message, "Lỗi");
+            }
+          },
+          error: (error) => {
+            console.error("Lỗi kết nối API:", error);
+            this.toastr.error("Có lỗi xảy ra, vui lòng thử lại!", "Lỗi");
+          }
+        });
+      });
+    });
+  }
+  
 
 validateAge(control: any) {
   if (!control.value) return null;

@@ -53,14 +53,6 @@ public class GetBaoCaoDiemDanhQueryHandler : IRequestHandler<GetBaoCaoDiemDanhQu
         var NgayDaHoc = (ngayHienTai <= LichHocCoDinh[0].NgayKetThuc)
             ? getNgayDaHoc(Thus, LichHocCoDinh[0].NgayBatDau, ngayHienTai)
             : getNgayDaHoc(Thus, LichHocCoDinh[0].NgayBatDau, LichHocCoDinh[0].NgayKetThuc);
-        var ListHocSinh = _context.ThamGiaLopHocs
-            .Where(tg => LichHocCoDinh.Select(lh=>lh.Id).ToList().Contains(tg.LichHocId))
-            .Select(tg => new
-            {
-                tg.HocSinhCode,
-                tg.HocSinh.Ten
-            })
-            .Distinct().ToList();
         var listHocBu = _context.LichHocs
             .Where(lh => lh.TenLop == request.TenLop 
             && lh.GiaoVienCode == giaoVien.Code 
@@ -74,6 +66,15 @@ public class GetBaoCaoDiemDanhQueryHandler : IRequestHandler<GetBaoCaoDiemDanhQu
         var data = new List<BaoCaoDiemDanhDto>();
         foreach(var ngay in NgayDaHoc)
         {
+            var ListHocSinh = _context.ThamGiaLopHocs
+            .Where(tg => LichHocCoDinh.Select(lh => lh.Id).ToList().Contains(tg.LichHocId)
+            &&tg.NgayBatDau<=ngay&&tg.NgayKetThuc>=ngay)
+            .Select(tg => new
+            {
+                tg.HocSinhCode,
+                tg.HocSinh.Ten
+            })
+            .Distinct().ToList();
             List<DiemDanhDto> diemDanhs = new List<DiemDanhDto>();
             var BaoCao = new BaoCaoDiemDanhDto
             {

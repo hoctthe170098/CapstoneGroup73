@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System.Threading;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using StudyFlow.Application.Common.Interfaces;
@@ -37,6 +38,23 @@ public class UpdateTraLoiCommandValidator : AbstractValidator<UpdateTraLoiComman
         RuleFor(x => x)
             .MustAsync(IsBeforeDeadline)
             .WithMessage("Bài tập này đã hết hạn, bạn không thể sửa câu trả lời.");
+
+        RuleFor(x => x)
+            .MustAsync(ChuaDuocNhanXet)
+            .WithMessage("Bài tập đã được nhận xét và chấm điểm, không thể sửa câu trả lời.");
+    }
+
+    private async Task<bool> ChuaDuocNhanXet(UpdateTraLoiCommand command, CancellationToken token)
+    {
+        var hocSinh = await GetHocSinhFromTokenAsync(token);
+        if (hocSinh == null) return false;
+
+        var traLoi = await _context.TraLois
+        .AsNoTracking()
+            .FirstOrDefaultAsync(t => t.Id == command.TraLoiId && t.HocSinhCode == hocSinh.Code, token);
+        if (traLoi?.Baitap == null) return false;
+        if (traLoi.Diem != null || traLoi.NhanXet != null) return false;
+        return true;
     }
 
     private bool BeValidFile(IFormFile? file)

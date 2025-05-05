@@ -35,8 +35,8 @@ export class BaocaohocphiComponent implements OnInit {
   loadBaoCao(thang?: number, nam?: number): void {
     this.spinner.show();
     this.lophocService.getBaoCaoHocPhi(this.tenLop, thang, nam).subscribe(res => {
+      this.spinner.hide();
       if (res.isError) {
-        this.spinner.hide();
         if (res.code === 404) {
           this.router.navigate(['/pages/error']);
         } else {

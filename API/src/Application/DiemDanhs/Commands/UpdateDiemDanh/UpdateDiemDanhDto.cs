@@ -9,7 +9,7 @@ namespace StudyFlow.Application.DiemDanhs.Commands.UpdateDiemDanh
 {
     public class UpdateDiemDanhDto
     {
-        public required Guid Id { get; set; }//k
+        public Guid? Id { get; set; }//k
         public required string HocSinhCode { get; set; } = "";
         public string? TenHocSinh { get; set; } = "";
         public required string TrangThai { get; set; }

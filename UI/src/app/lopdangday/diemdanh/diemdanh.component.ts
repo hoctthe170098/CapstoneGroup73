@@ -39,20 +39,18 @@ export class DiemdanhComponent implements OnInit {
     this.spinner.show();
     this.lopService.getDiemDanhTheoNgay(tenLop).subscribe(
       (res) => {
-        if (res.isError) {
-          this.spinner.hide();
+        this.spinner.hide();
+        if (res.isError) {       
           this.students = [];
           this.isError = true;
           if (res.code === 404) {
             this.router.navigate(['/pages/error'])
             return;
           }
-
           this.thongBao = res.message;
           this.cdr.detectChanges();
           return;
         }
-
         if (!res.data || res.data.length === 0) {
           this.students = [];
           this.isError = false;
@@ -60,11 +58,9 @@ export class DiemdanhComponent implements OnInit {
           this.cdr.detectChanges();
           return;
         }
-
         this.isError = false;
         this.thongBao = '';
         this.tenLop = res.data[0].tenLop || this.tenLop;
-
         this.students = res.data.map(sv => ({
           id: sv.id, 
           code: sv.hocSinhCode,
@@ -74,7 +70,6 @@ export class DiemdanhComponent implements OnInit {
           diemTrenLop: sv.diemTrenLop ?? '',
           nhanXet: sv.nhanXet ?? ''
         }));
-
         this.cdr.detectChanges();
       },
       (err) => {

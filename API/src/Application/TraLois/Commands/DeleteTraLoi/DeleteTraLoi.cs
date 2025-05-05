@@ -59,13 +59,13 @@ public class DeleteTraLoiCommandHandler : IRequestHandler<DeleteTraLoiCommand, O
         {
             throw new Exception("Bài tập đã kết thúc, bạn không thể xóa câu trả lời.");
         }
-
+        if(traLoi.Diem!=null||traLoi.NhanXet!=null) 
+            throw new Exception("Bài tập đã được chấm điểm và nhận xét, bạn không thể xóa câu trả lời.");
         // Xóa file đính kèm nếu có
         if (!string.IsNullOrEmpty(traLoi.UrlFile))
         {
             DeleteFile(traLoi.UrlFile);
         }
-
         _context.TraLois.Remove(traLoi);
         await _context.SaveChangesAsync(cancellationToken);
 

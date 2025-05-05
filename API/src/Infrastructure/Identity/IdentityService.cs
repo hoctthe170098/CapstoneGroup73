@@ -167,14 +167,14 @@ public class IdentityService : IIdentityService
         var user = await _userManager.FindByNameAsync(email);
         if (user == null)
         {
-            output.isError = false;
+            output.isError = true;
             output.message = "Username không khớp, vui lòng thử lại!";
             return output;
         }
         ;
         if (user.Email == null)
         {
-            output.isError = false;
+            output.isError = true;
             output.message = "Tài khoản này không có email, vui lòng liên hệ với quản lý!";
             return output;
         }

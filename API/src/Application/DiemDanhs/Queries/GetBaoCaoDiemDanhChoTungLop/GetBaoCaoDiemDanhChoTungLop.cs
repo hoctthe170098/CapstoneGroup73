@@ -60,6 +60,7 @@ public class GetBaoCaoDiemDanhChoTungLopQueryHandler : IRequestHandler<GetBaoCao
             if (hocBu.NgayBatDau < ngayHienTai) NgayDaHoc.Add(hocBu.NgayBatDau);
         }
         NgayDaHoc = NgayDaHoc.OrderByDescending(ng => ng).ToList();
+        if (NgayDaHoc.Count() == 0) throw new Exception("Lớp chưa học ngày nào, chưa thể hiển thị báo cáo.");
         DateOnly NgayCanLay = DateOnly.MinValue;
         if (request.Ngay == null) NgayCanLay = NgayDaHoc[0];
         else

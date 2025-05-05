@@ -1,11 +1,13 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using StudyFlow.Application.Common.Interfaces;
+using StudyFlow.Application.LichHocs.Commands.CreateLichDayBu;
 using StudyFlow.Application.LichHocs.Commands.UpdateLichDayBu;
 using StudyFlow.Domain.Entities;
 using System;
 using System.Linq;
 using System.Xml.Linq;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace StudyFlow.Application.LichHocs.Commands.UpdateLichDayBu;
 
@@ -28,7 +30,7 @@ public class UpdateLichDayBuCommandValidator : AbstractValidator<UpdateLichDayBu
             .WithMessage("Lịch học này đã hết hạn chỉnh sửa");
         RuleFor(x => x.LichDayBu)
             .MustAsync(ValidLichHocBu)
-            .WithMessage("Lịch học bù không hợp lệ, ngày học bù phải sau ngày hôm này" +
+            .WithMessage("Lịch học bù không hợp lệ, ngày học bù phải sau ngày hôm nay và trước ngày kết thúc lớp học" +
             ", giờ bắt đầu phải sau 8h sáng và giờ kết thúc phải trước 10h tối" +
             ", mỗi tiết học kéo dài ít nhất 2 tiếng")
             .MustAsync(KhongTrungLichDayCoDinh)
@@ -129,7 +131,7 @@ public class UpdateLichDayBuCommandValidator : AbstractValidator<UpdateLichDayBu
         return true;
     }
 
-    private async Task<bool> ValidLichHocBu(LichDayBuDto lichDayBu, CancellationToken cToken)
+    private async Task<bool> ValidLichHocBu(UpdateLichDayBuCommand command, LichDayBuDto lichDayBu, CancellationToken cToken)
     {
         if (lichDayBu == null) return true;
         if(lichDayBu.NgayHocBu <= DateOnly.FromDateTime(DateTime.Now)) return false;
@@ -137,6 +139,9 @@ public class UpdateLichDayBuCommandValidator : AbstractValidator<UpdateLichDayBu
         if (string.IsNullOrEmpty(token))
             throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
         var coSoId = _identityService.GetCampusId(token);
+        var lichHoc = await _context.LichHocs.FirstOrDefaultAsync(lh => lh.TenLop == command.TenLop && lh.Phong.CoSoId == coSoId);
+        if (lichHoc == null) return false;
+        if (lichHoc.NgayKetThuc < lichDayBu.NgayHocBu || lichHoc.NgayBatDau > lichDayBu.NgayHocBu) return false;
         var coSo = await _context.Phongs
             .AnyAsync(p =>p.Id==lichDayBu.PhongId && p.CoSoId == coSoId && p.TrangThai == "use");
         if(!coSo) return false;
