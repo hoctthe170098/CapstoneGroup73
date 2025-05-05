@@ -39,8 +39,8 @@ export class BaocaodiemdanhquanlycosoComponent implements OnInit {
   taiBaoCao(ngay?: string) {
     this.spinner.show();
     this.lophocService.getBaoCaoDiemDanh(this.tenLop, ngay).subscribe(res => {
+      this.spinner.hide();
       if(res.isError){
-        this.spinner.hide();
         if(res.code==404) this.router.navigate(['/pages/error']);
         else this.toastr.error(res.message);
       }else{

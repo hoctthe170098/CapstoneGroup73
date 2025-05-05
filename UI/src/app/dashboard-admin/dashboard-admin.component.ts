@@ -259,7 +259,7 @@ export class DashboardAdminComponent implements OnInit {
           this.pieChartColors = [{ backgroundColor: pieColors }];
 
           // Update Doughnut Chart
-          this.doughnutData = [data.tiLeDiemDanh, 100 - data.tiLeDiemDanh];
+          this.doughnutData = [100 - data.tiLeDiemDanh , data.tiLeDiemDanh];
 
           // Update Horizontal Bar
           this.horizontalLabels = data.hocSinhGiaoVienLopHocTheoCoSos.map(

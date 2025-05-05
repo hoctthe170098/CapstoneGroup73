@@ -47,7 +47,7 @@ export class ImportGiaovienComponent {
             this.toastr.success('Import thành công!', 'Thành công');
             this.cdr.detectChanges();
           } else {
-            this.toastr.error(res.message || 'Lỗi import file');
+            this.toastr.error(res.errors || 'Lỗi import file');
             this.fileSelected = false;
           }
         },

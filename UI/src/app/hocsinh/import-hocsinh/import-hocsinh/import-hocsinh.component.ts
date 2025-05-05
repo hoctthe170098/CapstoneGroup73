@@ -58,11 +58,11 @@ export class ImportHocsinhComponent {
           this.toastr.success('Import thành công!');
           this.cdr.detectChanges();
         } else {
-          this.toastr.error(res.message || 'Import thất bại!');
+          this.toastr.error(res.errors || 'Import thất bại!');
         }
       },
       error: (err) => {
-        console.error("❌ Import lỗi:", err);
+        console.error(" Import lỗi:", err);
         this.toastr.error('Đã xảy ra lỗi khi import!');
       }
     });

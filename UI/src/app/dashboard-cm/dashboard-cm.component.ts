@@ -123,7 +123,7 @@ export class DashboardCMComponent implements OnInit {
           this.pieChartColors = [{ backgroundColor: pieColors }];
 
           // Doughnut Chart
-          this.doughnutData = [data.tiLeDiemDanh, 100 - data.tiLeDiemDanh];
+          this.doughnutData = [ 100 - data.tiLeDiemDanh, data.tiLeDiemDanh];
 
           // Room usage 
           this.roomUsageList = data.thoiGianSuDungPhongHocs.map((item: any) => ({
