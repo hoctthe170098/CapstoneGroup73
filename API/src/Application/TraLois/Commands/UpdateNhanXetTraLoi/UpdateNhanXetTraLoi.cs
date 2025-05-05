@@ -50,7 +50,7 @@ public class UpdateNhanXetTraLoiCommandHandler : IRequestHandler<UpdateNhanXetTr
             .Include(t => t.Baitap)
                 .ThenInclude(bt => bt.LichHoc)
             .FirstOrDefaultAsync(t => t.Id == request.TraLoiId, cancellationToken)
-            ?? throw new NotFoundDataException("Không tìm thấy câu trả lời.");
+            ?? throw new Exception("Không tìm thấy câu trả lời.");
 
         if (traLoi.Baitap.LichHoc.GiaoVienCode != giaoVien.Code)
             throw new UnauthorizedAccessException("Bạn không có quyền chỉnh sửa nhận xét cho bài này.");

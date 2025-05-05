@@ -55,6 +55,7 @@ public class GetDiemBaiKiemTraChoGiaoVienQueryHandler : IRequestHandler<GetDiemB
             .FirstOrDefault(kt=>kt.Id.ToString()==request.BaiKiemTraId);
         if (BaiKiemTra == null) throw new NotFoundIDException();
         if(BaiKiemTra.LichHoc.GiaoVienCode!=giaoVien.Code) throw new NotFoundIDException();
+        if (BaiKiemTra.NgayKiemTra >= HomNay) throw new Exception("Chưa đến ngày kiểm tra, không thể cập nhật kết quả.");
         var checkKetQua = _context.KetQuaBaiKiemTras.Any(kq=>kq.BaiKiemTraId==BaiKiemTra.Id);
         if (!checkKetQua)
         {

@@ -6,6 +6,7 @@ using StudyFlow.Application.DiemDanhs.Commands.UpdateDiemDanh;
 using StudyFlow.Domain.Entities;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace StudyFlow.Application.LichHocs.Commands.UpdateDiemDanh;
@@ -22,11 +23,12 @@ public class UpdateDiemDanhCommandValidator : AbstractValidator<UpdateDiemDanhCo
         _context = context;
         _httpContextAccessor = httpContextAccessor;
         _identityService = identityService;
+        RuleFor(x => x.Ngay)
+            .MustAsync(TonTaiLichHoc)
+            .WithMessage("Không tồn tại lịch học của lớp trong ngày này");
         RuleFor(x => x.UpdateDiemDanhs)
             .MustAsync(TonTaiDiemDanh)
-            .WithMessage("Không tồn tại điểm danh này.")
-            .MustAsync(CungChungMotLopVaNgay)
-            .WithMessage("Các điểm danh phải cùng chung 1 lớp và ngày.")
+            .WithMessage("Không tồn tại 1 trong những điểm danh này.")
             .MustAsync(DuocQuyenChinhSua)
             .WithMessage("Bạn không thể chỉnh sửa điểm danh này.")
             .MustAsync(ChuaHetHan)
@@ -35,11 +37,20 @@ public class UpdateDiemDanhCommandValidator : AbstractValidator<UpdateDiemDanhCo
             .WithMessage("Điểm danh có format chưa đúng.");
     }
 
+    private async Task<bool> TonTaiLichHoc(UpdateDiemDanhCommand command, DateOnly ngay, CancellationToken token)
+    {
+        int thu = (int)(ngay.DayOfWeek);
+        if (thu == 0) thu = 8; else thu++;
+        return await _context.LichHocs
+            .AnyAsync(lh=>lh.TenLop==command.TenLop&&lh.Thu==thu);
+    }
+
     private bool DungFormatDiemDanh(List<UpdateDiemDanhDto> list)
     {
         foreach (var dto in list)
         {
-            if(dto.TrangThai!="Vắng"&&dto.TrangThai!="Có mặt") return false;
+            if(dto.TrangThai!="Vắng"&&dto.TrangThai!="Có mặt"&&dto.TrangThai!= "Không điểm danh") 
+                return false;
         }
         return true;
     }
@@ -49,11 +60,11 @@ public class UpdateDiemDanhCommandValidator : AbstractValidator<UpdateDiemDanhCo
         var idDiemDanh = diemDanhs.Select(d => d.Id).ToList();
         foreach(var item in idDiemDanh)
         {
+            if(item==null) continue;
             var DiemDanh = await _context.DiemDanhs
                 .Include(d => d.ThamGiaLopHoc)
                 .ThenInclude(tg => tg.LichHoc)
-                .ThenInclude(lh => lh.LichHocGoc)
-                
+                .ThenInclude(lh => lh.LichHocGoc)             
                 .FirstOrDefaultAsync(d => d.Id == item);
             if (DiemDanh == null)
                 return false;
@@ -69,41 +80,45 @@ public class UpdateDiemDanhCommandValidator : AbstractValidator<UpdateDiemDanhCo
         return true;
     }
 
-    private async Task<bool> CungChungMotLopVaNgay(List<UpdateDiemDanhDto> diemDanhs, CancellationToken token)
-    {
-        var diemdanh = await _context.DiemDanhs
-            .Where(d=>diemDanhs.Select(dd=>dd.Id).ToList().Contains(d.Id))
-            .Include(d=>d.ThamGiaLopHoc)
-            .ToListAsync();
-        var lichHoc = diemdanh.Select(d => d.ThamGiaLopHoc.LichHocId).Distinct();
-        var ngay = diemdanh.Select(d=>d.Ngay).Distinct();
-        return (lichHoc.Count() == 1 && ngay.Count() == 1);
-    }
-
-    private async Task<bool> TonTaiDiemDanh(List<UpdateDiemDanhDto> diemDanhs, CancellationToken token)
-    {
-        foreach (var item in diemDanhs)
-        {
-            var check = await _context.DiemDanhs.AnyAsync(d => d.Id == item.Id);
-            if(!check) return false;
-        }
-        return true;
-    }
-
-    private async Task<bool> DuocQuyenChinhSua(List<UpdateDiemDanhDto> diemDanhs, CancellationToken cToken)
+    private async Task<bool> TonTaiDiemDanh(UpdateDiemDanhCommand command, List<UpdateDiemDanhDto> diemDanhs, CancellationToken cToken)
     {
         var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
         if (string.IsNullOrEmpty(token))
             throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
         var coSoId = _identityService.GetCampusId(token);
-        var idDiemDanh = diemDanhs.Select(d => d.Id).ToList();
-        foreach(var id in idDiemDanh)
+        foreach (var item in diemDanhs)
         {
-            var diemDanh = await _context.DiemDanhs
-            .FirstOrDefaultAsync(dd => dd.Id == id
-            && (dd.ThamGiaLopHoc.LichHoc.Phong.CoSoId == coSoId));
-            if (diemDanh == null) return false;
+            if (item.Id != null)
+            {
+                var check = await _context.DiemDanhs
+                    .AnyAsync(d => d.Id == item.Id
+                    &&d.Ngay == command.Ngay
+                    &&d.ThamGiaLopHoc.LichHoc.TenLop==command.TenLop
+                    &&d.ThamGiaLopHoc.LichHoc.Phong.CoSoId==coSoId);
+                if (!check) return false;
+            }
+            else
+            {
+                var check = await _context.ThamGiaLopHocs
+                    .AnyAsync(tg => tg.LichHoc.TenLop == command.TenLop 
+                    && tg.HocSinhCode == item.HocSinhCode 
+                    && tg.HocSinh.CoSoId == coSoId&&tg.NgayBatDau<=command.Ngay
+                    && tg.NgayKetThuc>=command.Ngay);
+                if (!check) return false;
+            }         
         }
+        return true;
+    }
+
+    private async Task<bool> DuocQuyenChinhSua(UpdateDiemDanhCommand command,List<UpdateDiemDanhDto> diemDanhs, CancellationToken cToken)
+    {
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
+        var lichHoc = await _context.LichHocs
+            .AnyAsync(lh => lh.TenLop == command.TenLop && lh.Phong.CoSoId == coSoId);
+        if(!lichHoc) return false;
         return true;
     }
 }

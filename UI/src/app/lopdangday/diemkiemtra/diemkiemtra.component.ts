@@ -95,8 +95,8 @@ export class DiemkiemtraComponent implements OnInit {
     this.spinner.show();
     this.lopdangdayService.updateKetQuaBaiKiemTra(payload).subscribe({
       next: res => {
-        if (res?.isError) {
-          this.spinner.hide();
+        this.spinner.hide();
+        if (res?.isError) {        
           this.toastr.error(res.message || 'Có lỗi xảy ra!');
         } else {
           this.toastr.success(res.message || 'Lưu kết quả thành công!');
