@@ -399,10 +399,10 @@ editScheduleDayBu: any = {
       ngayKetThuc: this.dateEnd || "0001-01-01",
     };
   
-    this.spinner.show();
+    
     this.lophocService.getDanhSachLopHoc(payload).subscribe({
       next: (response) => {
-        this.spinner.hide();
+        
         if (!response.isError && response.data) {
           const data = response.data;
   
@@ -444,7 +444,7 @@ editScheduleDayBu: any = {
         }
       },
       error: (err) => {
-        this.spinner.hide();
+        
         console.error("Lỗi khi lấy danh sách lớp học:", err);
         this.lophocs = [];
         this.totalPages = 1;
@@ -465,10 +465,11 @@ editScheduleDayBu: any = {
 
   onEditClass(index: number): void {
     const tenLop = this.lophocs[index].tenLop;
-    console.log('🚀 Tên lớp từ UI:', tenLop);
+   
   
     this.lophocService.getLopHocByTenLop(tenLop).subscribe(
       (res) => {
+        
         this.router.navigate(['/lophoc/edit', tenLop]);
 
       },
@@ -512,7 +513,7 @@ editScheduleDayBu: any = {
   }
   
   onEditLichDayThay(lich: any, lop: any) {
-    console.log('GVCODE:', lich.giaoVienCode);
+  
   
     this.newScheduleEdit = {
       ...lich,
@@ -615,6 +616,7 @@ editScheduleDayBu: any = {
     });
   }
   onEditLichDayBu(lich: any, lop: any) {
+   
   
     // Dùng phongOptions đã load sẵn ở ngOnInit
     const matchedPhong = this.phongOptions.find(p => p.ten === lich.tenPhong);
