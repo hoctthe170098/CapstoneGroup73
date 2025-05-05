@@ -1,4 +1,4 @@
-import { Component, OnInit,ChangeDetectorRef  } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { TestlistService } from './shared/baikiemtra.service';
 import { BaiKiemTraDto } from './shared/baikiemtra.model';
 import { saveAs } from 'file-saver';
@@ -12,8 +12,8 @@ import { NgxSpinnerService } from 'ngx-spinner';
 })
 export class TestListComponent implements OnInit {
   statusList = ['Đã kiểm tra', 'Chưa kiểm tra'];
- classList: string[] = [];
- selectedClassSchedule: any[] = [];
+  classList: string[] = [];
+  selectedClassSchedule: any[] = [];
   selectedStatus = 'all';
   selectedClass = 'all';
   searchText = '';
@@ -39,23 +39,23 @@ export class TestListComponent implements OnInit {
     tenBaiKiemTra: '',
     ngayKiemTra: '',
     tenLop: '',
-    taiLieu: null as any 
+    taiLieu: null as any
   };
   showEditForm = false;
   editTest: any = {
     name: '',
     testDate: '',
-    tenLop:'',
+    tenLop: '',
     taiLieu: {
       name: '',
       url: ''
     }
   };
-  constructor(private testlistService: TestlistService,private cdr: ChangeDetectorRef, private toastr: ToastrService, private router: Router,private spinner: NgxSpinnerService) {}
+  constructor(private testlistService: TestlistService, private cdr: ChangeDetectorRef, private toastr: ToastrService, private router: Router, private spinner: NgxSpinnerService) { }
   ngOnInit() {
     this.loadTests();
     this.searchClassByName(''); // load tất cả lớp
-    
+
   }
   toggleClassDropdown() {
     this.classDropdownOpen = !this.classDropdownOpen;
@@ -89,14 +89,14 @@ export class TestListComponent implements OnInit {
       5: 'Thứ 5',
       6: 'Thứ 6',
       7: 'Thứ 7',
-      8: 'Chủ nhật' 
+      8: 'Chủ nhật'
     };
     return mapping[thu] || `Thứ ${thu}`;
   }
-  
+
   loadTests() {
     const trangThaiToSend = this.selectedStatus || 'all';
-    const tenLop = this.selectedClass || 'all';  
+    const tenLop = this.selectedClass || 'all';
     const tenBaiKiemTra = this.searchText?.trim() || '';
     ;
     this.spinner.show();
@@ -108,7 +108,7 @@ export class TestListComponent implements OnInit {
             this.router.navigate(['/pages/error'])
             return;
           }
-          
+
           if (!res || !res.data) {
             this.paginatedList = [];
             this.totalItems = 0;
@@ -116,11 +116,11 @@ export class TestListComponent implements OnInit {
             this.cdr.detectChanges();
             return;
           }
-          
+
           const responseData = res.data;
           this.totalItems = responseData.totalCount || 0;
           this.paginatedList = Array.isArray(responseData.data) ? responseData.data : [];
-  
+
           // Gọi detectChanges() sau khi cập nhật dữ liệu để trigger change detection
           this.cdr.detectChanges();
         },
@@ -133,15 +133,15 @@ export class TestListComponent implements OnInit {
         }
       });
   }
-  
+
   downloadFile(fileUrl: string, fileName: string): void {
     if (!fileUrl) {
       this.toastr.warning('Không có tài liệu để tải!');
       return;
     }
-  
-    
-  
+
+
+
     this.testlistService.downloadFile(fileUrl).subscribe(
       (res: Blob) => {
         saveAs(res, fileName);
@@ -152,10 +152,10 @@ export class TestListComponent implements OnInit {
       }
     );
   }
-  
+
   // Tách đường dẫn tương đối từ URL
-  
-  
+
+
 
   updatePaginatedList() {
     const start = (this.currentPage - 1) * this.itemsPerPage;
@@ -195,99 +195,99 @@ export class TestListComponent implements OnInit {
       }
     }
   }
-  
+
   allClassData: any[] = [];
 
-searchClassByName(name: string) {
-  const tenLop = name?.trim() || '';
+  searchClassByName(name: string) {
+    const tenLop = name?.trim() || '';
 
-  this.testlistService.getLopByName(tenLop).subscribe({
-    next: (res: any) => {
-      if (res?.data) {
-        this.allClassData = res.data;
-        this.classList = res.data.map((item: any) => item.tenLop);
-      } else {
+    this.testlistService.getLopByName(tenLop).subscribe({
+      next: (res: any) => {
+        if (res?.data) {
+          this.allClassData = res.data;
+          this.classList = res.data.map((item: any) => item.tenLop);
+        } else {
+          this.classList = [];
+          this.allClassData = [];
+        }
+      },
+      error: err => {
+
         this.classList = [];
         this.allClassData = [];
       }
-    },
-    error: err => {
-     
-      this.classList = [];
-      this.allClassData = [];
-    }
-  });
-}
-onClassSelected(tenLop: string) {
-  const selected = this.allClassData.find(item => item.tenLop === tenLop);
-  this.selectedClassSchedule = selected?.lichHocs || [];
-}
-toggleLopDropdown() {
-  this.lopDropdownOpen = !this.lopDropdownOpen;
-  this.lopSearchTerm = '';
-  this.filteredClassList = this.classList.slice(); // reset về đầy đủ
-}
-
-onLopSearchTermChange() {
-  const lower = this.lopSearchTerm.toLowerCase();
-  this.filteredClassList = this.classList.filter(cls =>
-    cls.toLowerCase().includes(lower)
-  );
-}
-
-selectLop(selected: string) {
-  this.newTest.tenLop = selected;
-  this.lopDropdownOpen = false;
-  this.onClassSelected(selected); // nếu bạn đang dùng để lấy lịch
-}
-
-addTest() {
-  if (!this.newTest.tenBaiKiemTra || !this.newTest.ngayKiemTra || !this.newTest.tenLop || !this.newTest.taiLieu) {
-    this.toastr.warning('Vui lòng điền đầy đủ thông tin!');
-    return;
+    });
+  }
+  onClassSelected(tenLop: string) {
+    const selected = this.allClassData.find(item => item.tenLop === tenLop);
+    this.selectedClassSchedule = selected?.lichHocs || [];
+  }
+  toggleLopDropdown() {
+    this.lopDropdownOpen = !this.lopDropdownOpen;
+    this.lopSearchTerm = '';
+    this.filteredClassList = this.classList.slice(); // reset về đầy đủ
   }
 
-  const formData = new FormData();
-  formData.append('BaiKiemTraDto.TenBaiKiemTra', this.newTest.tenBaiKiemTra);
-  formData.append('BaiKiemTraDto.NgayKiemTra', this.newTest.ngayKiemTra);
-  formData.append('BaiKiemTraDto.TenLop', this.newTest.tenLop);
-  formData.append('BaiKiemTraDto.TaiLieu', this.newTest.taiLieu);
-  this.spinner.show();
-  this.testlistService.createTest(formData).subscribe({
-    next: (res) => {
-      this.spinner.hide();
-      if (res?.isError) {
-        this.toastr.error(res.message);
-        return;
-      }
+  onLopSearchTermChange() {
+    const lower = this.lopSearchTerm.toLowerCase();
+    this.filteredClassList = this.classList.filter(cls =>
+      cls.toLowerCase().includes(lower)
+    );
+  }
 
-      this.toastr.success('Tạo bài kiểm tra thành công!');
-      this.newTest = {
-        tenBaiKiemTra: '',
-        ngayKiemTra: '',
-        tenLop: '',
-        taiLieu: null as any
-      };
-      this.selectedClassSchedule = [];
-      this.showCreateForm = false;
-      this.loadTests();
-    },
-    error: (error) => {
-       this.spinner.hide();
-        this.toastr.error('Đã xảy ra lỗi không xác định.');
-    
+  selectLop(selected: string) {
+    this.newTest.tenLop = selected;
+    this.lopDropdownOpen = false;
+    this.onClassSelected(selected); // nếu bạn đang dùng để lấy lịch
+  }
+
+  addTest() {
+    if (!this.newTest.tenBaiKiemTra || !this.newTest.ngayKiemTra || !this.newTest.tenLop || !this.newTest.taiLieu) {
+      this.toastr.warning('Vui lòng điền đầy đủ thông tin!');
+      return;
     }
-  });
-}
+
+    const formData = new FormData();
+    formData.append('BaiKiemTraDto.TenBaiKiemTra', this.newTest.tenBaiKiemTra);
+    formData.append('BaiKiemTraDto.NgayKiemTra', this.newTest.ngayKiemTra);
+    formData.append('BaiKiemTraDto.TenLop', this.newTest.tenLop);
+    formData.append('BaiKiemTraDto.TaiLieu', this.newTest.taiLieu);
+    this.spinner.show();
+    this.testlistService.createTest(formData).subscribe({
+      next: (res) => {
+        this.spinner.hide();
+        if (res?.isError) {
+          this.toastr.error(res.message);
+          return;
+        }
+
+        this.toastr.success('Tạo bài kiểm tra thành công!');
+        this.newTest = {
+          tenBaiKiemTra: '',
+          ngayKiemTra: '',
+          tenLop: '',
+          taiLieu: null as any
+        };
+        this.selectedClassSchedule = [];
+        this.showCreateForm = false;
+        this.loadTests();
+      },
+      error: (error) => {
+        this.spinner.hide();
+        this.toastr.error('Đã xảy ra lỗi không xác định.');
+
+      }
+    });
+  }
 
   openModal() {
     this.showCreateForm = true;
-    this.showEditForm = false; 
+    this.showEditForm = false;
   }
-  
+
 
   closeModal() {
-   
+
     this.showCreateForm = false;
   }
 
@@ -298,17 +298,17 @@ addTest() {
     this.editTest = {
       id: test.id,
       tenBaiKiemTra: test.tenBaiKiemTra || test.ten,
-      ngayKiemTra: this.formatDateToInput(test.ngayKiemTra), 
+      ngayKiemTra: this.formatDateToInput(test.ngayKiemTra),
       tenLop: test.tenLop,
       taiLieu: null,
       document: test.urlFile
         ? {
-            name: test.urlFile.split('/').pop(),
-            url: test.urlFile
-          }
+          name: test.urlFile.split('/').pop(),
+          url: test.urlFile
+        }
         : null
     };
-  
+
     this.onClassSelected(this.editTest.tenLop);
     this.showEditForm = true;
     this.showCreateForm = false;
@@ -321,46 +321,46 @@ addTest() {
     const day = ('0' + d.getDate()).slice(-2);
     return `${year}-${month}-${day}`;
   }
-  
+
 
   closeEditModal() {
     this.showEditForm = false;
   }
 
   updateTest() {
-  if (!this.editTest.id || !this.editTest.tenBaiKiemTra || !this.editTest.ngayKiemTra || !this.editTest.tenLop) {
-    this.toastr.warning('Vui lòng điền đầy đủ thông tin!');
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append('BaiKiemTraDto.Id', this.editTest.id);
-  formData.append('BaiKiemTraDto.TenBaiKiemTra', this.editTest.tenBaiKiemTra);
-  formData.append('BaiKiemTraDto.NgayKiemTra', this.editTest.ngayKiemTra);
-  formData.append('BaiKiemTraDto.TenLop', this.editTest.tenLop);
-
-  if (this.editTest.taiLieu instanceof File) {
-    formData.append('BaiKiemTraDto.TaiLieu', this.editTest.taiLieu);
-  }
-  this.spinner.show();
-  this.testlistService.updateTest(formData).subscribe({
-    next: (res) => {
-      if (res?.isError) {
-        this.spinner.hide();
-        this.toastr.error(res.message || res.errors?.[0] || 'Cập nhật thất bại!');
-        return;
-      }
-
-      this.toastr.success('Cập nhật bài kiểm tra thành công!');
-      this.closeEditModal();
-      this.loadTests();
-    },
-    error: (err) => {
-      this.spinner.hide();
-      this.toastr.error('Đã xảy ra lỗi không xác định.');
+    if (!this.editTest.id || !this.editTest.tenBaiKiemTra || !this.editTest.ngayKiemTra || !this.editTest.tenLop) {
+      this.toastr.warning('Vui lòng điền đầy đủ thông tin!');
+      return;
     }
-  });
-}
+
+    const formData = new FormData();
+    formData.append('BaiKiemTraDto.Id', this.editTest.id);
+    formData.append('BaiKiemTraDto.TenBaiKiemTra', this.editTest.tenBaiKiemTra);
+    formData.append('BaiKiemTraDto.NgayKiemTra', this.editTest.ngayKiemTra);
+    formData.append('BaiKiemTraDto.TenLop', this.editTest.tenLop);
+
+    if (this.editTest.taiLieu instanceof File) {
+      formData.append('BaiKiemTraDto.TaiLieu', this.editTest.taiLieu);
+    }
+    this.spinner.show();
+    this.testlistService.updateTest(formData).subscribe({
+      next: (res) => {
+        if (res?.isError) {
+          this.spinner.hide();
+          this.toastr.error(res.message || res.errors?.[0] || 'Cập nhật thất bại!');
+          return;
+        }
+
+        this.toastr.success('Cập nhật bài kiểm tra thành công!');
+        this.closeEditModal();
+        this.loadTests();
+      },
+      error: (err) => {
+        this.spinner.hide();
+        this.toastr.error('Đã xảy ra lỗi không xác định.');
+      }
+    });
+  }
 
   removeDocument() {
     this.editTest.document = null;
@@ -368,30 +368,39 @@ addTest() {
   confirmAndDelete(test: any) {
     const confirmDelete = confirm(`Bạn có chắc chắn muốn xoá bài kiểm tra "${test.tenBaiKiemTra || test.ten}"?`);
     if (!confirmDelete) return;
-  
+
     this.testlistService.deleteTest(test.id).subscribe({
       next: () => {
         this.toastr.success('Xoá bài kiểm tra thành công');
         this.loadTests(); // Refresh danh sách
       },
       error: (err) => {
-       
+
         this.toastr.error('Xoá bài kiểm tra thất bại ');
       }
-    }); 
+    });
   }
-  exportKetquabaikiemtra() {
-    this.testlistService.exportKetquabaikiemtraToExcel().subscribe(
-      (response: Blob) => {
-        const fileName = 'DanhSachKetquabaikiemtra.xlsx';
-        saveAs(response, fileName);
+  exportKetquabaikiemtra(id: string) {
+    this.testlistService.exportKetquabaikiemtraToExcel(id).subscribe(
+      (response: any) => {
+         if (response && response.isError) {
+          // Trường hợp lỗi (nhận res JSON)
+          this.toastr.error(response.message);
+        }
+        else {
+          const fileName = 'DanhSachKetquabaikiemtra.xlsx';
+          saveAs(response, fileName);
+        }
+        
       },
       (error) => {
-        console.error(' Lỗi khi xuất file:', error);
+        this.toastr.error(' Lỗi khi xuất file:', error);
       }
     );
   }
+
 }
-  
-  
+
+
+
 

@@ -71,11 +71,11 @@ export class TestlistService {
     const url = `${this.lopUrl}/gettenlophocbyname?TenLop=${encodeURIComponent(tenLop)}`;
     return this.http.get<string[]>(url, { headers });
   }
-  exportKetquabaikiemtraToExcel(): Observable<Blob> {
+  exportKetquabaikiemtraToExcel(id:string): Observable<Blob> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
   
-    return this.http.post(`${this.ketquaUrl}/exportketquabaikiemtra`, {}, { headers, responseType: 'blob' });
+    return this.http.post(`${this.ketquaUrl}/exportketquabaikiemtra`, {baiKiemTraId:id}, { headers, responseType: 'blob' });
   }
 }
   

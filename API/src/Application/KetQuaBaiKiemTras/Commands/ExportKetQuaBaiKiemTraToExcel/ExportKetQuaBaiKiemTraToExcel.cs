@@ -30,8 +30,8 @@ public class ExportKetQuaBaiKiemTraToExcelCommandHandler : IRequestHandler<Expor
 
     public async Task<Output> Handle(ExportKetQuaBaiKiemTraToExcelCommand request, CancellationToken cancellationToken)
     {
-        try
-        {
+        
+        
             var ketQuaKiemTra = await _context.KetQuaBaiKiemTras
                 .Where(kq => kq.BaiKiemTraId.ToString() == request.BaiKiemTraId && kq.BaiKiemTra.TrangThai == "Đã kiểm tra")
                 .ProjectTo<KetQuaKiemTraExcelDto>(_mapper.ConfigurationProvider)
@@ -39,7 +39,7 @@ public class ExportKetQuaBaiKiemTraToExcelCommandHandler : IRequestHandler<Expor
 
             if (!ketQuaKiemTra.Any()||ketQuaKiemTra.All(kq=>kq.Diem==null))
             {
-                throw new NotFoundDataException("Không có điểm nào để xuất file.");
+                throw new Exception("Không có điểm nào để xuất file.");
             }
 
             using (var package = new ExcelPackage())
@@ -81,18 +81,8 @@ public class ExportKetQuaBaiKiemTraToExcelCommandHandler : IRequestHandler<Expor
                     message = "Tải kết quả bài kiểm tra thành công."
                 };
             }
-        }
-        catch(NotFoundDataException)
-        {
-            throw;
-        }
-        catch
-        {
-            return new Output
-            {
-                isError = true,
-                message = "Xảy ra lỗi khi xuất file."
-            };
-        }
+        
+       
+        
     }
 }
