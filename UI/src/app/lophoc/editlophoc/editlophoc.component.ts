@@ -10,6 +10,7 @@ import { Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { NgxSpinnerService } from 'ngx-spinner';
+
 @Component({
   selector: 'app-edit-lophoc',
   templateUrl: './editlophoc.component.html',
@@ -151,10 +152,13 @@ selectedHocSinh: any = null;
         phong: [phongObj || null, Validators.required],
       }, { validators: this.validateTimeRange });
   
-      // 👇 Lắng nghe thay đổi của field 'thu'
-      group.get('thu')?.valueChanges.subscribe(() => {
-        this.lichHoc.updateValueAndValidity({ onlySelf: true });
+      //  Lắng nghe thay đổi của field 'thu'
+      group.valueChanges.subscribe(() => {
+        group.markAsTouched({ onlySelf: false });
+        group.markAsDirty({ onlySelf: false });
+        this.lichHoc.updateValueAndValidity({ onlySelf: false });
       });
+      
   
       lichHocArray.push(group);
     });
@@ -190,6 +194,9 @@ selectedHocSinh: any = null;
     if (this.editLopForm.invalid) {
       this.editLopForm.markAllAsTouched();
       this.lichHoc.markAsTouched();
+      if (this.editLopForm.invalid || this.lichHoc.hasError('duplicateDays')) {
+        return;
+      }
     }
     
   
@@ -274,15 +281,18 @@ selectedHocSinh: any = null;
         thu: ['', Validators.required],
         gioBatDau: ['', [Validators.required, this.validateTimeStart]],
         gioKetThuc: ['', [Validators.required, this.validateTimeEnd]],
-        phong: [null, Validators.required]
+        phong: [null, Validators.required],
       }, { validators: this.validateTimeRange });
   
-      // 👇 Theo dõi thay đổi để validate trùng
+      //Khi bất kỳ trường nào trong group thay đổi thì chạy lại toàn bộ validator array
       group.get('thu')?.valueChanges.subscribe(() => {
-        this.lichHoc.updateValueAndValidity({ onlySelf: true });
+        this.lichHoc.updateValueAndValidity(); //  BẮT BUỘC
       });
   
       this.lichHoc.push(group);
+  
+      //  Force chạy validator khi thêm mới
+      this.lichHoc.updateValueAndValidity();
     }
   }
   
@@ -291,18 +301,23 @@ selectedHocSinh: any = null;
     return date.toISOString().split('T')[0]; // Trả về dạng yyyy-MM-dd
   }
   onThuChange(): void {
-    // cập nhật lại trạng thái từng dòng (FormGroup)
+    //  đánh dấu dirty/touched từng dòng
     this.lichHoc.controls.forEach((ctrl) => {
-      ctrl.get('thu')?.markAsTouched();
+      ctrl.markAsTouched();
       ctrl.markAsDirty();
     });
   
-    // chạy lại validator cấp FormArray
-    this.lichHoc.updateValueAndValidity({ onlySelf: false });
-    this.lichHoc.markAsTouched({ onlySelf: false });
-    this.lichHoc.markAsDirty({ onlySelf: false });
+    //  luôn ép validator chạy lại sau khi có thay đổi
+    this.lichHoc.updateValueAndValidity();
   }
+  isDuplicate(value: string, currentIndex: number): boolean {
+    const controls = this.lichHoc.controls;
+    const thuList = controls
+      .map((ctrl, i) => i !== currentIndex ? String(ctrl.get('thu')?.value) : null)
+      .filter(v => !!v);
   
+    return thuList.includes(String(value));
+  }
   
   
   onSelectHocSinh(code: string): void {
@@ -319,11 +334,13 @@ selectedHocSinh: any = null;
   }
   validateDuplicateDays(formArray: AbstractControl): ValidationErrors | null {
     const controls = (formArray as FormArray).controls;
-    const thuList: any[] = controls
-      .map(control => control.get('thu')?.value)
+    const thuList: string[] = controls
+      .map(control => String(control.get('thu')?.value)) // ép về string
       .filter(v => !!v);
   
     const hasDuplicate = new Set(thuList).size !== thuList.length;
+  
+    console.log('[DEBUG] Danh sách "thu" ép kiểu:', thuList);
   
     return hasDuplicate ? { duplicateDays: true } : null;
   }
@@ -351,14 +368,14 @@ selectedHocSinh: any = null;
     const startTime = startHour * 60 + startMinute;
     const endTime = endHour * 60 + endMinute;
   
-    if (endTime - startTime < 60) {
+    if (endTime - startTime < 120) {
       return { invalidTimeRange: true };
     }
   
     return null;
   }
   onHocSinhSearchTermChange() {
-    this.hocSinhDropdownOpen = true; // ✅ luôn mở khi gõ
+    this.hocSinhDropdownOpen = true; //  luôn mở khi gõ
   
     const term = this.hocSinhSearchTerm.toLowerCase().trim();
     this.filteredHocSinhList = this.hocSinhDropdownList.filter(hs =>
@@ -367,14 +384,14 @@ selectedHocSinh: any = null;
   }
   
   
-  // ✅ Mở/đóng dropdown khi click
+  //  Mở/đóng dropdown khi click
   toggleHocSinhDropdown() {
     this.hocSinhDropdownOpen = !this.hocSinhDropdownOpen;
     this.hocSinhSearchTerm = '';
     this.filteredHocSinhList = this.hocSinhDropdownList.slice();
   }
   
-  // ✅ Chọn học sinh từ dropdown
+  //  Chọn học sinh từ dropdown
   selectHocSinh(hs: any) {
     if (!this.hocVienList.find(hv => hv.code === hs.code)) {
       this.hocVienList.push(hs);

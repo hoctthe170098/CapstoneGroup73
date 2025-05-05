@@ -12,7 +12,7 @@ export class ChuongtrinhComponent implements OnInit {
   programs: any[] = [];
   currentPage = 1;
   totalPages = 1;
-  searchQuery: string = ''; // ✅ Biến lưu từ khóa tìm kiếm
+  searchQuery: string = ''; //  Biến lưu từ khóa tìm kiếm
 
   constructor(
     private chuongtrinhService: ChuongtrinhService,
@@ -35,7 +35,8 @@ export class ChuongtrinhComponent implements OnInit {
         return;
       }
       if (!response.isError && response.code === 200) {
-        // ✅ Chỉ lọc theo tiêu đề (tieuDe)
+        // 
+        // Chỉ lọc theo tiêu đề (tieuDe)
         this.programs = response.data.items
           .filter(program => program.tieuDe.toLowerCase().includes(search.toLowerCase()))
           .map(program => ({ ...program, expanded: false }));
@@ -87,7 +88,7 @@ export class ChuongtrinhComponent implements OnInit {
     this.getPrograms(this.currentPage, this.searchQuery);
   }
   onDeleteProgram(id: number, event: Event): void {
-    event.preventDefault(); // ✅ Ngăn chặn reload
+    event.preventDefault(); //  Ngăn chặn reload
 
     if (confirm(`Bạn có chắc chắn muốn xóa chương trình này không?`)) {
       this.chuongtrinhService.deleteProgram(id).subscribe({

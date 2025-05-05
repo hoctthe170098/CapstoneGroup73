@@ -87,7 +87,7 @@ export class EditchuongtrinhComponent implements OnInit {
     }
   }
 
-  /** ✅ Kiểm tra nội dung bài học */
+  /**  Kiểm tra nội dung bài học */
   validateLesson(index: number, field: string) {
     if (!this.errors.noiDungBaiHocs[index]) {
       this.errors.noiDungBaiHocs[index] = {};
@@ -106,7 +106,7 @@ export class EditchuongtrinhComponent implements OnInit {
     }
   }
 
-  /** ✅ Kiểm tra toàn bộ dữ liệu trước khi gửi */
+  /**  Kiểm tra toàn bộ dữ liệu trước khi gửi */
   isFormValid() {
     let valid = true;
 
@@ -127,7 +127,7 @@ export class EditchuongtrinhComponent implements OnInit {
     return valid;
   }
 
-  /** ✅ Thêm bài học mới */
+  /**  Thêm bài học mới */
   addLesson() {
     this.program.noiDungBaiHocs.push({
       id: null,
@@ -139,12 +139,12 @@ export class EditchuongtrinhComponent implements OnInit {
     });
   }
 
-  /** ✅ Toggle mở rộng bài học */
+  /**  Toggle mở rộng bài học */
   toggleLesson(index: number) {
     this.program.noiDungBaiHocs[index].expanded = !this.program.noiDungBaiHocs[index].expanded;
   }
 
-  /** ✅ Xóa bài học */
+  /**  Xóa bài học */
   removeLesson(index: number) {
     this.program.noiDungBaiHocs.splice(index, 1);
     this.program.noiDungBaiHocs.forEach((lesson, i) => {
@@ -152,18 +152,18 @@ export class EditchuongtrinhComponent implements OnInit {
     });
   }
 
-  /** ✅ Lưu lại vị trí bài học đang kéo */
+  /**  Lưu lại vị trí bài học đang kéo */
   onDragStart(event: DragEvent, index: number) {
     this.draggedLessonIndex = index;
     event.dataTransfer?.setData("text/plain", index.toString());
   }
 
-  /** ✅ Xử lý khi kéo qua phần tử khác */
+  /**  Xử lý khi kéo qua phần tử khác */
   onDragOver(event: DragEvent) {
     event.preventDefault();
   }
 
-  /** ✅ Xử lý khi thả bài học */
+  /**  Xử lý khi thả bài học */
   onDropLesson(event: DragEvent, targetIndex: number) {
     event.preventDefault();
     if (this.draggedLessonIndex === null || this.draggedLessonIndex === targetIndex) return;
@@ -205,7 +205,7 @@ export class EditchuongtrinhComponent implements OnInit {
       ten:file.name
     });
   }
-  /** ✅ Upload file vào danh sách */
+  /**  Upload file vào danh sách */
   uploadFile(file: File, lessonIndex: number) {
     const allowedTypes = ['application/pdf', 'application/msword', 'video/mp4'];
     if (!allowedTypes.includes(file.type)) {
@@ -218,7 +218,7 @@ export class EditchuongtrinhComponent implements OnInit {
       ten: file.name
     });
   }
-  /** ✅ Gửi chương trình đã chỉnh sửa lên API */
+  /**  Gửi chương trình đã chỉnh sửa lên API */
   saveProgram() {
    
     if (!this.isFormValid()) {
@@ -271,7 +271,7 @@ export class EditchuongtrinhComponent implements OnInit {
     this.program.noiDungBaiHocs[lessonIndex].taiLieuHocTaps.splice(fileIndex, 1);
   }
 
-  /** ✅ Hủy chỉnh sửa */
+  /**  Hủy chỉnh sửa */
   cancelEdit() {
     this.router.navigate(['/chuongtrinh']);
   }

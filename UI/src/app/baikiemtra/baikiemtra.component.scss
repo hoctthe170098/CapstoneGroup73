@@ -290,7 +290,7 @@
 .lop-select-container {
   position: relative;
   width: 100%;
-  z-index: 10; // 👈 đảm bảo nằm trên các phần tử khác
+  z-index: 10; 
 }
 
 .lop-select-display {
@@ -322,11 +322,11 @@
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-  z-index: 9999; // 👈 phải cao hơn các thành phần xung quanh
+  z-index: 9999; 
   padding: 8px 0;
   max-height: 260px;
   overflow-y: auto;
-  box-sizing: border-box; // 👈 đảm bảo padding không làm bể khung
+  box-sizing: border-box; 
 }
 
 .search-box {

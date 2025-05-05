@@ -2,8 +2,8 @@
     font-family: sans-serif;
     padding: 1rem;
     background: #f9fafb;
-    border: 1px solid #d1d5db; // ✅ đường viền tổng thể
-    border-radius: 8px;         // tuỳ chọn bo góc nhẹ
+    border: 1px solid #d1d5db; 
+    border-radius: 8px;        
   
     .filter-bar {
       display: flex;
@@ -29,7 +29,7 @@
         
       }
       select:nth-of-type(1) {
-        width: 150px; // ✅ Tuần to hơn
+        width: 150px; 
       }
     }
   
@@ -47,7 +47,7 @@
         justify-content: center;
         background: #f3f4f6;
         font-size: 0.8rem;
-        border-bottom: 1px solid #d1d5db; /* ✅ Gạch dưới rõ hơn */
+        border-bottom: 1px solid #d1d5db; 
         font-weight: 600;
         color: #374151;
       }
@@ -57,7 +57,7 @@
         padding: 0.5rem;
         background: #f3f4f6;
         border-bottom: 1px solid #d1d5db;
-        border-left: 1px solid #e5e7eb; /* ✅ đường ngăn cách giữa các ngày */
+        border-left: 1px solid #e5e7eb; 
       }
     }
     .calendar-title {
@@ -65,7 +65,7 @@
       font-size: 1.5rem;
       font-weight: 700;
       margin-bottom: 1rem;
-      color: #1f2937; // màu đậm dễ nhìn
+      color: #1f2937; 
     }
   
     .calendar-body {
@@ -82,7 +82,7 @@
           height: 60px;
           font-size: 0.75rem;
           color: #6b7280;
-          border-bottom: 1px solid #ccc; // ✅ Đồng bộ với .hour-line
+          border-bottom: 1px solid #ccc; 
           padding-top: 4px;
           text-align: right;
           padding-right: 8px;
@@ -91,8 +91,8 @@
       }
   
       .day-column {
-        border-left: 1px solid #e5e7eb; /* ngăn cách với cột trước */
-        border-right: 1px solid #e5e7eb; /* ✅ ngăn cách với cột kế tiếp */
+        border-left: 1px solid #e5e7eb; 
+        border-right: 1px solid #e5e7eb; 
         position: relative;
   
         .time-blocks {
@@ -118,7 +118,10 @@
           box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   
           .title {
-            font-weight: 600;
+            a {
+              color: white;         
+              text-decoration: underline; 
+            }
           }
   
           .room,
@@ -129,10 +132,10 @@
       }
     }
     .calendar-table {
-      border: 2px solid #d1d5db;      // ✅ Viền ngoài tổng thể
+      border: 2px solid #d1d5db;      
       border-radius: 6px;
-      overflow: hidden;               // Ẩn phần viền tràn (nếu có)
-      background: white;              // Giữ cho nền trắng đẹp
+      overflow: hidden;               
+      background: white;             
     }
   }
   

@@ -2,7 +2,7 @@
   font-family: sans-serif;
   padding: 1rem;
   background: #f9fafb;
-  border: 1px solid #d1d5db; // ✅ đường viền tổng thể
+  border: 1px solid #d1d5db; //  đường viền tổng thể
   border-radius: 8px;         // tuỳ chọn bo góc nhẹ
 
   .filter-bar {
@@ -29,7 +29,7 @@
       
     }
     select:nth-of-type(1) {
-      width: 150px; // ✅ Tuần to hơn
+      width: 150px; //  Tuần to hơn
     }
   }
 
@@ -47,7 +47,7 @@
       justify-content: center;
       background: #f3f4f6;
       font-size: 0.8rem;
-      border-bottom: 1px solid #d1d5db; /* ✅ Gạch dưới rõ hơn */
+      border-bottom: 1px solid #d1d5db; /*  Gạch dưới rõ hơn */
       font-weight: 600;
       color: #374151;
     }
@@ -57,7 +57,7 @@
       padding: 0.5rem;
       background: #f3f4f6;
       border-bottom: 1px solid #d1d5db;
-      border-left: 1px solid #e5e7eb; /* ✅ đường ngăn cách giữa các ngày */
+      border-left: 1px solid #e5e7eb; /*  đường ngăn cách giữa các ngày */
     }
   }
   .calendar-title {
@@ -82,7 +82,7 @@
         height: 60px;
         font-size: 0.75rem;
         color: #6b7280;
-        border-bottom: 1px solid #ccc; // ✅ Đồng bộ với .hour-line
+        border-bottom: 1px solid #ccc; //  Đồng bộ với .hour-line
         padding-top: 4px;
         text-align: right;
         padding-right: 8px;
@@ -92,7 +92,7 @@
 
     .day-column {
       border-left: 1px solid #e5e7eb; /* ngăn cách với cột trước */
-      border-right: 1px solid #e5e7eb; /* ✅ ngăn cách với cột kế tiếp */
+      border-right: 1px solid #e5e7eb; /*  ngăn cách với cột kế tiếp */
       position: relative;
 
       .time-blocks {
@@ -129,13 +129,14 @@
     }
   }
   .calendar-table {
-    border: 2px solid #d1d5db;      // ✅ Viền ngoài tổng thể
+    border: 2px solid #d1d5db;      //  Viền ngoài tổng thể
     border-radius: 6px;
     overflow: hidden;               // Ẩn phần viền tràn (nếu có)
     background: white;              // Giữ cho nền trắng đẹp
   }
   .link {
-    color: #FBD1A2;
+    color: white;
+    text-decoration: underline;
     cursor: pointer;
   }
 }

@@ -112,7 +112,7 @@ export class AddlophocComponent implements OnInit {
       gioBatDau: ['', [Validators.required, this.validateTimeStart]],
       gioKetThuc: ['', [Validators.required, this.validateTimeEnd]],
       phong: [null, Validators.required]
-    }, { validators: this.validateTimeRange }); // 👈 Thêm validator ở đây
+    }, { validators: this.validateTimeRange }); //  Thêm validator ở đây
 
     return group;
   }

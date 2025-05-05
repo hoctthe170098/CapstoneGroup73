@@ -298,7 +298,7 @@ addTest() {
     this.editTest = {
       id: test.id,
       tenBaiKiemTra: test.tenBaiKiemTra || test.ten,
-      ngayKiemTra: this.formatDateToInput(test.ngayKiemTra), // 👈 Quan trọng!
+      ngayKiemTra: this.formatDateToInput(test.ngayKiemTra), 
       tenLop: test.tenLop,
       taiLieu: null,
       document: test.urlFile

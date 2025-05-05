@@ -2,11 +2,11 @@
   padding: 16px;
   display: flex;
   flex-direction: column;
-  align-items: center; // 👉 Căn giữa nội dung
-  border: 1px solid #ccc;       // 👉 khung viền ngoài
-  border-radius: 8px;           // 👉 bo góc nhẹ cho đẹp
-  background-color: #ffffff;    // 👉 nền trắng nếu cần nổi bật
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); // 👉 thêm đổ bóng nhẹ cho đẹp (tùy chọn)
+  align-items: center; //  Căn giữa nội dung
+  border: 1px solid #ccc;       //  khung viền ngoài
+  border-radius: 8px;           //  bo góc nhẹ cho đẹp
+  background-color: #ffffff;    //  nền trắng nếu cần nổi bật
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); //  thêm đổ bóng nhẹ cho đẹp (tùy chọn)
   h2 {
     font-size: 20px;
     margin-bottom: 16px;
@@ -28,16 +28,16 @@
   }
 
   table {
-    width: 100%; // 👉 bảng không quá to
+    width: 100%; //  bảng không quá to
     border-collapse: collapse;
     background: #fff;
 
     th, td {
       padding: 12px 16px;
       text-align: center;
-      border-bottom: 1px solid #e0e0e0; // 👉 chỉ còn border ngang
-      border-right: none; // 👉 bỏ border phải
-      border-left: none; // 👉 bỏ border trái
+      border-bottom: 1px solid #e0e0e0; //  chỉ còn border ngang
+      border-right: none; //  bỏ border phải
+      border-left: none; //  bỏ border trái
     }
 
     th {

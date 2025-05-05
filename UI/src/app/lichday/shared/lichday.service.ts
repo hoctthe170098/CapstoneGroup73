@@ -21,7 +21,7 @@ export class LichHocService {
     }
 
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${localStorage.getItem('token') || ''}` // tùy theo cách bạn lưu token
+      'Authorization': `Bearer ${localStorage.getItem('token') || ''}` 
     });
 
     return this.http.get<GetLichHocGiaoVienResponse>(`${this.lichhocUrl}/getlichhocgiaovien`, { headers, params });

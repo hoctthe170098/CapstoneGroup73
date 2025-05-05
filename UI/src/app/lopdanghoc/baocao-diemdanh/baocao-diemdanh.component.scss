@@ -1,40 +1,47 @@
 .attendance-report {
-    padding: 16px;
-  
-    h2 {
-      font-size: 20px;
-      margin-bottom: 16px;
+  padding: 16px;
+
+  h2 {
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+
+    th, td {
+      padding: 12px;
+      border: none; 
+      text-align: left;
     }
-  
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background-color: #fff;
-  
-      th, td {
-        padding: 12px;
-        border: 1px solid #e0e0e0;
-        text-align: left;
-      }
-  
-      th {
-        background-color: #f0f2f5;
-        font-weight: 600;
-      }
-  
-      tr:nth-child(even) {
-        background-color: #fafafa;
-      }
-  
-      .co-mat {
-        color: green;
-        font-weight: 500;
-      }
-  
-      .vang {
-        color: red;
-        font-weight: 500;
-      }
+
+    th {
+      background-color: #f0f2f5;
+      font-weight: 600;
+    }
+
+    tr {
+      border-bottom: 1px solid #e0e0e0; 
+    }
+
+    tr:last-child {
+      border-bottom: none;
+    }
+
+    tr:nth-child(even) {
+      background-color: #fafafa;
+    }
+
+    .co-mat {
+      color: green;
+      font-weight: 500;
+    }
+
+    .vang {
+      color: red;
+      font-weight: 500;
     }
   }
-  
+}

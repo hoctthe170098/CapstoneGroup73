@@ -27,7 +27,7 @@ export class NhanxetdinhkiComponent implements OnInit {
 
   ngOnInit(): void {
     const code = this.route.snapshot.paramMap.get('hocSinhId');
-    this.tenLop = this.route.parent?.snapshot.paramMap.get('tenLop'); // 👈 Gán vào this
+    this.tenLop = this.route.parent?.snapshot.paramMap.get('tenLop'); //  Gán vào this
 
     if (code && this.tenLop) {
       this.loadNhanXetDinhKy(this.tenLop, code);

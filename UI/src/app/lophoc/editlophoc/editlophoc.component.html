@@ -9,19 +9,18 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="tenLop">Tên lớp</label>
-              <input id="tenLop" type="text" class="form-control" formControlName="tenLop"
-       [readonly]="canEditAll" placeholder="Nhập tên lớp" />
+              <input id="tenLop" type="text" class="form-control" formControlName="tenLop" [readonly]="canEditAll"
+                placeholder="Nhập tên lớp" />
             </div>
-           
+
           </div>
 
           <div class="col-md-6">
             <div class="form-group">
               <label for="chuongTrinh">Chương trình học</label>
-            <input type="text" id="chuongTrinh" class="form-control"
-                   [value]="editLopForm.get('chuongTrinh')?.value?.tieuDe"
-                   readonly />
-             
+              <input type="text" id="chuongTrinh" class="form-control"
+                [value]="editLopForm.get('chuongTrinh')?.value?.tieuDe" readonly />
+
             </div>
           </div>
         </div>
@@ -31,40 +30,36 @@
           <div class="col-md-3">
             <div class="form-group">
               <label for="hocPhi">Học phí</label>
-              <input id="hocPhi" type="number" class="form-control" formControlName="hocPhi"
-                [readonly]="canEditAll" />
+              <input id="hocPhi" type="number" class="form-control" formControlName="hocPhi" [readonly]="canEditAll" />
 
-                          
+
             </div>
-            
+
           </div>
 
           <div class="col-md-3">
             <div class="form-group">
               <label for="giaoVien">Giáo viên</label>
               <input id="giaoVien" type="text" class="form-control"
-                     [value]="editLopForm.get('giaoVien')?.value?.codeTen"
-                     readonly />
+                [value]="editLopForm.get('giaoVien')?.value?.codeTen" readonly />
             </div>
           </div>
-          
+
 
           <div class="col-md-3">
             <div class="form-group">
               <label for="ngayBatDau">Ngày bắt đầu</label>
-              <input id="ngayBatDau" type="date" class="form-control" formControlName="ngayBatDau"
-                readonly/>
+              <input id="ngayBatDau" type="date" class="form-control" formControlName="ngayBatDau" readonly />
 
-             
+
             </div>
           </div>
 
           <div class="col-md-3">
             <div class="form-group">
               <label for="ngayKetThuc">Ngày kết thúc</label>
-              <input id="ngayKetThuc" type="date" class="form-control" formControlName="ngayKetThuc"
-                     readonly />
-                    
+              <input id="ngayKetThuc" type="date" class="form-control" formControlName="ngayKetThuc" readonly />
+
             </div>
           </div>
         </div>
@@ -75,10 +70,12 @@
         </div>
 
         <div formArrayName="lichHoc">
-          <div class="form-group row align-items-center" *ngFor="let schedule of lichHoc.controls; let i = index" [formGroupName]="i">
+          <div class="form-group row align-items-center" *ngFor="let schedule of lichHoc.controls; let i = index"
+            [formGroupName]="i">
             <div class="col-md-3 mb-2">
               <label>Thứ trong tuần</label>
-              <select class="form-control" formControlName="thu" [disabled]="!canEditAll" (change)="onThuChange()">
+              <select class="form-control" formControlName="thu" [disabled]="!canEditAll" (change)="onThuChange(i)">
+
                 <option value="">Chọn thứ trong tuần</option>
                 <option value="2">Thứ hai</option>
                 <option value="3">Thứ ba</option>
@@ -89,14 +86,16 @@
                 <option value="8">Chủ nhật</option>
               </select>
               <small class="text-danger"
-                *ngIf="schedule.get('thu').touched && schedule.get('thu').hasError('required')">
+                *ngIf="schedule.get('thu')?.touched && schedule.get('thu')?.hasError('required')">
                 Vui lòng chọn thứ trong tuần!
               </small>
-              <small class="text-danger mt-1" *ngIf="lichHoc.hasError('duplicateDays') && (lichHoc.dirty || lichHoc.touched)">
+
+              <small class="text-danger"
+                *ngIf="schedule.get('thu')?.touched && !schedule.get('thu')?.hasError('required') && isDuplicate(schedule.get('thu')?.value, i)">
                 Không được chọn trùng thứ trong tuần!
               </small>
             </div>
-            
+
 
             <div class="col-md-2 mb-2">
               <label>Giờ bắt đầu</label>
@@ -114,15 +113,16 @@
               <label>Giờ kết thúc</label>
               <input type="time" class="form-control" formControlName="gioKetThuc" [readonly]="!canEditAll" />
               <small class="text-danger"
-              *ngIf="schedule.get('gioKetThuc').touched && schedule.get('gioKetThuc').hasError('required')">
-              Vui lòng chọn giờ kết thúc!
-            </small>
-            <small class="text-danger" *ngIf="schedule.get('gioKetThuc').hasError('invalidEndTime')">
-              Giờ kết thúc không được sau 10:00 tối!
-            </small>
-            <small class="text-danger" *ngIf="schedule.errors?.invalidTimeRange && (schedule.get('gioKetThuc')?.touched || schedule.get('gioBatDau')?.touched)">
-              Giờ kết thúc phải sau giờ bắt đầu ít nhất 1 tiếng!
-            </small>
+                *ngIf="schedule.get('gioKetThuc').touched && schedule.get('gioKetThuc').hasError('required')">
+                Vui lòng chọn giờ kết thúc!
+              </small>
+              <small class="text-danger" *ngIf="schedule.get('gioKetThuc').hasError('invalidEndTime')">
+                Giờ kết thúc không được sau 10:00 tối!
+              </small>
+              <small class="text-danger"
+                *ngIf="schedule.errors?.invalidTimeRange && (schedule.get('gioKetThuc')?.touched || schedule.get('gioBatDau')?.touched)">
+                Giờ kết thúc phải sau giờ bắt đầu ít nhất 2 tiếng!
+              </small>
             </div>
 
             <div class="col-md-3 mb-2">
@@ -132,16 +132,16 @@
                 <option *ngFor="let p of phongList" [ngValue]="p">{{ p.ten }}</option>
               </select>
               <small class="text-danger"
-              *ngIf="schedule.get('phong').touched && schedule.get('phong').hasError('required')">
-              Vui lòng chọn phòng học!
-            </small>
+                *ngIf="schedule.get('phong').touched && schedule.get('phong').hasError('required')">
+                Vui lòng chọn phòng học!
+              </small>
             </div>
 
             <div class="col-md-2 mb-2 d-flex align-items-center justify-content-center" *ngIf="canEditAll">
               <button type="button" class="btn btn-danger" (click)="removeSchedule(i)">-</button>
             </div>
           </div>
-          
+
 
           <button type="button" class="btn btn-primary mt-2" (click)="addSchedule()" *ngIf="canEditAll">+</button>
         </div>
@@ -151,7 +151,7 @@
           <div class="hoc-vien-header d-flex align-items-center gap-3 flex-wrap">
             <!-- Label -->
             <label class="form-label fw-bold mb-0">Danh Sách Học Viên</label>
-          
+
             <!-- Dropdown -->
             <div class="hoc-sinh-dropdown-wrapper position-relative">
               <div class="lop-select-display" (click)="toggleHocSinhDropdown()">
@@ -159,22 +159,17 @@
                 <span *ngIf="selectedHocSinh">{{ selectedHocSinh.code }} - {{ selectedHocSinh.ten }}</span>
                 <i class="fa fa-caret-down caret-icon"></i>
               </div>
-          
+
               <div *ngIf="hocSinhDropdownOpen" class="lop-select-dropdown">
                 <div class="search-box">
-                  <input
-                    type="text"
-                    class="form-control"
-                    [(ngModel)]="hocSinhSearchTerm"
-                    [ngModelOptions]="{ standalone: true }"
-                    (input)="onHocSinhSearchTermChange()"
+                  <input type="text" class="form-control" [(ngModel)]="hocSinhSearchTerm"
+                    [ngModelOptions]="{ standalone: true }" (input)="onHocSinhSearchTermChange()"
                     placeholder="Tìm học sinh theo mã hoặc tên" />
                 </div>
-          
+
                 <ul class="select-options list-group list-group-flush mb-0">
-                  <li class="list-group-item list-group-item-action"
-                      *ngFor="let hs of filteredHocSinhList"
-                      (click)="selectHocSinh(hs)">
+                  <li class="list-group-item list-group-item-action" *ngFor="let hs of filteredHocSinhList"
+                    (click)="selectHocSinh(hs)">
                     {{ hs.code }} - {{ hs.ten }}
                   </li>
                   <li *ngIf="filteredHocSinhList.length === 0" class="list-group-item text-muted">
@@ -184,9 +179,9 @@
               </div>
             </div>
           </div>
-        
-        
-          
+
+
+
           <table class="table table-bordered table-hover mt-2">
             <thead class="table-light">
               <tr>

@@ -111,7 +111,7 @@ export class AccountmanagerComponent implements OnInit {
     );
   }
 
-  /** 🟢 Chuyển trang */
+  /**  Chuyển trang */
   changePage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
@@ -284,7 +284,7 @@ export class AccountmanagerComponent implements OnInit {
   onDistrictChange(districtCode: string) {
 
     if (!this.districts || this.districts.length === 0) {
-      console.error("⚠️ Không có danh sách quận/huyện để tìm kiếm khi thêm mới!");
+      console.error(" Không có danh sách quận/huyện để tìm kiếm khi thêm mới!");
       return;
     }
 
@@ -295,7 +295,7 @@ export class AccountmanagerComponent implements OnInit {
     const availableDistrictCodes = this.districts.map(d => isDistrictCodeString ? String(d.code) : Number(d.code));
 
     if (!availableDistrictCodes.includes(districtCodeFormatted)) {
-      console.error(`⚠️ Không tìm thấy quận/huyện với mã: ${districtCodeFormatted}`);
+      console.error(` Không tìm thấy quận/huyện với mã: ${districtCodeFormatted}`);
       return;
     }
 
@@ -366,7 +366,7 @@ export class AccountmanagerComponent implements OnInit {
   
       // Hiển thị toastr
       this.toastr.error('Vui lòng điền đầy đủ và đúng thông tin trước khi áp dụng!');
-      return; // ⛔ Không gửi API nếu form lỗi
+      return; //  Không gửi API nếu form lỗi
     }
 
     const provinceName = this.selectedProvince ? this.selectedProvince.name : "Không xác định";
@@ -424,7 +424,7 @@ export class AccountmanagerComponent implements OnInit {
   }
   onDistrictChangeForEdit(districtCode: string) {
     if (!this.editDistricts || this.editDistricts.length === 0) {
-      console.error("⚠️ Không có danh sách quận/huyện để tìm kiếm!");
+      console.error(" Không có danh sách quận/huyện để tìm kiếm!");
       return;
     }
 
@@ -442,7 +442,7 @@ export class AccountmanagerComponent implements OnInit {
     if (this.selectedDistrict) {
       this.editmanager.district = this.selectedDistrict.code;
     } else {
-      console.error(`⚠️ Không tìm thấy quận/huyện có mã: ${districtCodeFormatted}`);
+      console.error(` Không tìm thấy quận/huyện có mã: ${districtCodeFormatted}`);
       this.editmanager.district = '';  // Reset giá trị nếu không tìm thấy
     }
   }

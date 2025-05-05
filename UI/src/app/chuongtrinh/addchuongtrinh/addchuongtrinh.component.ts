@@ -53,7 +53,7 @@ export class AddchuongtrinhComponent {
     }
   }
 
-  /** ✅ Kiểm tra nội dung bài học */
+  /**  Kiểm tra nội dung bài học */
   validateLesson(index: number, field: string) {
     if (!this.errors.noiDungBaiHocs[index]) {
       this.errors.noiDungBaiHocs[index] = {};
@@ -71,7 +71,7 @@ export class AddchuongtrinhComponent {
     }
   }
 
-  /** ✅ Kiểm tra toàn bộ dữ liệu trước khi gửi */
+  /**  Kiểm tra toàn bộ dữ liệu trước khi gửi */
   isFormValid() {
     let valid = true;
 
@@ -93,7 +93,7 @@ export class AddchuongtrinhComponent {
   }
   
 
-  /** ✅ Thêm bài học mới */
+  /**  Thêm bài học mới */
   addLesson() {
     const soThuTu = this.program.noiDungBaiHocs.length + 1;
     this.program.noiDungBaiHocs.push({
@@ -105,7 +105,7 @@ export class AddchuongtrinhComponent {
     });
   }
 
-  /** ✅ Xóa bài học */
+  /**  Xóa bài học */
   removeLesson(index: number) {
     this.program.noiDungBaiHocs.splice(index, 1);
     // Cập nhật lại số thứ tự
@@ -114,12 +114,12 @@ export class AddchuongtrinhComponent {
     });
   }
 
-  /** ✅ Toggle mở rộng nội dung bài học */
+  /**  Toggle mở rộng nội dung bài học */
   toggleLesson(index: number) {
     this.program.noiDungBaiHocs[index].expanded = !this.program.noiDungBaiHocs[index].expanded;
   }
 
-  /** ✅ Xử lý tải file lên (chỉ lưu tạm, không upload ngay) */
+  /**  Xử lý tải file lên (chỉ lưu tạm, không upload ngay) */
   onFileChange(event: Event, lessonIndex: number) {
     const files = (event.target as HTMLInputElement).files;
     if (files) {
@@ -129,7 +129,7 @@ export class AddchuongtrinhComponent {
     }
   }
 
-  /** ✅ Xử lý kéo thả file */
+  /**  Xử lý kéo thả file */
   onDragStart(event: DragEvent, index: number) {
     this.draggedLessonIndex = index;
     event.dataTransfer?.setData("text/plain", index.toString());
@@ -154,7 +154,7 @@ export class AddchuongtrinhComponent {
     this.draggedLessonIndex = null;
   }
 
-  /** ✅ Lưu file vào danh sách bài học (Không upload ngay) */
+  /**  Lưu file vào danh sách bài học (Không upload ngay) */
   addFileToLesson(file: File, lessonIndex: number) {
     const allowedTypes = ['application/pdf', 'application/msword'
     ,'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
@@ -173,12 +173,12 @@ export class AddchuongtrinhComponent {
     });
   }
 
-  /** ✅ Xóa file khỏi danh sách */
+  /**  Xóa file khỏi danh sách */
   removeFile(lessonIndex: number, fileIndex: number) {
     this.program.noiDungBaiHocs[lessonIndex].taiLieuHocTaps.splice(fileIndex, 1);
   }
 
-  /** ✅ Gửi chương trình lên API (bao gồm cả file) */
+  /**  Gửi chương trình lên API (bao gồm cả file) */
   saveProgram() {
     if (!this.isFormValid()) {
       this.toastr.warning('Vui lòng điền đầy đủ thông tin!');
@@ -217,7 +217,7 @@ export class AddchuongtrinhComponent {
     });
   }
 
-  /** ✅ Hủy thêm */
+  /** Hủy thêm */
   cancel() {
     this.router.navigate(['/chuongtrinh']);
   }
