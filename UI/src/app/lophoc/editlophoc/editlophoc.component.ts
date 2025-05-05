@@ -46,7 +46,7 @@ selectedHocSinh: any = null;
       chuongTrinh: [null, Validators.required],
       hocPhi: [null, [Validators.required, Validators.min(50000), Validators.max(500000)]],
       giaoVien: [null, Validators.required],
-      ngayBatDau: ['', [Validators.required, this.validateStartDateAfterToday()]],
+      ngayBatDau: ['', [Validators.required]],
       ngayKetThuc: ['', [Validators.required, this.validateEndDate()]],
       lichHoc: this.fb.array([], [this.validateDuplicateDays.bind(this)])
     });
@@ -108,7 +108,7 @@ selectedHocSinh: any = null;
               startDate.setHours(0, 0, 0, 0);
         
               this.canEditAll = startDate > today;
-              this.isEditable = true; // ✅ Luôn cho phép submit
+              this.isEditable = true; //  Luôn cho phép submit
         
               setTimeout(() => {
                 this.patchForm(res.data);

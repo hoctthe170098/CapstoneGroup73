@@ -124,7 +124,7 @@ export class ChitietBaitaphocsinhComponent implements OnInit, OnDestroy {
   
     this.lopdanghocService.downloadBaiTapFile(path).subscribe({
       next: (res) => {
-  
+        
         if (res?.data?.fileContents) {
           const byteArray = new Uint8Array(
             atob(res.data.fileContents).split('').map(char => char.charCodeAt(0))
