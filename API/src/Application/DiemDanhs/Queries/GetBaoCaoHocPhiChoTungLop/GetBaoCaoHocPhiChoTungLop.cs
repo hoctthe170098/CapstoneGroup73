@@ -63,12 +63,12 @@ public class GetBaoCaoHocPhiChoTungLopQueryHandler : IRequestHandler<GetBaoCaoHo
         var listHocBu = _context.LichHocs
             .Where(lh => lh.TenLop == request.TenLop 
             && lh.Phong.CoSoId == coSoId 
-            && lh.TrangThai == "Học bù")
+            && lh.TrangThai == "Dạy bù")
             .ToList();
         foreach(var hocBu in listHocBu)
         {
             if (hocBu.NgayHocGoc < ngayHienTai) NgayDaHoc.Remove((DateOnly)hocBu.NgayHocGoc);
-            if (hocBu.NgayBatDau < ngayHienTai) NgayDaHoc.Add(hocBu.NgayBatDau);
+            if (hocBu.NgayBatDau < ngayHienTai && hocBu.NgayBatDau != DateOnly.MinValue) NgayDaHoc.Add(hocBu.NgayBatDau);
         }
         if (!NgayDaHoc.Any()) throw new Exception("Lớp học này chưa học buổi nào.");
         var monthYearFirstOccurrence = new Dictionary<ThangNamDto, DateOnly>();

@@ -42,7 +42,7 @@ public class DeleteLichHocCommandHandler : IRequestHandler<DeleteLichHocCommand,
         var ThuHomNay = (int)HomNay.DayOfWeek > 0 ? (int)(HomNay.DayOfWeek) + 1 : 8;
         var TonTaiLichHomNay = await _context.LichHocs
             .AnyAsync(lh => lh.Phong.CoSoId == coSoId && lh.TenLop == request.TenLopHoc
-            && ((lh.Thu == ThuHomNay && lh.TrangThai == "Cố định")
+            && ((lh.Thu == ThuHomNay && lh.TrangThai == "Cố định" && lh.NgayBatDau<=HomNay&&lh.NgayKetThuc>=HomNay)
             || (lh.TrangThai == "Dạy bù" && lh.NgayKetThuc == HomNay)));
         if (TonTaiLichHomNay) throw new Exception("Hôm nay lớp có lịch học, vui lòng chờ đến ngày mai để xoá ");
         if (lichHocCoDinh.NgayBatDau > HomNay)

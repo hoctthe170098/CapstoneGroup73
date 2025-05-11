@@ -66,7 +66,7 @@ public class GetBaoCaoDiemDanhHocSinhQueryHandler : IRequestHandler<GetBaoCaoDie
         foreach(var hocBu in LichHocBu)
         {
             if (hocBu.NgayHocGoc < ngayHienTai) NgayDaHoc.Remove((DateOnly)hocBu.NgayHocGoc);
-            if (hocBu.NgayBatDau < ngayHienTai) NgayDaHoc.Add(hocBu.NgayBatDau);
+            if (hocBu.NgayBatDau < ngayHienTai&&hocBu.NgayBatDau!=DateOnly.MinValue) NgayDaHoc.Add(hocBu.NgayBatDau);
         }
         var data = new List<DiemDanhDto>();
         foreach(var ngay in NgayDaHoc)

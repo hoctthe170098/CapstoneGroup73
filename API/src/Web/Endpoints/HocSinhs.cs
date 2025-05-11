@@ -9,6 +9,7 @@ using StudyFlow.Application.GiaoViens.Queries.GetGiaoViensByNameOrCode;
 using StudyFlow.Application.GiaoViens.Queries.GetGiaoViensWithPagination;
 using StudyFlow.Application.HocSinhs.Commands.AddListHocSinhs;
 using StudyFlow.Application.HocSinhs.Commands.CreateHocSinh;
+using StudyFlow.Application.HocSinhs.Commands.DownloadTemplateExcelHocSinh;
 using StudyFlow.Application.HocSinhs.Commands.EditHocSinh;
 using StudyFlow.Application.HocSinhs.Commands.ExportHocSinhsToExcel;
 using StudyFlow.Application.HocSinhs.Commands.ImportHocSinhFromExcel;
@@ -30,7 +31,8 @@ public class HocSinhs : EndpointGroupBase
             .MapPut(EditHocSinh, "edithocsinh")
             .MapPost(AddListHocSinhs, "addlisthocsinhs")
             .MapPost(ExportHocSinhsToExcel, "exporthocsinhstoexcel")
-            .MapPost(ImportHocSinhsFromExcel, "importhocsinhsfromexcel");
+            .MapPost(ImportHocSinhsFromExcel, "importhocsinhsfromexcel")
+            .MapPost(DownloadTemplateExcelHocSinh,"downtemplateexcelhocsinh");
     }
 
     [Authorize(Roles = Roles.CampusManager)]
@@ -62,6 +64,28 @@ public class HocSinhs : EndpointGroupBase
     }
     [Authorize(Roles = Roles.CampusManager)]
     public async Task<IResult> ExportHocSinhsToExcel(ISender sender, [FromBody] ExportHocSinhsToExcelCommand command)
+    {
+        var result = await sender.Send(command);
+
+        if (result.isError == true)
+        {
+            return Results.BadRequest(result.message);
+        }
+
+        if (result.data == null)
+        {
+            return Results.BadRequest("File not found or error occurred.");
+        }
+
+        if (!(result.data is FileContentResult fileContentResult))
+        {
+            return Results.BadRequest("Invalid file content.");
+        }
+
+        return Results.File(fileContentResult.FileContents, fileContentResult.ContentType, fileContentResult.FileDownloadName);
+    }
+    [Authorize(Roles = Roles.CampusManager)]
+    public async Task<IResult> DownloadTemplateExcelHocSinh(ISender sender, [FromBody] DownloadTemplateExcelHocSinhCommand command)
     {
         var result = await sender.Send(command);
 

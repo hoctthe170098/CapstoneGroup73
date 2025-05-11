@@ -4,6 +4,7 @@ using StudyFlow.Application.ChuongTrinhs.Commands.DowntaiLieuHocTap;
 using StudyFlow.Application.Common.Models;
 using StudyFlow.Application.GiaoViens.Commands.AddListGiaoViens;
 using StudyFlow.Application.GiaoViens.Commands.CreateGiaoVien;
+using StudyFlow.Application.GiaoViens.Commands.DownloadTemplateExcelGiaoVien;
 using StudyFlow.Application.GiaoViens.Commands.EditGiaoVien;
 using StudyFlow.Application.GiaoViens.Commands.ExportGiaoViensToExcel;
 using StudyFlow.Application.GiaoViens.Commands.ImportGiaoViensFromExcel;
@@ -27,7 +28,8 @@ public class GiaoViens : EndpointGroupBase
             .MapPost(AddListGiaoViens, "addlistgiaoviens")
             .MapPost(ImportGiaoViensFromEXcel, "importgiaoviensfromexcel")
             .MapPost(ExportGiaoViensToExcel, "exportgiaovienstoexcel")
-            .MapPost(GetGiaoVienAssignedClass, "getgiaovienassignedclass");
+            .MapPost(GetGiaoVienAssignedClass, "getgiaovienassignedclass")
+            .MapPost(DownloadTemplateExcelGiaoVien,"downloadtemplateexcelgiaovien");
     }
     [Authorize(Roles = Roles.CampusManager)]
     public async Task<Output> CreateGiaoVien(ISender sender, CreateGiaoVienCommand comand)
@@ -61,6 +63,28 @@ public class GiaoViens : EndpointGroupBase
     }
     [Authorize(Roles = Roles.CampusManager)]
     public async Task<IResult> ExportGiaoViensToExcel(ISender sender, [FromBody] ExportGiaoViensToExcelCommand command)
+    {
+        var result = await sender.Send(command);
+
+        if (result.isError == true)
+        {
+            return Results.BadRequest(result.message);
+        }
+
+        if (result.data == null)
+        {
+            return Results.BadRequest("File not found or error occurred.");
+        }
+
+        if (!(result.data is FileContentResult fileContentResult))
+        {
+            return Results.BadRequest("Invalid file content.");
+        }
+
+        return Results.File(fileContentResult.FileContents, fileContentResult.ContentType, fileContentResult.FileDownloadName);
+    }
+    [Authorize(Roles = Roles.CampusManager)]
+    public async Task<IResult> DownloadTemplateExcelGiaoVien(ISender sender, [FromBody] DownloadTemplateExcelGiaoVienCommand command)
     {
         var result = await sender.Send(command);
 

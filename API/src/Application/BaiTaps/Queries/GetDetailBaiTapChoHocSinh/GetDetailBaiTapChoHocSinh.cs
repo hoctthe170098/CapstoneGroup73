@@ -47,12 +47,11 @@ public class GetDetailBaiTapChoHocSinhQueryHandler : IRequestHandler<GetDetailBa
                 .ThenInclude(lh => lh.ThamGiaLopHocs)
             .FirstOrDefaultAsync(bt => bt.Id == request.BaiTapId, cancellationToken)
             ?? throw new NotFoundDataException("Không tìm thấy bài tập.");
-
+        var HomNay = DateOnly.FromDateTime(DateTime.Now);
         var isHocSinh = baiTap.LichHoc.ThamGiaLopHocs
-            .Any(tg => tg.HocSinhCode == hocSinh.Code);
-
+            .Any(tg => tg.HocSinhCode == hocSinh.Code&&DateOnly.FromDateTime(baiTap.NgayTao)<=tg.NgayKetThuc);
         if (!isHocSinh)
-            throw new UnauthorizedAccessException("Bạn không có quyền truy cập bài tập này.");
+            throw new NotFoundIDException();
 
         int secondsLeft = 0;
 

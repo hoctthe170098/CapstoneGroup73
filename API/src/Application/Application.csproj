@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="BaiTaps\Commands\DownloadBaiTap\" />
     <Folder Include="DashBoards\Commands\" />
   </ItemGroup>
 

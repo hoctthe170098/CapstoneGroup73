@@ -52,12 +52,12 @@ public class GetBaoCaoDiemDanhChoTungLopQueryHandler : IRequestHandler<GetBaoCao
         var listHocBu = _context.LichHocs
             .Where(lh => lh.TenLop == request.TenLop
             && lh.Phong.CoSoId == coSoId
-            && lh.TrangThai == "Học bù")
+            && lh.TrangThai == "Dạy bù")
             .ToList();
         foreach (var hocBu in listHocBu)
         {
             if (hocBu.NgayHocGoc < ngayHienTai) NgayDaHoc.Remove((DateOnly)hocBu.NgayHocGoc);
-            if (hocBu.NgayBatDau < ngayHienTai) NgayDaHoc.Add(hocBu.NgayBatDau);
+            if (hocBu.NgayBatDau < ngayHienTai && hocBu.NgayBatDau!=DateOnly.MinValue) NgayDaHoc.Add(hocBu.NgayBatDau);
         }
         NgayDaHoc = NgayDaHoc.OrderByDescending(ng => ng).ToList();
         if (NgayDaHoc.Count() == 0) throw new Exception("Lớp chưa học ngày nào, chưa thể hiển thị báo cáo.");

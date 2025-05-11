@@ -33,18 +33,18 @@
         [routerLinkActive]="menuItem.submenu.length != 0 ? 'open' : 'active'" [routerLinkActiveOptions]="{exact: false}">
         <a appSidebarAnchorToggle *ngIf="menuItem.submenu.length > 0 && !menuItem.isExternalLink">
           <i [ngClass]="[menuItem.icon]"></i>
-          <span class="menu-title">{{menuItem.title | translate }}</span>
+          <span class="menu-title">{{(menuItem.title | translate)||menuItem.title }}</span>
           <span *ngIf="menuItem.badge && menuItem.badge != '' " [ngClass]="[menuItem.badgeClass]">{{menuItem.badge}}</span>
         </a>
         <a appSidebarAnchorToggle routerLink="{{menuItem.path}}"
           *ngIf="menuItem.submenu.length === 0 && !menuItem.isExternalLink">
           <i [ngClass]="[menuItem.icon]"></i>
-          <span class="menu-title">{{menuItem.title | translate }}</span>
+          <span class="menu-title">{{(menuItem.title | translate)||menuItem.title }}</span>
           <span *ngIf="menuItem.badge && menuItem.badge != '' " [ngClass]="[menuItem.badgeClass]">{{menuItem.badge}}</span>
         </a>
         <a [href]="[menuItem.path]" target="_blank" *ngIf="menuItem.isExternalLink">
           <i [ngClass]="[menuItem.icon]"></i>
-          <span class="menu-title">{{menuItem.title | translate }}</span>
+          <span class="menu-title">{{(menuItem.title | translate)||menuItem.title }}</span>
           <span *ngIf="menuItem.badge && menuItem.badge != '' " [ngClass]="[menuItem.badgeClass]">{{menuItem.badge}}</span>
         </a>
          <!-- Second level menu -->
@@ -54,18 +54,18 @@
             [routerLinkActive]="menuSubItem.submenu.length != 0 ? 'open' : 'active'">
             <a appSidebarAnchorToggle *ngIf="menuSubItem.submenu.length > 0 && !menuSubItem.isExternalLink">
               <i [ngClass]="[menuSubItem.icon]"></i>
-              <span class="menu-title">{{menuSubItem.title | translate }}</span>
+              <span class="menu-title">{{(menuSubItem.title | translate)||menuSubItem.title }}</span>
               <span *ngIf="menuSubItem.badge && menuSubItem.badge != '' " [ngClass]="[menuSubItem.badgeClass]">{{menuSubItem.badge}}</span>
             </a>
             <a appSidebarAnchorToggle routerLink="{{menuSubItem.path}}"
               *ngIf="menuSubItem.submenu.length === 0 && !menuSubItem.isExternalLink">
               <i [ngClass]="[menuSubItem.icon]"></i>
-              <span class="menu-title">{{menuSubItem.title | translate }}</span>
+              <span class="menu-title">{{(menuSubItem.title | translate)||menuSubItem.title }}</span>
               <span *ngIf="menuSubItem.badge && menuSubItem.badge != '' " [ngClass]="[menuSubItem.badgeClass]">{{menuSubItem.badge}}</span>
             </a>
             <a routerLink="{{menuSubItem.path}}" target="_blank" *ngIf="menuSubItem.isExternalLink">
               <i [ngClass]="[menuSubItem.icon]"></i>
-              <span class="menu-title">{{menuSubItem.title | translate }}</span>
+              <span class="menu-title">{{(menuSubItem.title | translate)||menuSubItem.title }}</span>
               <span *ngIf="menuSubItem.badge && menuSubItem.badge != '' " [ngClass]="[menuSubItem.badgeClass]">{{menuSubItem.badge}}</span>
             </a>
             <!-- Third level menu -->
@@ -76,14 +76,14 @@
                 <a appSidebarAnchorToggle routerLink="{{menuSubsubItem.path}}"
                   *ngIf="!menuSubsubItem.isExternalLink; else externalSubSubLinkBlock">
                   <i [ngClass]="[menuSubsubItem.icon]"></i>
-                  <span class="menu-title">{{menuSubsubItem.title | translate }}</span>
+                  <span class="menu-title">{{(menuSubsubItem.title | translate)||menuSubsubItem.title }}</span>
                   <span *ngIf="menuSubsubItem.badge && menuSubsubItem.badge != '' "
                     [ngClass]="[menuSubsubItem.badgeClass]">{{menuSubsubItem.badge}}</span>
                 </a>
                 <ng-template #externalSubSubLinkBlock>
                   <a routerLink="{{menuSubsubItem.path}}" target="_blank">
                     <i [ngClass]="[menuSubsubItem.icon]"></i>
-                    <span class="menu-title">{{menuSubsubItem.title | translate }}</span>
+                    <span class="menu-title">{{(menuSubsubItem.title | translate)||menuSubsubItem.title }}</span>
                     <span *ngIf="menuSubsubItem.badge && menuSubsubItem.badge != '' "
                       [ngClass]="[menuSubsubItem.badgeClass]">{{menuSubsubItem.badge}}</span>
                   </a>

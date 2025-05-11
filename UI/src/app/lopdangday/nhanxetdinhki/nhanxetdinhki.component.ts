@@ -40,19 +40,6 @@ export class NhanxetdinhkiComponent implements OnInit {
     };
     this.lopService.getNhanXetDinhKy(tenLop, code).subscribe({
       next: (res) => {
-        const data = res.data;
-
-        this.hocSinh = {
-          code: data.hocSinhCode,
-          ten: data.tenHocSinh
-        };
-        this.lichSu = data.danhSachNhanXet.map((item: any) => ({
-          id: item.id,
-          ngay: item.ngayNhanXet,
-          noiDung: item.noiDungNhanXet
-        }));
-        this.denHanNhanXet = data.denHanNhanXet;      
-        this.cdr.detectChanges();
         if(!res.isError){
           const data = res.data;
           this.hocSinh = {

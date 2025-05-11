@@ -30,7 +30,11 @@ public record UpdateDiemDanhCommand : IRequest<Output>
         }
         public async Task<Output> Handle(UpdateDiemDanhCommand request, CancellationToken cancellationToken)
         {
-           foreach(var item in request.UpdateDiemDanhs)
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (string.IsNullOrEmpty(token))
+            throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
+        var coSoId = _identityService.GetCampusId(token);
+        foreach (var item in request.UpdateDiemDanhs)
         {
             if (item.Id != null)
             {
@@ -42,17 +46,40 @@ public record UpdateDiemDanhCommand : IRequest<Output>
                 if (item.TrangThai == "Không điểm danh") continue;
                 int thu = (int)(request.Ngay.DayOfWeek);
                 if (thu == 0) thu = 8; else thu++;
-                var lichHoc = _context.LichHocs.First(lh=>lh.Thu == thu&&lh.TenLop==request.TenLop);
-                var ThamGia = _context.ThamGiaLopHocs
-                    .First(tg=>tg.HocSinhCode==item.HocSinhCode&&tg.LichHocId==lichHoc.Id);
-                var diemDanh = new DiemDanh
+                var lichDayBu = _context.LichHocs
+                    .FirstOrDefault(lh => lh.TenLop == request.TenLop 
+                    && lh.Phong.CoSoId == coSoId 
+                    && lh.NgayBatDau == request.Ngay 
+                    && lh.NgayKetThuc == request.Ngay 
+                    && lh.TrangThai == "Dạy bù");
+                if (lichDayBu != null)
                 {
-                    Id = Guid.NewGuid(),
-                    ThamGiaLopHocId = ThamGia.Id,
-                    TrangThai = item.TrangThai,
-                    Ngay = request.Ngay
-                };
-                _context.DiemDanhs.Add(diemDanh);
+                    var ThamGia = _context.ThamGiaLopHocs
+                    .First(tg => tg.HocSinhCode == item.HocSinhCode && tg.LichHocId == lichDayBu.Id);
+                    var diemDanh = new DiemDanh
+                    {
+                        Id = Guid.NewGuid(),
+                        ThamGiaLopHocId = ThamGia.Id,
+                        TrangThai = item.TrangThai,
+                        Ngay = request.Ngay
+                    };
+                    _context.DiemDanhs.Add(diemDanh);
+                }
+                else 
+                {
+                    var lichHoc = _context.LichHocs.First(lh => lh.Thu == thu
+                                        && lh.TenLop == request.TenLop && lh.TrangThai=="Cố định");
+                    var ThamGia = _context.ThamGiaLopHocs
+                        .First(tg => tg.HocSinhCode == item.HocSinhCode && tg.LichHocId == lichHoc.Id);
+                    var diemDanh = new DiemDanh
+                    {
+                        Id = Guid.NewGuid(),
+                        ThamGiaLopHocId = ThamGia.Id,
+                        TrangThai = item.TrangThai,
+                        Ngay = request.Ngay
+                    };
+                    _context.DiemDanhs.Add(diemDanh);
+                }              
             }
             await _context.SaveChangesAsync(cancellationToken);
         }

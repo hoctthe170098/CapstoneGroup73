@@ -7,12 +7,12 @@
           <input type="file" (change)="onFileSelected($event)" />
           <div class="template-note">
             File import có định dạng <strong>.xls</strong> hoặc <strong>.xlsx</strong>. 
-            <a href="assets/templates/template-import-giaovien.xlsx" download class="download-link">
+            <a (click)="downloadtemplate()" class="download-link">
               Download template file
             </a>.
           </div>
         </div>
-      </div>
+      </div> 
 
     <button class="btn btn-secondary back-btn" (click)="goBack()" *ngIf="!fileSelected">
         <i class="fa fa-arrow-left"></i> Back

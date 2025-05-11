@@ -53,8 +53,10 @@ public class GetLichKiemTraVaKetQuaChoHocSinhQueryHandler : IRequestHandler<GetL
             .Select(lh=>lh.Id)
             .ToListAsync();
         if(!LichHocCoSinh.Any()) throw new NotFoundIDException();
+        var thamGia = _context.ThamGiaLopHocs
+            .Where(tg => tg.HocSinhCode == HocSinh.Code && LichHocCoSinh.Contains(tg.LichHocId)).ToList();
         var BaiKiemTra = await _context.BaiKiemTras
-            .Where(kt=>LichHocCoSinh.Contains(kt.LichHocId))
+            .Where(kt => LichHocCoSinh.Contains(kt.LichHocId) && kt.NgayKiemTra <= thamGia[0].NgayKetThuc)
             .OrderByDescending(kt=>kt.NgayKiemTra)
             .ToListAsync();
         var BaiKiemTraList = new List<BaiKiemTraDto>();

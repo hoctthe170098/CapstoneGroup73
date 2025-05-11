@@ -30,7 +30,17 @@
     <PackageReference Include="ZymLabs.NSwag.FluentValidation.AspNetCore" />
   </ItemGroup>
 
-
+  <ItemGroup>
+    <Folder Include="baitaps\" />
+    <Content Include="baitaps\**" CopyToOutputDirectory="Always" />
+    <Folder Include="baikiemtras\" />
+    <Content Include="baikiemtras\**" CopyToOutputDirectory="Always" />
+    <Folder Include="uploads\" />
+    <Content Include="uploads\**" CopyToOutputDirectory="Always" />
+    <Folder Include="tralois\" />
+    <Content Include="tralois\**" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+  
   <!-- Auto-generated Open API specification and Angular TypeScript clients -->
   <PropertyGroup>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>

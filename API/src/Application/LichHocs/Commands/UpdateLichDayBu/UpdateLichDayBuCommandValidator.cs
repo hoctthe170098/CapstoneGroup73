@@ -108,7 +108,7 @@ public class UpdateLichDayBuCommandValidator : AbstractValidator<UpdateLichDayBu
     {
         var ngayNghi = _context.LichHocs
             .Where(lh => lh.LichHocGocId == lichHocId && lh.NgayKetThuc == DateOnly.MinValue
-            && lh.TrangThai == "Học bù")
+            && lh.TrangThai == "Dạy bù")
             .Select(lh => lh.NgayHocGoc)
             .FirstOrDefault();
         return ngayNghi;
@@ -139,7 +139,7 @@ public class UpdateLichDayBuCommandValidator : AbstractValidator<UpdateLichDayBu
         if (string.IsNullOrEmpty(token))
             throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
         var coSoId = _identityService.GetCampusId(token);
-        var lichHoc = await _context.LichHocs.FirstOrDefaultAsync(lh => lh.TenLop == command.TenLop && lh.Phong.CoSoId == coSoId);
+        var lichHoc = await _context.LichHocs.FirstOrDefaultAsync(lh => lh.TenLop == command.TenLop && lh.Phong.CoSoId == coSoId&&lh.TrangThai=="Cố định");
         if (lichHoc == null) return false;
         if (lichHoc.NgayKetThuc < lichDayBu.NgayHocBu || lichHoc.NgayBatDau > lichDayBu.NgayHocBu) return false;
         var coSo = await _context.Phongs

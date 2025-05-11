@@ -51,7 +51,7 @@ public class TeacherAssignmentListWithPaginationQueryHandler : IRequestHandler<T
 
         if (string.IsNullOrEmpty(token))
             throw new Exception("Token không hợp lệ hoặc bị thiếu.");
-
+        var coSoId = _identityService.GetCampusId(token);
         var userId = _identityService.GetUserId(token).ToString();
 
         var hocSinh = await _context.HocSinhs
@@ -64,7 +64,8 @@ public class TeacherAssignmentListWithPaginationQueryHandler : IRequestHandler<T
 
         // Kiểm tra học sinh có tham gia lớp này không
         var isInClass = await _context.ThamGiaLopHocs
-            .AnyAsync(tg => tg.HocSinhCode == hocSinhCode && tg.LichHoc.TenLop == tenLop, cancellationToken);
+            .AnyAsync(tg => tg.HocSinhCode == hocSinhCode 
+            && tg.LichHoc.TenLop == tenLop&&tg.LichHoc.Phong.CoSoId==coSoId, cancellationToken);
 
         if (!isInClass)
             throw new NotFoundIDException();
@@ -73,11 +74,11 @@ public class TeacherAssignmentListWithPaginationQueryHandler : IRequestHandler<T
         var now = DateTime.Now;
         var expiredAssignments = await _context.BaiTaps
             .Where(bt => bt.LichHoc.TenLop == tenLop &&
+                         bt.LichHoc.Phong.CoSoId==coSoId &&
                          bt.ThoiGianKetThuc.HasValue &&
                          bt.ThoiGianKetThuc.Value <= now &&
                          bt.TrangThai != "Kết thúc")
             .ToListAsync(cancellationToken);
-
         foreach (var baiTap in expiredAssignments)
         {
             baiTap.TrangThai = "Kết thúc";
@@ -93,7 +94,9 @@ public class TeacherAssignmentListWithPaginationQueryHandler : IRequestHandler<T
             .AsNoTracking()
             .Where(bt =>
                 bt.LichHoc.TenLop == tenLop &&
-                bt.LichHoc.ThamGiaLopHocs.Any(tg => tg.HocSinhCode == hocSinhCode));
+                bt.LichHoc.Phong.CoSoId == coSoId &&
+                bt.LichHoc.ThamGiaLopHocs
+                .Any(tg => tg.HocSinhCode == hocSinhCode&&tg.NgayKetThuc >= DateOnly.FromDateTime(bt.NgayTao)));
 
         if (!string.IsNullOrWhiteSpace(request.TrangThai) && request.TrangThai.ToLower() != "all")
         {

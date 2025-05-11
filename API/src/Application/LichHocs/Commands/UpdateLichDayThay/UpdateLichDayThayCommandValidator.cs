@@ -99,7 +99,7 @@ public class UpdateLichDayThayCommandValidator : AbstractValidator<UpdateLichDay
     {
         var ngayNghi = _context.LichHocs
             .Where(lh => lh.LichHocGocId == lichHocId && lh.NgayKetThuc == DateOnly.MinValue
-            && lh.TrangThai == "Học bù")
+            && lh.TrangThai == "Dạy bù")
             .Select(lh => lh.NgayHocGoc)
             .FirstOrDefault();
         return ngayNghi;

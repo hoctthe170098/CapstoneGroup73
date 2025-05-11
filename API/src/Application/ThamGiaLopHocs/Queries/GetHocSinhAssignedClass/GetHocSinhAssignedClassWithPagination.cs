@@ -38,7 +38,7 @@ public class GetHocSinhAssignedClassWithPaginationHandler
         if (string.IsNullOrEmpty(token))
             throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
         var userId = _identityService.GetUserId(token);
-
+        var coSoId = _identityService.GetCampusId(token);
         var hocSinh = await _context.HocSinhs
             .FirstOrDefaultAsync(hs => hs.UserId == userId.ToString(), cancellationToken);
 
@@ -46,7 +46,7 @@ public class GetHocSinhAssignedClassWithPaginationHandler
             throw new Exception("Không tìm thấy giáo viên tương ứng với tài khoản.");
 
         var query = _context.ThamGiaLopHocs
-            .Where(t => t.HocSinhCode == hocSinh.Code && t.LichHoc.TrangThai == "Cố định")
+            .Where(t => t.HocSinhCode == hocSinh.Code && t.LichHoc.TrangThai == "Cố định"&&t.LichHoc.Phong.CoSoId==coSoId)
             .Select(t => t.LichHoc)
             .GroupBy(l => l.TenLop)
             .Select(g => new LichHoc

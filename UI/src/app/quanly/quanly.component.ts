@@ -372,8 +372,7 @@ export class AccountmanagerComponent implements OnInit {
     const provinceName = this.selectedProvince ? this.selectedProvince.name : "Không xác định";
     const districtName = this.selectedDistrict ? this.selectedDistrict.name : "Không xác định";
 
-    const fullAddress = `${provinceName}, ${districtName}, ${this.editmanager.diaChi.trim()}`;
-
+    const fullAddress = `${this.editmanager.diaChi.trim()}, ${districtName}, ${provinceName}`;
     const updatedHs = {
       code: this.editmanager.code,
       ten: this.editmanager.ten,

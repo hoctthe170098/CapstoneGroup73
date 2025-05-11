@@ -72,15 +72,11 @@ public class CreateTraLoiCommandHandler : IRequestHandler<CreateTraLoiCommand, O
         // ❗ Kiểm tra trạng thái bài tập
         if (baiTap.TrangThai == "Kết thúc")
             throw new InvalidOperationException("Bài tập đã kết thúc, bạn không thể gửi câu trả lời.");
-
         // Kiểm tra học sinh có học lớp này không
         var isThamGiaLop = await _context.ThamGiaLopHocs
-            .AnyAsync(tg => tg.LichHocId == baiTap.LichHocId && tg.HocSinhCode == hocSinhCode, cancellationToken);
-
+            .AnyAsync(tg => tg.LichHocId == baiTap.LichHocId && tg.HocSinhCode == hocSinhCode&&tg.NgayKetThuc>=DateOnly.FromDateTime(baiTap.NgayTao), cancellationToken);
         if (!isThamGiaLop)
             throw new UnauthorizedAccessException("Bạn không có quyền trả lời bài tập này vì không thuộc lớp học tương ứng.");
-
-
         // Lưu file nếu có
         string? fileUrl = null;
         if (request.TepDinhKem != null)

@@ -35,7 +35,7 @@ public class GetHocSinhsInClassQueriesHandler : IRequestHandler<GetHocSinhsInCla
         if (string.IsNullOrEmpty(token))
             throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
         var userId = _identityService.GetUserId(token);
-
+        var coSoId = _identityService.GetCampusId(token);
         var giaoVien = await _context.GiaoViens
             .FirstOrDefaultAsync(gv => gv.UserId == userId.ToString(), cancellationToken);
 
@@ -43,14 +43,14 @@ public class GetHocSinhsInClassQueriesHandler : IRequestHandler<GetHocSinhsInCla
             throw new Exception("Không tìm thấy giáo viên tương ứng với tài khoản.");
 
         var isTeachingClass = await _context.LichHocs
-            .AnyAsync(ld => ld.GiaoVienCode == giaoVien.Code && ld.TenLop == request.TenLop, cancellationToken);
-
+            .AnyAsync(ld => ld.GiaoVienCode == giaoVien.Code && ld.TenLop == request.TenLop&&ld.Phong.CoSoId==coSoId, cancellationToken);    
         if (!isTeachingClass)
             throw new NotFoundIDException();
-
+        var HomNay = DateOnly.FromDateTime(DateTime.Now);
         var list = await _context.ThamGiaLopHocs
             .Include(t => t.LichHoc)
-            .Where(t => t.LichHoc.TenLop == request.TenLop)
+            .Where(t => t.LichHoc.TenLop == request.TenLop&&t.LichHoc.Phong.CoSoId==coSoId
+            && t.NgayBatDau<=HomNay&&t.NgayKetThuc>=HomNay)
             .Select(t => t.HocSinh)
             .Distinct()
             .OrderByDescending(hs => hs.Ten)

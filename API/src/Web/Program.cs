@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 using StudyFlow.Infrastructure.Data;
 using StudyFlow.Web.Endpoints;
 
@@ -15,55 +17,60 @@ builder.Services.AddWebServices();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+
+// Cấu hình kích thước request lớn (cho multipart/form-data)
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 100_000_000; // 100MB
+});
+
+// Cấu hình Kestrel để chấp nhận request lớn
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 100_000_000; // 100MB
+});
+
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Middleware pipeline
+app.UseSwagger();
+app.UseSwaggerUI(settings =>
 {
-    await app.InitialiseDatabaseAsync();
+    settings.SwaggerEndpoint("/api/specification.json", "StudyFlowProject API");
+    settings.RoutePrefix = "swagger";
+});
 
-    app.UseSwagger();
-    app.UseSwaggerUI(settings =>
-    {
-        settings.SwaggerEndpoint("/api/specification.json", "StudyFlowProject API");
-        settings.RoutePrefix = "swagger";
-    });
-
-    // Thêm middleware chuyển hướng
-    app.Use(async (context, next) =>
-    {
-        if (context.Request.Path == "/")
-        {
-            context.Response.Redirect("/swagger/index.html");
-            return;
-        }
-        await next();
-    });
-}
-else
+// Redirect root to Swagger
+app.Use(async (context, next) =>
 {
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    if (context.Request.Path == "/")
+    {
+        context.Response.Redirect("/swagger/index.html");
+        return;
+    }
+    await next();
+});
+
+await app.InitialiseDatabaseAsync();
+
+if (!app.Environment.IsDevelopment())
+{
     app.UseHsts();
 }
 
-app.UseHealthChecks("/health");
+// Quan trọng: Thứ tự middleware chuẩn
+app.UseCors(options => options
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .WithExposedHeaders("Authorization")); // Cho phép client đọc header Authorization
+
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.UseAuthentication();  // Đặt trước UseAuthorization
+app.UseAuthorization();   // Đặt trước các middleware cần xác thực
+app.UseStaticFiles();     // Đặt sau auth để file tĩnh không cần xác thực
 app.MapRazorPages();
-
-
-app.UseExceptionHandler(options => { });
-app.UseCors(
-    options => options.
-    WithOrigins("http://localhost:4200")
-    .AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+app.UseExceptionHandler(); // Chỉ gọi một lần
 app.MapEndpoints();
-app.UseExceptionHandler();
+
 app.Run();
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(builder.Environment.ContentRootPath, "uploads")),
-    RequestPath = "/uploads"
-});
 public partial class Program { }

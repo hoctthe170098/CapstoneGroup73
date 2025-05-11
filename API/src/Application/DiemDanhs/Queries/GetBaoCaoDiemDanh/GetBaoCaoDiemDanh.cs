@@ -56,12 +56,12 @@ public class GetBaoCaoDiemDanhQueryHandler : IRequestHandler<GetBaoCaoDiemDanhQu
         var listHocBu = _context.LichHocs
             .Where(lh => lh.TenLop == request.TenLop 
             && lh.GiaoVienCode == giaoVien.Code 
-            && lh.TrangThai == "Học bù")
+            && lh.TrangThai == "Dạy bù")
             .ToList();
         foreach(var hocBu in listHocBu)
         {
             if (hocBu.NgayHocGoc < ngayHienTai) NgayDaHoc.Remove((DateOnly)hocBu.NgayHocGoc);
-            if (hocBu.NgayBatDau < ngayHienTai) NgayDaHoc.Add(hocBu.NgayBatDau);
+            if (hocBu.NgayBatDau < ngayHienTai && hocBu.NgayBatDau!=DateOnly.MinValue) NgayDaHoc.Add(hocBu.NgayBatDau);
         }
         var data = new List<BaoCaoDiemDanhDto>();
         foreach(var ngay in NgayDaHoc)

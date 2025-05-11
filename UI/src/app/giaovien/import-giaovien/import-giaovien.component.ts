@@ -3,6 +3,7 @@ import { GiaovienService } from '../shared/giaovien.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { saveAs } from 'file-saver';
 @Component({
   selector: 'app-import-giaovien',
   templateUrl: './import-giaovien.component.html',
@@ -119,6 +120,16 @@ export class ImportGiaovienComponent {
   goBack() {
     window.history.back();
   }
-
+  downloadtemplate(){
+    this.giaovienService.downloadTemplateGiaoViens().subscribe(
+      (response: Blob) => {
+        const fileName = 'TemplateDanhSachGiaoVien.xlsx';
+        saveAs(response, fileName);
+      },
+      (error) => {
+        console.error(' Lỗi khi xuất file:', error);
+      }
+    );
+  }
   
 }

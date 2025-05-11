@@ -45,9 +45,8 @@ export class EditchuongtrinhComponent implements OnInit {
     this.spinner.show();
     this.chuongtrinhService.getProgramById(this.programId).subscribe({
       next: (response) => {
-        this.spinner.show();
+        this.spinner.hide();
         if (!response) {
-          this.spinner.hide();
           return;
         }
         // Gán dữ liệu vào program
@@ -253,8 +252,8 @@ export class EditchuongtrinhComponent implements OnInit {
     this.spinner.show();
     this.chuongtrinhService.updateProgram(formData).subscribe({
       next: (response) => {
-        if (response.isError) {
-          this.spinner.hide();
+        this.spinner.hide();
+        if (response.isError) {   
           this.toastr.warning(response.message );
         } else {
           this.toastr.success("Cập nhật chương trình thành công!");

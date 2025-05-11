@@ -52,7 +52,7 @@ public class UpdateTraLoiCommandValidator : AbstractValidator<UpdateTraLoiComman
         var traLoi = await _context.TraLois
         .AsNoTracking()
             .FirstOrDefaultAsync(t => t.Id == command.TraLoiId && t.HocSinhCode == hocSinh.Code, token);
-        if (traLoi?.Baitap == null) return false;
+        if(traLoi == null) return false;
         if (traLoi.Diem != null || traLoi.NhanXet != null) return false;
         return true;
     }

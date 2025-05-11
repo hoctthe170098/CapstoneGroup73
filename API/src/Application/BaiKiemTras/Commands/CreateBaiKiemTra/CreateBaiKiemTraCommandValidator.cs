@@ -48,7 +48,7 @@ public class UpdateBaiKiemTraCommandValidator : AbstractValidator<CreateBaiKiemT
     {
         return await _context.LichHocs.AnyAsync(lh => lh.TenLop == command.BaiKiemTraDto.TenLop
         && lh.NgayHocGoc == ngayKiemTra
-        && lh.TrangThai == "Học bù");
+        && lh.TrangThai == "Dạy bù");
     }
 
     private async Task<bool> ValidLopDaHocDuSoBuoi(string tenLop, CancellationToken token)

@@ -136,7 +136,7 @@ public record CreateLichDayBuCommand : IRequest<Output>
                     NgayKetThuc = lichDayBu.NgayKetThuc,
                     HocSinhCode = hs,
                     LichHocId = lichDayBu.Id,
-                    TrangThai = "Học bù",
+                    TrangThai = "Dạy bù",
                 };
                 _context.ThamGiaLopHocs.Add(thamGia);
             }

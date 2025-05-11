@@ -47,7 +47,7 @@ public class GetListBaiTapChoGiaoVienWithPaginationQueryHandler
             throw new Exception("Token không hợp lệ hoặc bị thiếu.");
 
         var userId = _identityService.GetUserId(token).ToString();
-
+        var coSoId = _identityService.GetCampusId(token);
         var giaoVien = await _context.GiaoViens
             .AsNoTracking()
             .FirstOrDefaultAsync(gv => gv.UserId == userId, cancellationToken)
@@ -59,7 +59,7 @@ public class GetListBaiTapChoGiaoVienWithPaginationQueryHandler
             .Include(bt => bt.LichHoc)
             .Where(bt =>
                 bt.LichHoc.GiaoVienCode == giaoVienCode &&
-                bt.LichHoc.TenLop == request.TenLop);
+                bt.LichHoc.TenLop == request.TenLop&&bt.LichHoc.Phong.CoSoId==coSoId);
 
         // Lọc theo trạng thái nếu có
         if (!string.IsNullOrWhiteSpace(request.TrangThai) && request.TrangThai.ToLower() != "all")

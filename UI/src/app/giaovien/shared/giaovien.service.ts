@@ -56,6 +56,12 @@ exportGiaoViensToExcel(): Observable<Blob> {
 
   return this.http.post(`${this.baseUrl}/exportgiaovienstoexcel`, {}, { headers, responseType: 'blob' });
 }
+downloadTemplateGiaoViens(): Observable<Blob> {
+  const token = localStorage.getItem('token');
+  const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+  return this.http.post(`${this.baseUrl}/downloadtemplateexcelgiaovien`, {}, { headers, responseType: 'blob' });
+}
 importGiaoViensFromExcel(file: File): Observable<any> {
   const token = localStorage.getItem('token');
   const headers = new HttpHeaders({

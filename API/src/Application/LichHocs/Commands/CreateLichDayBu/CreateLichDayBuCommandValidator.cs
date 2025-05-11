@@ -97,7 +97,7 @@ public class UpdateLichDayBuCommandValidator : AbstractValidator<CreateLichDayBu
             foreach(var lich in lichHocSinhVien)
             {
                 var thamGia = _context.ThamGiaLopHocs
-                    .First(tg=>tg.LichHocId==tg.Id&&tg.HocSinhCode==code);
+                    .First(tg=>tg.LichHocId==lich.Id&&tg.HocSinhCode==code);
                 if (thamGia.NgayKetThuc < lichDayBu.NgayHocBu) lichHocSinhVien.Remove(lich);
             }
             var checkLichSinhVien = lichHocSinhVien
@@ -118,7 +118,7 @@ public class UpdateLichDayBuCommandValidator : AbstractValidator<CreateLichDayBu
         var ngayNghi = _context.LichHocs
             .Where(lh => lh.LichHocGocId == lichHocId && lh.NgayKetThuc == DateOnly.MinValue
             && lh.Phong.CoSoId == coSoId
-            && lh.TrangThai == "Học bù")
+            && lh.TrangThai == "Dạy bù")
             .Select(lh => lh.NgayHocGoc)
             .FirstOrDefault();
         return ngayNghi;
@@ -155,7 +155,7 @@ public class UpdateLichDayBuCommandValidator : AbstractValidator<CreateLichDayBu
         if (string.IsNullOrEmpty(token))
             throw new UnauthorizedAccessException("Token không hợp lệ hoặc bị thiếu.");
         var coSoId = _identityService.GetCampusId(token);
-        var lichHoc = await _context.LichHocs.FirstOrDefaultAsync(lh => lh.TenLop == command.TenLop&&lh.Phong.CoSoId==coSoId);
+        var lichHoc = await _context.LichHocs.FirstOrDefaultAsync(lh => lh.TenLop == command.TenLop&&lh.Phong.CoSoId==coSoId&&lh.TrangThai=="Cố định");
         if (lichHoc == null) return false;
         if(lichHoc.NgayKetThuc<lichDayBu.NgayHocBu||lichHoc.NgayBatDau>lichDayBu.NgayHocBu) return false;
         var coSo = await _context.Phongs

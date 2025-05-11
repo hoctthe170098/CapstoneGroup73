@@ -7,7 +7,7 @@
         <input type="file" (change)="onFileSelected($event)" />
         <div class="template-note">
           File import có định dạng <strong>.xls</strong> hoặc <strong>.xlsx</strong>. 
-          <a href="assets/templates/template-import-hocsinh.xlsx" download class="download-link">
+          <a (click)="downloadtemplate()" class="download-link">
             Download template file
           </a>.
         </div>

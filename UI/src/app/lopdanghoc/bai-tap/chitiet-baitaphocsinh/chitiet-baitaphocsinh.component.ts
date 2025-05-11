@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { saveAs } from 'file-saver';
 import { LopdanghocService } from 'app/lopdanghoc/shared/lopdanghoc.service';
 import { ToastrService } from 'ngx-toastr';
@@ -32,6 +32,7 @@ export class ChitietBaitaphocsinhComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private lopdanghocService: LopdanghocService,
     private cdr: ChangeDetectorRef, 
+    private router: Router,
     private toastr: ToastrService
   ) {}
 
@@ -70,6 +71,8 @@ export class ChitietBaitaphocsinhComponent implements OnInit, OnDestroy {
         if (!res.isError) {
           this.baiTapDetail = res.data;
           this.startCountdown(res.data.secondsUntilDeadline);
+        }else {
+          if(res.code==404) this.router.navigate(['/pages/error']);
         }
       },
       error: (err) => {

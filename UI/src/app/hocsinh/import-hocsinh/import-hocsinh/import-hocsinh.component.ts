@@ -3,6 +3,7 @@ import { HocSinhService } from 'app/hocsinh/shared/hocsinh.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { saveAs } from 'file-saver';
 @Component({
   selector: 'app-import-hocsinh',
   templateUrl: './import-hocsinh.component.html',
@@ -115,5 +116,16 @@ export class ImportHocsinhComponent {
 
   goBack() {
     window.history.back();
+  }
+  downloadtemplate(){
+    this.hocSinhService.downloadTemplateHocSinhs().subscribe(
+      (response: Blob) => {
+        const fileName = 'TemplateDanhSachHocSinh.xlsx';
+        saveAs(response, fileName);
+      },
+      (error) => {
+        console.error(' Lỗi khi xuất file:', error);
+      }
+    );
   }
 }

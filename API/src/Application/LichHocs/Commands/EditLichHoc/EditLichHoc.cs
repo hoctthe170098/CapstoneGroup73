@@ -70,22 +70,14 @@ public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Out
                         if (thamGia.NgayKetThuc > ngayHienTai)
                         {
                             _context.ThamGiaLopHocs.Remove(thamGia);
+                            await _context.SaveChangesAsync(cancellationToken);
                         }
                     }
                     else
                     {
                         _context.ThamGiaLopHocs.Remove(thamGia);
+                        await _context.SaveChangesAsync(cancellationToken);
                     }
-                    //if (await _context.DiemDanhs.AnyAsync(dh => dh.ThamGiaLopHocId == thamGia.Id
-                    //&& dh.ThamGiaLopHoc.LichHoc.TrangThai == "Cố định"))
-                    //{
-                    //    thamGia.NgayKetThuc = DateOnly.FromDateTime(DateTime.Now);
-                    //    thamGia.TrangThai = lh.TrangThai;
-                    //}
-                    //else
-                    //{
-                    //    _context.ThamGiaLopHocs.Remove(thamGia);
-                    //}
                 }
                 var codeHocSinhCanThem = request.LopHocDto.HocSinhCodes
                     .Where(hs => !_context.ThamGiaLopHocs
@@ -113,6 +105,7 @@ public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Out
                             TrangThai = lh.TrangThai
                         };
                         _context.ThamGiaLopHocs.Add(thamGiaLopHoc);
+                        await _context.SaveChangesAsync(cancellationToken);
                     }
                     var lichHocBuTuongLai = await _context.LichHocs
                         .Where(l=>l.LichHocGocId==lh.Id
@@ -131,6 +124,7 @@ public class EditLichHocCommandHandler : IRequestHandler<EditLichHocCommand, Out
                             TrangThai = hocBu.TrangThai
                         };
                         _context.ThamGiaLopHocs.Add(thamGiaLopHocBu);
+                        await _context.SaveChangesAsync(cancellationToken);
                     }
                 }
             }

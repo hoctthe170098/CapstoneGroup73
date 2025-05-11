@@ -114,7 +114,7 @@ public class CreateLichDayThayCommandValidator : AbstractValidator<CreateLichDay
             .Where(lh=>lh.LichHocGocId==lichHocId
             &&lh.Phong.CoSoId == coSoId
             &&lh.NgayKetThuc==DateOnly.MinValue
-            &&lh.TrangThai=="Học bù")
+            &&lh.TrangThai=="Dạy bù")
             .Select(lh=>lh.NgayHocGoc)
             .FirstOrDefault();
          return ngayNghi;

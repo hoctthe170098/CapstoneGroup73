@@ -53,7 +53,7 @@ public class EditLichHocCommandValidator : AbstractValidator<EditLichHocCommand>
         var HomNay = DateOnly.FromDateTime(DateTime.Now);
         var ThuHomNay = (int)HomNay.DayOfWeek>0?(int)(HomNay.DayOfWeek)+1:8;
         return !await _context.LichHocs
-            .AnyAsync(lh => lh.Phong.CoSoId == coSoId && lh.TenLop == tenLop 
+            .AnyAsync(lh => lh.Phong.CoSoId == coSoId && lh.TenLop == tenLop && lh.NgayBatDau<=HomNay&&lh.NgayKetThuc>=HomNay
             && ((lh.Thu == ThuHomNay&&lh.TrangThai=="Cố định")
             ||(lh.TrangThai=="Dạy bù"&&lh.NgayKetThuc==HomNay)));
     }
